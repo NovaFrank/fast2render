@@ -8,6 +8,11 @@ const routes = [
     path: '/',
     name: 'home',
   },
+  {
+    path: '/rfq',
+    name: 'rfq',
+    component: () => import('@/views/rfq/index')
+  },
 ]
 
 const router = new VueRouter({

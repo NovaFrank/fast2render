@@ -1,6 +1,6 @@
 module.exports = {
   //路径前缀
-  publicPath: "/",
+  publicPath: "./",
   lintOnSave: true,
   productionSourceMap: false,
   devServer: {

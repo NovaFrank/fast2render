@@ -1,0 +1,53 @@
+// 全局变量
+@import './variables.scss';
+// ele样式覆盖
+@import './element-ui.scss';
+// 顶部右侧显示
+@import './top.scss';
+// 导航标签
+@import './tags.scss';
+// 工具类函数
+@import './mixin.scss';
+// 侧面导航栏
+@import './sidebar.scss';
+// 动画
+@import './animate/vue-transition.scss';
+//主题
+@import './theme/index.scss';
+//适配
+@import './media.scss';
+//通用配置
+@import './normalize.scss';
+
+a{
+  text-decoration: none;
+  color:#333;
+}
+*{
+  outline: none;
+}
+.inline{
+  display: inline-block;
+}
+.clear {
+  clear: both;
+}
+.m-r-sm{
+  margin-right: 10px;
+}
+.m-r-md{
+  margin-right: 20px;
+}
+.m-t-md{
+  margin-top: 20px;
+}
+.collapse-custome .el-collapse-item__header{
+  background-color: #f2f2f2;
+  padding-left: 20px;
+}
+ul, li {
+  list-style: none;
+  padding: 0;
+}
+//滚动条样式
+@include scrollBar;

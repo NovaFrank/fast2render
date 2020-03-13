@@ -14,7 +14,6 @@ export const getList = (elsAccount, page, params) => {
     }
   });
 };
-
 export const delData = (elsAccount, purchaseRequestItemVOs) => {
   // 采购申请管理页面 删除 数据
   return axios({
@@ -26,7 +25,6 @@ export const delData = (elsAccount, purchaseRequestItemVOs) => {
     }
   });
 };
-
 export const getDetailList = (elsAccount, purchaseRequestNumber) => {
   // 获取采购申请详情页面数据
   return axios({

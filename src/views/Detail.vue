@@ -1,10 +1,15 @@
 <template>
   <basic-container>
-    <el-row type="flex" class="row-bg" justify="end">
-      <div class="grid-content">
-        <button-group :option="btnOption" @item-save="itemSave"></button-group>
-      </div>
-    </el-row>
+    <form-header
+      titleText="新建订单"
+      showButton
+      :buttons="headerButtons"
+      @on-cancel="handleCancel"
+      @on-release="handleRelease"
+      @on-save="handleSave"
+    ></form-header>
+    <!-- <button-group :option="btnOption" @item-save="itemSave"></button-group> -->
+
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-form
       v-if="formOption.column"
@@ -42,22 +47,6 @@
         @row-update="rowUpdate"
         ref="crud"
       >
-        <!-- <template slot="menuLeft">
-          <el-button type="primary" size="small" @click="downloadExcelTemp">下载模板</el-button>
-          <el-upload
-            style="display: inline-block;"
-            :show-file-list="false"
-            action="https://cs.51qqt.com/qqt-srm/rest/inquiry/PurchaseRequestService/importExcel"
-            :before-upload="beforeUploadExcel"
-            :data="{
-                elsAccount: '307000',
-                fbk20: url,
-                fbk30: tableCode
-              }"
-          >
-            <el-button type="primary" size="small">导入 excel</el-button>
-          </el-upload>
-        </template> -->
       </avue-crud>
     </span>
     <h5>表单文件</h5>
@@ -69,10 +58,6 @@
         :page.sync="page"
         ref="uploadCrud"
       >
-        <!-- <template slot="menuLeft">
-          <el-button type="primary" size="small">上传</el-button>
-          <el-button type="primary" size="small">下载</el-button>
-        </template> -->
       </avue-crud>
     </span>
     <el-dialog
@@ -106,7 +91,7 @@
 </template>
 
 <script>
-import ButtonGroup from "@/common/ButtonGroup";
+import FormHeader from "@/components/formHeader";
 import {
   getDetailList,
   handleData,
@@ -122,7 +107,7 @@ import {
 } from "@/api/inquiry.js";
 export default {
   components: {
-    ButtonGroup
+    FormHeader
   },
   name: "Detail",
   props: {
@@ -227,6 +212,26 @@ export default {
           }
         ]
       },
+      headerButtons: [
+        {
+          text: "取消",
+          type: "",
+          size: "",
+          action: "on-cancel"
+        },
+        {
+          text: "发布",
+          type: "primary",
+          size: "",
+          action: "on-release"
+        },
+        {
+          text: "保存",
+          type: "primary",
+          size: "",
+          action: "on-save"
+        }
+      ],
       dialogCrudObj: {},
       dialogCrudData: [],
       dialogCrudOption: {
@@ -254,7 +259,6 @@ export default {
         {
           name: "btn-save",
           label: "保存",
-          icon: "el-icon-plus",
           size: "small",
           type: "primary",
           action: "item-save",
@@ -263,7 +267,6 @@ export default {
         {
           name: "btn-submitAudit",
           label: "提交审批",
-          icon: "el-icon-plus",
           size: "small",
           type: "primary",
           action: "item-submit",
@@ -272,7 +275,6 @@ export default {
         {
           name: "btn-cancelAudit",
           label: "撤销审批",
-          icon: "el-icon-plus",
           size: "small",
           type: "primary",
           action: "item-cancel",
@@ -281,7 +283,6 @@ export default {
         {
           name: "btn-process",
           label: "审批流程",
-          icon: "el-icon-plus",
           size: "small",
           type: "primary",
           action: "item-process",
@@ -672,7 +673,12 @@ export default {
       // 删除
       this.crudData.splice(index, 1);
       this.params.deleteList.push(row);
-    }
+    },
+    handleCancel() {
+      this.$router.back();
+    },
+    handleRelease() {},
+    handleSave() {}
   }
 };
 </script>
@@ -680,5 +686,19 @@ export default {
 <style scoped lang="scss">
 .avue-crud {
   width: 100%;
+}
+.form-header {
+  display: flex;
+  height: 80px;
+  line-height: 80px;
+}
+.form-title {
+  margin: 0px 20px;
+  font-size: 20px;
+  font-weight: bold;
+}
+.form-buttons {
+  position: absolute;
+  right: 20px;
 }
 </style>

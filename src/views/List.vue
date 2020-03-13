@@ -23,7 +23,7 @@
           </template>
           <template slot-scope="{ row }" slot="purchaseRequestNumber">
             <router-link
-              :to="`inapproval/${row.purchaseRequestNumber}_${row.requestType}`"
+              :to="`edit/${row.purchaseRequestNumber}_${row.requestType}`"
             >
               <el-tag>{{ row.purchaseRequestNumber }}</el-tag>
             </router-link>

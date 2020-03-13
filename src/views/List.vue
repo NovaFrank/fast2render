@@ -16,15 +16,10 @@
           ref="crud"
         >
           <template slot="menuLeft">
-            <button-group
-              :option="btnOption"
-              @item-add="itemAdd"
-            ></button-group>
+            <button-group :option="btnOption" @item-add="itemAdd"></button-group>
           </template>
           <template slot-scope="{ row }" slot="purchaseRequestNumber">
-            <router-link
-              :to="`edit/${row.purchaseRequestNumber}_${row.requestType}`"
-            >
+            <router-link :to="`edit/${row.purchaseRequestNumber}_${row.requestType}`">
               <el-tag>{{ row.purchaseRequestNumber }}</el-tag>
             </router-link>
             <!-- <router-link :to="`inapproval/${row.purchaseRequestNumber}_${row.requestType}`">
@@ -39,8 +34,8 @@
 </template>
 
 <script>
-import ButtonGroup from "@/common/ButtonGroup";
-import { getList, delData } from "@/api/inquiry.js";
+import ButtonGroup from '@/common/ButtonGroup';
+import { getList, delData } from '@/api/inquiry.js';
 export default {
   components: {
     ButtonGroup
@@ -55,40 +50,40 @@ export default {
         total: 0,
         pageSize: 20
       },
-      activeName: "first",
+      activeName: 'first',
       updateObj: {}, // todo 上传的数据
       tabOption: {
         column: [
           {
-            label: "新建",
-            prop: "tab1"
+            label: '新建',
+            prop: 'tab1'
           },
           {
-            label: "审批中",
-            prop: "tab2"
+            label: '审批中',
+            prop: 'tab2'
           },
           {
-            label: "审批通过",
-            prop: "tab3"
+            label: '审批通过',
+            prop: 'tab3'
           },
           {
-            label: "审批拒绝",
-            prop: "tab4"
+            label: '审批拒绝',
+            prop: 'tab4'
           }
         ]
       },
       crudObj: {},
       crudData: [
         {
-          status: "新建",
-          auditStatus: "审批通过",
-          applicationNumber: "12003827276",
-          rowNumber: "1",
-          type: "采购申请",
-          materialNumber: "127989832",
-          materialDesc: "临渴掘井阿萨德",
-          number: "233",
-          applicateUser: "Mr.wang"
+          status: '新建',
+          auditStatus: '审批通过',
+          applicationNumber: '12003827276',
+          rowNumber: '1',
+          type: '采购申请',
+          materialNumber: '127989832',
+          materialDesc: '临渴掘井阿萨德',
+          number: '233',
+          applicateUser: 'Mr.wang'
         }
       ],
       crudOption: {
@@ -96,63 +91,63 @@ export default {
         border: true,
         stripe: true,
         index: true,
-        indexLabel: "序号",
+        indexLabel: '序号',
         page: false,
         addBtn: false,
         editBtn: false,
-        align: "center",
-        menuAlign: "center",
-        menuWidth: "80",
+        align: 'center',
+        menuAlign: 'center',
+        menuWidth: '80',
         column: []
       },
       btnOption: [
         {
-          name: "btn-add",
-          label: "新建",
-          size: "small",
-          type: "primary",
-          action: "item-add",
-          align: "btn-left"
+          name: 'btn-add',
+          label: '新建',
+          size: 'small',
+          type: 'primary',
+          action: 'item-add',
+          align: 'btn-left'
         },
         {
-          name: "btn-submitAudit",
-          label: "提交审批",
-          size: "small",
-          type: "primary",
-          action: "item-submit",
-          align: "btn-left"
+          name: 'btn-submitAudit',
+          label: '提交审批',
+          size: 'small',
+          type: 'primary',
+          action: 'item-submit',
+          align: 'btn-left'
         },
         {
-          name: "btn-cancelAudit",
-          label: "撤销审批",
-          size: "small",
-          type: "primary",
-          action: "item-cancel",
-          align: "btn-left"
+          name: 'btn-cancelAudit',
+          label: '撤销审批',
+          size: 'small',
+          type: 'primary',
+          action: 'item-cancel',
+          align: 'btn-left'
         },
         {
-          name: "btn-process",
-          label: "审批流程",
-          size: "small",
-          type: "primary",
-          action: "item-process",
-          align: "btn-left"
+          name: 'btn-process',
+          label: '审批流程',
+          size: 'small',
+          type: 'primary',
+          action: 'item-process',
+          align: 'btn-left'
         },
         {
-          name: "btn-provider",
-          label: "发给供方",
-          size: "small",
-          type: "primary",
-          action: "item-sendprovider",
-          align: "btn-left"
+          name: 'btn-provider',
+          label: '发给供方',
+          size: 'small',
+          type: 'primary',
+          action: 'item-sendprovider',
+          align: 'btn-left'
         },
         {
-          name: "btn-recall",
-          label: "撤回",
-          size: "small",
-          type: "primary",
-          action: "item-recall",
-          align: "btn-left"
+          name: 'btn-recall',
+          label: '撤回',
+          size: 'small',
+          type: 'primary',
+          action: 'item-recall',
+          align: 'btn-left'
         }
       ]
     };
@@ -171,47 +166,47 @@ export default {
       //   dicData: DIC.auditStatus
       // },
       {
-        label: "订单号",
-        prop: "purchaseRequestNumber",
+        label: '订单号',
+        prop: 'purchaseRequestNumber',
         width: 170,
         search: true,
         slot: true
       },
       {
-        label: "ELS账号",
-        prop: "requestItemNumber"
+        label: 'ELS账号',
+        prop: 'requestItemNumber'
       },
       {
-        label: "公司名称",
-        prop: "requestType"
+        label: '公司名称',
+        prop: 'requestType'
       },
       {
-        label: "创建日期",
-        prop: "materialNumber",
+        label: '创建日期',
+        prop: 'materialNumber',
         width: 130,
         search: true,
         overHidden: true
       },
       {
-        label: "时间戳",
-        prop: "materialDesc",
+        label: '时间戳',
+        prop: 'materialDesc',
         width: 130,
         search: true,
         overHidden: true
       },
       {
-        label: "订单类型",
-        prop: "quantity"
+        label: '订单类型',
+        prop: 'quantity'
       },
       {
-        label: "采购负责人",
-        prop: "unitQuantity"
+        label: '采购负责人',
+        prop: 'unitQuantity'
       }
     ];
   },
   computed: {
     leftStyle: function() {
-      return this.flag === true ? "el-icon-s-fold" : "el-icon-s-unfold";
+      return this.flag === true ? 'el-icon-s-fold' : 'el-icon-s-unfold';
     }
   },
   methods: {
@@ -219,40 +214,40 @@ export default {
     toggleLeft() {
       this.flag = !this.flag;
       if (this.flag === false) {
-        this.$refs.leftWrapper.style.display = "none";
-        this.$refs.rightWrapper.style.width = 100 + "%";
-        this.$refs.toggle.style.left = 10 + "px";
+        this.$refs.leftWrapper.style.display = 'none';
+        this.$refs.rightWrapper.style.width = 100 + '%';
+        this.$refs.toggle.style.left = 10 + 'px';
       } else {
-        this.$refs.leftWrapper.style.display = "block";
-        this.$refs.rightWrapper.style.width = "calc(100% - 220px)";
-        this.$refs.toggle.style.left = 220 + "px";
+        this.$refs.leftWrapper.style.display = 'block';
+        this.$refs.rightWrapper.style.width = 'calc(100% - 220px)';
+        this.$refs.toggle.style.left = 220 + 'px';
       }
     },
     // 获取列表数据
     onLoad(page, params = {}) {
-      getList("307000", page, params).then(res => {
+      getList('307000', page, params).then((res) => {
         this.crudData = res.data.rows;
         this.page.total = res.data.total;
       });
     },
     itemAdd() {
       // 新增
-      this.$router.push({ path: "/create" });
+      this.$router.push({ path: '/create' });
     },
     itemSubmit() {
       // 提交审批
       // this.$router.push({ path: '/' })
-      console.log("submit");
+      console.log('submit');
     },
     itemCancel() {
       // 撤销审批
       // this.$router.push({ path: '/' })
-      console.log("cancel");
+      console.log('cancel');
     },
     itemProcess() {
       // 审批流程
       // this.$router.push({ path: '/' })
-      console.log("process");
+      console.log('process');
     },
     itemSendProvider() {
       // 发给供方
@@ -263,15 +258,15 @@ export default {
     rowDel(row, index) {
       // 删除
       this.$confirm(`确认修改？`, {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
         .then(() => {
-          return delData("307000", row);
+          return delData('307000', row);
         })
         .then(() => {
-          this.$message.success("修改成功!");
+          this.$message.success('修改成功!');
           this.onLoad(this.page);
         });
     },
@@ -301,17 +296,17 @@ export default {
         pageSize: 20
       };
       this.crudData = [];
-      if (tab.prop === "tab1") {
+      if (tab.prop === 'tab1') {
         this.onLoad(this.page);
-      } else if (tab.prop === "tab2") {
+      } else if (tab.prop === 'tab2') {
         this.auditStatusSearch(2);
-      } else if (tab.prop === "tab3") {
+      } else if (tab.prop === 'tab3') {
         this.auditStatusSearch(0);
       } else {
         return false;
       }
       this.type = tab;
-      console.log("this.type :", this.type);
+      console.log('this.type :', this.type);
     }
   }
 };

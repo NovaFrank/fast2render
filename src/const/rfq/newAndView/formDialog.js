@@ -1,57 +1,57 @@
 export default {
-  column:[
+  column: [
     {
       type: 'select',
       label: '物料编号',
-      prop: 'materialNo',
+      prop: 'materialNo'
     },
     {
       label: '物料描述',
-      prop: 'materialDesc',
+      prop: 'materialDesc'
     },
     {
       label: '规格',
-      prop: 'standards',
+      prop: 'standards'
     },
     {
       label: '单位',
-      prop: 'unit',
+      prop: 'unit'
     },
     {
       type: 'date',
-      format:'yyyy-MM-dd',
-      valueFormat:'yyyy-MM-dd',
+      format: 'yyyy-MM-dd',
+      valueFormat: 'yyyy-MM-dd',
       label: '要求交期',
-      prop: 'requireTime',
+      prop: 'requireTime'
     },
     {
       label: '需求数量',
-      prop: 'count',
+      prop: 'count'
     },
     {
       label: 'ELS账号',
-      prop: 'elsCount',
+      prop: 'elsCount'
     },
     {
       type: 'select',
       label: '供应商',
-      prop: 'supplier',
+      prop: 'supplier'
     },
     {
       type: 'date',
-      format:'yyyy-MM-dd',
-      valueFormat:'yyyy-MM-dd',
+      format: 'yyyy-MM-dd',
+      valueFormat: 'yyyy-MM-dd',
       label: '交货日期',
-      prop: 'deadline',
+      prop: 'deadline'
     },
     {
       type: 'select',
       label: '报价方式',
-      prop: 'quoteType',
+      prop: 'quoteType'
     },
     {
       label: '设置成本报价',
-      prop: 'setQuote',
+      prop: 'setQuote'
     }
   ],
   menuBtn: true,
@@ -59,5 +59,5 @@ export default {
   submitBtn: false,
   submitSize: 'medium',
   submitText: '保存',
-  menuPosition: 'center',
-}
+  menuPosition: 'center'
+};

@@ -18,41 +18,51 @@ export default {
     border: true,
     highlightCurrentRow: true,
     index: true,
-    column:[
+    column: [
       {
         label: '物料编号',
-        prop: 'materialNo',
-      }, {
+        prop: 'materialNo'
+      },
+      {
         label: '物料描述',
-        prop: 'materialDesc',
-      }, {
+        prop: 'materialDesc'
+      },
+      {
         label: '规格',
-        prop: 'standards',
-      }, {
+        prop: 'standards'
+      },
+      {
         label: '单位',
-        prop: 'unit',
-      }, {
+        prop: 'unit'
+      },
+      {
         label: '要求交期',
-        prop: 'requireTime',
-      }, {
+        prop: 'requireTime'
+      },
+      {
         label: '需求数量',
-        prop: 'count',
-      }, {
+        prop: 'count'
+      },
+      {
         label: 'ELS账号',
-        prop: 'elsCount',
-      }, {
+        prop: 'elsCount'
+      },
+      {
         label: '供应商',
-        prop: 'supplier',
-      }, {
+        prop: 'supplier'
+      },
+      {
         label: '交货日期',
-        prop: 'deadline',
-      }, {
+        prop: 'deadline'
+      },
+      {
         label: '报价方式',
-        prop: 'quoteType',
-      }, {
+        prop: 'quoteType'
+      },
+      {
         label: '设置成本报价',
-        prop: 'setQuote',
+        prop: 'setQuote'
       }
     ]
-  },
-}
+  }
+};

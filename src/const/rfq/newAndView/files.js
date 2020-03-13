@@ -7,8 +7,8 @@ export default {
       {
         prop: 'imgUrl',
         type: 'upload',
-        tip: '只能上传jpg/png文件，且不超过500kb',
+        tip: '只能上传jpg/png文件，且不超过500kb'
       }
     ]
   }
-}
+};

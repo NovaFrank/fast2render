@@ -3,12 +3,12 @@ export default {
     column: [
       {
         label: '询价明细',
-        prop: 'detail',
+        prop: 'detail'
       },
       {
         label: '表单文件',
         prop: 'files'
       }
     ]
-  },
-}
+  }
+};

@@ -8,5 +8,5 @@ export const DIC = {
       label: 'N',
       value: 'N'
     }
-  ],
-}
+  ]
+};

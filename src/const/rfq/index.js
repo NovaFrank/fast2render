@@ -18,41 +18,51 @@ export default {
     border: true,
     highlightCurrentRow: true,
     index: true,
-    column:[
+    column: [
       {
         label: '询价单号',
-        prop: 'inquiryNo',
-      }, {
+        prop: 'inquiryNo'
+      },
+      {
         label: '询价类型',
-        prop: 'inquiryType',
-      }, {
+        prop: 'inquiryType'
+      },
+      {
         label: 'ELS账号',
-        prop: 'elsCount',
-      }, {
+        prop: 'elsCount'
+      },
+      {
         label: '公司名称',
-        prop: 'companyName',
-      }, {
+        prop: 'companyName'
+      },
+      {
         label: '询价日期',
-        prop: 'inquiryTime',
-      }, {
+        prop: 'inquiryTime'
+      },
+      {
         label: '报价截止日期',
-        prop: 'quoteDeadline',
-      }, {
+        prop: 'quoteDeadline'
+      },
+      {
         label: '物料名称',
-        prop: 'materialName',
-      }, {
+        prop: 'materialName'
+      },
+      {
         label: '物料描述',
-        prop: 'materialDesc',
-      }, {
+        prop: 'materialDesc'
+      },
+      {
         label: '数量',
-        prop: 'count',
-      }, {
+        prop: 'count'
+      },
+      {
         label: '交货日期',
-        prop: 'deadline',
-      }, {
+        prop: 'deadline'
+      },
+      {
         label: '创建人',
-        prop: 'creator',
+        prop: 'creator'
       }
     ]
-  },
-}
+  }
+};

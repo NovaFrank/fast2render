@@ -1,5 +1,5 @@
 // 注册信息字段、资质准入字段 dialog
-import { DIC } from '../../dic'
+import { DIC } from '../../dic';
 
 export default {
   column: [
@@ -9,40 +9,40 @@ export default {
       label: '询价类型',
       span: 6,
       prop: 'formBusiness',
-      valueDefault: '',
+      valueDefault: ''
     },
     {
       type: 'date',
-      format:'yyyy-MM-dd',
-      valueFormat:'yyyy-MM-dd',
+      format: 'yyyy-MM-dd',
+      valueFormat: 'yyyy-MM-dd',
       label: '询价日期',
       span: 6,
-      prop: 'inquiryTime',
+      prop: 'inquiryTime'
     },
     {
       type: 'date',
-      format:'yyyy-MM-dd',
-      valueFormat:'yyyy-MM-dd',
+      format: 'yyyy-MM-dd',
+      valueFormat: 'yyyy-MM-dd',
       label: '截止日期',
       span: 6,
-      prop: 'quoteDeadline',
+      prop: 'quoteDeadline'
     },
     {
       type: 'input',
       label: '负责人',
       span: 6,
-      prop: 'inCharge',
+      prop: 'inCharge'
     },
     {
       type: 'input',
       label: '备注',
-      prop: 'mark',
-    },
+      prop: 'mark'
+    }
   ],
   menuBtn: true,
   emptyBtn: false,
   submitBtn: false,
   submitSize: 'medium',
   submitText: '保存',
-  menuPosition: 'center',
-}
+  menuPosition: 'center'
+};

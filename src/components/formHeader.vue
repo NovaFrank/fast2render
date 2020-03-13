@@ -36,16 +36,28 @@ export default {
             action: 'on-cancel'
           },
           {
-            text: '发布',
+            text: '撤销审批',
             type: 'primary',
             size: '',
-            action: 'on-release'
+            action: 'recall'
           },
           {
             text: '保存',
             type: 'primary',
             size: '',
             action: 'on-save'
+          },
+          {
+            text: '审批流程',
+            type: 'primary',
+            size: '',
+            action: 'on-approval'
+          },
+          {
+            text: '提交审批',
+            type: 'primary',
+            size: '',
+            action: 'on-submit'
           }
         ];
       }

@@ -5,12 +5,12 @@ module.exports = {
   productionSourceMap: false,
   devServer: {
     proxy: {
-      '/inquiry': {
+      '/apis': {
         target: 'https://cs.51qqt.com/qqt-srm/rest',
         ws: true,
         changOrigin: true,
         pathRequiresRewrite: {
-          '^/inquiry': '/'
+          '^/apis': '/'
         }
       }
     }

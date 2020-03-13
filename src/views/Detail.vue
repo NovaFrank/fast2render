@@ -12,13 +12,33 @@
 
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-form v-if="formOption.column" :option="formOption" v-model="formObj" ref="form">
-      <template slot="applicationType">
+      <template slot="orderType">
         <div>
-          <el-select
-            v-model="applicationTypeValue"
-            @change="selectChange"
-            :disabled="selectDisabled"
-          >
+          <el-select v-model="orderTypeValue" @change="selectChange">
+            <el-option
+              v-for="item in dicData"
+              :key="item.fieldValue"
+              :label="item.fieldValueText"
+              :value="item.fieldValue"
+            ></el-option>
+          </el-select>
+        </div>
+      </template>
+      <template slot="purchaseType">
+        <div>
+          <el-select v-model="purchaseTypeValue" @change="selectChange">
+            <el-option
+              v-for="item in dicData"
+              :key="item.fieldValue"
+              :label="item.fieldValueText"
+              :value="item.fieldValue"
+            ></el-option>
+          </el-select>
+        </div>
+      </template>
+      <template slot="purchaseGroup">
+        <div>
+          <el-select v-model="purchaseGroupValue" @change="selectChange">
             <el-option
               v-for="item in dicData"
               :key="item.fieldValue"
@@ -78,20 +98,6 @@
 
 <script>
 import FormHeader from '@/components/formHeader';
-
-import {
-  getDetailList,
-  handleData,
-  getApplicationType,
-  getTablePageConfig,
-  findTableColumnConfig,
-  generateExcel,
-  uploadServlet,
-  queryMaterialList,
-  convertExecute,
-  findSubAccountByKeyWord,
-  findPriceByMaterialNumber
-} from '@/api/inquiry.js';
 export default {
   components: {
     FormHeader
@@ -126,8 +132,19 @@ export default {
       tableCode: '',
       formColumn: [],
       tableColumn: [],
-      applicationTypeValue: '', // 申请类型的值
-      dicData: [], // 申请类型选项
+      orderTypeValue: '', // 订单类型的值
+      purchaseTypeValue: '',
+      purchaseGroupValue: '',
+      dicData: [
+        {
+          fieldValue: 1,
+          fieldValueText: '测试一'
+        },
+        {
+          fieldValue: 2,
+          fieldValueText: '测试二'
+        }
+      ], // 订单类型选项
       selectDisabled: false, // 编辑时进入，select不能更改
       purchaseRequestNumber: '', // 采购申请号
       page: {
@@ -145,7 +162,17 @@ export default {
       },
 
       crudObj: {},
-      crudData: [],
+      crudData: [
+        {
+          orderNumber: '12003827276',
+          elsAccount: '127989832',
+          supplierName: '彩虹有限公司',
+          createDate: '2020-03-02',
+          unix: '2020-03-02',
+          orderType: '类型1',
+          purchasePerson: '李雷'
+        }
+      ],
       crudOption: {
         dialogDirection: 'rtl',
         dialogType: 'drawer',
@@ -162,7 +189,53 @@ export default {
         // addRowBtn: true,
         // cellBtn: true,
         rowKey: '$index', // todo 需要一个固定的主键，来防止点击行取消时，数据被删
-        column: []
+        column: [
+          {
+            label: '物料编码',
+            prop: 'materialNumber',
+            slot: true
+          },
+          {
+            label: '物料描述',
+            prop: 'materialDesc'
+          },
+          {
+            label: '规格',
+            prop: 'materialSpec'
+          },
+          {
+            label: '单位',
+            prop: 'unitQuantity'
+          },
+          {
+            label: '要求交期',
+            prop: 'deliveryDate'
+          },
+          {
+            label: '需求数量',
+            prop: 'quantity'
+          },
+          {
+            label: 'ELS账号',
+            prop: 'elsAccount'
+          },
+          {
+            label: '供应商',
+            prop: 'elsName'
+          },
+          {
+            label: '交货日期',
+            prop: 'receivedTime'
+          },
+          {
+            label: '含税价',
+            prop: 'budgetPrice'
+          },
+          {
+            label: '不含税价',
+            prop: 'nobudgetPrice'
+          }
+        ]
       },
       uploadObj: {},
       uploadData: [],
@@ -201,22 +274,22 @@ export default {
       },
       headerButtons: [
         {
-          text: '取消',
-          type: '',
-          size: '',
-          action: 'on-cancel'
-        },
-        {
-          text: '发布',
+          text: '审批流程',
           type: 'primary',
-          size: '',
-          action: 'on-release'
+          size: 'small',
+          action: 'on-approval'
         },
         {
           text: '保存',
           type: 'primary',
-          size: '',
+          size: 'small',
           action: 'on-save'
+        },
+        {
+          text: '提交审批',
+          type: 'primary',
+          size: 'small',
+          action: 'on-submit'
         }
       ],
       dialogCrudObj: {},
@@ -286,159 +359,140 @@ export default {
     // this.formOption.column = this.formColumn // 初始化默认显示的表单
     if (this.isEdit) {
       this.selectDisabled = true;
-      // 申请类型的值
-      this.applicationTypeValue = this.$route.params && this.$route.params.id.split('_')[1];
-      this.purchaseRequestNumber = this.$route.params && this.$route.params.id.split('_')[0];
+      // 订单类型的值
+      // todo
       if (this.purchaseRequestNumber) {
         this.fechList(this.page, this.purchaseRequestNumber);
       }
     }
-    await getApplicationType('307000', {
-      tableName: 'purchaseRequisition',
-      fieldName: 'requisitionType',
-      configColumnCount: '0'
-    }).then((res) => {
-      // 获取申请类型配置
-      this.dicData = res.data.rows;
-      if (this.isEdit === false) {
-        this.applicationTypeValue = res.data.rows[0].fieldValue;
-        this.selectChange(this.applicationTypeValue);
-      }
-    });
+    // this.dicData = res.data.rows;
+    if (this.isEdit === false) {
+      // this.orderTypeValue = res.data.rows[0].fieldValue;
+      this.selectChange(this.orderTypeValue);
+    }
     this.fetchConfig();
     if (this.isEdit === true) {
       // 只有编辑状态下才有默认选项
-      this.selectChange(this.applicationTypeValue);
+      this.selectChange(this.orderTypeValue);
     }
   },
   methods: {
     // 获取采购负责人
     getSubAccount(page) {
-      findSubAccountByKeyWord('307000', page).then((res) => {
-        this.dialogTitle = '选择采购负责人';
-        this.dialogCrudData = res.data.rows;
-        this.page.total = res.data.total;
-        this.dialogCrudOption.column = [
-          {
-            label: '过滤条件',
-            prop: 'keyWord',
-            hide: true,
-            search: true,
-            searchPlaceholder: '子账号/姓名'
-          },
-          {
-            label: '子账号',
-            prop: 'elsSubAccount',
-            overHidden: true
-          },
-          {
-            label: '姓名',
-            prop: 'name',
-            overHidden: true
-          }
-        ];
-      });
+      this.dialogTitle = '选择采购负责人';
+      // this.dialogCrudData = res.data.rows;
+      // this.page.total = res.data.total;
+      this.dialogCrudOption.column = [
+        {
+          label: '过滤条件',
+          prop: 'keyWord',
+          hide: true,
+          search: true,
+          searchPlaceholder: '子账号/姓名'
+        },
+        {
+          label: '子账号',
+          prop: 'elsSubAccount',
+          overHidden: true
+        },
+        {
+          label: '姓名',
+          prop: 'name',
+          overHidden: true
+        }
+      ];
     },
     // 获取物料的数据
     getmaterialList(page, keyWord) {
-      queryMaterialList('307000', page, keyWord).then((res) => {
-        this.dialogTitle = '选择物料';
-        this.dialogCrudData = res.data.rows;
-        this.page.total = res.data.total;
-        this.dialogCrudOption.column = [
-          {
-            label: '过滤条件',
-            prop: 'keyWord',
-            hide: true,
-            search: true,
-            searchPlaceholder: '物料编码/物料名称/物料描述'
-          },
-          {
-            label: '物料分类编码',
-            prop: 'fbk1',
-            overHidden: true
-          },
-          {
-            label: '物料分类名称',
-            prop: 'fbk16',
-            overHidden: true
-          },
-          {
-            prop: 'materialNumber',
-            width: 120,
-            overHidden: true,
-            label: '物料编号'
-          },
-          {
-            label: '物料名称',
-            prop: 'materialName',
-            overHidden: true
-          },
-          {
-            label: '物料描述',
-            prop: 'materialDesc',
-            overHidden: true
-          },
-          {
-            label: '规格',
-            prop: 'fbk2',
-            overHidden: true
-          },
-          {
-            label: '型号',
-            prop: 'fbk17',
-            overHidden: true
-          },
-          {
-            label: '品牌',
-            prop: 'materialCategory4',
-            overHidden: true
-          },
-          {
-            label: '英文名称',
-            prop: 'fbk3',
-            overHidden: true
-          },
-          {
-            label: '单位',
-            prop: 'basicUnit',
-            overHidden: true
-          },
-          {
-            prop: 'extendFactoryCodeList',
-            label: '工厂',
-            overHidden: true
-          },
-          {
-            prop: 'fbk19',
-            label: 'SAP物料组',
-            overHidden: true
-          },
-          {
-            prop: 'fbk4',
-            label: 'SAP物料号',
-            overHidden: true
-          },
-          {
-            prop: 'purchaseGroup',
-            label: '采购组',
-            overHidden: true
-          }
-        ];
-      });
+      this.dialogTitle = '选择物料';
+      // this.dialogCrudData = res.data.rows;
+      // this.page.total = res.data.total;
+      this.dialogCrudOption.column = [
+        {
+          label: '过滤条件',
+          prop: 'keyWord',
+          hide: true,
+          search: true,
+          searchPlaceholder: '物料编码/物料名称/物料描述'
+        },
+        {
+          label: '物料分类编码',
+          prop: 'fbk1',
+          overHidden: true
+        },
+        {
+          label: '物料分类名称',
+          prop: 'fbk16',
+          overHidden: true
+        },
+        {
+          prop: 'materialNumber',
+          width: 120,
+          overHidden: true,
+          label: '物料编号'
+        },
+        {
+          label: '物料名称',
+          prop: 'materialName',
+          overHidden: true
+        },
+        {
+          label: '物料描述',
+          prop: 'materialDesc',
+          overHidden: true
+        },
+        {
+          label: '规格',
+          prop: 'fbk2',
+          overHidden: true
+        },
+        {
+          label: '型号',
+          prop: 'fbk17',
+          overHidden: true
+        },
+        {
+          label: '品牌',
+          prop: 'materialCategory4',
+          overHidden: true
+        },
+        {
+          label: '英文名称',
+          prop: 'fbk3',
+          overHidden: true
+        },
+        {
+          label: '单位',
+          prop: 'basicUnit',
+          overHidden: true
+        },
+        {
+          prop: 'extendFactoryCodeList',
+          label: '工厂',
+          overHidden: true
+        },
+        {
+          prop: 'fbk19',
+          label: 'SAP物料组',
+          overHidden: true
+        },
+        {
+          prop: 'fbk4',
+          label: 'SAP物料号',
+          overHidden: true
+        },
+        {
+          prop: 'purchaseGroup',
+          label: '采购组',
+          overHidden: true
+        }
+      ];
     },
     // 添加物料
     addMaterial() {
       this.dialogVisible = false;
       if (this.dialogTitle === '选择物料') {
-        let stringifyData = JSON.stringify(this.inputParamJson);
-        convertExecute('307000', '307000', this.typeCode, stringifyData).then((res) => {
-          console.log('res :', JSON.parse(res.data.outputParamJson).itemList[0]);
-          this.crudObj = Object.assign(
-            this.crudObj,
-            JSON.parse(res.data.outputParamJson).itemList[0]
-          );
-        });
+        // todo
       }
       if (this.dialogTitle === '选择采购负责人') {
         this.crudObj.purchasePerson = this.purchaseName;
@@ -468,7 +522,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          this.formObj.requestType = this.applicationTypeValue;
+          this.formObj.requestType = this.orderTypeValue;
           this.$refs.form.validate((vaild) => {
             if (vaild) {
               this.$message.success(JSON.stringify(this.obj0));
@@ -477,10 +531,9 @@ export default {
             }
           });
           console.log('this.formObj :', this.formObj);
-          return handleData('307000', this.purchaseRequestNumber, this.params, this.formObj);
         })
         .then(() => {
-          this.selectChange(this.applicationTypeValue);
+          this.selectChange(this.orderTypeValue);
           this.$message.success('保存成功');
         });
     },
@@ -496,9 +549,7 @@ export default {
     },
     // 生成excel模板
     generateExcelTemp() {
-      generateExcel('307000', this.tableCode).then((res) => {
-        this.downloadMessage = res.data.message;
-      });
+      // todo
     },
     // 下载excel模板
     downloadExcelTemp() {
@@ -509,108 +560,51 @@ export default {
     // 导入excel
     async beforeUploadExcel(file) {
       console.log('file.raw :', file);
-      let response = await uploadServlet('307000', file);
-      console.log('response :', response);
-      /* this.$export.xlsx(file.raw)
-        .then(data => {
-          this.crudData = data.results.splice(1, 1)
-        }) */
     },
     // 选择申请类型的值后触发接口
     async selectChange(value) {
       this.fetchConfig(); // 防止没有配置的选项，form表单显示的是之前的表单配置
-      let data = this.dicData.filter((item) => {
-        return item.fieldValue === value;
-      });
-      // this.pageCode = await `purchaseRequisitionConfig_${value}_${data[0].fbk2}_purchase`
-      this.tableCode = await `${data[0].elsAccount}_purchaseRequisitionConfig_${value}_${data[0].fbk2}_purchase`;
-      this.typeCode = await `${value}_${data[0].fbk2}`; // 接受单据的类型
-      this.generateExcelTemp(); // 生成excel模板
-      // 动态表头
-      getTablePageConfig('307000', this.typeCode).then(async (res) => {
-        let rows = await res.data.rows;
-        if (rows) {
-          let data = rows.map((item) => {
-            let newItem = {
-              span: 6
-            };
-            return Object.assign(item, newItem);
-          });
-          let arr = await this.formColumn.concat(data);
-          let price = await findPriceByMaterialNumber('292000', '39001010001', 'avgPrice');
-          console.log('price :', price);
-          this.formOption.column = arr;
-        }
-      });
-      // 动态表体
-      findTableColumnConfig('307000', '1001', '', this.tableCode).then(async (res) => {
-        let rows = res.data.rows;
-        if (rows) {
-          this.tableColumn = rows.map((item) => {
-            let newItem = {};
-            // ! 添加动态事件。
-            if (item.columnCode === 'materialNumber') {
-              newItem = {
-                click: ({ value, column }) => {
-                  this.dialogVisible = true;
-                  this.getmaterialList(this.page);
-                }
-              };
-              Object.assign(item, newItem);
-            }
-            if (item.columnCode === 'purchasePerson') {
-              newItem = {
-                click: ({ value, column }) => {
-                  this.dialogVisible = true;
-                  this.getSubAccount(this.page);
-                }
-              };
-              Object.assign(item, newItem);
-            }
-            if (item.columnCode === 'fbk1') {
-              newItem = {
-                change: ({ value, column }) => {
-                  console.log('value :', value);
-                  console.log('column :', column);
-                  findPriceByMaterialNumber().then((res) => {
-                    console.log('res :', res);
-                  });
-                }
-              };
-              Object.assign(item, newItem);
-            }
-            return item;
-          });
-        }
-        this.crudOption.column = await this.tableColumn;
-        this.fechList(this.page, this.purchaseRequestNumber);
-      });
     },
     fetchConfig() {
       this.formColumn = [
         {
-          label: '采购申请类型',
-          prop: 'applicationType',
+          label: '订单类型',
+          prop: 'orderType',
           span: 6,
           type: 'select',
           formslot: true,
           rules: [
             {
               required: true,
-              message: '请选择采购申请类型',
+              message: '请选择',
               trigger: 'blur'
             }
           ]
         },
         {
-          label: '标题',
-          prop: 'subject',
+          label: '采购类别',
+          prop: 'purchaseType',
           span: 6,
-          prefixIcon: 'el-icon-tickets',
+          type: 'select',
+          formslot: true,
           rules: [
             {
               required: true,
-              message: '请输入标题',
+              message: '请选择',
+              trigger: 'blur'
+            }
+          ]
+        },
+        {
+          label: '采购组',
+          prop: 'purchaseGroup',
+          span: 6,
+          type: 'select',
+          formslot: true,
+          rules: [
+            {
+              required: true,
+              message: '请选择',
               trigger: 'blur'
             }
           ]
@@ -619,12 +613,10 @@ export default {
       this.formOption.column = this.formColumn;
     },
     fechList(page, purchaseRequestNumber) {
-      getDetailList('307000', purchaseRequestNumber).then((res) => {
-        this.crudData = res.data.purchaseRequestItemVOs;
-        this.page.total = res.data.total;
-        // todo 需要获取sesstion的值来赋值给formObj
-        this.formObj = res.data;
-      });
+      // this.crudData = res.data.purchaseRequestItemVOs;
+      // this.page.total = res.data.total;
+      // todo 需要获取sesstion的值来赋值给formObj
+      // this.formObj = res.data;
     },
     rowSave(row, done, loading) {
       // 保存新增的数据

@@ -18,13 +18,10 @@
           <template slot="menuLeft">
             <button-group :option="btnOption" @item-add="itemAdd"></button-group>
           </template>
-          <template slot-scope="{ row }" slot="purchaseRequestNumber">
-            <router-link :to="`edit/${row.purchaseRequestNumber}_${row.requestType}`">
-              <el-tag>{{ row.purchaseRequestNumber }}</el-tag>
+          <template slot-scope="{ row }" slot="orderNumber">
+            <router-link :to="`edit/${row.orderNumber}_${row.requestType}`">
+              <el-tag>{{ row.orderNumber }}</el-tag>
             </router-link>
-            <!-- <router-link :to="`inapproval/${row.purchaseRequestNumber}_${row.requestType}`">
-              <el-tag>{{row.purchaseRequestNumber}}</el-tag>
-            </router-link> -->
           </template>
         </avue-crud>
       </span>
@@ -35,7 +32,6 @@
 
 <script>
 import ButtonGroup from '@/common/ButtonGroup';
-import { getList, delData } from '@/api/inquiry.js';
 export default {
   components: {
     ButtonGroup
@@ -75,15 +71,13 @@ export default {
       crudObj: {},
       crudData: [
         {
-          status: '新建',
-          auditStatus: '审批通过',
-          applicationNumber: '12003827276',
-          rowNumber: '1',
-          type: '采购申请',
-          materialNumber: '127989832',
-          materialDesc: '临渴掘井阿萨德',
-          number: '233',
-          applicateUser: 'Mr.wang'
+          orderNumber: '12003827276',
+          elsAccount: '127989832',
+          supplierName: '彩虹有限公司',
+          createDate: '2020-03-02',
+          unix: '2020-03-02',
+          orderType: '类型1',
+          purchasePerson: '李雷'
         }
       ],
       crudOption: {
@@ -167,40 +161,32 @@ export default {
       // },
       {
         label: '订单号',
-        prop: 'purchaseRequestNumber',
-        width: 170,
-        search: true,
+        prop: 'orderNumber',
         slot: true
       },
       {
         label: 'ELS账号',
-        prop: 'requestItemNumber'
+        prop: 'elsAccount'
       },
       {
         label: '公司名称',
-        prop: 'requestType'
+        prop: 'supplierName'
       },
       {
         label: '创建日期',
-        prop: 'materialNumber',
-        width: 130,
-        search: true,
-        overHidden: true
+        prop: 'createDate'
       },
       {
         label: '时间戳',
-        prop: 'materialDesc',
-        width: 130,
-        search: true,
-        overHidden: true
+        prop: 'unix'
       },
       {
         label: '订单类型',
-        prop: 'quantity'
+        prop: 'orderType'
       },
       {
         label: '采购负责人',
-        prop: 'unitQuantity'
+        prop: 'purchasePerson'
       }
     ];
   },
@@ -225,10 +211,8 @@ export default {
     },
     // 获取列表数据
     onLoad(page, params = {}) {
-      getList('307000', page, params).then((res) => {
-        this.crudData = res.data.rows;
-        this.page.total = res.data.total;
-      });
+      // this.crudData = res.data.rows;
+      // this.page.total = res.data.total;
     },
     itemAdd() {
       // 新增
@@ -263,7 +247,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          return delData('307000', row);
+          // return delData('307000', row);
         })
         .then(() => {
           this.$message.success('修改成功!');

@@ -1,5 +1,49 @@
 <template>
   <div>
+    <div>
+      <el-button
+        type="primary"
+        size="small"
+        @click="handleCreate"
+      >
+        新建
+      </el-button>
+      <el-button
+        v-if="['all', 'new', 'quoting', 'quoted', 'priced', 'approval', 'pass'].includes(tabActive)"
+        type="primary"
+        size="small"
+      >
+        关闭
+      </el-button>
+      <el-button
+        v-if="['all', 'new'].includes(tabActive)"
+        type="primary"
+        size="small"
+      >
+        发布
+      </el-button>
+      <el-button
+        v-if="['all', 'quoted', 'priced'].includes(tabActive)"
+        type="primary"
+        size="small"
+      >
+        提交审批
+      </el-button>
+      <el-button
+        v-if="['all', 'approval', 'pass'].includes(tabActive)"
+        type="primary"
+        size="small"
+      >
+        审批流程
+      </el-button>
+      <el-button
+        v-if="['all', 'approval'].includes(tabActive)"
+        type="primary"
+        size="small"
+      >
+        撤销审批
+      </el-button>
+    </div>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <avue-crud
       :data="tableOption.data"
@@ -8,43 +52,26 @@
       v-model="tableOption.obj"
       @size-change="sizeChange"
       @current-change="currentChange">
-      <!--<template slot-scope="scope" slot="menuRight">
-        <el-button
-          type="primary"
-          @click.stop="handleAddShow('新建类型', {})">新建</el-button>
-      </template>-->
-      <template slot-scope="scope" slot="menu">
-        <el-row :gutter="24">
-          <el-col :span="6">
-            <a class="scope-btn" @click.stop="handleAddShow('编辑类型', scope.row)">
-              编辑
-            </a>
-          </el-col>
-          <el-col :span="6">
-            <a class="scope-btn" @click.stop="handleDelete(scope.row)">
-              删除
-            </a>
-          </el-col>
-        </el-row>
-      </template>
     </avue-crud>
   </div>
 </template>
 
 <script>
-  import tabOption from '@/const/rfq/tabs'
+  import tabOption from '@/const/rfq/navTabs'
   import tableOption from '@/const/rfq/index'
   import { elsFromSta } from '@/api/rfq'
 
   export default {
-    components: {
-      // fieldDialog
-    },
+    components: {},
     data(){
       return{
         tabOption: tabOption,
         tableOption: tableOption,
-        tabActive: 'all'
+        tabActive: 'all',
+        buttons: [{
+          show: true,
+          label: '新建',
+        }]
       }
     },
     created() {
@@ -62,6 +89,9 @@
           currentPage: val,
           pageSize: this.tableOption.page.pageSize
         })
+      },
+      handleCreate() {
+        this.$router.push({ path: '/detail' })
       },
       handleDelete(row) {
         this.$confirm('确定删除？', '提示').then(() => {
@@ -83,7 +113,7 @@
         })
       },
       handleTabChange(value) {
-        this.fbk1 = value.prop
+        this.tabActive = value.prop
       },
       onSaveForm(form) {
         let params = {
@@ -137,8 +167,4 @@
 </script>
 
 <style>
-  .scope-btn {
-    color: #409EFF;
-    cursor: pointer;
-  }
 </style>

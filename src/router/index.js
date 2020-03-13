@@ -9,9 +9,14 @@ const routes = [
     name: 'home',
   },
   {
-    path: '/rfq',
+    path: '/list',
     name: 'rfq',
     component: () => import('@/views/rfq/index')
+  },
+  {
+    path: '/detail',
+    name: 'rfqDetail',
+    component: () => import('@/views/rfq/newAndView')
   },
 ]
 

@@ -3,9 +3,9 @@
 </template>
 
 <script>
-import Detail from "@/views/Detail";
+import Detail from '@/views/Detail';
 export default {
-  name: "Edit",
+  name: 'Edit',
   components: { Detail }
 };
 </script>

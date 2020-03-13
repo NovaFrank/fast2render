@@ -3,9 +3,9 @@
 </template>
 
 <script>
-import Detail from "@/views/Detail";
+import Detail from '@/views/Detail';
 export default {
-  name: "Create",
+  name: 'Create',
   components: { Detail }
 };
 </script>

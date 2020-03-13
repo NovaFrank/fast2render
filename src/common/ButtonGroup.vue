@@ -17,27 +17,27 @@
 
 <script>
 export default {
-  name: "button-group",
+  name: 'button-group',
   inheritAttrs: false,
   props: {
     align: {
       type: String,
-      default: "btns-right"
+      default: 'btns-right'
     },
     option: {
       type: Array,
       default: () => {
         return [
           {
-            name: "btn-add",
-            label: "添加",
-            icon: "el-icon-plus",
-            size: "small",
-            type: "primary",
+            name: 'btn-add',
+            label: '添加',
+            icon: 'el-icon-plus',
+            size: 'small',
+            type: 'primary',
             disabled: false,
             round: false,
-            action: "item-add",
-            align: "btn-right"
+            action: 'item-add',
+            align: 'btn-right'
           }
         ];
       }

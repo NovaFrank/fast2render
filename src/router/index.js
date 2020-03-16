@@ -17,6 +17,11 @@ const routes = [
     path: '/detail',
     name: 'rfqDetail',
     component: () => import('@/views/rfq/newAndView')
+  },
+  {
+    path: '/price',
+    name: 'rfqPrice',
+    component: () => import('@/views/rfq/priceBids')
   }
 ];
 

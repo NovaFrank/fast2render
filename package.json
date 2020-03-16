@@ -12,6 +12,7 @@
     "babel-polyfill": "^6.26.0",
     "classlist-polyfill": "^1.2.0",
     "core-js": "^3.4.4",
+    "echarts": "^4.6.0",
     "element-ui": "^2.13.0",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",

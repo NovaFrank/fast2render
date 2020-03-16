@@ -8,7 +8,7 @@
       @on-release="handleRelease"
       @on-save="handleSave"
     ></form-header>
-    <avue-form ref="form" v-model="form" :option="formOption"> </avue-form>
+    <avue-form ref="form" v-model="form" :option="formOption"></avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <avue-form
       v-if="tabActive === 'files'"

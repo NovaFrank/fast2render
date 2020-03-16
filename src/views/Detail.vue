@@ -49,58 +49,59 @@
         </div>
       </template>
     </avue-form>
-    <h5>物料明细</h5>
-    <span>
-      <avue-crud
-        v-if="crudOption.column"
-        :data="crudData"
-        :option="crudOption"
-        v-model="crudObj"
-        :page.sync="page"
-        @row-save="rowSave"
-        @row-del="rowDel"
-        @row-update="rowUpdate"
-        ref="crud"
-      >
-      </avue-crud>
-    </span>
-    <h5>表单文件</h5>
-    <span>
-      <avue-crud
-        :data="uploadData"
-        :option="uploadCrudOption"
-        v-model="uploadObj"
-        :page.sync="page"
-        ref="uploadCrud"
-      >
-      </avue-crud>
-    </span>
-    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" append-to-body width="80%">
-      <avue-crud
-        v-if="dialogCrudOption.column"
-        :page.sync="page"
-        :data="dialogCrudData"
-        :option="dialogCrudOption"
-        v-model="dialogCrudObj"
-        @current-change="currentChange"
-        @current-row-change="selectionChange"
-        ref="materialCrud"
-      >
-        <template slot="menuLeft">
-          <el-button type="primary" size="small" icon="el-icon-plus" @click="addMaterial"
-            >添 加</el-button
-          >
-        </template>
-      </avue-crud>
-    </el-dialog>
+    <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
+    <avue-crud
+      v-if="tabActive === 'detail'"
+      :data="crudData"
+      :option="materielListOption.option"
+      v-model="crudObj"
+      :page.sync="page"
+      @row-save="rowSave"
+      @row-del="rowDel"
+      @row-update="rowUpdate"
+      ref="crud"
+    >
+      <template slot="menuLeft">
+        <el-button size="small" @click.stop="handleAddLine('添加', {})">添加行</el-button>
+      </template>
+    </avue-crud>
+    <avue-form
+      v-if="tabActive === 'files'"
+      :option="fileOption.option"
+      v-model="filesForm"
+      :upload-before="uploadBefore"
+      :upload-after="uploadAfter"
+    ></avue-form>
+    <avue-form
+      v-if="tabActive === 'plan'"
+      :option="fileOption.option"
+      v-model="filesForm"
+      :upload-before="uploadBefore"
+      :upload-after="uploadAfter"
+    ></avue-form>
+    <common-dialog
+      :dialogTitle="dialogTitle"
+      :dialogOption="dialogOption"
+      :common="commonDialogForm"
+      :commonDialogVisible="commonDialogVisible"
+      :dialogWidth="dialogWidth"
+      @on-save-form="onSaveForm"
+      @close-common-dialog="closeCommonDialog"
+    ></common-dialog>
   </basic-container>
 </template>
 
 <script>
 import FormHeader from '@/components/formHeader';
+import tabOption from '@/const/order/tabs';
+import fileOption from '@/const/order/files';
+import commonDialog from '@/components/commonDialog';
+import addLineOption from '@/const/order/addLine';
+import materielListOption from '@/const/order/materielList';
 export default {
   components: {
-    FormHeader
+    FormHeader,
+    commonDialog
   },
   name: 'Detail',
   props: {
@@ -115,12 +116,21 @@ export default {
   },
   data() {
     return {
-      dialogTitle: '',
       inputParamJson: {
         // 业务类型转换传入的值
         itemList: []
       },
       dialogVisible: false,
+      tabOption: tabOption,
+      tabActive: 'detail',
+      fileOption: fileOption,
+      commonDialogForm: {},
+      commonDialogVisible: false,
+      dialogTitle: '',
+      dialogWidth: '50%',
+      dialogOption: addLineOption,
+      filesForm: {},
+      materielListOption: materielListOption,
       params: {
         addList: [],
         updateList: [],
@@ -160,7 +170,6 @@ export default {
         menuBtn: false,
         column: []
       },
-
       crudObj: {},
       crudData: [
         {
@@ -173,70 +182,7 @@ export default {
           purchasePerson: '李雷'
         }
       ],
-      crudOption: {
-        dialogDirection: 'rtl',
-        dialogType: 'drawer',
-        border: true,
-        stripe: true,
-        index: true,
-        indexLabel: '序号',
-        page: false,
-        align: 'center',
-        menuAlign: 'center',
-        menuWidth: '180',
-        // addBtn: false,
-        // editBtn: false,
-        // addRowBtn: true,
-        // cellBtn: true,
-        rowKey: '$index', // todo 需要一个固定的主键，来防止点击行取消时，数据被删
-        column: [
-          {
-            label: '物料编码',
-            prop: 'materialNumber',
-            slot: true
-          },
-          {
-            label: '物料描述',
-            prop: 'materialDesc'
-          },
-          {
-            label: '规格',
-            prop: 'materialSpec'
-          },
-          {
-            label: '单位',
-            prop: 'unitQuantity'
-          },
-          {
-            label: '要求交期',
-            prop: 'deliveryDate'
-          },
-          {
-            label: '需求数量',
-            prop: 'quantity'
-          },
-          {
-            label: 'ELS账号',
-            prop: 'elsAccount'
-          },
-          {
-            label: '供应商',
-            prop: 'elsName'
-          },
-          {
-            label: '交货日期',
-            prop: 'receivedTime'
-          },
-          {
-            label: '含税价',
-            prop: 'budgetPrice'
-          },
-          {
-            label: '不含税价',
-            prop: 'nobudgetPrice'
-          }
-        ]
-      },
+      crudOption: {},
       uploadObj: {},
       uploadData: [],
       uploadCrudOption: {
@@ -537,6 +483,9 @@ export default {
           this.$message.success('保存成功');
         });
     },
+    handleTabClick(value) {
+      this.tabActive = value.prop;
+    },
     // 切换表格
     async handleChange(column) {
       console.log('column :', column);
@@ -643,7 +592,36 @@ export default {
       this.$router.back();
     },
     handleRelease() {},
-    handleSave() {}
+    handleSave() {},
+    uploadAfter(res, done, loading) {
+      console.log('after upload', res);
+      done();
+    },
+    uploadBefore(file, done, loading) {
+      console.log('before upload', file);
+      // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
+      const newFile = new File([file], '1234', { type: file.type });
+      done(newFile);
+    },
+    handleAddLine(title, row) {
+      this.commonDialogForm =
+        title === '添加'
+          ? {
+              elsAccount: 307000,
+              whetherDefault: 'Y',
+              fromDesc: '',
+              fromBusiness: ''
+            }
+          : row;
+      this.dialogTitle = `${title}物料信息`;
+      this.commonDialogVisible = true;
+    },
+    closeCommonDialog() {
+      this.commonDialogVisible = false;
+    },
+    onSaveForm(form) {
+      // todo
+    }
   }
 };
 </script>

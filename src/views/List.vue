@@ -235,7 +235,6 @@ export default {
     getBtnOption(value) {
       let activeBtnList = [];
       if (value === 'Create') {
-        console.log('aa');
         activeBtnList.push(this.btnOption[0]);
         activeBtnList.push(this.btnOption[1]);
       }

@@ -4,9 +4,8 @@
       <avue-tabs :option="tabOption" @change="handleClick"></avue-tabs>
       <span>
         <avue-crud
-          v-if="crudOption.column"
           :data="crudData"
-          :option="crudOption"
+          :option="formOption.option"
           v-model="crudObj"
           :page.sync="page"
           @on-load="onLoad"
@@ -32,6 +31,7 @@
 
 <script>
 import ButtonGroup from '@/common/ButtonGroup';
+import formOption from '@/const/order/orderFormOption';
 export default {
   components: {
     ButtonGroup
@@ -39,7 +39,7 @@ export default {
   data() {
     return {
       flag: true,
-      type: {},
+      type: 'Create',
       page: {
         // pageSizes: [10, 20, 30, 40],默认
         currentPage: 1,
@@ -49,24 +49,7 @@ export default {
       activeName: 'first',
       updateObj: {}, // todo 上传的数据
       tabOption: {
-        column: [
-          {
-            label: '新建',
-            prop: 'tab1'
-          },
-          {
-            label: '审批中',
-            prop: 'tab2'
-          },
-          {
-            label: '审批通过',
-            prop: 'tab3'
-          },
-          {
-            label: '审批拒绝',
-            prop: 'tab4'
-          }
-        ]
+        column: []
       },
       crudObj: {},
       crudData: [
@@ -80,20 +63,7 @@ export default {
           purchasePerson: '李雷'
         }
       ],
-      crudOption: {
-        menu: false,
-        border: true,
-        stripe: true,
-        index: true,
-        indexLabel: '序号',
-        page: false,
-        addBtn: false,
-        editBtn: false,
-        align: 'center',
-        menuAlign: 'center',
-        menuWidth: '80',
-        column: []
-      },
+      formOption: formOption,
       btnOption: [
         {
           name: 'btn-add',
@@ -112,19 +82,19 @@ export default {
           align: 'btn-left'
         },
         {
-          name: 'btn-cancelAudit',
-          label: '撤销审批',
-          size: 'small',
-          type: 'primary',
-          action: 'item-cancel',
-          align: 'btn-left'
-        },
-        {
           name: 'btn-process',
           label: '审批流程',
           size: 'small',
           type: 'primary',
           action: 'item-process',
+          align: 'btn-left'
+        },
+        {
+          name: 'btn-cancelAudit',
+          label: '撤销审批',
+          size: 'small',
+          type: 'primary',
+          action: 'item-cancel',
           align: 'btn-left'
         },
         {
@@ -142,51 +112,40 @@ export default {
           type: 'primary',
           action: 'item-recall',
           align: 'btn-left'
+        },
+        {
+          name: 'btn-sendmenu',
+          label: '发送货通知单',
+          size: 'small',
+          type: 'primary',
+          action: 'item-sendmenu',
+          align: 'btn-left'
         }
       ]
     };
   },
   created() {
     this.type = this.tabOption.column[0]; // 初始化的tab显示
-    this.crudOption.column = [
-      // {
-      //   label: '单据状态',
-      //   prop: 'fbk35',
-      //   dicData: DIC.fbk35
-      // },
-      // {
-      //   label: '审批状态',
-      //   prop: 'auditStatus',
-      //   dicData: DIC.auditStatus
-      // },
+    this.tabOption.column = [
       {
-        label: '订单号',
-        prop: 'orderNumber',
-        slot: true
+        label: '新建',
+        prop: 'Create'
       },
       {
-        label: 'ELS账号',
-        prop: 'elsAccount'
+        label: '审批中',
+        prop: 'Pending'
       },
       {
-        label: '公司名称',
-        prop: 'supplierName'
+        label: '审批通过',
+        prop: 'Approval'
       },
       {
-        label: '创建日期',
-        prop: 'createDate'
+        label: '供方确认中',
+        prop: 'ProviderPending'
       },
       {
-        label: '时间戳',
-        prop: 'unix'
-      },
-      {
-        label: '订单类型',
-        prop: 'orderType'
-      },
-      {
-        label: '采购负责人',
-        prop: 'purchasePerson'
+        label: '供方已确认',
+        prop: 'ProviderApproval'
       }
     ];
   },
@@ -273,24 +232,39 @@ export default {
     uploadFile(row) {
       // console.log('row :', row)
     },
-    async handleClick(tab) {
-      this.page = {
-        currentPage: 1,
-        total: 0,
-        pageSize: 20
-      };
-      this.crudData = [];
-      if (tab.prop === 'tab1') {
-        this.onLoad(this.page);
-      } else if (tab.prop === 'tab2') {
-        this.auditStatusSearch(2);
-      } else if (tab.prop === 'tab3') {
-        this.auditStatusSearch(0);
-      } else {
-        return false;
+    getBtnOption(value) {
+      let activeBtnList = [];
+      if (value === 'Create') {
+        console.log('aa');
+        activeBtnList.push(this.btnOption[0]);
+        activeBtnList.push(this.btnOption[1]);
       }
-      this.type = tab;
+      if (value === 'Pending') {
+        activeBtnList.push(this.btnOption[0]);
+        activeBtnList.push(this.btnOption[2]);
+        activeBtnList.push(this.btnOption[3]);
+      }
+      if (value === 'Approval') {
+        activeBtnList.push(this.btnOption[0]);
+        activeBtnList.push(this.btnOption[2]);
+        activeBtnList.push(this.btnOption[4]);
+      }
+      if (value === 'ProviderPending') {
+        activeBtnList.push(this.btnOption[0]);
+        activeBtnList.push(this.btnOption[2]);
+        activeBtnList.push(this.btnOption[5]);
+      }
+      if (value === 'ProviderApproval') {
+        activeBtnList.push(this.btnOption[0]);
+        activeBtnList.push(this.btnOption[2]);
+        activeBtnList.push(this.btnOption[6]);
+      }
+      return activeBtnList;
+    },
+    async handleClick(tab) {
+      this.type = tab.prop;
       console.log('this.type :', this.type);
+      this.getBtnOption(this.type);
     }
   }
 };

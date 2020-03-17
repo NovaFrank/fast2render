@@ -5,11 +5,9 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/rfq/list',
+    path: '/list',
     name: 'rfqList',
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '@/views/rfq/index');
-    }
+    component: () => import('@/views/rfq/index')
   },
   {
     path: '/new',

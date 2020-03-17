@@ -74,7 +74,7 @@ export default {
       });
     },
     handleCreate() {
-      this.$router.push({ path: '/detail' });
+      this.$router.push({ path: '/new' });
     },
     handleDelete(row) {
       this.$confirm('确定删除？', '提示').then(() => {

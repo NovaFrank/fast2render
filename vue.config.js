@@ -7,13 +7,13 @@ module.exports = {
     port: 8080,
     disableHostCheck: true,
     proxy: {
-      '/apis': {
+      '/apis/': {
         // 这里最好有一个/
-        target: 'http://cs.51qqt.com/qqt-srm', // 后台接口域名
+        target: 'http://cs.51qqt.com/qqt-srm/rest', // 后台接口域名
         secure: false, // 如果是https接口，需要配置这个参数
         changeOrigin: true, // 是否跨域
         pathRewrite: {
-          '^/apis': ''
+          '^/apis/': ''
         }
       }
     }

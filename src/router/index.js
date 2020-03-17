@@ -5,6 +5,10 @@ Vue.use(VueRouter);
 
 const routes = [
   {
+    path: '/',
+    redirect: '/list'
+  },
+  {
     path: '/list',
     name: 'rfqList',
     component: () => import('@/views/rfq/index')
@@ -27,8 +31,6 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  mode: 'hash',
-  base: process.env.BASE_URL,
   routes
 });
 

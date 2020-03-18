@@ -1,7 +1,7 @@
 <template>
   <basic-container>
     <form-header
-      titleText="新建订单"
+      titleText="预览"
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"

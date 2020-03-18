@@ -8,7 +8,6 @@
           :option="formOption.option"
           v-model="crudObj"
           :page.sync="page"
-          @on-load="onLoad"
           @row-del="rowDel"
           @search-change="search"
           @search-reset="searchReset"
@@ -32,6 +31,7 @@
 <script>
 import ButtonGroup from '@/common/ButtonGroup';
 import formOption from '@/const/order/orderFormOption';
+import { getList } from '@/api/order.js';
 export default {
   components: {
     ButtonGroup
@@ -52,17 +52,7 @@ export default {
         column: []
       },
       crudObj: {},
-      crudData: [
-        {
-          orderNumber: '12003827276',
-          elsAccount: '127989832',
-          supplierName: '彩虹有限公司',
-          createDate: '2020-03-02',
-          unix: '2020-03-02',
-          orderType: '类型1',
-          purchasePerson: '李雷'
-        }
-      ],
+      crudData: [],
       formOption: formOption,
       btnOption: [
         {
@@ -125,6 +115,7 @@ export default {
     };
   },
   created() {
+    this.tableData();
     this.type = this.tabOption.column[0]; // 初始化的tab显示
     this.tabOption.column = [
       {
@@ -169,9 +160,22 @@ export default {
       }
     },
     // 获取列表数据
-    onLoad(page, params = {}) {
-      // this.crudData = res.data.rows;
-      // this.page.total = res.data.total;
+    tableData(data) {
+      const params = {
+        pageSize: this.formOption.page.pageSize || 10,
+        currentPage: 1,
+        ...data
+        // tabActive: this.tabActive
+      };
+      getList('307000', params).then((res) => {
+        console.log(res);
+        // if (res.data.statusCode) {
+        //   this.$message.error(res.data.message);
+        //   return;
+        // }
+        // this.tableOption.data = res.data.rows;
+        // this.tableOption.page.total = res.data.total;
+      });
     },
     itemAdd() {
       // 新增

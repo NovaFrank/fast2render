@@ -8,16 +8,6 @@ const routes = [
     path: '/',
     redirect: '/list'
   },
-  // {
-  //   path: '/peizhi/:id/:valueText',
-  //   name: 'peizhi',
-  //   component: () => import('@/views/Peizhi.vue')
-  // },
-  // {
-  //   path: '/peizhi-list',
-  //   name: 'peizhiList',
-  //   component: () => import('@/views/PeizhiList.vue')
-  // },
   {
     path: '/list',
     name: 'list',
@@ -34,9 +24,9 @@ const routes = [
     name: 'Edit'
   },
   {
-    path: '/inapproval/:id',
-    component: () => import('@/views/InApproval'),
-    name: 'inApproval'
+    path: '/detail/:id',
+    component: () => import('@/views/Detail'),
+    name: 'Detail'
   }
 ];
 

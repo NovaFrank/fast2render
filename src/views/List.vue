@@ -146,19 +146,6 @@ export default {
     }
   },
   methods: {
-    // 切换left关闭打开状态
-    toggleLeft() {
-      this.flag = !this.flag;
-      if (this.flag === false) {
-        this.$refs.leftWrapper.style.display = 'none';
-        this.$refs.rightWrapper.style.width = 100 + '%';
-        this.$refs.toggle.style.left = 10 + 'px';
-      } else {
-        this.$refs.leftWrapper.style.display = 'block';
-        this.$refs.rightWrapper.style.width = 'calc(100% - 220px)';
-        this.$refs.toggle.style.left = 220 + 'px';
-      }
-    },
     // 获取列表数据
     tableData(data) {
       const params = {
@@ -264,6 +251,7 @@ export default {
       }
       return activeBtnList;
     },
+    // 切换表格
     async handleClick(tab) {
       this.type = tab.prop;
       console.log('this.type :', this.type);

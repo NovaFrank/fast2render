@@ -425,10 +425,8 @@ export default {
       done();
     },
 
-    rowUpdate(row, index, done, loading) {
-      // 修改数据
-      this.$set(this.crudData, index, row);
-      this.params.updateList.push(row);
+    rowUpdate(form, index, done, loading) {
+      loading();
       done();
     },
     rowDel(row, index) {

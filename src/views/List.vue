@@ -4,13 +4,17 @@
       <avue-tabs :option="tabOption" @change="handleClick"></avue-tabs>
       <span>
         <avue-crud
-          :data="crudData"
+          v-if="formOption.option.column"
+          :data="formOption.data"
           :option="formOption.option"
           v-model="crudObj"
-          :page.sync="page"
+          :page.sync="formOption.page"
           @row-del="rowDel"
+          @on-load="tableData"
           @search-change="search"
           @search-reset="searchReset"
+          @size-change="sizeChange"
+          @current-change="currentChange"
           ref="crud"
         >
           <template slot="menuLeft">
@@ -115,7 +119,6 @@ export default {
     };
   },
   created() {
-    this.tableData();
     this.type = this.tabOption.column[0]; // 初始化的tab显示
     this.tabOption.column = [
       {
@@ -147,15 +150,11 @@ export default {
   },
   methods: {
     // 获取列表数据
-    tableData(data) {
-      const params = {
-        pageSize: this.formOption.page.pageSize || 10,
-        currentPage: 1,
-        ...data
-        // tabActive: this.tabActive
-      };
-      getList('307000', params).then((res) => {
+    tableData(page, params = {}) {
+      getList('307000', page).then((res) => {
         console.log(res);
+        this.formOption.data = res.data.rows;
+        this.formOption.page.total = res.data.total;
         // if (res.data.statusCode) {
         //   this.$message.error(res.data.message);
         //   return;
@@ -256,6 +255,21 @@ export default {
       this.type = tab.prop;
       console.log('this.type :', this.type);
       this.getBtnOption(this.type);
+    },
+    // 分页
+    currentChange(val) {
+      this.formOption.page.currentPage = val;
+      this.tableData({
+        currentPage: val,
+        pageSize: this.formOption.page.pageSize
+      });
+    },
+    sizeChange(val) {
+      this.formOption.page.pageSize = val;
+      this.tableData({
+        currentPage: 1,
+        pageSize: val
+      });
     }
   }
 };

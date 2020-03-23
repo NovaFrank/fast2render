@@ -7,6 +7,18 @@
     :before-close="closeDialog"
   >
     <avue-form ref="form" :option="dialogOption" v-model="form" class="new-field">
+      <template slot="suppliers">
+        <avue-crud
+          :data="form.suppliers"
+          :option="supplierList.option"
+          @row-save="handleSaveSupplier"
+          @row-del="handleDeleteSupplier"
+        >
+          <template slot="menuLeft">
+            <el-button type="primary" @click="handleShowSupplierSelect">添加</el-button>
+          </template>
+        </avue-crud>
+      </template>
       <template slot="menuForm">
         <el-button @click="closeDialog">取消</el-button>
         <el-button type="primary" @click="handleSubmit">保存</el-button>
@@ -16,6 +28,8 @@
 </template>
 
 <script>
+import supplierList from '@/const/rfq/newAndView/supplierList';
+
 export default {
   name: 'field-dialog',
   components: {},
@@ -34,14 +48,18 @@ export default {
       default: () => {
         return {
           elsAccount: '',
-          fromBusiness: ''
+          fromBusiness: '',
+          suppliers: []
         };
       }
     }
   },
   data() {
     return {
-      form: {}
+      supplierList: supplierList,
+      form: {
+        suppliers: []
+      }
     };
   },
   watch: {
@@ -53,6 +71,18 @@ export default {
   methods: {
     closeDialog() {
       this.$emit('close-field-dialog');
+    },
+    handleDeleteSupplier(row, index) {
+      console.log(row, index);
+      this.form.suppliers.splice(index, 1);
+    },
+    handleSaveSupplier(row, done) {
+      console.log(row);
+      this.form.suppliers.push(row);
+      done();
+    },
+    handleShowSupplierSelect() {
+      this.$emit('show-supplier-select');
     },
     handleSubmit() {
       this.$refs.form.validate((valid) => {

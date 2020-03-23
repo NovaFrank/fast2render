@@ -27,6 +27,11 @@ const routes = [
     path: '/price',
     name: 'rfqPrice',
     component: () => import('@/views/rfq/priceBids')
+  },
+  {
+    path: '/quotationTemplate',
+    name: 'quotationTemplate',
+    component: () => import('@/views/rfq/quotationTemplate/index')
   }
 ];
 

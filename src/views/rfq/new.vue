@@ -52,24 +52,41 @@
       :dialogWidth="dialogWidth"
       @on-save-form="onSaveForm"
       @close-field-dialog="closeFieldDialog"
+      @show-supplier-select="handleShowSupplierSelect"
     ></field-dialog>
+    <SelectDialogTable
+      ref="suppliersDialog"
+      :dialogVisible.sync="suppliersDialogVisable"
+      :title="'从物料基础数据提取'"
+      :column="suppliersDialogOptionColumn"
+      :data="suppliersDialogData"
+      :page="suppliersDialogPage"
+      :queryParam="suppliersDialogQueryParam"
+      :pageParam="suppliersDialogPageParam"
+      :multiple="true"
+      @save="suppliersDialogSave"
+      @handleList="suppliersHandleList"
+    ></SelectDialogTable>
   </div>
 </template>
 
 <script>
 import FormHeader from '@/components/views/formHeader';
 import fieldDialog from '@/components/views/fieldDialog';
+import SelectDialogTable from '@/components/views/SelectDialogTable';
 import fieldDialogOption from '@/const/rfq/newAndView/formDialog';
 import formOption from '@/const/rfq/newAndView/form';
 import tabOption from '@/const/rfq/newAndView/tabs';
 import inquiryListOption from '@/const/rfq/newAndView/inquiryList';
 import filesOption from '@/const/rfq/newAndView/files';
+import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
 import { elsFromSta } from '@/api/rfq';
 
 export default {
   components: {
     FormHeader,
-    fieldDialog
+    fieldDialog,
+    SelectDialogTable
   },
   data() {
     return {
@@ -80,7 +97,9 @@ export default {
       tabActive: 'detail',
       form: {},
       filesForm: {},
-      fieldDialogForm: {},
+      fieldDialogForm: {
+        suppliers: []
+      },
       fieldDialogVisible: false,
       dialogTitle: '',
       dialogWidth: '50%',
@@ -104,7 +123,15 @@ export default {
           size: '',
           action: 'on-save'
         }
-      ]
+      ],
+      // 供应商选择框
+      suppliersDialogVisable: false,
+      suppliersDialogOptionColumn: supplierSelectDialog.option.column,
+      suppliersDialogData: supplierSelectDialog.data,
+      suppliersDialogPage: supplierSelectDialog.page,
+      suppliersDialogQueryParam: {},
+      suppliersDialogPageParam: { pageNo: 1, pageSize: 10 },
+      suppliersSelect: []
     };
   },
   created() {
@@ -152,9 +179,13 @@ export default {
               elsAccount: 307000,
               whetherDefault: 'Y',
               fromDesc: '',
-              fromBusiness: ''
+              fromBusiness: '',
+              suppliers: []
             }
-          : row;
+          : {
+              ...row,
+              suppliers: []
+            };
       this.dialogTitle = `${title}询价明细`;
       this.fieldDialogVisible = true;
     },
@@ -163,10 +194,14 @@ export default {
     },
     handleRelease() {},
     handleSave() {},
+    handleShowSupplierSelect() {
+      this.suppliersDialogVisable = true;
+    },
     handleTabChange(value) {
       this.tabActive = value.prop;
     },
     onSaveForm(form) {
+      console.log('form', form);
       let params = {
         elsAccount: form.elsAccount,
         whetherDefault: form.whetherDefault,
@@ -196,6 +231,40 @@ export default {
         currentPage: 1,
         pageSize: val
       });
+    },
+    suppliersDialogSave(selectItems) {
+      console.log('selectItems', selectItems);
+      selectItems.forEach((item) => {
+        let isExist = false;
+        let newSupplier = {
+          elsCount: item.elsCount,
+          supplierName: item.supplierName,
+          $cellEdit: true
+        };
+        this.fieldDialogForm.suppliers.forEach((supplier) => {
+          if (supplier.elsCount === newSupplier.elsCount) {
+            isExist = true;
+          }
+        });
+        if (!isExist) {
+          this.fieldDialogForm.suppliers.push(newSupplier);
+        }
+      });
+    },
+    suppliersHandleList() {
+      // let listParams = deepClone(this.materialsDialogQueryParam);
+      // Object.assign(listParams, this.materialsDialogPageParam);
+      // getMaterialsData(listParams).then((res) => {
+      //   const data = res.data;
+      //   setTimeout(() => {
+      //     this.materialsDialogData = data.items;
+      //     this.materialsDialogPage = {
+      //       total: data.paginator.total,
+      //       pageSize: data.paginator.pageSize,
+      //       currentPage: data.paginator.currentPage
+      //     };
+      //   }, 1000);
+      // });
     },
     tableData(data) {
       const params = {

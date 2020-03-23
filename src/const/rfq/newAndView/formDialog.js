@@ -33,11 +33,6 @@ export default {
       prop: 'elsCount'
     },
     {
-      type: 'select',
-      label: '供应商',
-      prop: 'supplier'
-    },
-    {
       type: 'date',
       format: 'yyyy-MM-dd',
       valueFormat: 'yyyy-MM-dd',
@@ -52,6 +47,12 @@ export default {
     {
       label: '设置成本报价',
       prop: 'setQuote'
+    },
+    {
+      span: 24,
+      label: '供应商',
+      prop: 'suppliers',
+      formslot: true
     }
   ],
   menuBtn: true,

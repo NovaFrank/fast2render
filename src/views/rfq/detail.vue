@@ -14,18 +14,27 @@
           type="date"
           placeholder="选择日期"
           value-format="yyyy-MM-dd"
-          @change="handleYearChange"
         ></el-date-picker>
+        <!-- @change="handleYearChange" -->
       </template>
     </avue-detail>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
-    <avue-form
+    <avue-crud
       v-if="tabActive === 'files'"
+      :data="filesOption.data"
       :option="filesOption.option"
-      v-model="filesForm"
-      :upload-before="uploadBefore"
-      :upload-after="uploadAfter"
-    ></avue-form>
+      :page.sync="filesOption.page"
+      @size-change="sizeChange"
+      @current-change="currentChange"
+    >
+      <template slot-scope="scope" slot="menu">
+        <el-row :gutter="24">
+          <el-col :span="6">
+            <a :href="scope.url">下载</a>
+          </el-col>
+        </el-row>
+      </template>
+    </avue-crud>
     <avue-crud
       v-if="tabActive === 'detail'"
       :data="inquiryListOption.data"
@@ -35,16 +44,13 @@
       @size-change="sizeChange"
       @current-change="currentChange"
     >
-      <template slot="menuLeft">
-        <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>
-      </template>
       <template slot-scope="scope" slot="menu">
         <el-row :gutter="24">
           <el-col :span="6">
-            <a class="scope-btn" @click.stop="handleAddShow('修改', scope.row)">编辑</a>
+            <a class="scope-btn" @click.stop="handleAcceptShow(scope)">接受</a>
           </el-col>
           <el-col :span="6">
-            <a class="scope-btn">删除</a>
+            <a class="scope-btn">重报价</a>
           </el-col>
         </el-row>
       </template>
@@ -64,11 +70,11 @@
 <script>
 import FormHeader from '@/components/views/formHeader';
 import fieldDialog from '@/components/views/fieldDialog';
-import fieldDialogOption from '@/const/rfq/newAndView/formDialog';
+import fieldDialogOption from '@/const/rfq/newAndView/quoteDialog';
 import formOption from '@/const/rfq/newAndView/detail';
 import tabOption from '@/const/rfq/newAndView/tabs';
 import inquiryListOption from '@/const/rfq/newAndView/inquiryList';
-import filesOption from '@/const/rfq/newAndView/files';
+import filesOption from '@/const/rfq/newAndView/fileList';
 import { elsFromSta } from '@/api/rfq';
 
 export default {
@@ -94,7 +100,7 @@ export default {
       fieldDialogForm: {},
       fieldDialogVisible: false,
       dialogTitle: '',
-      dialogWidth: '50%',
+      dialogWidth: '30%',
       dialogOption: fieldDialogOption,
       headerButtons: [
         {
@@ -131,6 +137,20 @@ export default {
         pageSize: this.inquiryListOption.page.pageSize
       });
     },
+    handleAcceptShow(scope) {
+      console.log('scope', scope.index, scope.row);
+      this.fieldDialogForm = {
+        index: scope.index,
+        quote: scope.row.quote
+      };
+      fieldDialogOption.column[0].label = `${scope.row.materialNo}配额`;
+      this.dialogTitle = `${scope.row.supplier}(${scope.row.elsCount})供应商授标配额`;
+      this.fieldDialogVisible = true;
+    },
+    handleCancel() {
+      this.$router.back();
+    },
+    handleClose() {},
     handleDelete(row) {
       this.$confirm('确定删除？', '提示').then(() => {
         let params = {
@@ -150,50 +170,15 @@ export default {
         });
       });
     },
-    handleAddShow(title, row) {
-      this.fieldDialogForm =
-        title === '添加'
-          ? {
-              elsAccount: 307000,
-              whetherDefault: 'Y',
-              fromDesc: '',
-              fromBusiness: ''
-            }
-          : row;
-      this.dialogTitle = `${title}询价明细`;
-      this.fieldDialogVisible = true;
-    },
-    handleCancel() {
-      this.$router.back();
-    },
-    handleClose() {},
     handleSave() {},
     handleTabChange(value) {
       this.tabActive = value.prop;
     },
+    // 配额保存
     onSaveForm(form) {
-      let params = {
-        elsAccount: form.elsAccount,
-        whetherDefault: form.whetherDefault,
-        fromDesc: form.fromDesc,
-        fromBusiness: form.fromBusiness
-      };
-      let action = 'saveElsFromSta';
-      if (this.dialogTitle === '新建类型') {
-        action = 'insertElsFromSta';
-        params = {
-          ...params,
-          fbk1: this.fbk1
-        };
-      }
-      elsFromSta(action, params).then((res) => {
-        if (res.data.statusCode) {
-          this.$message.error(res.data.message);
-          return;
-        }
-        this.$message.success('保存成功');
-        this.tableData();
-      });
+      console.log('form', form);
+      inquiryListOption.data[form.index].quote = form.quote;
+      this.fieldDialogVisible = false;
     },
     sizeChange(val) {
       this.inquiryListOption.page.pageSize = val;
@@ -203,20 +188,20 @@ export default {
       });
     },
     tableData(data) {
-      const params = {
-        pageSize: this.inquiryListOption.page.pageSize || 10,
-        currentPage: 1,
-        ...data,
-        tabActive: this.tabActive
-      };
-      elsFromSta('queryElsFromSta', params).then((res) => {
-        if (res.data.statusCode) {
-          this.$message.error(res.data.message);
-          return;
-        }
-        this.inquiryListOption.data = res.data.rows;
-        this.inquiryListOption.page.total = res.data.total;
-      });
+      // const params = {
+      //   pageSize: this.inquiryListOption.page.pageSize || 10,
+      //   currentPage: 1,
+      //   ...data,
+      //   tabActive: this.tabActive
+      // };
+      // elsFromSta('queryElsFromSta', params).then((res) => {
+      //   if (res.data.statusCode) {
+      //     this.$message.error(res.data.message);
+      //     return;
+      //   }
+      //   this.inquiryListOption.data = res.data.rows;
+      //   this.inquiryListOption.page.total = res.data.total;
+      // });
     },
     uploadAfter(res, done, loading) {
       console.log('after upload', res);

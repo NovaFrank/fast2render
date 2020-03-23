@@ -1,5 +1,14 @@
 export default {
-  data: [],
+  data: [
+    {
+      materialNo: 'materialNo',
+      materialDesc: 'materialDesc',
+      standards: 'standards',
+      unit: 'unit',
+      elsCount: 'elsCount',
+      supplier: 'supplier'
+    }
+  ],
   page: {
     currentPage: 1,
     total: 0,

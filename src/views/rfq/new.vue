@@ -57,7 +57,7 @@
     <SelectDialogTable
       ref="suppliersDialog"
       :dialogVisible.sync="suppliersDialogVisable"
-      :title="'从物料基础数据提取'"
+      :title="'供应商'"
       :column="suppliersDialogOptionColumn"
       :data="suppliersDialogData"
       :page="suppliersDialogPage"

@@ -6,7 +6,7 @@ let prefix = '/apis';
 export const getList = (elsAccount, page, params) => {
   // 订单管理列表页面 获取 列表数据，删除delData，获取订单详情页面getDetailList，订单详情页面 (行增加、修改与删除)handleData
   return axios({
-    url: `${prefix}/order/OrderService/findPageList`,
+    url: `${prefix}/OrderService/findPageList`,
     method: 'post',
     data: {
       elsAccount,

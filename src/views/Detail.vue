@@ -9,46 +9,8 @@
       @on-save="handleSave"
     ></form-header>
     <!-- <button-group :option="btnOption" @item-save="itemSave"></button-group> -->
-
+    <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail>
     <div class="clear" style="margin-bottom: 30px;"></div>
-    <avue-form v-if="formOption.column" :option="formOption" v-model="formObj" ref="form">
-      <template slot="orderType">
-        <div>
-          <el-select v-model="orderTypeValue" @change="selectChange">
-            <el-option
-              v-for="item in dicData"
-              :key="item.fieldValue"
-              :label="item.fieldValueText"
-              :value="item.fieldValue"
-            ></el-option>
-          </el-select>
-        </div>
-      </template>
-      <template slot="purchaseType">
-        <div>
-          <el-select v-model="purchaseTypeValue" @change="selectChange">
-            <el-option
-              v-for="item in dicData"
-              :key="item.fieldValue"
-              :label="item.fieldValueText"
-              :value="item.fieldValue"
-            ></el-option>
-          </el-select>
-        </div>
-      </template>
-      <template slot="purchaseGroup">
-        <div>
-          <el-select v-model="purchaseGroupValue" @change="selectChange">
-            <el-option
-              v-for="item in dicData"
-              :key="item.fieldValue"
-              :label="item.fieldValueText"
-              :value="item.fieldValue"
-            ></el-option>
-          </el-select>
-        </div>
-      </template>
-    </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
     <avue-crud
       v-if="tabActive === 'detail'"
@@ -61,9 +23,6 @@
       @row-update="rowUpdate"
       ref="crud"
     >
-      <template slot="menuLeft">
-        <el-button size="small" @click.stop="handleAddLine('添加', {})">添加行</el-button>
-      </template>
     </avue-crud>
     <avue-form
       v-if="tabActive === 'files'"
@@ -79,29 +38,18 @@
       :upload-before="uploadBefore"
       :upload-after="uploadAfter"
     ></avue-form>
-    <common-dialog
-      :dialogTitle="dialogTitle"
-      :dialogOption="dialogOption"
-      :common="commonDialogForm"
-      :commonDialogVisible="commonDialogVisible"
-      :dialogWidth="dialogWidth"
-      @on-save-form="onSaveForm"
-      @close-common-dialog="closeCommonDialog"
-    ></common-dialog>
   </basic-container>
 </template>
 
 <script>
 import FormHeader from '@/components/formHeader';
 import tabOption from '@/const/order/tabs';
+import formOption from '@/const/order/detail';
 import fileOption from '@/const/order/files';
-import commonDialog from '@/components/commonDialog';
-import addLineOption from '@/const/order/addLine';
 import materielListOption from '@/const/order/materielList';
 export default {
   components: {
-    FormHeader,
-    commonDialog
+    FormHeader
   },
   name: 'Detail',
   props: {
@@ -120,15 +68,9 @@ export default {
         // 业务类型转换传入的值
         itemList: []
       },
-      dialogVisible: false,
       tabOption: tabOption,
       tabActive: 'detail',
       fileOption: fileOption,
-      commonDialogForm: {},
-      commonDialogVisible: false,
-      dialogTitle: '',
-      dialogWidth: '50%',
-      dialogOption: addLineOption,
       filesForm: {},
       materielListOption: materielListOption,
       params: {
@@ -163,13 +105,15 @@ export default {
         total: 0,
         pageSize: 10
       },
-      formObj: {},
-      formOption: {
-        menuPosition: 'left',
-        labelWidth: 120,
-        menuBtn: false,
-        column: []
+      formObj: {
+        toElsAccount: 'Form Business',
+        toElsAccountName: '111',
+        purchaseGroup: '111',
+        orderNumber: 'In Charge',
+        responsible: 'Mark',
+        purchaseType: 'dddd'
       },
+      formOption: formOption,
       crudObj: {},
       crudData: [
         {
@@ -316,7 +260,7 @@ export default {
       // this.orderTypeValue = res.data.rows[0].fieldValue;
       this.selectChange(this.orderTypeValue);
     }
-    this.fetchConfig();
+    // this.fetchConfig();
     if (this.isEdit === true) {
       // 只有编辑状态下才有默认选项
       this.selectChange(this.orderTypeValue);
@@ -512,54 +456,7 @@ export default {
     },
     // 选择申请类型的值后触发接口
     async selectChange(value) {
-      this.fetchConfig(); // 防止没有配置的选项，form表单显示的是之前的表单配置
-    },
-    fetchConfig() {
-      this.formColumn = [
-        {
-          label: '订单类型',
-          prop: 'orderType',
-          span: 6,
-          type: 'select',
-          formslot: true,
-          rules: [
-            {
-              required: true,
-              message: '请选择',
-              trigger: 'blur'
-            }
-          ]
-        },
-        {
-          label: '采购类别',
-          prop: 'purchaseType',
-          span: 6,
-          type: 'select',
-          formslot: true,
-          rules: [
-            {
-              required: true,
-              message: '请选择',
-              trigger: 'blur'
-            }
-          ]
-        },
-        {
-          label: '采购组',
-          prop: 'purchaseGroup',
-          span: 6,
-          type: 'select',
-          formslot: true,
-          rules: [
-            {
-              required: true,
-              message: '请选择',
-              trigger: 'blur'
-            }
-          ]
-        }
-      ];
-      this.formOption.column = this.formColumn;
+      // this.fetchConfig(); // 防止没有配置的选项，form表单显示的是之前的表单配置
     },
     fechList(page, purchaseRequestNumber) {
       // this.crudData = res.data.purchaseRequestItemVOs;
@@ -602,22 +499,6 @@ export default {
       // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
       const newFile = new File([file], '1234', { type: file.type });
       done(newFile);
-    },
-    handleAddLine(title, row) {
-      this.commonDialogForm =
-        title === '添加'
-          ? {
-              elsAccount: 307000,
-              whetherDefault: 'Y',
-              fromDesc: '',
-              fromBusiness: ''
-            }
-          : row;
-      this.dialogTitle = `${title}物料信息`;
-      this.commonDialogVisible = true;
-    },
-    closeCommonDialog() {
-      this.commonDialogVisible = false;
     },
     onSaveForm(form) {
       // todo

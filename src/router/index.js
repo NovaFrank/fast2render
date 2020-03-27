@@ -24,7 +24,7 @@ const routes = [
     name: 'Edit'
   },
   {
-    path: '/detail/:id',
+    path: '/detail',
     component: () => import('@/views/Detail'),
     name: 'Detail'
   }

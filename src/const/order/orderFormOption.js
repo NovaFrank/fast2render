@@ -1,5 +1,11 @@
 export default {
-  data: [],
+  data: [
+    {
+      orderNumber: '123345',
+      elsAccount: '000000',
+      supplierName: 'iek'
+    }
+  ],
   page: {
     currentPage: 1,
     total: 0,
@@ -14,6 +20,7 @@ export default {
     page: false,
     addBtn: false,
     editBtn: false,
+    highlightCurrentRow: true,
     align: 'center',
     menuAlign: 'center',
     menuWidth: '80',

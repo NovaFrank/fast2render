@@ -60,7 +60,21 @@
       ref="crud"
     >
       <template slot="menuLeft">
-        <el-button size="small" @click.stop="handleAddLine('添加', {})">添加行</el-button>
+        <button-group :option="btnOption" @item-add="itemAdd"></button-group>
+      </template>
+      <template slot-scope="scope" slot="menu">
+        <el-row :gutter="24">
+          <el-col :span="12">
+            <a class="scope-btn" @click.stop="handleAddShow(scope.row)">
+              编辑
+            </a>
+          </el-col>
+          <el-col :span="12">
+            <a class="scope-btn">
+              删除
+            </a>
+          </el-col>
+        </el-row>
       </template>
     </avue-crud>
     <avue-form
@@ -77,29 +91,19 @@
       :upload-before="uploadBefore"
       :upload-after="uploadAfter"
     ></avue-form>
-    <common-dialog
-      :dialogTitle="dialogTitle"
-      :dialogOption="dialogOption"
-      :common="commonDialogForm"
-      :commonDialogVisible="commonDialogVisible"
-      :dialogWidth="dialogWidth"
-      @on-save-form="onSaveForm"
-      @close-common-dialog="closeCommonDialog"
-    ></common-dialog>
   </basic-container>
 </template>
 
 <script>
+import ButtonGroup from '@/common/ButtonGroup';
 import FormHeader from '@/components/formHeader';
 import tabOption from '@/const/order/tabs';
 import fileOption from '@/const/order/files';
-import commonDialog from '@/components/commonDialog';
-import addLineOption from '@/const/order/addLine';
 import materielListOption from '@/const/order/materielList';
 export default {
   components: {
     FormHeader,
-    commonDialog
+    ButtonGroup
   },
   name: 'Detail',
   props: {
@@ -122,11 +126,6 @@ export default {
       tabOption: tabOption,
       tabActive: 'detail',
       fileOption: fileOption,
-      commonDialogForm: {},
-      commonDialogVisible: false,
-      dialogTitle: '',
-      dialogWidth: '50%',
-      dialogOption: addLineOption,
       filesForm: {},
       materielListOption: materielListOption,
       params: {
@@ -261,39 +260,10 @@ export default {
       },
       btnOption: [
         {
-          name: 'btn-save',
-          label: '保存',
-          icon: 'el-icon-plus',
+          name: 'btn-add',
+          label: '添加行',
           size: 'small',
-          type: 'primary',
-          action: 'item-save',
-          align: 'btn-left'
-        },
-        {
-          name: 'btn-submitAudit',
-          label: '提交审批',
-          icon: 'el-icon-plus',
-          size: 'small',
-          type: 'primary',
-          action: 'item-submit',
-          align: 'btn-left'
-        },
-        {
-          name: 'btn-cancelAudit',
-          label: '撤销审批',
-          icon: 'el-icon-plus',
-          size: 'small',
-          type: 'primary',
-          action: 'item-cancel',
-          align: 'btn-left'
-        },
-        {
-          name: 'btn-process',
-          label: '审批流程',
-          icon: 'el-icon-plus',
-          size: 'small',
-          type: 'primary',
-          action: 'item-process',
+          action: 'item-add',
           align: 'btn-left'
         }
       ]
@@ -326,6 +296,9 @@ export default {
       this.page.currentPage = val;
       this.getmaterialList(this.page);
     },
+    itemAdd() {
+      this.$refs.crud.rowAdd();
+    },
     // 保存表头和表单
     itemSave() {
       this.$confirm(`确认添加？`, {
@@ -357,6 +330,9 @@ export default {
         pageSize: 10
       };
       this.tabActive = value.prop;
+    },
+    handleAddShow(row) {
+      this.$refs.crud.rowEdit(row);
     },
     // 选择申请类型的值后触发接口
     async selectChange(value) {
@@ -449,22 +425,6 @@ export default {
       const newFile = new File([file], '1234', { type: file.type });
       done(newFile);
     },
-    handleAddLine(title, row) {
-      this.commonDialogForm =
-        title === '添加'
-          ? {
-              elsAccount: 307000,
-              whetherDefault: 'Y',
-              fromDesc: '',
-              fromBusiness: ''
-            }
-          : row;
-      this.dialogTitle = `${title}物料信息`;
-      this.commonDialogVisible = true;
-    },
-    closeCommonDialog() {
-      this.commonDialogVisible = false;
-    },
     onSaveForm(form) {
       // todo
     }
@@ -489,5 +449,9 @@ export default {
 .form-buttons {
   position: absolute;
   right: 20px;
+}
+.scope-btn {
+  color: #409eff;
+  cursor: pointer;
 }
 </style>

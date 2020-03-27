@@ -9,6 +9,7 @@
           :option="formOption.option"
           v-model="crudObj"
           :page.sync="formOption.page"
+          @current-row-change="selectionChange"
           @row-del="rowDel"
           @on-load="tableData"
           @search-change="search"
@@ -153,7 +154,7 @@ export default {
     tableData(page, params = {}) {
       getList('307000', page).then((res) => {
         console.log(res);
-        this.formOption.data = res.data.rows;
+        // this.formOption.data = res.data.rows;
         this.formOption.page.total = res.data.total;
         // if (res.data.statusCode) {
         //   this.$message.error(res.data.message);
@@ -255,6 +256,11 @@ export default {
       this.type = tab.prop;
       console.log('this.type :', this.type);
       this.getBtnOption(this.type);
+    },
+    selectionChange(val) {
+      console.log(val);
+      this.selectionList = [];
+      this.selectionList.push(val);
     },
     // 分页
     currentChange(val) {

@@ -17,7 +17,8 @@ export default {
     menuAlign: 'center',
     menuWidth: '180',
     addBtn: false,
-    // editBtn: false,
+    editBtn: false,
+    delBtn: false,
     // addRowBtn: true,
     // cellBtn: true,
     rowKey: '$index', // todo 需要一个固定的主键，来防止点击行取消时，数据被删

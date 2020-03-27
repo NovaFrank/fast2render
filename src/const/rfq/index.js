@@ -1,23 +1,37 @@
 export default {
-  data: [],
+  data: [
+    {
+      inquiryNo: 'inquiryNo',
+      inquiryType: 'inquiryType',
+      elsCount: 'elsCount'
+    },
+    {
+      inquiryNo: 'inquiryNo',
+      inquiryType: 'inquiryType',
+      elsCount: 'elsCount'
+    }
+  ],
   page: {
     currentPage: 1,
     total: 0,
     pageSize: 10
   },
   option: {
+    header: false,
+    selection: true,
     addBtn: false,
     refreshBtn: false,
     columnBtn: false,
     searchBtn: false,
-    menu: true,
+    menu: false,
     menuAlign: 'left',
-    delBtn: false,
-    editBtn: false,
     indexLabel: '序号',
     border: true,
     highlightCurrentRow: true,
     index: true,
+    selectable: (row, index) => {
+      console.log(row, index);
+    },
     column: [
       {
         label: '询价单号',

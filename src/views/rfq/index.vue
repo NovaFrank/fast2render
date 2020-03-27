@@ -26,10 +26,12 @@
     </div>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <avue-crud
+      ref="list"
       :data="tableOption.data"
       :option="tableOption.option"
       :page.sync="tableOption.page"
       v-model="tableOption.obj"
+      @current-row-change="handleCurrentRowChange"
       @size-change="sizeChange"
       @current-change="currentChange"
     >
@@ -48,6 +50,7 @@ export default {
     return {
       tabOption: tabOption,
       tableOption: tableOption,
+      currentSelectRow: {},
       tabActive: 'all',
       buttons: [
         {
@@ -75,6 +78,11 @@ export default {
     },
     handleCreate() {
       this.$router.push({ path: '/new' });
+    },
+    handleCurrentRowChange(val) {
+      this.currentSelectRow = val;
+      this.$refs.list.selectClear();
+      this.$refs.list.toggleSelection([val]);
     },
     handleDelete(row) {
       this.$confirm('确定删除？', '提示').then(() => {
@@ -130,20 +138,20 @@ export default {
       });
     },
     tableData(data) {
-      const params = {
-        pageSize: this.tableOption.page.pageSize || 10,
-        currentPage: 1,
-        ...data,
-        tabActive: this.tabActive
-      };
-      elsFromSta('queryElsFromSta', params).then((res) => {
-        if (res.data.statusCode) {
-          this.$message.error(res.data.message);
-          return;
-        }
-        this.tableOption.data = res.data.rows;
-        this.tableOption.page.total = res.data.total;
-      });
+      // const params = {
+      //   pageSize: this.tableOption.page.pageSize || 10,
+      //   currentPage: 1,
+      //   ...data,
+      //   tabActive: this.tabActive
+      // };
+      // elsFromSta('queryElsFromSta', params).then((res) => {
+      //   if (res.data.statusCode) {
+      //     this.$message.error(res.data.message);
+      //     return;
+      //   }
+      //   this.tableOption.data = res.data.rows;
+      //   this.tableOption.page.total = res.data.total;
+      // });
     }
   }
 };

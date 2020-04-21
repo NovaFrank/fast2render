@@ -67,7 +67,6 @@
               :ProviderData="ProviderData.dynamicTabData"
               v-on="$listeners"
             ></component>
-            <fast2-tab-render></fast2-tab-render>
           </div>
         </template>
         <template v-else>

@@ -3,7 +3,7 @@
     <template v-if="list && list.length">
       <el-tabs v-model="active">
         <template v-for="subItem in list">
-          <el-tab-pane :label="subItem.label" :name="subItem.prop" :key="subItem.prop">
+          <el-tab-pane :label="subItem.label" :name="subItem.prop" type="block" :key="subItem.prop">
             <RenderDynamicTab @updateLayout="updateTabLayoutOption" :api="subItem.version">
               <template slot-scope="component">
                 <fast2-component-render

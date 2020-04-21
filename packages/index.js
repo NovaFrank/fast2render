@@ -6,6 +6,7 @@ import TabRender from './components/render/tabRender';
 import ButtonGroupRender from './components/render/widget/render-button-group';
 import BlockProvider from './components/render/widget/block-provider';
 import PageProvider from './components/render/widget/page-provider';
+import ThemeProvider from './components/render/widget/theme-provider';
 import TemplateProvider from './components/render/widget/template-provider';
 
 export default {
@@ -18,6 +19,8 @@ export default {
     Vue.component('Fast2' + BlockProvider.name, BlockProvider);
     Vue.component('Fast2' + PageProvider.name, PageProvider);
     Vue.component('Fast2' + TemplateProvider.name, TemplateProvider);
+    Vue.component('Fast2' + ThemeProvider.name, ThemeProvider);
+
     Vue.component(ButtonGroupRender.name, ButtonGroupRender);
   }
 };

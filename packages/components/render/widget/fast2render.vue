@@ -10,11 +10,7 @@
             :md="column.span || 12"
             :xs="24"
           >
-            <render-card
-              :data="data"
-              :column="column"
-              :index="index"
-            ></render-card>
+            <render-card :data="data" :column="column" :index="index"></render-card>
           </el-col>
           <el-col
             class="widget-group"
@@ -23,8 +19,7 @@
             :md="column.span || 12"
             :xs="24"
           >
-            <render-group :data="data" :column="column" :index="index">
-            </render-group>
+            <render-group :data="data" :column="column" :index="index"> </render-group>
           </el-col>
           <el-col
             class="widget-tab"
@@ -33,16 +28,9 @@
             :md="column.span || 12"
             :xs="24"
           >
-            <render-tab :data="data" :column="column" :index="index">
-            </render-tab>
+            <render-tab :data="data" :column="column" :index="index"> </render-tab>
           </el-col>
-          <el-col
-            v-else
-            :key="index"
-            :md="column.span || 12"
-            class="widget-item"
-            :xs="24"
-          >
+          <el-col v-else :key="index" :md="column.span || 12" class="widget-item" :xs="24">
             <render-item
               :column="column"
               :item="column"
@@ -59,15 +47,15 @@
 </template>
 
 <script>
-import RenderItem from "./render-item";
-import RenderCard from "./render-card";
-import RenderGroup from "./render-group";
-import RenderTab from "./render-tab";
+import RenderItem from './render-item';
+import RenderCard from './render-card';
+import RenderGroup from './render-group';
+import RenderTab from './render-tab';
 
 export default {
-  name: "Render",
+  name: 'Render',
   components: { RenderItem, RenderCard, RenderGroup, RenderTab },
-  props: ["option", "data"],
+  props: ['option', 'data'],
   data() {
     return {
       selectWidget: this.select

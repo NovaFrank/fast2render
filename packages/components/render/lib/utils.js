@@ -266,6 +266,34 @@ export const makeBlockOutputJson = (page) => {
 };
 /**
  *
+ * @param {*} remoteColumn 远程配置系统配置的column 属性
+ * @param {*} localColum  本地附件修正的column 属性
+ */
+export const mergeColumn = (remoteColumn = [], localColum = []) => {
+  // 以远程配置为基准
+  let newColumn = remoteColumn;
+  // 如果远程配置未定义，则直接添加到数组
+  localColum.map((item) => {
+    newColumn = newColumn.map((subitem) => {
+      let newSubItem = subitem;
+      if (subitem.prop === item.prop) {
+        newSubItem = _.merge(subitem, item);
+      }
+      return newSubItem;
+    });
+    let isExist = newColumn.find((subitem) => {
+      return subitem.prop === item.prop;
+    });
+    console.log('是否有重复项', isExist);
+    if (!isExist) {
+      newColumn.push(item);
+    }
+  });
+  return newColumn;
+};
+
+/**
+ *
  * @param {所有的数据} data
  * @param {需要合并的列如：[1, 2]} arr
  * @param {通过该字段来区分哪些是要合并的} filed

@@ -5,6 +5,7 @@
 </template>
 <script>
 import { getStore, setStore } from '../lib/store';
+import { mergeColumn } from '../lib/utils';
 export default {
   name: 'BlockProvider',
   props: {
@@ -86,14 +87,14 @@ export default {
       let option = this.list.find((item) => {
         return item.id === 'listLayout';
       });
-      let column = option.data.column;
+      let column = mergeColumn(option.data.column, finaloption.column);
       if (!column && !column.length) {
         column = finaloption.column;
       }
       column = column.map((item) => {
         return this.fixDicUrl(item);
       });
-      this.finaloption = Object.assign(finaloption, column);
+      this.finaloption.column = column;
     },
     fixDicUrl(config) {
       if (!config || !config.dicUrl) {

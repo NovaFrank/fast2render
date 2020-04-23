@@ -1,4 +1,5 @@
 import { validateNull } from './validate';
+import _ from 'lodash';
 
 /**
  * 验证表单
@@ -171,7 +172,7 @@ export const getObjValue = (stringOfObj, obj) => {
   const array = stringOfObj.split('.');
   if (validateNull(array)) return null;
   let tempObj = obj;
-  let value = array.reduce(function(prev, cur, index, arr) {
+  let value = array.reduce(function(prev, cur) {
     let currentObj = getObjType(prev) === 'object' ? prev : getItemChildrenProp(prev, tempObj);
     let newObj = getItemChildrenProp(cur, currentObj);
     // console.log(newObj, currentObj, 'current level obj');

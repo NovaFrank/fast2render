@@ -1,6 +1,7 @@
 export default {
   dialogDirection: 'rtl',
   dialogType: 'drawer',
+  dialogWidth: '30%',
   border: true,
   stripe: true,
   index: true,
@@ -9,7 +10,9 @@ export default {
   align: 'center',
   menuAlign: 'left',
   menuWidth: '140',
-  addBtn: true,
+  addBtn: false,
+  addBtnText: '新增行',
+  simplePage: true,
   size: 'mini',
   refreshBtn: false,
   searchBtn: false,

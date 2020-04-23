@@ -1,25 +1,37 @@
 <template>
-  <div>
-    <slot :list="list"></slot>
+  <div v-if="finaloption">
+    <slot :list="list" :option="finaloption"></slot>
   </div>
 </template>
 <script>
+import { getStore, setStore } from '../lib/store';
 export default {
   name: 'BlockProvider',
   props: {
-    api: {
+    version: {
+      type: String,
+      default: null
+    },
+    path: {
       type: String,
       default: null
     },
     fileType: {
       type: String,
       default: 'block'
+    },
+    option: {
+      type: Object,
+      default: function() {
+        return {};
+      }
     }
   },
   data() {
     return {
       list: [],
-      filePath: 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/'
+      filePath: 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/',
+      finaloption: null
     };
   },
   mounted() {
@@ -27,32 +39,72 @@ export default {
     if (configFilePath && configFilePath !== '') {
       this.filePath = configFilePath;
     }
-    this.onLoad();
+    if (this.path) {
+      this.filePath = this.path;
+    }
+    if (this.version) {
+      this.onLoad(this.version);
+    } else {
+      this.finaloption = this.option;
+    }
   },
   methods: {
-    onLoad(slug = this.api) {
-      const url = this.filePath + this.fileType + '/' + slug + '.json';
-      const request = new XMLHttpRequest();
-      request.open('get', url); /*设置请求方法与路径*/
-      request.send(null); /*不发送数据到服务器*/
-      request.onload = function() {
-        /*XHR对象获取到返回信息后执行*/
-        if (request.status === 200) {
-          /*返回状态为200，即为数据获取成功*/
-          const json = JSON.parse(request.responseText);
-          this.list = json;
-          console.log(json, '获取的json 内容');
+    onLoad(slug = this.version) {
+      const url = `${this.filePath}${this.fileType}/${slug}.json`;
+      let list = getStore({ name: slug, timer: 1200 });
+      let _this = this;
+      if (list) {
+        this.handlerLayoutData(list);
+        return;
+      }
+      const xhr = new XMLHttpRequest();
+      xhr.open('get', url, true);
+
+      xhr.responseType = 'json';
+
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          _this.handlerLayoutData(xhr.response);
+          console.log('获取发布版本OK', url);
+          setStore({ name: slug, content: xhr.response });
+        } else {
+          console.log('获取发布版本失败', xhr.status, xhr.statusText);
+          this.$message.error('获取发布版本失败', xhr.statusText);
         }
       };
-      // apis.fetchItem(url).then((res) => {
-      //   const json = res.data.outputJson;
-      //   let obj = JSON.parse(json);
-      //   if (typeof obj === 'object') {
-      //     this.list = obj;
-      //   } else {
-      //     this.list = this.unzipLayout(json);
-      //   }
-      // });
+
+      xhr.onerror = function() {
+        console.log('获取发布版本失败', xhr.status, xhr.statusText);
+        this.$message.error('获取发布版本失败', xhr.statusText);
+      };
+
+      xhr.send();
+    },
+    handlerLayoutData(list) {
+      this.list = list;
+      let finaloption = this.option || { column: [] };
+      let option = this.list.find((item) => {
+        return item.id === 'listLayout';
+      });
+      let column = option.data.column;
+      if (!column && !column.length) {
+        column = finaloption.column;
+      }
+      column = column.map((item) => {
+        return this.fixDicUrl(item);
+      });
+      this.finaloption = Object.assign(finaloption, column);
+    },
+    fixDicUrl(config) {
+      if (!config || !config.dicUrl) {
+        return config;
+      }
+      // 如果是关联子选择框，去掉自动拉取
+      if (config.dicUrl.includes('{{key}}')) {
+        config.dicFlag = false;
+        return config;
+      }
+      return config;
     },
     unzipLayout(jsonObjStr) {
       let _atob = '';
@@ -68,8 +120,3 @@ export default {
   }
 };
 </script>
-<style scoped>
-.configlist tr {
-  cursor: pointer;
-}
-</style>

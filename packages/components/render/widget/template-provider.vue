@@ -4,7 +4,6 @@
   </div>
 </template>
 <script>
-import apis from '@/api/layout';
 
 export default {
   name: 'TemplateProvider',
@@ -23,18 +22,8 @@ export default {
   },
   created() {},
   mounted() {
-    this.onLoad();
   },
   methods: {
-    onLoad(api = this.api) {
-      const url = `template-versions/slug/${api}`;
-      apis.fetchItem(url).then((res) => {
-        const json = res.data.outputJson;
-        const pageJson = this.unzipLayout(json);
-        this.pageJson = pageJson;
-        this.$emit('updateLayout', { data: this.pageJson, version: this.api });
-      });
-    },
     unzipLayout(jsonObjStr) {
       let _atob = '';
       try {

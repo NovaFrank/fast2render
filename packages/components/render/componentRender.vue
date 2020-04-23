@@ -33,19 +33,26 @@
         </template>
         <template v-else-if="item.type === BLOCK_TYPE.LIST">
           <div :key="item.slug">
-            <slot name="crud-header"></slot>
-            <avue-crud
-              :option="item.data"
-              @row-save="listRowSave"
-              @row-del="listRowDel"
-              @row-update="listRowUpdate"
-              :data="ProviderData.tableData"
-              v-model="tableData"
-              v-on="$listeners"
-              ref="table"
-              ><slot name="crud-slot"></slot>
-            </avue-crud>
-            <slot name="crud-footer"></slot>
+            <fast2-theme-provider :option="item.data" theme="block" ref="themebox"
+              ><template slot-scope="component">
+                <slot name="crud-header">
+                  <h4>
+                    {{ item.name }} <el-button size="mini" @click="listRowAdd">新增行</el-button>
+                  </h4>
+                </slot>
+                <avue-crud
+                  :option="component.option"
+                  @row-save="listRowSave"
+                  @row-del="listRowDel"
+                  @row-update="listRowUpdate"
+                  :data="ProviderData.tableData"
+                  v-model="tableData"
+                  v-on="$listeners"
+                  ref="table"
+                  ><slot name="crud-slot"></slot>
+                </avue-crud>
+                <slot name="crud-footer"></slot> </template
+            ></fast2-theme-provider>
           </div>
         </template>
         <template v-else-if="item.type === BLOCK_TYPE.COMPONENT">
@@ -142,6 +149,9 @@ export default {
     },
     listRowDel(payload) {
       this.ProviderData.tableData.splice(payload.index, 1);
+    },
+    listRowAdd() {
+      this.$refs.table[0].rowAdd();
     },
     getComponent(type, component) {
       let KEY_COMPONENT_NAME = 'item-';

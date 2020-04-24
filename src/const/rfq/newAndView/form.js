@@ -4,12 +4,12 @@ import { DIC } from '../../dic';
 export default {
   column: [
     {
-      type: 'select',
-      dicData: DIC.TABLE_CONFIG_DEFAULT,
-      label: '询价类型',
+      formslot: true,
+      type: 'text',
+      label: '询价单号',
       span: 6,
-      prop: 'formBusiness',
-      valueDefault: ''
+      prop: 'no',
+      value: '待生成'
     },
     {
       type: 'date',
@@ -28,21 +28,35 @@ export default {
       prop: 'quoteDeadline'
     },
     {
+      type: 'select',
+      dicData: DIC.TABLE_CONFIG_DEFAULT,
+      label: '询价类型',
+      span: 6,
+      prop: 'formBusiness',
+      valueDefault: ''
+    },
+    {
+      type: 'select',
+      dicData: DIC.TABLE_CONFIG_DEFAULT,
+      label: '公司代码',
+      span: 6,
+      prop: 'companyCode',
+      valueDefault: ''
+    },
+    {
       type: 'input',
       label: '负责人',
       span: 6,
       prop: 'inCharge'
     },
     {
-      type: 'input',
-      label: '备注',
-      prop: 'mark'
+      type: 'select',
+      dicData: DIC.TABLE_CONFIG_DEFAULT,
+      label: '公开方式',
+      span: 6,
+      prop: 'type',
+      valueDefault: ''
     }
   ],
-  menuBtn: true,
-  emptyBtn: false,
-  submitBtn: false,
-  submitSize: 'medium',
-  submitText: '保存',
-  menuPosition: 'center'
+  menuBtn: false
 };

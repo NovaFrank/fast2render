@@ -4,7 +4,7 @@
       <el-button type="primary" size="small" @click="handleCreate">
         新建
       </el-button>
-      <el-button
+      <!-- <el-button
         v-if="['all', 'new', 'quoting', 'quoted', 'priced', 'approval', 'pass'].includes(tabActive)"
         type="primary"
         size="small"
@@ -22,7 +22,7 @@
       </el-button>
       <el-button v-if="['all', 'approval'].includes(tabActive)" type="primary" size="small">
         撤销审批
-      </el-button>
+      </el-button> -->
     </div>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <avue-crud

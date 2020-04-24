@@ -18,7 +18,7 @@ export default {
   },
   option: {
     header: false,
-    selection: true,
+    // selection: true,
     addBtn: false,
     refreshBtn: false,
     columnBtn: false,

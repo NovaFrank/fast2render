@@ -8,7 +8,11 @@
       @on-release="handleRelease"
       @on-save="handleSave"
     ></form-header>
-    <avue-form ref="form" v-model="form" :option="formOption"></avue-form>
+    <avue-form ref="form" v-model="form" :option="formOption">
+      <template slot-scope="scope" slot="no">
+        <span>{{ scope.value }}</span>
+      </template>
+    </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <avue-form
       v-if="tabActive === 'files'"
@@ -106,13 +110,25 @@ export default {
       dialogOption: fieldDialogOption,
       headerButtons: [
         {
-          text: '取消',
+          text: '删除',
+          type: 'primary',
+          size: '',
+          action: 'on-delete'
+        },
+        {
+          text: '退回',
+          type: 'primary',
+          size: '',
+          action: 'on-back'
+        },
+        {
+          text: '返回',
           type: '',
           size: '',
           action: 'on-cancel'
         },
         {
-          text: '发布',
+          text: '发布/提交审批',
           type: 'primary',
           size: '',
           action: 'on-release'

@@ -41,15 +41,19 @@
       :option="inquiryListOption.option"
       :page.sync="inquiryListOption.page"
       v-model="inquiryListOption.obj"
+      :span-method="spanMethod"
       @size-change="sizeChange"
       @current-change="currentChange"
     >
-      <template slot-scope="scope" slot="menu">
+      <template slot-scope="scope" slot="option">
         <el-row :gutter="24">
-          <el-col :span="6">
-            <a class="scope-btn" @click.stop="handleAcceptShow(scope)">接受</a>
+          <el-col :span="12">
+            <avue-radio v-model="scope.option" :dic="dic"></avue-radio>
           </el-col>
-          <el-col :span="6">
+          <!-- <el-col :span="6">
+            <a class="scope-btn" @click.stop="handleAcceptShow(scope)">接受</a>
+          </el-col> -->
+          <el-col :span="12">
             <a class="scope-btn">重报价</a>
           </el-col>
         </el-row>
@@ -68,6 +72,7 @@
 </template>
 
 <script>
+import { mySpanMethod } from '@/util/utils';
 import FormHeader from '@/components/views/formHeader';
 import fieldDialog from '@/components/views/fieldDialog';
 import fieldDialogOption from '@/const/rfq/newAndView/quoteDialog';
@@ -84,6 +89,16 @@ export default {
   },
   data() {
     return {
+      dic: [
+        {
+          label: '接受',
+          value: 0
+        },
+        {
+          label: '拒绝',
+          value: 1
+        }
+      ],
       formOption: formOption,
       tabOption: tabOption,
       inquiryListOption: inquiryListOption,
@@ -104,16 +119,28 @@ export default {
       dialogOption: fieldDialogOption,
       headerButtons: [
         {
-          text: '关闭',
-          type: 'primary',
+          text: '返回',
+          type: '',
           size: '',
-          action: 'on-close'
+          action: 'on-back'
         },
         {
           text: '保存',
           type: 'primary',
           size: '',
           action: 'on-save'
+        },
+        {
+          text: '关闭',
+          type: 'primary',
+          size: '',
+          action: 'on-close'
+        },
+        {
+          text: '开启',
+          type: 'primary',
+          size: '',
+          action: 'on-open'
         }
       ]
     };
@@ -138,7 +165,6 @@ export default {
       });
     },
     handleAcceptShow(scope) {
-      console.log('scope', scope.index, scope.row);
       this.fieldDialogForm = {
         index: scope.index,
         quote: scope.row.quote
@@ -177,8 +203,8 @@ export default {
     // 配额保存
     onSaveForm(form) {
       console.log('form', form);
-      inquiryListOption.data[form.index].quote = form.quote;
       this.fieldDialogVisible = false;
+      this.inquiryListOption.data[form.index].quote = form.quote;
     },
     sizeChange(val) {
       this.inquiryListOption.page.pageSize = val;
@@ -186,6 +212,16 @@ export default {
         currentPage: 1,
         pageSize: val
       });
+    },
+    spanMethod({ row, column, rowIndex, columnIndex }) {
+      return mySpanMethod(
+        this.inquiryListOption.data,
+        [1, 2, 3, 4],
+        'materialNo',
+        'uuid',
+        columnIndex,
+        row
+      );
     },
     tableData(data) {
       // const params = {

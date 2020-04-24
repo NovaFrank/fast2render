@@ -6,20 +6,12 @@ export default {
         prop: 'all'
       },
       {
-        label: '新建',
+        label: '未发布/未提交',
         prop: 'new'
       },
       {
         label: '报价中',
         prop: 'quoting'
-      },
-      {
-        label: '已报价',
-        prop: 'quoted'
-      },
-      {
-        label: '已定价',
-        prop: 'priced'
       },
       {
         label: '审批中',
@@ -28,6 +20,10 @@ export default {
       {
         label: '审批通过',
         prop: 'pass'
+      },
+      {
+        label: '审批驳回',
+        prop: 'reject'
       },
       {
         label: '已关闭',

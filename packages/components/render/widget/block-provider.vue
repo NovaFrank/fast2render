@@ -84,19 +84,23 @@ export default {
     handlerLayoutData(list) {
       this.list = list;
       let finaloption = this.option || { column: [] };
+      if (!finaloption.column) {
+        finaloption.column = [];
+      }
       let option = this.list.find((item) => {
         return item.id === 'listLayout';
       });
-      let column = mergeColumn(option.data.column, finaloption.column);
-      if (!column && !column.length) {
-        column = finaloption.column;
+      if (!option || !option.data || !option.data.column) {
+        option = { data: { column: [] } };
       }
+      let column = mergeColumn(option.data.column, finaloption.column);
       column = column.map((item) => {
-        return this.fixDicUrl(item);
+        return this.fixColumn(item);
       });
+      this.finaloption = finaloption;
       this.finaloption.column = column;
     },
-    fixDicUrl(config) {
+    fixColumn(config) {
       if (!config || !config.dicUrl) {
         return config;
       }
@@ -104,6 +108,9 @@ export default {
       if (config.dicUrl.includes('{{key}}')) {
         config.dicFlag = false;
         return config;
+      }
+      if (config.span) {
+        config.span = config.span * 1;
       }
       return config;
     },

@@ -26,7 +26,6 @@
               :ref="item.slug"
               v-on="$listeners"
               ><slot name="form-slot"></slot>
-              <slot name="detail-slot"></slot>
             </avue-form>
             <slot name="form-footer"></slot>
           </div>
@@ -34,7 +33,7 @@
         <template v-else-if="item.type === BLOCK_TYPE.LIST">
           <div :key="item.slug">
             <fast2-theme-provider :option="item.data" theme="block" ref="themebox"
-              ><template slot-scope="component">
+              ><template v-slot="component">
                 <slot name="crud-header">
                   <h4>
                     {{ item.name }} <el-button size="mini" @click="listRowAdd">新增行</el-button>
@@ -53,17 +52,6 @@
                 </avue-crud>
                 <slot name="crud-footer"></slot> </template
             ></fast2-theme-provider>
-          </div>
-        </template>
-        <template v-else-if="item.type === BLOCK_TYPE.COMPONENT">
-          <div :key="item.slug">
-            <slot name="component-header"></slot>
-            <fast2-component-render
-              :componentsList="item.data"
-              :ProviderData="ProviderData.componentData"
-              v-on="$listeners"
-            ></fast2-component-render>
-            <slot name="component-footer"></slot>
           </div>
         </template>
         <template v-else-if="item.type === BLOCK_TYPE.DYNAMIC">

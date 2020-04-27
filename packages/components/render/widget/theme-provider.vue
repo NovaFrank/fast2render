@@ -1,16 +1,23 @@
 <template>
-  <fast2-block-provider :option="finalOption" :version="version" v-on="$listeners">
-    <template v-slot="component">
-      <div>
-        <slot :option="component.option" :data="myData" :spanMethod="spanMethod"></slot>
-      </div>
-    </template>
-  </fast2-block-provider>
+  <div>
+    <fast2-block-provider :option="finalOption" :version="version" :type="type" v-on="$listeners">
+      <template v-slot="component">
+        <div v-if="spanMethodData.prop">
+          <slot :option="component.option" :data="myData" :spanMethod="spanMethod"></slot>
+        </div>
+        <div v-else>
+          <slot :option="component.option" :data="myData"></slot>
+        </div>
+      </template>
+    </fast2-block-provider>
+  </div>
 </template>
 <script>
 import BigListTemplate from '../lib/crud-biglist';
 import SmallListTemplate from '../lib/crud-small';
-import { mySpanMethod } from '../lib/utils.js';
+import BigFormTemplate from '../lib/form-big';
+import SmallFormTemplate from '../lib/form-small';
+import { mySpanMethod, sortArrys } from '../lib/utils.js';
 import _ from 'lodash';
 
 export default {
@@ -18,7 +25,11 @@ export default {
   props: {
     theme: {
       type: String,
-      default: 'page' // 分2类 ， 大的列表 为 page, 小的模块内列表为 block, 其他类型待添加
+      default: 'page' // 分2类 ， 大的列表 为 page, 小的模块内列表为 block, 表单为 form  详情为 detail 其他类型待添加
+    },
+    type: {
+      type: String,
+      default: 'crud' // 远程获取 表格字段数据配置- 后续扩充 from 类型
     },
     version: {
       type: String,
@@ -49,11 +60,8 @@ export default {
   },
   computed: {
     finalOption: function() {
-      let option =
-        this.theme === 'page'
-          ? this.handlerBigThemeOption(this.option)
-          : this.handlerSmallThemeOption(this.option);
-      return option;
+      if (this.type === 'crud') return this.handlerOption(this.option, this.theme === 'page');
+      return this.handlerOptionForm(this.option, this.theme === 'page');
     },
     myData: function() {
       if (this.spanMethodData.prop) {
@@ -63,38 +71,30 @@ export default {
     }
   },
   methods: {
-    handlerBigThemeOption(option) {
-      let newOption = Object.assign(BigListTemplate, option);
-      return this.handlerOption(newOption);
-    },
-    handlerSmallThemeOption(option) {
-      let newOption = Object.assign(SmallListTemplate, option);
-      return this.handlerOption(newOption);
-    },
-    handlerOption(option) {
-      option.searchMenuSpan = this.getSearchMenuSpan(option.column);
-      // 如果无新建按钮 并且不强制显示header ，隐藏headewr
+    handlerOption(option, isBig) {
+      let newOption = Object.assign(isBig ? BigListTemplate : SmallListTemplate, option);
+      // set option header
       if (!option.addBtn && !option.header) {
         option.header = false;
       }
-      return option;
-    },
-    getSearchMenuSpan(column) {
-      if (!column) return 24;
-      let n = this.getNumberOfSearchAbleField(column);
-      if (n % 4) {
-        return 6;
-      }
-      return 24;
-    },
-    getNumberOfSearchAbleField(column) {
+
+      // set search menu span
+      const column = option.column || [];
+
       let n = 0;
       column.map((item) => {
         if (item.search) {
-          n++;
+          n = n + 1;
         }
       });
-      return n;
+
+      option.searchMenuSpan = n % 4 ? 6 : 24;
+
+      return newOption;
+    },
+    handlerOptionForm(option, isBig) {
+      let newOption = Object.assign(isBig ? BigFormTemplate : SmallFormTemplate, option);
+      return newOption;
     },
     spanMethod({ row, columnIndex }) {
       return mySpanMethod(

@@ -4,7 +4,6 @@
   </div>
 </template>
 <script>
-
 export default {
   name: 'PageProvider',
   props: {
@@ -21,8 +20,7 @@ export default {
     };
   },
   created() {},
-  mounted() {
-  },
+  mounted() {},
   methods: {
     unzipLayout(jsonObjStr) {
       let _atob = '';

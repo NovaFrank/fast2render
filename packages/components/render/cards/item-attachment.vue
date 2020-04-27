@@ -63,12 +63,15 @@ export default {
   },
   computed: {
     myOption() {
-      let setting = this.setting.data.fieldData;
-      let addBtn = !(!setting.addable || setting.addable === 'false');
-      let option = this.option;
-      option.addBtn = addBtn;
-      option.delBtn = addBtn;
-      return option;
+      if (this.setting && this.setting.data && this.setting.data.fieldData) {
+        let setting = this.setting.data.fieldData;
+        let addBtn = !(!setting.addable || setting.addable === 'false');
+        let option = this.option;
+        option.addBtn = addBtn;
+        option.delBtn = addBtn;
+        return option;
+      }
+      return {};
     }
   },
   methods: {

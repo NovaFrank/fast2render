@@ -4,11 +4,11 @@
       <el-tabs v-model="active">
         <template v-for="subItem in list">
           <el-tab-pane :label="subItem.label" :name="subItem.prop" :key="subItem.prop">
-            <RenderDynamicTab @updateLayout="updateTabLayoutOption" :api="subItem.version">
+            <fast2-block-provider :version="subItem.version">
               <template slot-scope="component">
                 <fast2-component-render :ProviderData="subItem.data" :list="component.list">
                 </fast2-component-render> </template
-            ></RenderDynamicTab> </el-tab-pane></template
+            ></fast2-block-provider> </el-tab-pane></template
       ></el-tabs>
     </template>
   </div>
@@ -21,7 +21,6 @@
  * 进入屏蔽其他操作状态，单纯进行布局， 保存 及 发布 ， 可维护类型为 表格 表单 详情， 组合， 可 维护 模版 页面  模块
  * block 内含一组组件
  */
-import RenderDynamicTab from '../widget/block-provider';
 
 const BLOCK_TYPE = {
   LIST: 'crud',
@@ -35,7 +34,6 @@ const BLOCK_TYPE = {
 
 export default {
   name: 'item-tab',
-  components: { RenderDynamicTab },
   props: {
     list: {
       type: Array,

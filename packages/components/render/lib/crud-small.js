@@ -11,6 +11,7 @@ export default {
   menuAlign: 'left',
   menuWidth: '140',
   addBtn: false,
+  header: false,
   addBtnText: '新增行',
   simplePage: true,
   size: 'mini',

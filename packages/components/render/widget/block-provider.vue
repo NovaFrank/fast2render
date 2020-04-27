@@ -5,11 +5,15 @@
 </template>
 <script>
 import { getStore, setStore } from '../lib/store';
-import { mergeColumn } from '../lib/utils';
+import { mergeColumn, vaildData } from '../lib/utils';
 export default {
   name: 'BlockProvider',
   props: {
     version: {
+      type: String,
+      default: null
+    },
+    type: {
       type: String,
       default: null
     },
@@ -43,11 +47,7 @@ export default {
     if (this.path) {
       this.filePath = this.path;
     }
-    if (this.version) {
-      this.onLoad(this.version);
-    } else {
-      this.finaloption = this.option;
-    }
+    this.version ? this.onLoad(this.version) : (this.finaloption = this.option);
   },
   methods: {
     onLoad(slug = this.version) {
@@ -69,30 +69,29 @@ export default {
           console.log('获取发布版本OK', url);
           setStore({ name: slug, content: xhr.response });
         } else {
-          console.log('获取发布版本失败', xhr.status, xhr.statusText);
-          this.$message.error('获取发布版本失败', xhr.statusText);
+          console.log('获取配置文件失败', xhr.status, xhr.statusText);
+          this.$message.error('获取配置文件失败', xhr.statusText);
         }
       };
 
       xhr.onerror = function() {
-        console.log('获取发布版本失败', xhr.status, xhr.statusText);
-        this.$message.error('获取发布版本失败', xhr.statusText);
+        console.log('获取配置文件失败', xhr.status, xhr.statusText);
+        this.$message.error('获取配置文件失败', xhr.statusText);
       };
-
       xhr.send();
     },
     handlerLayoutData(list) {
       this.list = list;
-      let finaloption = this.option || { column: [] };
-      if (!finaloption.column) {
-        finaloption.column = [];
-      }
+      let finaloption = vaildData(this.option, { column: [] });
+      let findStr = {
+        crud: 'listLayout',
+        form: 'detailLayout',
+        detail: 'detailLayout'
+      };
       let option = this.list.find((item) => {
-        return item.id === 'listLayout';
+        return item.id === findStr[this.type];
       });
-      if (!option || !option.data || !option.data.column) {
-        option = { data: { column: [] } };
-      }
+      option = vaildData(option, { data: { column: [] } });
       let column = mergeColumn(option.data.column, finaloption.column);
       column = column.map((item) => {
         return this.fixColumn(item);
@@ -113,17 +112,6 @@ export default {
         config.span = config.span * 1;
       }
       return config;
-    },
-    unzipLayout(jsonObjStr) {
-      let _atob = '';
-      try {
-        _atob = decodeURIComponent(escape(atob(jsonObjStr)));
-      } catch (e) {
-        _atob = jsonObjStr;
-      }
-      const projectObj = JSON.parse(_atob);
-      console.log(projectObj, '解压缩数据');
-      return projectObj;
     }
   }
 };

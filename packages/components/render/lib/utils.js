@@ -47,8 +47,12 @@ export const getObjType = (obj) => {
 export const formatObject = (data, expect) => {
   let type = getObjType(data);
   let expectType = getObjType(expect);
-  if (type === 'null' || type === 'undefined') return expect;
-  if (type === expectType) return data;
+  if (type === 'null' || type === 'undefined') {
+    return expect;
+  }
+  if (type === expectType) {
+    return data;
+  }
   if (type === 'string') {
     let newData;
     try {
@@ -58,7 +62,9 @@ export const formatObject = (data, expect) => {
       newData = null;
     }
     let newType = getObjType(newData);
-    if (newType === expectType) return newData;
+    if (newType === expectType) {
+      return newData;
+    }
   }
   return expect;
 };
@@ -119,7 +125,9 @@ export const diff = (obj1, obj2) => {
  */
 export const findByValue = (dic, value) => {
   let result = '';
-  if (validateNull(dic)) return value;
+  if (validateNull(dic)) {
+    return value;
+  }
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
     let index = 0;
     index = findArray(dic, value);
@@ -167,10 +175,16 @@ export const findSlug = (url, index = 2) => {
  * @param obj 被查找的对象
  */
 export const getObjValue = (stringOfObj, obj) => {
-  if (validateNull(stringOfObj)) return null;
-  if (validateNull(obj)) return null;
+  if (validateNull(stringOfObj)) {
+    return null;
+  }
+  if (validateNull(obj)) {
+    return null;
+  }
   const array = stringOfObj.split('.');
-  if (validateNull(array)) return null;
+  if (validateNull(array)) {
+    return null;
+  }
   let tempObj = obj;
   let value = array.reduce(function(prev, cur) {
     let currentObj = getObjType(prev) === 'object' ? prev : getItemChildrenProp(prev, tempObj);
@@ -181,15 +195,55 @@ export const getObjValue = (stringOfObj, obj) => {
   return value;
 };
 
+export const detailDataType = (value, type) => {
+  if (type === 'number') {
+    return Number(value);
+  } else if (type === 'string') {
+    return value + '';
+  } else {
+    return value;
+  }
+};
+
+/**
+ * 根据字段数组排序
+ */
+
+export const vaildData = (val, dafult) => {
+  if (typeof val === 'boolean') {
+    return val;
+  }
+  return !validateNull(val) ? val : dafult;
+};
+
+export const sortArrys = (list, prop) => {
+  list.sort(function(a, b) {
+    if (a[prop] > b[prop]) {
+      return -1;
+    }
+    if (a[prop] < b[prop]) {
+      return 1;
+    }
+    return 0;
+  });
+  return list;
+};
+
 /**
  * @param stringOfObj 查找对象的路径 从子级开始， 以点区隔
  * @param obj 被查找的对象
  */
 export const checkObjExist = (stringOfObj, obj) => {
-  if (validateNull(stringOfObj)) return false;
-  if (validateNull(obj)) return false;
+  if (validateNull(stringOfObj)) {
+    return false;
+  }
+  if (validateNull(obj)) {
+    return false;
+  }
   const array = stringOfObj.split('.');
-  if (validateNull(array)) return false;
+  if (validateNull(array)) {
+    return false;
+  }
   let tempObj = obj;
   let value = array.reduce(function(prev, cur) {
     let currentObj = getObjType(prev) === 'object' ? prev : getItemChildrenProp(prev, tempObj);
@@ -200,8 +254,12 @@ export const checkObjExist = (stringOfObj, obj) => {
 };
 
 const getItemChildrenProp = (str, obj) => {
-  if (validateNull(str)) return null;
-  if (validateNull(obj)) return null;
+  if (validateNull(str)) {
+    return null;
+  }
+  if (validateNull(obj)) {
+    return null;
+  }
   try {
     return str.includes('[') ? getItemFormArrayStr(str, obj) : obj[str];
   } catch (err) {
@@ -227,18 +285,16 @@ export const unzipLayout = (jsonObjStr) => {
 };
 
 export const getItemFormArrayStr = (str, obj) => {
-  if (validateNull(obj)) return null;
+  if (validateNull(obj)) {
+    return null;
+  }
   let array = str.split('[');
-  console.log('数组对象', array, obj);
   let index = parseInt(array[1]);
   let newObj = obj[array[0]];
-  if (validateNull(newObj)) return null;
+  if (validateNull(newObj)) {
+    return null;
+  }
   return newObj[index];
-};
-
-const ACTION_TYPE = {
-  DELETE: 'delete',
-  UPDATE: 'update'
 };
 
 export function isJSON(str) {
@@ -335,7 +391,6 @@ export function mySpanMethod(data, arr, filed, id, columnIndex, row) {
 
 const util = {
   findSlug,
-  ACTION_TYPE,
   getObjType,
   validateNull,
   formatObject,

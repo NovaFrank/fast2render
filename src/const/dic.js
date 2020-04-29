@@ -8,5 +8,15 @@ export const DIC = {
       label: 'N',
       value: 'N'
     }
+  ],
+  ENQUIRY_METHOD: [
+    {
+      label: '公开',
+      value: 'open'
+    },
+    {
+      label: '询价',
+      value: 'enquiry'
+    }
   ]
 };

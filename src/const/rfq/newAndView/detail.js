@@ -1,9 +1,17 @@
 export default {
   column: [
     {
+      label: '询价单号',
+      span: 6,
+      prop: 'enquiryNumber'
+    },
+    {
+      // dicData: DIC.TABLE_CONFIG_DEFAULT,
+      dicUrl: '/layout/dics/value/enquiryType',
+      dicMethod: 'get',
       label: '询价类型',
       span: 6,
-      prop: 'formBusiness'
+      prop: 'enquiryType'
     },
     {
       type: 'date',
@@ -11,7 +19,7 @@ export default {
       valueFormat: 'yyyy-MM-dd',
       label: '询价日期',
       span: 6,
-      prop: 'inquiryTime'
+      prop: 'beginDate'
     },
     {
       formslot: true,
@@ -21,17 +29,17 @@ export default {
       valueFormat: 'yyyy-MM-dd',
       label: '截止日期',
       span: 6,
-      prop: 'quoteDeadline'
+      prop: 'endDate'
     },
     {
       label: '负责人',
       span: 6,
-      prop: 'inCharge'
-    },
-    {
-      label: '备注',
-      prop: 'mark'
+      prop: 'responsible'
     }
+    // {
+    //   label: '备注',
+    //   prop: 'mark'
+    // }
   ],
   menuBtn: true,
   emptyBtn: false,

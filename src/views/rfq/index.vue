@@ -31,10 +31,56 @@
       :option="tableOption.option"
       :page.sync="tableOption.page"
       v-model="tableOption.obj"
+      @row-click="handleRowClick"
       @current-row-change="handleCurrentRowChange"
       @size-change="sizeChange"
       @current-change="currentChange"
     >
+      <template
+        v-if="['new', 'quoting', 'close'].includes(tabActive)"
+        slot-scope="scope"
+        slot="status"
+      >
+        <!-- // new itemStatus 0
+            // quoting itemStatus 1
+            // close itemStatus 6 -->
+        <span>
+          {{
+            scope.row.itemStatus === '0'
+              ? '未发布'
+              : scope.row.itemStatus === '1'
+              ? '报价中'
+              : '已关闭'
+          }}
+        </span>
+      </template>
+      <template
+        v-else-if="['approval', 'pass', 'reject'].includes(tabActive)"
+        slot-scope="scope"
+        slot="status"
+      >
+        <!-- // approval auditStatus 2
+            // pass auditStatus 0
+            // reject auditStatus 3 -->
+        <span>
+          {{
+            scope.row.auditStatus === '2'
+              ? '审批中'
+              : scope.row.auditStatus === '0'
+              ? '审批通过'
+              : '审批驳回'
+          }}
+        </span>
+      </template>
+      <!-- <template v-if="tabActive === 'new'" slot-scope="scope" slot="menu">
+        <el-button
+          @click.stop="handleEditRow(scope)"
+          class="el-button el-button--text el-button--small"
+        >
+          <i class="el-icon-edit"></i>
+          编辑
+        </el-button>
+      </template> -->
     </avue-crud>
   </div>
 </template>
@@ -42,7 +88,8 @@
 <script>
 import tabOption from '@/const/rfq/navTabs';
 import tableOption from '@/const/rfq/index';
-import { elsFromSta } from '@/api/rfq';
+import { purchaseEnquiryAction } from '@/api/rfq';
+import { getUserInfo } from '@/util/utils.js';
 
 export default {
   components: {},
@@ -61,6 +108,9 @@ export default {
     };
   },
   created() {
+    const userInfo = getUserInfo();
+    this.elsAccount = userInfo.elsAccount;
+    this.elsSubAccount = userInfo.elsSubAccount;
     this.tableData();
   },
   watch: {
@@ -86,49 +136,40 @@ export default {
     },
     handleDelete(row) {
       this.$confirm('确定删除？', '提示').then(() => {
-        let params = {
-          elsAccount: row.elsAccount,
-          whetherDefault: row.whetherDefault,
-          fromDesc: row.fromDesc,
-          fromBusiness: row.fromBusiness,
-          fbk1: this.fbk1
-        };
-        elsFromSta('delElsFromSta', params).then((res) => {
-          if (res.data.statusCode) {
-            this.$message.error(res.data.message);
-            return;
-          }
-          this.$message.success('删除成功');
-          this.tableData();
-        });
+        // let params = {
+        //   elsAccount: row.elsAccount,
+        //   whetherDefault: row.whetherDefault,
+        //   fromDesc: row.fromDesc,
+        //   fromBusiness: row.fromBusiness,
+        //   fbk1: this.fbk1
+        // };
+        // elsFromSta('delElsFromSta', params).then((res) => {
+        //   if (res.data.statusCode) {
+        //     this.$message.error(res.data.message);
+        //     return;
+        //   }
+        //   this.$message.success('删除成功');
+        //   this.tableData();
+        // });
       });
+    },
+    handleEditRow(scope) {
+      this.$router.push({ path: '/new', query: { enquiryNumber: scope.row.enquiryNumber } });
+    },
+    handleRowClick(row, column, event) {
+      if (this.tabActive === 'new' || row.itemStatus === '0') {
+        this.$router.push({ path: '/new', query: { enquiryNumber: row.enquiryNumber } });
+      } else {
+        this.$router.push({ path: `/detail/${row.enquiryNumber}` });
+      }
     },
     handleTabChange(value) {
       this.tabActive = value.prop;
-    },
-    onSaveForm(form) {
-      let params = {
-        elsAccount: form.elsAccount,
-        whetherDefault: form.whetherDefault,
-        fromDesc: form.fromDesc,
-        fromBusiness: form.fromBusiness
+      this.tableOption.page = {
+        currentPage: 1,
+        total: 0,
+        pageSize: 10
       };
-      let action = 'saveElsFromSta';
-      if (this.dialogTitle === '新建类型') {
-        action = 'insertElsFromSta';
-        params = {
-          ...params,
-          fbk1: this.fbk1
-        };
-      }
-      elsFromSta(action, params).then((res) => {
-        if (res.data.statusCode) {
-          this.$message.error(res.data.message);
-          return;
-        }
-        this.$message.success('保存成功');
-        this.tableData();
-      });
     },
     sizeChange(val) {
       this.tableOption.page.pageSize = val;
@@ -138,20 +179,38 @@ export default {
       });
     },
     tableData(data) {
-      // const params = {
-      //   pageSize: this.tableOption.page.pageSize || 10,
-      //   currentPage: 1,
-      //   ...data,
-      //   tabActive: this.tabActive
-      // };
-      // elsFromSta('queryElsFromSta', params).then((res) => {
-      //   if (res.data.statusCode) {
-      //     this.$message.error(res.data.message);
-      //     return;
-      //   }
-      //   this.tableOption.data = res.data.rows;
-      //   this.tableOption.page.total = res.data.total;
-      // });
+      let params = {
+        pageSize: this.tableOption.page.pageSize || 10,
+        currentPage: 1,
+        ...data,
+        elsAccount: this.elsAccount
+      };
+
+      // new itemStatus 0
+      // quoting itemStatus 1
+      // close itemStatus 6
+      // approval auditStatus 2
+      // pass auditStatus 0
+      // reject auditStatus 3
+      if (['new', 'quoting', 'close'].includes(this.tabActive)) {
+        params = {
+          ...params,
+          itemStatus: this.tabActive === 'new' ? '0' : this.tabActive === 'quoting' ? '1' : '6'
+        };
+      } else if (['approval', 'pass', 'reject'].includes(this.tabActive)) {
+        params = {
+          ...params,
+          auditStatus: this.tabActive === 'approval' ? '2' : this.tabActive === 'pass' ? '0' : '3'
+        };
+      }
+      purchaseEnquiryAction('findPageList', params).then((res) => {
+        if (res.data.statusCode !== '200') {
+          this.$message.error(res.data.message || '请求失败');
+          return;
+        }
+        this.tableOption.data = res.data.pageData.rows;
+        this.tableOption.page.total = res.data.pageData.total;
+      });
     }
   }
 };

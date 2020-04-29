@@ -1,59 +1,70 @@
 export default {
   column: [
     {
-      type: 'select',
+      type: 'tree',
       label: '物料编号',
-      prop: 'materialNo'
+      prop: 'materialNumber',
+      rules: [
+        {
+          required: true,
+          message: '请选择物料编号',
+          trigger: 'blur'
+        }
+      ]
     },
-    {
-      label: '物料描述',
-      prop: 'materialDesc'
-    },
-    {
-      label: '规格',
-      prop: 'standards'
-    },
-    {
-      label: '单位',
-      prop: 'unit'
-    },
+    // {
+    //   label: '物料名称',
+    //   prop: 'materialName'
+    // },
+    // {
+    //   label: '物料描述',
+    //   prop: 'materialDesc'
+    // },
+    // {
+    //   label: '规格',
+    //   prop: 'materialSpecifications'
+    // },
+    // {
+    //   label: '单位',
+    //   prop: 'baseUnit '
+    // },
     {
       type: 'date',
       format: 'yyyy-MM-dd',
-      valueFormat: 'yyyy-MM-dd',
+      valueFormat: 'timestamp',
       label: '要求交期',
-      prop: 'requireTime'
+      prop: 'deliveryDate'
     },
     {
       label: '需求数量',
-      prop: 'count'
-    },
-    {
-      label: 'ELS账号',
-      prop: 'elsCount'
+      prop: 'quantity'
     },
     {
       type: 'date',
       format: 'yyyy-MM-dd',
-      valueFormat: 'yyyy-MM-dd',
+      valueFormat: 'timestamp',
       label: '交货日期',
-      prop: 'deadline'
+      prop: 'canDeliveryDate'
     },
     {
+      dicUrl: '/layout/dics/value/enquiryMethod',
+      dicMethod: 'get',
       type: 'select',
       label: '报价方式',
-      prop: 'quoteType'
+      prop: 'quoteMethod' // 0、1
     },
     {
       label: '设置成本报价',
       prop: 'setQuote'
-    },
-    {
-      span: 24,
-      label: '供应商',
-      prop: 'suppliers',
-      formslot: true
     }
+    // {
+    //   type: 'tree',
+    //   span: 24,
+    //   label: '供应商',
+    //   prop: 'toElsAccountList',
+    //   multiple: true
+    //   // formslot: true
+    // },
   ],
   menuBtn: true,
   emptyBtn: false,

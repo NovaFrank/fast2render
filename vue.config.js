@@ -15,6 +15,14 @@ module.exports = {
         pathRewrite: {
           '^/apis/': '/'
         }
+      },
+      '/layout/': {
+        target: 'http://www.fast2.cn:1337',
+        ws: false,
+        changOrigin: true,
+        pathRewrite: {
+          '^/layout/': '/'
+        }
       }
     }
   }

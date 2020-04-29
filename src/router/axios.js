@@ -10,6 +10,7 @@ import { Message } from 'element-ui';
 import NProgress from 'nprogress'; // progress bar
 import 'nprogress/nprogress.css'; // progress bar style
 import website from '@/const/website';
+import { getAccount } from '@/util/utils';
 
 axios.defaults.timeout = 10000;
 // 返回其他状态吗
@@ -26,6 +27,9 @@ NProgress.configure({
 axios.interceptors.request.use(
   (config) => {
     NProgress.start(); // start progress bar
+    let userAccount = getAccount();
+    config.headers['token'] = userAccount.token;
+    config.headers['account'] = `${userAccount.elsAccount}_${userAccount.elsSubAccount}`;
     return config;
   },
   (error) => {

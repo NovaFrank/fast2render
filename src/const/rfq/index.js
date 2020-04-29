@@ -1,16 +1,5 @@
 export default {
-  data: [
-    {
-      inquiryNo: 'inquiryNo',
-      inquiryType: 'inquiryType',
-      elsCount: 'elsCount'
-    },
-    {
-      inquiryNo: 'inquiryNo',
-      inquiryType: 'inquiryType',
-      elsCount: 'elsCount'
-    }
-  ],
+  data: [],
   page: {
     currentPage: 1,
     total: 0,
@@ -35,28 +24,29 @@ export default {
     column: [
       {
         label: '询价单号',
-        prop: 'inquiryNo'
+        prop: 'enquiryNumber'
       },
-      {
-        label: '询价类型',
-        prop: 'inquiryType'
-      },
+      // {
+      //   slot: true,
+      //   label: '状态',
+      //   prop: 'status'
+      // },
       {
         label: 'ELS账号',
-        prop: 'elsCount'
+        prop: 'elsAccount'
       },
-      {
-        label: '公司名称',
-        prop: 'companyName'
-      },
-      {
-        label: '询价日期',
-        prop: 'inquiryTime'
-      },
-      {
-        label: '报价截止日期',
-        prop: 'quoteDeadline'
-      },
+      // {
+      //   label: '公司名称',
+      //   prop: 'companyShortName'
+      // },
+      // {
+      //   label: '询价日期',
+      //   prop: 'beginDate'
+      // },
+      // {
+      //   label: '报价截止日期',
+      //   prop: 'endDate'
+      // },
       {
         label: '物料名称',
         prop: 'materialName'
@@ -67,15 +57,17 @@ export default {
       },
       {
         label: '数量',
-        prop: 'count'
+        prop: 'quantity'
       },
       {
+        type: 'date',
+        format: 'yyyy-MM-dd',
         label: '交货日期',
-        prop: 'deadline'
+        prop: 'canDeliveryDate'
       },
       {
         label: '创建人',
-        prop: 'creator'
+        prop: 'createUser'
       }
     ]
   }

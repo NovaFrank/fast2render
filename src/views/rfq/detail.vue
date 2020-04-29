@@ -5,7 +5,7 @@
       showButton
       :buttons="headerButtons"
       @on-close="handleClose"
-      @on-save="handleSave"
+      @on-submit-approval="handleSubmit"
     ></form-header>
     <avue-detail ref="form" v-model="detailObj" :option="formOption">
       <template slot="quoteDeadlineForm">
@@ -45,10 +45,14 @@
       @size-change="sizeChange"
       @current-change="currentChange"
     >
-      <template slot-scope="scope" slot="option">
+      <template slot-scope="scope" slot="itemStatus">
         <el-row :gutter="24">
           <el-col :span="12">
-            <avue-radio v-model="scope.option" :dic="dic"></avue-radio>
+            <avue-radio
+              v-model="scope.row.itemStatus"
+              :dic="dic"
+              @change="(value) => handleRadioChange(value, scope)"
+            ></avue-radio>
           </el-col>
           <!-- <el-col :span="6">
             <a class="scope-btn" @click.stop="handleAcceptShow(scope)">接受</a>
@@ -78,9 +82,17 @@ import fieldDialog from '@/components/views/fieldDialog';
 import fieldDialogOption from '@/const/rfq/newAndView/quoteDialog';
 import formOption from '@/const/rfq/newAndView/detail';
 import tabOption from '@/const/rfq/newAndView/tabs';
-import inquiryListOption from '@/const/rfq/newAndView/inquiryList';
+import inquiryListOption from '@/const/rfq/newAndView/detailInquiryList';
 import filesOption from '@/const/rfq/newAndView/fileList';
-import { elsFromSta } from '@/api/rfq';
+// import { elsFromSta } from '@/api/rfq';
+
+import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
+import {
+  dataDicAPI
+  // materialListAction,
+  // supplierMasterListAction,
+  // accountListAction
+} from '@/api/rfq/common';
 
 export default {
   components: {
@@ -91,12 +103,12 @@ export default {
     return {
       dic: [
         {
-          label: '接受',
-          value: 0
+          label: '接受', // 行信息 itemStatus
+          value: '4'
         },
         {
           label: '拒绝',
-          value: 1
+          value: '5'
         }
       ],
       formOption: formOption,
@@ -104,13 +116,7 @@ export default {
       inquiryListOption: inquiryListOption,
       filesOption: filesOption,
       tabActive: 'detail',
-      detailObj: {
-        formBusiness: 'Form Business',
-        inquiryTime: '2019-10-23',
-        quoteDeadline: '2019-12-09',
-        inCharge: 'In Charge',
-        mark: 'Mark'
-      },
+      detailObj: {},
       filesForm: {},
       fieldDialogForm: {},
       fieldDialogVisible: false,
@@ -119,40 +125,43 @@ export default {
       dialogOption: fieldDialogOption,
       headerButtons: [
         {
+          power: true,
           text: '返回',
           type: '',
           size: '',
           action: 'on-back'
         },
         {
-          text: '保存',
+          power: true,
+          text: '提交审批',
           type: 'primary',
           size: '',
-          action: 'on-save'
+          action: 'on-submit-approval'
         },
         {
+          power: true,
           text: '关闭',
           type: 'primary',
           size: '',
           action: 'on-close'
         },
         {
+          power: true,
           text: '开启',
           type: 'primary',
           size: '',
           action: 'on-open'
         }
-      ]
+      ],
+      currentEnquiryNumber: ''
     };
   },
   created() {
+    this.currentEnquiryNumber = this.$route.params.enquiryNumber;
     this.tableData();
+    this.initDetail();
   },
-  watch: {
-    tabActive() {
-      // this.tableData()
-    }
-  },
+  watch: {},
   methods: {
     closeFieldDialog() {
       this.fieldDialogVisible = false;
@@ -176,29 +185,98 @@ export default {
     handleCancel() {
       this.$router.back();
     },
-    handleClose() {},
-    handleDelete(row) {
-      this.$confirm('确定删除？', '提示').then(() => {
-        let params = {
-          elsAccount: row.elsAccount,
-          whetherDefault: row.whetherDefault,
-          fromDesc: row.fromDesc,
-          fromBusiness: row.fromBusiness,
-          fbk1: this.fbk1
+    handleClose() {
+      this.$confirm('是否提交审批？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const params = {
+          ...this.detailObj,
+          itemList: this.inquiryListOption.data
         };
-        elsFromSta('delElsFromSta', params).then((res) => {
-          if (res.data.statusCode) {
+        purchaseEnquiryAction('close', params).then((res) => {
+          if (res.data.statusCode !== '200') {
             this.$message.error(res.data.message);
             return;
           }
-          this.$message.success('删除成功');
-          this.tableData();
+          this.$message.success('提交成功');
         });
       });
     },
-    handleSave() {},
+    handleDelete(row) {
+      this.$confirm('确定删除？', '提示').then(() => {
+        // let params = {
+        //   elsAccount: row.elsAccount,
+        //   whetherDefault: row.whetherDefault,
+        //   fromDesc: row.fromDesc,
+        //   fromBusiness: row.fromBusiness,
+        //   fbk1: this.fbk1
+        // };
+        // elsFromSta('delElsFromSta', params).then((res) => {
+        //   if (res.data.statusCode) {
+        //     this.$message.error(res.data.message);
+        //     return;
+        //   }
+        //   this.$message.success('删除成功');
+        //   this.tableData();
+        // });
+      });
+    },
+    handleSubmit() {
+      this.$confirm('是否提交审批？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const params = {
+          enquiryNumber: this.currentEnquiryNumber,
+          itemList: this.inquiryListOption.data
+        };
+        purchaseEnquiryAction('acceptOrRefuse', params).then((res) => {
+          if (res.data.statusCode !== '200') {
+            this.$message.error(res.data.message);
+            return;
+          }
+          this.$message.success('提交成功');
+        });
+      });
+    },
+    handleRadioChange(value, scope) {
+      this.inquiryListOption.data[scope.row.$index].itemStatus = value;
+      if (value === '5') {
+        this.inquiryListOption.data[scope.row.$index].quota = '';
+        this.inquiryListOption.data[scope.row.$index].$cellEdit = false;
+      } else {
+        this.inquiryListOption.data[scope.row.$index].$cellEdit = true;
+      }
+    },
     handleTabChange(value) {
       this.tabActive = value.prop;
+    },
+    initDetailError(res) {
+      if (res.data.statusCode !== '200') {
+        this.$message.error(res.data.message);
+        return false;
+      }
+      return true;
+    },
+    initDetail() {
+      this.detailObj = {};
+      this.inquiryListOption.data = [];
+      queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
+        if (!this.initDetailError(res)) return;
+        this.detailObj = res.data.data;
+      });
+      queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
+        if (!this.initDetailError(res)) return;
+        this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
+          return {
+            $cellEdit: item.itemStatus === '4',
+            ...item
+          };
+        });
+      });
     },
     // 配额保存
     onSaveForm(form) {
@@ -224,20 +302,17 @@ export default {
       );
     },
     tableData(data) {
-      // const params = {
-      //   pageSize: this.inquiryListOption.page.pageSize || 10,
-      //   currentPage: 1,
-      //   ...data,
-      //   tabActive: this.tabActive
-      // };
-      // elsFromSta('queryElsFromSta', params).then((res) => {
-      //   if (res.data.statusCode) {
-      //     this.$message.error(res.data.message);
-      //     return;
-      //   }
-      //   this.inquiryListOption.data = res.data.rows;
-      //   this.inquiryListOption.page.total = res.data.total;
-      // });
+      dataDicAPI('enquiryType').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'enquiryType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
     },
     uploadAfter(res, done, loading) {
       console.log('after upload', res);

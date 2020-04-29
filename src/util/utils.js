@@ -1,4 +1,8 @@
 import _ from 'lodash';
+import { getStore, setStore } from '@/util/store.js';
+import { login } from '@/api/index';
+import { setToken } from '@/util/auth.js';
+import md5 from 'js-md5';
 /**
  * 验证表单
  *
@@ -48,4 +52,39 @@ export const mySpanMethod = (data, arr, filed, id, columnIndex, row) => {
       }
     }
   }
+};
+
+export const getUserInfo = () => {
+  if (window.frames.length === parent.frames.length) {
+    getLocalToken();
+  }
+  return getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
+};
+
+export const getAccount = () => {
+  let userInfo = getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
+  if (userInfo && userInfo.elsAccount) {
+    return userInfo;
+  }
+  return null;
+};
+
+export const getLocalToken = () => {
+  const params = {
+    elsAccount: '307000',
+    elsSubAccount: '1001',
+    elsSubAccountPassword: md5('123')
+  };
+  login(params).then((res) => {
+    setToken(res.data.data.token);
+    let params2 = {
+      name: 'userInfo',
+      content: {
+        elsAccount: params.elsAccount,
+        elsSubAccount: params.elsSubAccount,
+        token: res.data.data.token
+      }
+    };
+    setStore(params2);
+  });
 };

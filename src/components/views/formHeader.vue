@@ -3,7 +3,7 @@
     <p class="form-title">{{ titleText }}</p>
     <div v-if="showButton" class="form-buttons">
       <el-button
-        v-for="(button, index) in buttons"
+        v-for="(button, index) in buttons.filter((item) => item.power)"
         :key="index"
         :type="button.type"
         :size="button.size"
@@ -31,18 +31,21 @@ export default {
       default: () => {
         return [
           {
+            power: false,
             text: '取消',
             type: '',
             size: '',
             action: 'on-cancel'
           },
           {
+            power: false,
             text: '发布',
             type: 'primary',
             size: '',
             action: 'on-release'
           },
           {
+            power: false,
             text: '保存',
             type: 'primary',
             size: '',

@@ -1,6 +1,16 @@
 import request from '@/router/axios';
 let prefix = '/apis';
 
+// 获取登录信息 开发使用
+export const login = (params) =>
+  request({
+    url: `${prefix}/ElsAuthService/login`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+
 // 列表 queryElsFromSta、更新 saveElsFromSta、新增 insertElsFromSta、删除 delElsFromSta
 export const elsFromSta = (action, param) =>
   request({

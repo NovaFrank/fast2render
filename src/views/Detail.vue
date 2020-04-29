@@ -106,12 +106,12 @@ export default {
         pageSize: 10
       },
       formObj: {
-        toElsAccount: 'Form Business',
-        toElsAccountName: '111',
-        purchaseGroup: '111',
-        orderNumber: 'In Charge',
-        responsible: 'Mark',
-        purchaseType: 'dddd'
+        orderNumber: '',
+        orderType: '',
+        purchasePerson: '',
+        toElsAccount: '',
+        purchaseType: '',
+        purchaseGroup: ''
       },
       formOption: formOption,
       crudObj: {},

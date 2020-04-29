@@ -6,11 +6,21 @@ module.exports = {
   devServer: {
     proxy: {
       '/apis/': {
-        target: 'https://cs.51qqt.com/qqt-srm/rest',
-        ws: true,
+        // target: 'http://cs.51qqt.com/ELSServer_SRM',
+        target: 'http://cs.51qqt.com/ELSServer_SRM/rest',
+        ws: false,
         changOrigin: true,
-        pathRequiresRewrite: {
-          '^/apis/': ''
+        pathRewrite: {
+          '^/apis/': '/'
+        }
+      },
+      '/layout/': {
+        // target: 'http://localhost:1337',
+        target: 'http://www.fast2.cn:1337',
+        ws: false,
+        changOrigin: true,
+        pathRewrite: {
+          '^/layout/': '/'
         }
       }
     }

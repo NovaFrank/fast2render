@@ -1,32 +1,34 @@
 export default {
   column: [
     {
-      label: '供应商编号',
-      span: 6,
-      prop: 'toElsAccount'
-    },
-    {
-      label: '供应商名称',
-      span: 6,
-      prop: 'toElsAccountName'
-    },
-    {
-      label: '采购组',
-      prop: 'purchaseGroup'
-    },
-    {
-      label: '采购单号',
+      label: '订单单号',
       prop: 'orderNumber',
       span: 6
     },
     {
-      label: '负责人',
-      prop: 'responsible',
+      label: '订单类型',
+      prop: 'orderType',
+      span: 6
+    },
+    {
+      label: '采购负责人',
+      prop: 'purchasePerson',
+      span: 6
+    },
+    {
+      label: '供应商',
+      prop: 'toElsAccount',
       span: 6
     },
     {
       label: '采购类别',
-      prop: 'purchaseType'
+      prop: 'purchaseType',
+      span: 6
+    },
+    {
+      label: '采购组',
+      prop: 'purchaseGroup',
+      span: 6
     }
   ],
   menuBtn: true,

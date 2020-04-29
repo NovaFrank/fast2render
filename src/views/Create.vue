@@ -5,46 +5,28 @@
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
-      @on-release="handleRelease"
+      @on-submit="handleRelease"
       @on-save="handleSave"
     ></form-header>
     <div class="clear" style="margin-bottom: 30px;"></div>
-    <avue-form v-if="formOption.column" :option="formOption" v-model="formObj" ref="form">
-      <template slot="orderType">
-        <div>
-          <el-select v-model="orderTypeValue" @change="selectChange">
-            <el-option
-              v-for="item in dicData"
-              :key="item.fieldValue"
-              :label="item.fieldValueText"
-              :value="item.fieldValue"
-            ></el-option>
-          </el-select>
-        </div>
+    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form">
+      <template slot="toElsAccount">
+        <el-input v-model="formOption.obj.toElsAccount" :readonly="true">
+          <i
+            slot="suffix"
+            class=" el-input_icon el-icon-search pointer"
+            @click="supplierDialogOpen"
+          ></i>
+        </el-input>
       </template>
-      <template slot="purchaseType">
-        <div>
-          <el-select v-model="purchaseTypeValue" @change="selectChange">
-            <el-option
-              v-for="item in dicData"
-              :key="item.fieldValue"
-              :label="item.fieldValueText"
-              :value="item.fieldValue"
-            ></el-option>
-          </el-select>
-        </div>
-      </template>
-      <template slot="purchaseGroup">
-        <div>
-          <el-select v-model="purchaseGroupValue" @change="selectChange">
-            <el-option
-              v-for="item in dicData"
-              :key="item.fieldValue"
-              :label="item.fieldValueText"
-              :value="item.fieldValue"
-            ></el-option>
-          </el-select>
-        </div>
+      <template slot="purchasePerson">
+        <el-input v-model="formOption.obj.purchasePerson" :readonly="true">
+          <i
+            slot="suffix"
+            class=" el-input_icon el-icon-search pointer"
+            @click="purchaseDialogOpen"
+          ></i>
+        </el-input>
       </template>
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
@@ -62,6 +44,15 @@
       <template slot="menuLeft">
         <button-group :option="btnOption" @item-add="itemAdd"></button-group>
       </template>
+      <template slot="materialNumberForm">
+        <el-input v-model="crudObj.materialNumber" :readonly="true">
+          <i
+            slot="suffix"
+            class=" el-input_icon el-icon-search pointer"
+            @click="materialDialogOpen"
+          ></i>
+        </el-input>
+      </template>
       <template slot-scope="scope" slot="menu">
         <el-row :gutter="24">
           <el-col :span="12">
@@ -77,6 +68,18 @@
         </el-row>
       </template>
     </avue-crud>
+    <avue-crud
+      v-if="tabActive === 'plan'"
+      :data="planListOption.data"
+      :option="planListOption.option"
+      v-model="planListOption.planObj"
+      :page.sync="planListOption.page"
+      @row-save="rowSavePlan"
+      @row-del="rowDelPlan"
+      @row-update="rowUpdatePlan"
+      ref="crud"
+    >
+    </avue-crud>
     <avue-form
       v-if="tabActive === 'files'"
       :option="fileOption.option"
@@ -84,13 +87,33 @@
       :upload-before="uploadBefore"
       :upload-after="uploadAfter"
     ></avue-form>
-    <avue-form
-      v-if="tabActive === 'plan'"
-      :option="fileOption.option"
-      v-model="filesForm"
-      :upload-before="uploadBefore"
-      :upload-after="uploadAfter"
-    ></avue-form>
+    <selectDialog
+      ref="materialDialog"
+      :dialogVisible.sync="dialogVisible"
+      :title="'添加物料'"
+      :column="materialOption.option.column"
+      :elsAccount="elsAccount"
+      actionPath="findPageList"
+      @save="materialDialogSave"
+    ></selectDialog>
+    <selectDialog2
+      ref="supplierDialog"
+      :dialogVisible.sync="dialogSupplierVisible"
+      :title="'添加供应商'"
+      :column="supplierOption.option.column"
+      :elsAccount="elsAccount"
+      actionPath="findPageList"
+      @save="supplierDialogSave"
+    ></selectDialog2>
+    <selectDialog3
+      ref="purchaseDialog"
+      :dialogVisible.sync="dialogPurchaseVisible"
+      :title="'添加采购方负责人'"
+      :column="purchaseOption.option.column"
+      :elsAccount="elsAccount"
+      actionPath="findPageList"
+      @save="purchaseDialogSave"
+    ></selectDialog3>
   </basic-container>
 </template>
 
@@ -99,11 +122,24 @@ import ButtonGroup from '@/common/ButtonGroup';
 import FormHeader from '@/components/formHeader';
 import tabOption from '@/const/order/tabs';
 import fileOption from '@/const/order/files';
+import formOption from '@/const/order/orderForm';
 import materielListOption from '@/const/order/materielList';
+import materialOption from '@/const/order/materiaList';
+import supplierOption from '@/const/order/supplierList';
+import purchaseOption from '@/const/order/purchaseList';
+import planListOption from '@/const/order/planList';
+import selectDialog from '@/common/selectDialog';
+import selectDialog2 from '@/common/selectDialog2';
+import selectDialog3 from '@/common/selectDialog3';
+import { getUserInfo } from '@/util/utils.js';
+import { getDataDic } from '@/api/order.js';
 export default {
   components: {
     FormHeader,
-    ButtonGroup
+    ButtonGroup,
+    selectDialog,
+    selectDialog2,
+    selectDialog3
   },
   name: 'Detail',
   props: {
@@ -123,6 +159,8 @@ export default {
         itemList: []
       },
       dialogVisible: false,
+      dialogSupplierVisible: false,
+      dialogPurchaseVisible: false,
       tabOption: tabOption,
       tabActive: 'detail',
       fileOption: fileOption,
@@ -139,7 +177,10 @@ export default {
       tableCode: '',
       formColumn: [],
       tableColumn: [],
+      orderNumberValue: '',
       orderTypeValue: '', // 订单类型的值
+      purchasePersonValue: '',
+      elsAccountNameValue: '',
       purchaseTypeValue: '',
       purchaseGroupValue: '',
       dicData: [
@@ -161,24 +202,9 @@ export default {
         pageSize: 10
       },
       formObj: {},
-      formOption: {
-        menuPosition: 'left',
-        labelWidth: 120,
-        menuBtn: false,
-        column: []
-      },
+      formOption: formOption,
       crudObj: {},
-      crudData: [
-        {
-          orderNumber: '12003827276',
-          elsAccount: '127989832',
-          supplierName: '彩虹有限公司',
-          createDate: '2020-03-02',
-          unix: '2020-03-02',
-          orderType: '类型1',
-          purchasePerson: '李雷'
-        }
-      ],
+      crudData: [],
       crudOption: {},
       uploadObj: {},
       uploadData: [],
@@ -217,10 +243,10 @@ export default {
       },
       headerButtons: [
         {
-          text: '审批流程',
+          text: '返回',
           type: 'primary',
           size: 'small',
-          action: 'on-approval'
+          action: 'on-cancel'
         },
         {
           text: '保存',
@@ -229,35 +255,12 @@ export default {
           action: 'on-save'
         },
         {
-          text: '提交审批',
+          text: '提交',
           type: 'primary',
           size: 'small',
           action: 'on-submit'
         }
       ],
-      dialogCrudObj: {},
-      dialogCrudData: [],
-      dialogCrudOption: {
-        // 系统自带配置的表格
-        highlightCurrentRow: true,
-        indexLabel: '序号',
-        indexFixed: false,
-        align: 'center',
-        border: true,
-        stripe: true,
-        page: true,
-        menu: false,
-        index: true,
-        sortable: true,
-        tip: false,
-        addBtn: false,
-        columnBtn: false,
-        refreshBtn: false,
-        searchBtn: false,
-        dialogDrag: true,
-        searchMenuSpan: 2,
-        column: []
-      },
       btnOption: [
         {
           name: 'btn-add',
@@ -266,35 +269,37 @@ export default {
           action: 'item-add',
           align: 'btn-left'
         }
-      ]
+      ],
+      materialOption: materialOption,
+      supplierOption: supplierOption,
+      purchaseOption: purchaseOption,
+      planListOption: planListOption
     };
   },
   async created() {
-    // this.formOption.column = this.formColumn // 初始化默认显示的表单
-    if (this.isEdit) {
-      this.selectDisabled = true;
-      // 订单类型的值
-      // todo
-      if (this.purchaseRequestNumber) {
-        this.fechList(this.page, this.purchaseRequestNumber);
-      }
-    }
-    // this.dicData = res.data.rows;
-    if (this.isEdit === false) {
-      // this.orderTypeValue = res.data.rows[0].fieldValue;
-      this.selectChange(this.orderTypeValue);
-    }
-    this.fetchConfig();
-    if (this.isEdit === true) {
-      // 只有编辑状态下才有默认选项
-      this.selectChange(this.orderTypeValue);
-    }
+    const userInfo = getUserInfo();
+    this.elsAccount = userInfo.elsAccount;
+    this.elsSubAccount = userInfo.elsSubAccount;
+    this.getDicData();
   },
   methods: {
-    // 分页
-    currentChange(val) {
-      this.page.currentPage = val;
-      this.getmaterialList(this.page);
+    async getDicData(data) {
+      const action = 'orderType';
+      const action2 = 'purchaseType';
+      const resp = await getDataDic(action);
+      const resp2 = await getDataDic(action2);
+      this.formOption.option.column[0].dicData = [];
+      for (let item of resp.data) {
+        const orderTypeList = {};
+        orderTypeList.value = item.label;
+        this.formOption.option.column[0].dicData.push(orderTypeList);
+      }
+      this.formOption.option.column[4].dicData = [];
+      for (let item of resp2.data) {
+        const purchaseTypeList = {};
+        purchaseTypeList.value = item.label;
+        this.formOption.option.column[4].dicData.push(purchaseTypeList);
+      }
     },
     itemAdd() {
       this.$refs.crud.rowAdd();
@@ -324,11 +329,6 @@ export default {
     },
     // 切换表格
     handleTabClick(value) {
-      this.page = {
-        currentPage: 1,
-        total: 0,
-        pageSize: 10
-      };
       this.tabActive = value.prop;
     },
     handleAddShow(row) {
@@ -336,54 +336,7 @@ export default {
     },
     // 选择申请类型的值后触发接口
     async selectChange(value) {
-      this.fetchConfig(); // 防止没有配置的选项，form表单显示的是之前的表单配置
-    },
-    fetchConfig() {
-      this.formColumn = [
-        {
-          label: '订单类型',
-          prop: 'orderType',
-          span: 6,
-          type: 'select',
-          formslot: true,
-          rules: [
-            {
-              required: true,
-              message: '请选择',
-              trigger: 'blur'
-            }
-          ]
-        },
-        {
-          label: '采购类别',
-          prop: 'purchaseType',
-          span: 6,
-          type: 'select',
-          formslot: true,
-          rules: [
-            {
-              required: true,
-              message: '请选择',
-              trigger: 'blur'
-            }
-          ]
-        },
-        {
-          label: '采购组',
-          prop: 'purchaseGroup',
-          span: 6,
-          type: 'select',
-          formslot: true,
-          rules: [
-            {
-              required: true,
-              message: '请选择',
-              trigger: 'blur'
-            }
-          ]
-        }
-      ];
-      this.formOption.column = this.formColumn;
+      // this.fetchConfig(); // 防止没有配置的选项，form表单显示的是之前的表单配置
     },
     fechList(page, purchaseRequestNumber) {
       // this.crudData = res.data.purchaseRequestItemVOs;
@@ -400,14 +353,31 @@ export default {
       this.params.addList.push(row);
       done();
     },
-
+    rowSavePlan(row, done, loading) {
+      // 保存新增的数据
+      if (this.crudPlanData === undefined) {
+        this.crudPlanData = [];
+      }
+      this.crudPlanData.push(row);
+      this.params.addList.push(row);
+      done();
+    },
     rowUpdate(form, index, done, loading) {
+      loading();
+      done();
+    },
+    rowUpdatePlan(form, index, done, loading) {
       loading();
       done();
     },
     rowDel(row, index) {
       // 删除
       this.crudData.splice(index, 1);
+      this.params.deleteList.push(row);
+    },
+    rowDelPlan(row, index) {
+      // 删除
+      this.crudPlanData.splice(index, 1);
       this.params.deleteList.push(row);
     },
     handleCancel() {
@@ -427,6 +397,35 @@ export default {
     },
     onSaveForm(form) {
       // todo
+    },
+    materialDialogOpen() {
+      this.dialogVisible = true;
+    },
+    supplierDialogOpen() {
+      this.dialogSupplierVisible = true;
+    },
+    purchaseDialogOpen() {
+      this.dialogPurchaseVisible = true;
+    },
+    materialDialogSave(selectColumns) {
+      if (selectColumns.length !== 0) {
+        this.crudObj.materialNumber = selectColumns[0].materialNumber;
+        this.crudObj.materialDesc = selectColumns[0].materialDesc;
+        this.crudObj.materialSpecifications = selectColumns[0].materialSpecifications;
+        this.crudObj.baseUnit = selectColumns[0].baseUnit;
+      }
+    },
+    supplierDialogSave(selectColumns) {
+      if (selectColumns.length !== 0) {
+        this.formOption.obj.toElsAccount = selectColumns[0].toElsAccount;
+        this.formOption.obj.supplierName = selectColumns[0].supplierName;
+      }
+    },
+    purchaseDialogSave(selectColumns) {
+      if (selectColumns.length !== 0) {
+        this.formOption.obj.purchasePerson =
+          selectColumns[0].elsSubAccount + '_' + selectColumns[0].name;
+      }
     }
   }
 };

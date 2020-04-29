@@ -1,15 +1,9 @@
 export default {
-  data: [
-    {
-      orderNumber: '123345',
-      elsAccount: '000000',
-      supplierName: 'iek'
-    }
-  ],
+  data: [],
   page: {
     currentPage: 1,
     total: 0,
-    pageSize: 20
+    pageSize: 10
   },
   option: {
     menu: false,
@@ -36,15 +30,14 @@ export default {
       },
       {
         label: '公司名称',
-        prop: 'supplierName'
+        prop: 'elsAccountName'
       },
       {
         label: '创建日期',
-        prop: 'createDate'
-      },
-      {
-        label: '时间戳',
-        prop: 'unix'
+        prop: 'createDate',
+        type: 'date',
+        format: 'yyyy-MM-dd',
+        valueFormat: 'yyyy-MM-dd'
       },
       {
         label: '订单类型',
@@ -53,6 +46,10 @@ export default {
       {
         label: '采购负责人',
         prop: 'purchasePerson'
+      },
+      {
+        label: '订单状态',
+        prop: 'orderStatus'
       }
     ]
   }

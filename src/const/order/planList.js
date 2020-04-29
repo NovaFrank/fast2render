@@ -6,6 +6,7 @@ export default {
     pageSize: 10
   },
   option: {
+    header: false,
     dialogDirection: 'rtl',
     dialogType: 'drawer',
     border: true,
@@ -21,9 +22,6 @@ export default {
     delBtn: false,
     refreshBtn: false,
     columnBtn: false,
-    // addRowBtn: true,
-    // cellBtn: true,
-    rowKey: '$index', // todo 需要一个固定的主键，来防止点击行取消时，数据被删
     column: [
       {
         label: '物料编码',
@@ -35,45 +33,28 @@ export default {
         prop: 'materialDesc'
       },
       {
-        label: '规格',
-        prop: 'materialSpecifications',
-        addDisplay: false
-      },
-      {
-        label: '单位',
-        prop: 'baseUnit',
+        label: '要求交期',
+        prop: 'requestDeliveryDate',
+        type: 'date',
+        format: 'yyyy-MM-dd',
+        valueFormat: 'yyyy-MM-dd',
         addDisplay: false
       },
       {
         label: '需求数量',
-        prop: 'quantity'
+        prop: 'requestDeliveryQuantity'
       },
       {
-        label: 'ELS账号',
-        prop: 'elsAccount',
-        addDisplay: false
-      },
-      {
-        label: '供应商',
-        prop: 'toElsAccount',
-        addDisplay: false
-      },
-      {
-        label: '交货日期',
-        type: 'deliveryDate',
+        label: '计划交货日期',
+        type: 'date',
         format: 'yyyy-MM-dd',
         valueFormat: 'yyyy-MM-dd',
-        prop: 'receivedTime',
+        prop: 'replyDeliveryDate',
         addDisplay: false
       },
       {
-        label: '含税价',
-        prop: 'orderAmountTax'
-      },
-      {
-        label: '不含税价',
-        prop: 'orderAmount',
-        addDisplay: false
+        label: '计划交货数量',
+        prop: 'replyDeliveryQuantity'
       }
     ]
   }

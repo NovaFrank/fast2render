@@ -22,6 +22,7 @@ export default {
       {
         label: '订单号',
         prop: 'orderNumber',
+        width: 200,
         slot: true
       },
       {
@@ -54,30 +55,6 @@ export default {
         type: 'select',
         disabled: true,
         dicData: [
-          {
-            label: '已作废',
-            value: '-1'
-          },
-          {
-            label: '订单关闭已确认',
-            value: '11'
-          },
-          {
-            label: '订单关闭未确认',
-            value: '10'
-          },
-          {
-            label: '更新生产状态',
-            value: '7'
-          },
-          {
-            label: '变更对方退回',
-            value: '5'
-          },
-          {
-            label: '变更对方已确认',
-            value: '4'
-          },
           {
             label: '供方已确认',
             value: '3'

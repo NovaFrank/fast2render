@@ -22,7 +22,7 @@ export default {
         prop: 'Reject'
       },
       {
-        label: '供方确认中',
+        label: '已发送',
         prop: 'ProviderPending'
       },
       {

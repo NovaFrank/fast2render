@@ -117,7 +117,7 @@ export default {
     handleList() {
       let listParams = {};
       listParams.elsAccount = this.elsAccount;
-      listParams.toElsAccout = '307001';
+      // listParams.toElsAccout = '307002';
       listParams.currentPage = this.crudPage.currentPage;
       listParams.pageSize = this.crudPage.pageSize;
       getSupplierData(this.actionPath, listParams).then((res) => {

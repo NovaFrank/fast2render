@@ -359,68 +359,99 @@ export default {
       this.$router.back();
     },
     // 发送订单
-    handleRelease() {
+    async handleRelease() {
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
 
-      this.$confirm('确定发送?', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'primary'
-      })
-        .then(() => {
-          const action = 'sendOrder';
-          let params = {
-            elsAccount: this.elsAccount,
-            elsSubAccount: this.elsSubAccount,
-            ...this.formOption.obj,
-            orderItemVOList: this.materielListOption.data,
-            deliveryPlanVOList: this.planListOption.data
-          };
-          console.log('params: ' + JSON.stringify(params));
-          return createOrder(action, params);
-        })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '发送成功!'
-          });
-          this.$router.push({ path: '/list' });
-        })
-        .catch(() => {});
+      const action = 'sendOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
+      console.log('params: ' + JSON.stringify(params));
+      await createOrder(action, params);
+
+      this.$message({
+        type: 'success',
+        message: '发送成功!'
+      });
+      this.$router.push({ path: '/list' });
+
+      // this.$confirm('确定发送?', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'primary'
+      // })
+      //   .then(() => {
+      //     const action = 'sendOrder';
+      //     let params = {
+      //       elsAccount: this.elsAccount,
+      //       elsSubAccount: this.elsSubAccount,
+      //       ...this.formOption.obj,
+      //       orderItemVOList: this.materielListOption.data,
+      //       deliveryPlanVOList: this.planListOption.data
+      //     };
+      //     console.log('params: ' + JSON.stringify(params));
+      //     return createOrder(action, params);
+      //   })
+      //   .then(() => {
+      //     this.$message({
+      //       type: 'success',
+      //       message: '发送成功!'
+      //     });
+      //     this.$router.push({ path: '/list' });
+      //   })
+      //   .catch(() => {});
     },
 
     // 保存
     async handleSave() {
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
+      const action = 'createOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
+      console.log('params: ' + JSON.stringify(params));
+      await createOrder(action, params);
+      this.$message({
+        type: 'success',
+        message: '保存成功!'
+      });
+      this.$router.push({ path: '/list' });
 
-      this.$confirm('确定保存?', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'primary'
-      })
-        .then(() => {
-          const action = 'createOrder';
-          let params = {
-            elsAccount: this.elsAccount,
-            elsSubAccount: this.elsSubAccount,
-            ...this.formOption.obj,
-            orderItemVOList: this.materielListOption.data,
-            deliveryPlanVOList: this.planListOption.data
-          };
-          console.log('params: ' + JSON.stringify(params));
-          return createOrder(action, params);
-        })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '保存成功!'
-          });
-          this.$router.push({ path: '/list' });
-        })
-        .catch(() => {});
-      // this.onLoad(this.mainTable.page);
+      // this.$confirm('确定保存?', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'primary'
+      // })
+      //   .then(() => {
+      //     const action = 'createOrder';
+      //     let params = {
+      //       elsAccount: this.elsAccount,
+      //       elsSubAccount: this.elsSubAccount,
+      //       ...this.formOption.obj,
+      //       orderItemVOList: this.materielListOption.data,
+      //       deliveryPlanVOList: this.planListOption.data
+      //     };
+      //     console.log('params: ' + JSON.stringify(params));
+      //     return createOrder(action, params);
+      //   })
+      //   .then(() => {
+      //     this.$message({
+      //       type: 'success',
+      //       message: '保存成功!'
+      //     });
+      //     this.$router.push({ path: '/list' });
+      //   })
+      //   .catch(() => {});
     },
 
     uploadAfter(res, done, loading) {

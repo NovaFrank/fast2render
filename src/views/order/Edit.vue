@@ -387,60 +387,92 @@ export default {
     async handleSave() {
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
-      this.$confirm(`确认提交修改？`, {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          const action = 'updateOrder';
-          let params = {
-            elsAccount: this.elsAccount,
-            elsSubAccount: this.elsSubAccount,
-            ...this.formOption.obj,
-            orderItemVOList: this.materielListOption.data,
-            deliveryPlanVOList: this.planListOption.data
-          };
-          console.log('params: ' + JSON.stringify(params.orderItemVOList));
-          return createOrder(action, params);
-        })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          });
-          this.$router.push({ path: '/list' });
-        });
+      const action = 'updateOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
+      console.log('params: ' + JSON.stringify(params.orderItemVOList));
+      await createOrder(action, params);
+      this.$message({
+        type: 'success',
+        message: '修改成功!'
+      });
+      this.$router.push({ path: '/list' });
+
+      // this.$confirm(`确认提交修改？`, {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // })
+      //   .then(() => {
+      //     const action = 'updateOrder';
+      //     let params = {
+      //       elsAccount: this.elsAccount,
+      //       elsSubAccount: this.elsSubAccount,
+      //       ...this.formOption.obj,
+      //       orderItemVOList: this.materielListOption.data,
+      //       deliveryPlanVOList: this.planListOption.data
+      //     };
+      //     console.log('params: ' + JSON.stringify(params.orderItemVOList));
+      //     return createOrder(action, params);
+      //   })
+      //   .then(() => {
+      //     this.$message({
+      //       type: 'success',
+      //       message: '修改成功!'
+      //     });
+      //     this.$router.push({ path: '/list' });
+      //   });
     },
 
     // 发送订单
-    handleRelease() {
+    async handleRelease() {
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
-      this.$confirm(`确认提交修改？`, {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          const action = 'sendOrder';
-          let params = {
-            elsAccount: this.elsAccount,
-            elsSubAccount: this.elsSubAccount,
-            ...this.formOption.obj,
-            orderItemVOList: this.materielListOption.data,
-            deliveryPlanVOList: this.planListOption.data
-          };
-          console.log('params: ' + JSON.stringify(params.orderItemVOList));
-          return createOrder(action, params);
-        })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          });
-          this.$router.push({ path: '/list' });
-        });
+      const action = 'sendOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
+      console.log('params: ' + JSON.stringify(params.orderItemVOList));
+      await createOrder(action, params);
+      this.$message({
+        type: 'success',
+        message: '修改成功!'
+      });
+      this.$router.push({ path: '/list' });
+
+      // this.$confirm(`确认提交修改？`, {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // })
+      //   .then(() => {
+      //     const action = 'sendOrder';
+      //     let params = {
+      //       elsAccount: this.elsAccount,
+      //       elsSubAccount: this.elsSubAccount,
+      //       ...this.formOption.obj,
+      //       orderItemVOList: this.materielListOption.data,
+      //       deliveryPlanVOList: this.planListOption.data
+      //     };
+      //     console.log('params: ' + JSON.stringify(params.orderItemVOList));
+      //     return createOrder(action, params);
+      //   })
+      //   .then(() => {
+      //     this.$message({
+      //       type: 'success',
+      //       message: '修改成功!'
+      //     });
+      //     this.$router.push({ path: '/list' });
+      //   });
     },
     uploadAfter(res, done, loading) {
       console.log('after upload', res);

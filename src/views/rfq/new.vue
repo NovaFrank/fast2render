@@ -4,6 +4,7 @@
       titleText="新建询价单"
       showButton
       :buttons="headerButtons"
+      @on-back="handleBack"
       @on-cancel="handleCancel"
       @on-close="handleClose"
       @on-delete="handleDelete"
@@ -194,7 +195,7 @@ export default {
       this.fieldDialogVisible = true;
     },
     handleClose() {
-      this.$confirm('是否提交审批？', '提示', {
+      this.$confirm('是否关闭？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -208,7 +209,22 @@ export default {
             this.$message.error(res.data.message);
             return;
           }
-          this.$message.success('提交成功');
+          this.$message.success('关闭成功');
+        });
+      });
+    },
+    handleBack() {
+      this.$confirm('是否退回？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        queryDetailAction('goBack', this.currentEnquiryNumber).then((res) => {
+          if (res.data.statusCode !== '200') {
+            this.$message.error(res.data.message);
+            return;
+          }
+          this.$message.success('退回成功');
         });
       });
     },

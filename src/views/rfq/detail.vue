@@ -6,14 +6,15 @@
       :buttons="headerButtons"
       @on-close="handleClose"
       @on-submit-approval="handleSubmit"
+      @on-update-end="handleUpdateEndDate"
     ></form-header>
     <avue-detail ref="form" v-model="detailObj" :option="formOption">
-      <template slot="quoteDeadlineForm">
+      <template slot="endDateForm">
         <el-date-picker
-          v-model="detailObj.quoteDeadline"
+          v-model="detailObj.endDate"
           type="date"
           placeholder="选择日期"
-          value-format="yyyy-MM-dd"
+          value-format="timestamp"
         ></el-date-picker>
         <!-- @change="handleYearChange" -->
       </template>
@@ -45,7 +46,13 @@
       @size-change="sizeChange"
       @current-change="currentChange"
     >
-      <template slot-scope="scope" slot="itemStatus">
+      <template slot="taxRate" slot-scope="scope">
+        <span v-if="scope.row.itemStatus === '2'">**</span>
+      </template>
+      <template slot="priceIncludingTax" slot-scope="scope">
+        <span v-if="scope.row.itemStatus === '2'">**</span>
+      </template>
+      <template slot-scope="scope" slot="option">
         <el-row :gutter="24">
           <el-col :span="12">
             <avue-radio
@@ -54,11 +61,13 @@
               @change="(value) => handleRadioChange(value, scope)"
             ></avue-radio>
           </el-col>
-          <!-- <el-col :span="6">
-            <a class="scope-btn" @click.stop="handleAcceptShow(scope)">接受</a>
-          </el-col> -->
           <el-col :span="12">
-            <a class="scope-btn">重报价</a>
+            <el-button
+              class="el-button el-button--text el-button--small"
+              @click.stop="handleAgainQuote(scope.row)"
+            >
+              <span>重报价</span>
+            </el-button>
           </el-col>
         </el-row>
       </template>
@@ -84,15 +93,9 @@ import formOption from '@/const/rfq/newAndView/detail';
 import tabOption from '@/const/rfq/newAndView/tabs';
 import inquiryListOption from '@/const/rfq/newAndView/detailInquiryList';
 import filesOption from '@/const/rfq/newAndView/fileList';
-// import { elsFromSta } from '@/api/rfq';
 
 import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
-import {
-  dataDicAPI
-  // materialListAction,
-  // supplierMasterListAction,
-  // accountListAction
-} from '@/api/rfq/common';
+import { dataDicAPI } from '@/api/rfq/common';
 
 export default {
   components: {
@@ -124,34 +127,11 @@ export default {
       dialogWidth: '30%',
       dialogOption: fieldDialogOption,
       headerButtons: [
-        {
-          power: true,
-          text: '返回',
-          type: '',
-          size: '',
-          action: 'on-back'
-        },
-        {
-          power: true,
-          text: '提交审批',
-          type: 'primary',
-          size: '',
-          action: 'on-submit-approval'
-        },
-        {
-          power: true,
-          text: '关闭',
-          type: 'primary',
-          size: '',
-          action: 'on-close'
-        },
-        {
-          power: true,
-          text: '开启',
-          type: 'primary',
-          size: '',
-          action: 'on-open'
-        }
+        { power: true, text: '返回', type: '', size: '', action: 'on-back' },
+        { power: true, text: '更新时间', type: 'primary', size: '', action: 'on-update-end' },
+        { power: true, text: '提交审批', type: 'primary', size: '', action: 'on-submit-approval' },
+        { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+        { power: true, text: '开启', type: 'primary', size: '', action: 'on-open' }
       ],
       currentEnquiryNumber: ''
     };
@@ -182,11 +162,31 @@ export default {
       this.dialogTitle = `${scope.row.supplier}(${scope.row.elsCount})供应商授标配额`;
       this.fieldDialogVisible = true;
     },
+    handleAgainQuote(row) {
+      this.$confirm('确定要该供应商物料重报价？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const params = {
+          enquiryNumber: this.detailObj.enquiryNumber,
+          itemList: [this.inquiryListOption.data[row.$index]]
+        };
+        purchaseEnquiryAction('againQuote', params).then((res) => {
+          if (res.data.statusCode !== '200') {
+            this.$message.error(res.data.message);
+            return;
+          }
+          this.$message.success('重报价成功');
+          this.$router.go(0);
+        });
+      });
+    },
     handleCancel() {
       this.$router.back();
     },
     handleClose() {
-      this.$confirm('是否提交审批？', '提示', {
+      this.$confirm('是否关闭？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -204,24 +204,17 @@ export default {
         });
       });
     },
-    handleDelete(row) {
-      this.$confirm('确定删除？', '提示').then(() => {
-        // let params = {
-        //   elsAccount: row.elsAccount,
-        //   whetherDefault: row.whetherDefault,
-        //   fromDesc: row.fromDesc,
-        //   fromBusiness: row.fromBusiness,
-        //   fbk1: this.fbk1
-        // };
-        // elsFromSta('delElsFromSta', params).then((res) => {
-        //   if (res.data.statusCode) {
-        //     this.$message.error(res.data.message);
-        //     return;
-        //   }
-        //   this.$message.success('删除成功');
-        //   this.tableData();
-        // });
-      });
+    handleRadioChange(value, scope) {
+      this.inquiryListOption.data[scope.row.$index].itemStatus = value;
+      if (value === '5') {
+        this.inquiryListOption.data[scope.row.$index].quota = '';
+        this.inquiryListOption.data[scope.row.$index].$cellEdit = false;
+      } else {
+        this.inquiryListOption.data[scope.row.$index].$cellEdit = true;
+      }
+    },
+    handleTabChange(value) {
+      this.tabActive = value.prop;
     },
     handleSubmit() {
       this.$confirm('是否提交审批？', '提示', {
@@ -242,17 +235,21 @@ export default {
         });
       });
     },
-    handleRadioChange(value, scope) {
-      this.inquiryListOption.data[scope.row.$index].itemStatus = value;
-      if (value === '5') {
-        this.inquiryListOption.data[scope.row.$index].quota = '';
-        this.inquiryListOption.data[scope.row.$index].$cellEdit = false;
-      } else {
-        this.inquiryListOption.data[scope.row.$index].$cellEdit = true;
-      }
-    },
-    handleTabChange(value) {
-      this.tabActive = value.prop;
+    handleUpdateEndDate() {
+      this.$confirm('是否更新截止时间？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        console.log('detailObj', this.detailObj);
+        purchaseEnquiryAction('updateQuoteEndTime', this.detailObj).then((res) => {
+          if (res.data.statusCode !== '200') {
+            this.$message.error(res.data.message);
+            return;
+          }
+          this.$message.success('更新截止时间成功');
+        });
+      });
     },
     initDetailError(res) {
       if (res.data.statusCode !== '200') {

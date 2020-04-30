@@ -32,6 +32,16 @@ const routes = [
     path: '/quotationTemplate',
     name: 'quotationTemplate',
     component: () => import('@/views/rfq/quotationTemplate/index')
+  },
+  {
+    path: '/client/list',
+    name: 'rfqSupplierClientList',
+    component: () => import('@/views/rfq/supplierClient/index')
+  },
+  {
+    path: '/client/quota/:enquiryNumber',
+    name: 'rfqSupplierClientDetail',
+    component: () => import('@/views/rfq/supplierClient/quota')
   }
 ];
 

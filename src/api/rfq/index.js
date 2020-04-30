@@ -24,6 +24,8 @@ export const elsFromColumnSta = (action, param) =>
 // 发布 publishEnquiry post
 // 接受/拒绝 acceptOrRefuse post
 // 关闭 close post
+// 更新截止时间 updateQuoteEndTime post
+// 重报价 againQuote post
 export const purchaseEnquiryAction = (action, params) =>
   request({
     url: `${prefix}/inquiry/PurchaseEnquiryService/${action}`,
@@ -34,6 +36,7 @@ export const purchaseEnquiryAction = (action, params) =>
 // 询价单头明细查询 findHeadDetails/${enquiryNumber} get
 // 询价单行明细查询 findItemDetails/${enquiryNumber} get
 // 询价单删除 delete/${enquiryNumber} get
+// 退回 goBack get
 export const queryDetailAction = (action, enquiryNumber) =>
   request({
     url: `${prefix}/inquiry/PurchaseEnquiryService/${action}/${enquiryNumber}`,

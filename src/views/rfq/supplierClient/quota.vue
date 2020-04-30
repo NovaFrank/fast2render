@@ -1,0 +1,277 @@
+<template>
+  <div>
+    <form-header
+      titleText="报价详情"
+      showButton
+      :buttons="headerButtons"
+      @on-save="handleSave"
+      @on-send="handleSend"
+    ></form-header>
+    <avue-detail ref="form" v-model="detailObj" :option="formOption"> </avue-detail>
+    <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
+    <avue-crud
+      v-if="tabActive === 'files'"
+      :data="filesOption.data"
+      :option="filesOption.option"
+      :page.sync="filesOption.page"
+      @size-change="sizeChange"
+      @current-change="currentChange"
+    >
+      <template slot-scope="scope" slot="menu">
+        <el-row :gutter="24">
+          <el-col :span="6">
+            <a :href="scope.url">下载</a>
+          </el-col>
+        </el-row>
+      </template>
+    </avue-crud>
+    <avue-crud
+      v-if="tabActive === 'detail'"
+      :data="inquiryListOption.data"
+      :option="inquiryListOption.option"
+      :page.sync="inquiryListOption.page"
+      v-model="inquiryListOption.obj"
+      @size-change="sizeChange"
+      @current-change="currentChange"
+    >
+      <template slot-scope="scope" slot="quote">
+        <!-- <avue-switch
+          v-if="scope.row.itemStatus === '1'"
+          v-model="scope.row.noQuoted"
+          @change="(value) => handleSwitchChange(value, scope.row)"
+          :dic="dic"
+        ></avue-switch> -->
+        <avue-radio
+          v-model="scope.row.noQuoted"
+          :disabled="!['1', '3'].includes(scope.row.itemStatus)"
+          :dic="dic"
+          @change="(value) => handleRadioChange(value, scope)"
+        ></avue-radio>
+      </template>
+    </avue-crud>
+    <field-dialog
+      :dialogTitle="dialogTitle"
+      :dialogOption="dialogOption"
+      :field="fieldDialogForm"
+      :fieldDialogVisible="fieldDialogVisible"
+      :dialogWidth="dialogWidth"
+      @on-save-form="onSaveForm"
+      @close-field-dialog="closeFieldDialog"
+    ></field-dialog>
+  </div>
+</template>
+
+<script>
+import FormHeader from '@/components/views/formHeader';
+import fieldDialog from '@/components/views/fieldDialog';
+import fieldDialogOption from '@/const/rfq/newAndView/quoteDialog';
+import formOption from '@/const/rfq/newAndView/detail';
+import tabOption from '@/const/rfq/newAndView/tabs';
+import filesOption from '@/const/rfq/newAndView/fileList';
+
+import { getAction, postAction } from '@/api/rfq/supplierClient';
+import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
+import {
+  dataDicAPI
+  // materialListAction,
+  // supplierMasterListAction,
+  // accountListAction
+} from '@/api/rfq/common';
+
+export default {
+  components: {
+    FormHeader,
+    fieldDialog
+  },
+  data() {
+    return {
+      dic: [
+        {
+          label: '否',
+          value: 'N'
+        },
+        {
+          label: '是', // 行信息 itemStatus
+          value: 'Y'
+        }
+      ],
+      formOption: formOption,
+      tabOption: tabOption,
+      inquiryListOption: inquiryListOption,
+      filesOption: filesOption,
+      tabActive: 'detail',
+      detailObj: {},
+      filesForm: {},
+      fieldDialogForm: {},
+      fieldDialogVisible: false,
+      dialogTitle: '',
+      dialogWidth: '30%',
+      dialogOption: fieldDialogOption,
+      headerButtons: [
+        { power: true, text: '返回', type: '', size: '', action: 'on-back' },
+        { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+        { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
+        { power: true, text: '发送', type: 'primary', size: '', action: 'on-send' }
+      ],
+      currentEnquiryNumber: ''
+    };
+  },
+  created() {
+    this.currentEnquiryNumber = this.$route.params.enquiryNumber;
+    this.tableData();
+    this.initDetail();
+  },
+  watch: {},
+  methods: {
+    closeFieldDialog() {
+      this.fieldDialogVisible = false;
+    },
+    currentChange(val) {
+      this.inquiryListOption.page.currentPage = val;
+      this.tableData({
+        currentPage: val,
+        pageSize: this.inquiryListOption.page.pageSize
+      });
+    },
+    handleAcceptShow(scope) {
+      this.fieldDialogForm = {
+        index: scope.index,
+        quote: scope.row.quote
+      };
+      fieldDialogOption.column[0].label = `${scope.row.materialNo}配额`;
+      this.dialogTitle = `${scope.row.supplier}(${scope.row.elsCount})供应商授标配额`;
+      this.fieldDialogVisible = true;
+    },
+    handleCancel() {
+      this.$router.back();
+    },
+    handleSave() {
+      this.inquiryListOption.data.forEach((element) => {
+        console.log(element.priceIncludingTax);
+      });
+      const params = {
+        enquiryNumber: this.currentEnquiryNumber,
+        saleItemList: this.inquiryListOption.data
+      };
+      postAction('save', params).then((res) => {
+        if (res.data.statusCode !== '200') {
+          this.$message.error(res.data.message);
+          return;
+        }
+        this.$message.success('保存成功');
+      });
+    },
+    handleSend() {
+      this.$confirm('是否发送报价？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const params = {
+          enquiryNumber: this.currentEnquiryNumber,
+          toElsAccount: this.detailObj.toElsAccount,
+          saleItemList: this.inquiryListOption.data
+        };
+        postAction('quote', params).then((res) => {
+          if (res.data.statusCode !== '200') {
+            this.$message.error(res.data.message);
+            return;
+          }
+          this.$message.success('发送成功');
+        });
+      });
+    },
+    handleRadioChange(value, scope) {
+      if (value === 'N') {
+        this.inquiryListOption.data[scope.row.$index].priceIncludingTax = '';
+        this.inquiryListOption.data[scope.row.$index].taxRate = '';
+        this.inquiryListOption.data[scope.row.$index].priceExcludingTax = '';
+        this.inquiryListOption.data[scope.row.$index].$cellEdit = false;
+      } else {
+        this.inquiryListOption.data[scope.row.$index].$cellEdit = true;
+      }
+    },
+    handleTabChange(value) {
+      this.tabActive = value.prop;
+    },
+    initDetailError(res) {
+      if (res.data.statusCode !== '200') {
+        this.$message.error(res.data.message);
+        return false;
+      }
+      return true;
+    },
+    initDetail() {
+      this.detailObj = {};
+      this.inquiryListOption.data = [];
+      getAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
+        if (!this.initDetailError(res)) return;
+        this.detailObj = res.data.data;
+      });
+      // new itemStatus 0
+      // quoting itemStatus 1
+      // price itemStatus 4/5
+      // close itemStatus 6
+      getAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
+        if (!this.initDetailError(res)) return;
+        this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
+          return {
+            $cellEdit: ['1', '3'].includes(item.itemStatus) && item.noQuoted === 'Y', // 重报价/报价中，且报价 是
+            ...item,
+            noQuoted: item.noQuoted || 'Y'
+          };
+        });
+      });
+    },
+    // 配额保存
+    onSaveForm(form) {
+      console.log('form', form);
+      this.fieldDialogVisible = false;
+      this.inquiryListOption.data[form.index].quote = form.quote;
+    },
+    sizeChange(val) {
+      this.inquiryListOption.page.pageSize = val;
+      this.tableData({
+        currentPage: 1,
+        pageSize: val
+      });
+    },
+    tableData(data) {
+      // 询价类型 数据字典（临时），最好写option dicUrl
+      dataDicAPI('enquiryType').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'enquiryType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 报价方式 数据字典
+      dataDicAPI('quoteMethod').then((res) => {
+        this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
+          if (item.prop === 'quoteMethod') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+    },
+    uploadAfter(res, done, loading) {
+      console.log('after upload', res);
+      done();
+    },
+    uploadBefore(file, done, loading) {
+      console.log('before upload', file);
+      // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
+      const newFile = new File([file], '1234', { type: file.type });
+      done(newFile);
+    }
+  }
+};
+</script>

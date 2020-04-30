@@ -6,6 +6,7 @@ export default {
       prop: 'enquiryNumber'
     },
     {
+      type: 'select',
       // dicData: DIC.TABLE_CONFIG_DEFAULT,
       dicUrl: '/layout/dics/value/enquiryType',
       dicMethod: 'get',

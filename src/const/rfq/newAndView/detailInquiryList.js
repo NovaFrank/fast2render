@@ -50,12 +50,24 @@ export default {
         prop: 'toElsAccount'
       },
       {
+        type: 'select',
+        label: '状态',
+        prop: 'itemStatus',
+        dicData: [
+          { label: '已报价', value: '2' },
+          { label: '报价中', value: '1' },
+          { label: '重报价', value: '3' }
+        ]
+      },
+      {
+        slot: true,
         label: '税率',
         prop: 'taxRate'
       },
       {
+        slot: true,
         label: '报价',
-        prop: 'price'
+        prop: 'priceIncludingTax'
       },
       {
         label: '交货日期',
@@ -64,7 +76,7 @@ export default {
       {
         slot: true,
         label: '操作',
-        prop: 'itemStatus'
+        prop: 'option'
       },
       {
         label: '配额',

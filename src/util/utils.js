@@ -61,17 +61,28 @@ export const getUserInfo = () => {
   return getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
 };
 
+export const getSupplierInfo = () => {
+  if (window.frames.length === parent.frames.length) {
+    getLocalToken(true);
+  }
+  return getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
+};
+
 export const getAccount = () => {
   let userInfo = getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
   if (userInfo && userInfo.elsAccount) {
     return userInfo;
   }
-  return null;
+  return {
+    elsAccount: '',
+    elsSubAccount: '',
+    token: ''
+  };
 };
 
-export const getLocalToken = () => {
+export const getLocalToken = (supplier) => {
   const params = {
-    elsAccount: '307000',
+    elsAccount: supplier ? '307001' : '307000',
     elsSubAccount: '1001',
     elsSubAccountPassword: md5('123')
   };

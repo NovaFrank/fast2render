@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import tabOption from '@/const/order/navTabs';
-import tableAll from './tables/tableAll';
+import tabOption from '@/const/supplierOrder/navTabs';
+import tableAll from '../supplierTables/tableAll';
 // import tableUnRelease from './tables/tableUnRelease';
 // import tableRelease from './tables/tableRelease';
 export default {

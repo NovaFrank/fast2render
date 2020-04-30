@@ -30,63 +30,52 @@
       </template>
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
-    <avue-crud
-      v-if="tabActive === 'detail'"
-      :data="crudData"
-      :option="materielListOption.option"
-      v-model="crudObj"
-      :page.sync="page"
-      @row-save="rowSave"
-      @row-del="rowDel"
-      @row-update="rowUpdate"
-      ref="crud"
-    >
-      <template slot="menuLeft">
-        <button-group :option="btnOption" @item-add="itemAdd"></button-group>
-      </template>
-      <template slot="materialNumberForm">
-        <el-input v-model="crudObj.materialNumber" :readonly="true">
-          <i
-            slot="suffix"
-            class=" el-input_icon el-icon-search pointer"
-            @click="materialDialogOpen"
-          ></i>
-        </el-input>
-      </template>
-      <template slot-scope="scope" slot="menu">
-        <el-row :gutter="24">
-          <el-col :span="12">
-            <a class="scope-btn" @click.stop="handleAddShow(scope.row)">
-              编辑
-            </a>
-          </el-col>
-          <el-col :span="12">
-            <a class="scope-btn">
-              删除
-            </a>
-          </el-col>
-        </el-row>
-      </template>
-    </avue-crud>
-    <avue-crud
-      v-if="tabActive === 'plan'"
-      :data="planListOption.data"
-      :option="planListOption.option"
-      v-model="planListOption.planObj"
-      :page.sync="planListOption.page"
-      @row-save="rowSavePlan"
-      @row-del="rowDelPlan"
-      @row-update="rowUpdatePlan"
-      ref="crud"
-    >
-    </avue-crud>
-    <avue-form
-      v-if="tabActive === 'files'"
-      :option="fileOption.option"
-      v-model="filesForm"
-      :upload-before="uploadBefore"
-      :upload-after="uploadAfter"
-    ></avue-form>
+    <span v-if="tabActive.prop === 'detail'">
+      <avue-crud
+        :data="materielListOption.data"
+        :option="materielListOption.option"
+        v-model="crudObj"
+        :page.sync="page"
+        @row-save="rowSave"
+        @row-update="rowUpdate"
+        @row-del="handleDeleteRow"
+        ref="crud"
+      >
+        <template slot="menuLeft">
+          <button-group :option="btnOption" @item-add="itemAdd"></button-group>
+        </template>
+        <template slot="materialNumberForm">
+          <el-input v-model="crudObj.materialNumber" :readonly="true">
+            <i
+              slot="suffix"
+              class=" el-input_icon el-icon-search pointer"
+              @click="materialDialogOpen"
+            ></i>
+          </el-input>
+        </template>
+      </avue-crud>
+    </span>
+    <span v-if="tabActive.prop === 'plan'">
+      <avue-crud
+        :data="planListOption.data"
+        :option="planListOption.option"
+        v-model="planListOption.planObj"
+        :page.sync="planListOption.page"
+        @row-save="rowSavePlan"
+        @row-del="rowDelPlan"
+        @row-update="rowUpdatePlan"
+      >
+      </avue-crud>
+    </span>
+    <span v-if="tabActive.prop === 'files'">
+      <avue-form
+        :option="fileOption.option"
+        v-model="filesForm"
+        :upload-before="uploadBefore"
+        :upload-after="uploadAfter"
+      ></avue-form>
+    </span>
+
     <selectDialog
       ref="materialDialog"
       :dialogVisible.sync="dialogVisible"
@@ -132,7 +121,7 @@ import selectDialog from '@/common/selectDialog';
 import selectDialog2 from '@/common/selectDialog2';
 import selectDialog3 from '@/common/selectDialog3';
 import { getUserInfo } from '@/util/utils.js';
-import { getDataDic } from '@/api/order.js';
+import { getDataDic, createOrder } from '@/api/order.js';
 export default {
   components: {
     FormHeader,
@@ -154,15 +143,17 @@ export default {
   },
   data() {
     return {
+      elsAccount: '',
+      elsSubAccount: '',
       inputParamJson: {
         // 业务类型转换传入的值
         itemList: []
       },
+      tabActive: {},
       dialogVisible: false,
       dialogSupplierVisible: false,
       dialogPurchaseVisible: false,
       tabOption: tabOption,
-      tabActive: 'detail',
       fileOption: fileOption,
       filesForm: {},
       materielListOption: materielListOption,
@@ -174,37 +165,14 @@ export default {
       url: '', // 上传路径
       type: {},
       downloadMessage: '',
-      tableCode: '',
-      formColumn: [],
-      tableColumn: [],
-      orderNumberValue: '',
-      orderTypeValue: '', // 订单类型的值
-      purchasePersonValue: '',
-      elsAccountNameValue: '',
-      purchaseTypeValue: '',
-      purchaseGroupValue: '',
-      dicData: [
-        {
-          fieldValue: 1,
-          fieldValueText: '测试一'
-        },
-        {
-          fieldValue: 2,
-          fieldValueText: '测试二'
-        }
-      ], // 订单类型选项
-      selectDisabled: false, // 编辑时进入，select不能更改
-      purchaseRequestNumber: '', // 采购申请号
       page: {
         // pageSizes: [10, 20, 30, 40],默认
         currentPage: 1,
         total: 0,
         pageSize: 10
       },
-      formObj: {},
       formOption: formOption,
       crudObj: {},
-      crudData: [],
       crudOption: {},
       uploadObj: {},
       uploadData: [],
@@ -255,7 +223,7 @@ export default {
           action: 'on-save'
         },
         {
-          text: '提交',
+          text: '提交审批',
           type: 'primary',
           size: 'small',
           action: 'on-submit'
@@ -280,9 +248,15 @@ export default {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
+    this.materielListOption.data = [];
     this.getDicData();
+    this.tabActive = this.tabOption.option.column[0];
+    this.formOption.obj.orderStatus = '0';
+    this.formOption.obj.sendStatus = '0';
+    this.formOption.obj.deliveryStatus = '0';
   },
   methods: {
+    // 获取数据字典下拉列表
     async getDicData(data) {
       const action = 'orderType';
       const action2 = 'purchaseType';
@@ -304,77 +278,78 @@ export default {
     itemAdd() {
       this.$refs.crud.rowAdd();
     },
-    // 保存表头和表单
-    itemSave() {
-      this.$confirm(`确认添加？`, {
+
+    // 切换表格
+    handleTabClick(value) {
+      this.tabActive = value;
+      console.log(this.tabActive.prop);
+      sessionStorage.setItem('materialRow', JSON.stringify(this.materielListOption.data));
+      if (this.tabActive.prop === 'plan') {
+        let sessionCateCode = sessionStorage.getItem('materialRow');
+        this.planListOption.data = JSON.parse(sessionCateCode);
+
+        this.planListOption.data.forEach((item) => {
+          JSON.parse(sessionCateCode).forEach((i) => {
+            if (i.orderItemNumber === item.orderItemNumber) {
+              item.requestDeliveryDate = i.deliveryDate;
+              item.requestDeliveryQuantity = i.quantity;
+            }
+          });
+        });
+      }
+    },
+
+    handleDeleteRow(row, index) {
+      this.$confirm('确定将选择数据删除?', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      })
-        .then(() => {
-          this.formObj.requestType = this.orderTypeValue;
-          this.$refs.form.validate((vaild) => {
-            if (vaild) {
-              this.$message.success(JSON.stringify(this.obj0));
-            } else {
-              return false;
-            }
-          });
-          console.log('this.formObj :', this.formObj);
-        })
-        .then(() => {
-          this.selectChange(this.orderTypeValue);
-          this.$message.success('保存成功');
-        });
+      }).then(() => {
+        this.materielListOption.data.splice(index, 1);
+      });
     },
-    // 切换表格
-    handleTabClick(value) {
-      this.tabActive = value.prop;
-    },
-    handleAddShow(row) {
-      this.$refs.crud.rowEdit(row);
-    },
-    // 选择申请类型的值后触发接口
-    async selectChange(value) {
-      // this.fetchConfig(); // 防止没有配置的选项，form表单显示的是之前的表单配置
-    },
-    fechList(page, purchaseRequestNumber) {
-      // this.crudData = res.data.purchaseRequestItemVOs;
-      // this.page.total = res.data.total;
-      // todo 需要获取sesstion的值来赋值给formObj
-      // this.formObj = res.data;
-    },
+
     rowSave(row, done, loading) {
       // 保存新增的数据
-      if (this.crudData === undefined) {
-        this.crudData = [];
+      if (this.materielListOption.data === undefined) {
+        this.materielListOption.data = [];
       }
-      this.crudData.push(row);
-      this.params.addList.push(row);
+      row.deliveryItemNumber = '1';
+      if (this.materielListOption.data.length <= 0) {
+        row.orderItemNumber = '1';
+        this.materielListOption.data.push(row);
+        this.params.addList.push(row);
+      } else {
+        row.orderItemNumber = (this.params.addList.length + 1).toString();
+        this.materielListOption.data.push(row);
+        this.params.addList.push(row);
+      }
       done();
     },
+    // onLoadPlan() {
+    //   let sessionCateCode = sessionStorage.getItem('materialRow');
+    //   console.log('this.params.addList2:' + sessionCateCode);
+    // },
     rowSavePlan(row, done, loading) {
       // 保存新增的数据
       if (this.crudPlanData === undefined) {
         this.crudPlanData = [];
       }
       this.crudPlanData.push(row);
-      this.params.addList.push(row);
+      // this.params.addList.push(row);
       done();
     },
-    rowUpdate(form, index, done, loading) {
+    rowUpdate(row, index, done, loading) {
+      console.log(row, index);
+      loading();
+      this.$set(this.materielListOption.data, index, row);
+      done();
+    },
+    rowUpdatePlan(row, index, done, loading) {
       loading();
       done();
     },
-    rowUpdatePlan(form, index, done, loading) {
-      loading();
-      done();
-    },
-    rowDel(row, index) {
-      // 删除
-      this.crudData.splice(index, 1);
-      this.params.deleteList.push(row);
-    },
+
     rowDelPlan(row, index) {
       // 删除
       this.crudPlanData.splice(index, 1);
@@ -383,8 +358,71 @@ export default {
     handleCancel() {
       this.$router.back();
     },
-    handleRelease() {},
-    handleSave() {},
+    // 发送订单
+    handleRelease() {
+      this.tabActive = this.tabOption.option.column[2];
+      this.handleTabClick(this.tabActive);
+
+      this.$confirm('确定发送?', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'primary'
+      })
+        .then(() => {
+          const action = 'sendOrder';
+          let params = {
+            elsAccount: this.elsAccount,
+            elsSubAccount: this.elsSubAccount,
+            ...this.formOption.obj,
+            orderItemVOList: this.materielListOption.data,
+            deliveryPlanVOList: this.planListOption.data
+          };
+          console.log('params: ' + JSON.stringify(params));
+          return createOrder(action, params);
+        })
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: '发送成功!'
+          });
+          this.$router.push({ path: '/list' });
+        })
+        .catch(() => {});
+    },
+
+    // 保存
+    async handleSave() {
+      this.tabActive = this.tabOption.option.column[2];
+      this.handleTabClick(this.tabActive);
+
+      this.$confirm('确定保存?', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'primary'
+      })
+        .then(() => {
+          const action = 'createOrder';
+          let params = {
+            elsAccount: this.elsAccount,
+            elsSubAccount: this.elsSubAccount,
+            ...this.formOption.obj,
+            orderItemVOList: this.materielListOption.data,
+            deliveryPlanVOList: this.planListOption.data
+          };
+          console.log('params: ' + JSON.stringify(params));
+          return createOrder(action, params);
+        })
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: '保存成功!'
+          });
+          this.$router.push({ path: '/list' });
+        })
+        .catch(() => {});
+      // this.onLoad(this.mainTable.page);
+    },
+
     uploadAfter(res, done, loading) {
       console.log('after upload', res);
       done();
@@ -418,7 +456,7 @@ export default {
     supplierDialogSave(selectColumns) {
       if (selectColumns.length !== 0) {
         this.formOption.obj.toElsAccount = selectColumns[0].toElsAccount;
-        this.formOption.obj.supplierName = selectColumns[0].supplierName;
+        this.formOption.obj.toElsAccountName = selectColumns[0].toElsAccountName;
       }
     },
     purchaseDialogSave(selectColumns) {

@@ -127,6 +127,13 @@ export default {
           return;
         }
         this.crudData = data.pageData.rows;
+        data.pageData.rows.forEach((item) => {
+          this.crudData.forEach((i) => {
+            if (i.toElsAccount === item.toElsAccount) {
+              i.toElsAccountName = item.supplierName;
+            }
+          });
+        });
         this.crudPage.total = data.pageData.total;
         this.crudPage.currentPage = this.crudPageParam.currentPage;
         this.crudPage.pageSize = this.crudPageParam.pageSize;

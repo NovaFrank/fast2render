@@ -25,17 +25,31 @@ export default {
     sortable: true,
     tip: false,
     indeterminate: true,
+    refreshBtn: false,
     column: [
       {
-        label: '供应商ELS',
-        prop: 'toElsAccount',
+        prop: 'materialNumber',
+        label: '物料编码',
         overHidden: true
       },
       {
-        label: '供应商名称',
-        prop: 'toElsAccountName',
+        label: '物料名称',
+        prop: 'materialName',
         overHidden: true
-        // supplierName
+      },
+      {
+        label: '单位',
+        prop: 'baseUnit',
+        overHidden: true,
+        addDisplay: false,
+        editDisplay: false
+      },
+      {
+        label: '物料规格',
+        prop: 'materialSpecifications',
+        overHidden: true,
+        addDisplay: false,
+        editDisplay: false
       }
     ]
   }

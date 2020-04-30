@@ -6,6 +6,7 @@ export default {
     pageSize: 10
   },
   option: {
+    header: false,
     menu: false,
     border: true,
     stripe: true,
@@ -25,12 +26,8 @@ export default {
         slot: true
       },
       {
-        label: 'ELS账号',
-        prop: 'elsAccount'
-      },
-      {
-        label: '公司名称',
-        prop: 'toElsAccountName'
+        label: '订单类型',
+        prop: 'orderType'
       },
       {
         label: '创建日期',
@@ -40,8 +37,8 @@ export default {
         valueFormat: 'yyyy-MM-dd'
       },
       {
-        label: '订单类型',
-        prop: 'orderType'
+        label: '供方负责人',
+        prop: 'salePerson'
       },
       {
         label: '采购负责人',
@@ -55,44 +52,12 @@ export default {
         disabled: true,
         dicData: [
           {
-            label: '已作废',
-            value: '-1'
+            label: '已确认',
+            value: 1
           },
           {
-            label: '订单关闭已确认',
-            value: '11'
-          },
-          {
-            label: '订单关闭未确认',
-            value: '10'
-          },
-          {
-            label: '更新生产状态',
-            value: '7'
-          },
-          {
-            label: '变更对方退回',
-            value: '5'
-          },
-          {
-            label: '变更对方已确认',
-            value: '4'
-          },
-          {
-            label: '供方已确认',
-            value: '3'
-          },
-          {
-            label: '供方变更',
-            value: '2'
-          },
-          {
-            label: '已发送',
-            value: '1'
-          },
-          {
-            label: '未发送',
-            value: '0'
+            label: '未确认',
+            value: 0
           }
         ]
       },
@@ -105,19 +70,19 @@ export default {
         dicData: [
           {
             label: '变更已发送',
-            value: '3'
+            value: 3
           },
           {
             label: '变更未发送',
-            value: '2'
+            value: 2
           },
           {
             label: '已发送',
-            value: '1'
+            value: 1
           },
           {
             label: '未发送',
-            value: '0'
+            value: 0
           }
         ]
       },
@@ -130,44 +95,23 @@ export default {
         dicData: [
           {
             label: '超量交收',
-            value: '4'
+            value: 4
           },
           {
             label: '全部交收',
-            value: '3'
+            value: 3
           },
           {
             label: '部分交收',
-            value: '2'
+            value: 2
           },
           {
             label: '订单发货在途',
-            value: '1'
+            value: 1
           },
           {
             label: '未交收',
-            value: '0'
-          }
-        ]
-      },
-      {
-        label: '审批状态',
-        prop: 'auditStatus',
-        span: 6,
-        type: 'select',
-        disabled: true,
-        dicData: [
-          {
-            label: '审批驳回',
-            value: '2'
-          },
-          {
-            label: '审批通过',
-            value: '1'
-          },
-          {
-            label: '审批中',
-            value: '0'
+            value: 0
           }
         ]
       }

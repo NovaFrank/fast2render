@@ -27,15 +27,14 @@ export default {
     indeterminate: true,
     column: [
       {
-        label: '供应商ELS',
-        prop: 'toElsAccount',
+        label: '子账号',
+        prop: 'elsSubAccount',
         overHidden: true
       },
       {
-        label: '供应商名称',
-        prop: 'toElsAccountName',
+        label: '姓名',
+        prop: 'name',
         overHidden: true
-        // supplierName
       }
     ]
   }

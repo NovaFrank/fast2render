@@ -39,7 +39,7 @@ export const getSupplierData = (action, params) => {
 // 获取订单列表
 export const getOrderList = (action, params) => {
   return axios({
-    url: `${baseUrl}/order/PurchaseOrderService/${action}`,
+    url: `${baseUrl}/order/SaleOrderService/${action}`,
     method: 'post',
     data: {
       // elsAccount: elsAccount,

@@ -11,22 +11,32 @@ const routes = [
   {
     path: '/list',
     name: 'list',
-    component: () => import('@/views/List.vue')
+    component: () => import('@/views/order/List.vue')
   },
   {
     path: '/create',
-    component: () => import('@/views/Create'),
+    component: () => import('@/views/order/Create'),
     name: 'Create'
   },
   {
     path: '/edit/:id',
-    component: () => import('@/views/Edit'),
+    component: () => import('@/views/order/Edit'),
     name: 'Edit'
   },
   {
     path: '/detail',
-    component: () => import('@/views/Detail'),
+    component: () => import('@/views/order/Detail'),
     name: 'Detail'
+  },
+  {
+    path: '/orderList',
+    name: 'orderList',
+    component: () => import('@/views/supplierOrder/List.vue')
+  },
+  {
+    path: '/orderDetail/:id',
+    component: () => import('@/views/supplierOrder/Detail'),
+    name: 'orderDetail'
   }
 ];
 

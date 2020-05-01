@@ -5,7 +5,7 @@
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
-      @on-submit="handleRelease"
+      @on-submit="handleSubmit"
       @on-save="handleSave"
     ></form-header>
     <div class="clear" style="margin-bottom: 30px;"></div>
@@ -68,14 +68,9 @@
       </avue-crud>
     </span>
     <span v-if="tabActive.prop === 'files'">
-      <avue-form
-        :option="fileOption.option"
-        v-model="filesForm"
-        :upload-before="uploadBefore"
-        :upload-after="uploadAfter"
-      ></avue-form>
+      <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
+      </avue-crud>
     </span>
-
     <selectDialog
       ref="materialDialog"
       :dialogVisible.sync="dialogVisible"
@@ -110,7 +105,7 @@
 import ButtonGroup from '@/common/ButtonGroup';
 import FormHeader from '@/components/formHeader';
 import tabOption from '@/const/order/tabs';
-import fileOption from '@/const/order/files';
+import fileOption from '@/const/order/newFiles';
 import formOption from '@/const/order/orderForm';
 import materielListOption from '@/const/order/materielList';
 import materialOption from '@/const/order/materiaList';
@@ -145,10 +140,6 @@ export default {
     return {
       elsAccount: '',
       elsSubAccount: '',
-      inputParamJson: {
-        // 业务类型转换传入的值
-        itemList: []
-      },
       tabActive: {},
       dialogVisible: false,
       dialogSupplierVisible: false,
@@ -164,7 +155,6 @@ export default {
       },
       url: '', // 上传路径
       type: {},
-      downloadMessage: '',
       page: {
         // pageSizes: [10, 20, 30, 40],默认
         currentPage: 1,
@@ -172,43 +162,12 @@ export default {
         pageSize: 10
       },
       formOption: formOption,
+      materialOption: materialOption,
+      supplierOption: supplierOption,
+      purchaseOption: purchaseOption,
+      planListOption: planListOption,
       crudObj: {},
       crudOption: {},
-      uploadObj: {},
-      uploadData: [],
-      uploadCrudOption: {
-        dialogDirection: 'rtl',
-        dialogType: 'drawer',
-        border: true,
-        stripe: true,
-        page: false,
-        addBtn: true,
-        align: 'center',
-        menuAlign: 'center',
-        menuWidth: '180',
-        column: [
-          {
-            label: '文件ID',
-            prop: 'profileID'
-          },
-          {
-            label: '创建者',
-            prop: 'creator'
-          },
-          {
-            label: '创建人',
-            prop: 'createPeople'
-          },
-          {
-            label: '文件类型',
-            prop: 'fileType'
-          },
-          {
-            label: '行项目号',
-            prop: 'lineNumber'
-          }
-        ]
-      },
       headerButtons: [
         {
           text: '返回',
@@ -237,11 +196,7 @@ export default {
           action: 'item-add',
           align: 'btn-left'
         }
-      ],
-      materialOption: materialOption,
-      supplierOption: supplierOption,
-      purchaseOption: purchaseOption,
-      planListOption: planListOption
+      ]
     };
   },
   async created() {
@@ -249,6 +204,7 @@ export default {
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
     this.materielListOption.data = [];
+    this.fileOption.option.menu = true;
     this.getDicData();
     this.tabActive = this.tabOption.option.column[0];
     this.formOption.obj.orderStatus = '0';
@@ -282,7 +238,6 @@ export default {
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
-      console.log(this.tabActive.prop);
       sessionStorage.setItem('materialRow', JSON.stringify(this.materielListOption.data));
       if (this.tabActive.prop === 'plan') {
         let sessionCateCode = sessionStorage.getItem('materialRow');
@@ -298,7 +253,6 @@ export default {
         });
       }
     },
-
     handleDeleteRow(row, index) {
       this.$confirm('确定将选择数据删除?', {
         confirmButtonText: '确定',
@@ -340,7 +294,6 @@ export default {
       done();
     },
     rowUpdate(row, index, done, loading) {
-      console.log(row, index);
       loading();
       this.$set(this.materielListOption.data, index, row);
       done();
@@ -358,53 +311,25 @@ export default {
     handleCancel() {
       this.$router.back();
     },
-    // 发送订单
-    async handleRelease() {
-      this.tabActive = this.tabOption.option.column[2];
-      this.handleTabClick(this.tabActive);
-
-      const action = 'sendOrder';
-      let params = {
-        elsAccount: this.elsAccount,
-        elsSubAccount: this.elsSubAccount,
-        ...this.formOption.obj,
-        orderItemVOList: this.materielListOption.data,
-        deliveryPlanVOList: this.planListOption.data
-      };
-      console.log('params: ' + JSON.stringify(params));
-      await createOrder(action, params);
-
-      this.$message({
-        type: 'success',
-        message: '发送成功!'
-      });
-      this.$router.push({ path: '/list' });
-
-      // this.$confirm('确定发送?', {
-      //   confirmButtonText: '确定',
-      //   cancelButtonText: '取消',
-      //   type: 'primary'
-      // })
-      //   .then(() => {
-      //     const action = 'sendOrder';
-      //     let params = {
-      //       elsAccount: this.elsAccount,
-      //       elsSubAccount: this.elsSubAccount,
-      //       ...this.formOption.obj,
-      //       orderItemVOList: this.materielListOption.data,
-      //       deliveryPlanVOList: this.planListOption.data
-      //     };
-      //     console.log('params: ' + JSON.stringify(params));
-      //     return createOrder(action, params);
-      //   })
-      //   .then(() => {
-      //     this.$message({
-      //       type: 'success',
-      //       message: '发送成功!'
-      //     });
-      //     this.$router.push({ path: '/list' });
-      //   })
-      //   .catch(() => {});
+    // 提交审批
+    async handleSubmit() {
+      // this.tabActive = this.tabOption.option.column[2];
+      // this.handleTabClick(this.tabActive);
+      // const action = 'sendOrder';
+      // let params = {
+      //   elsAccount: this.elsAccount,
+      //   elsSubAccount: this.elsSubAccount,
+      //   ...this.formOption.obj,
+      //   orderItemVOList: this.materielListOption.data,
+      //   deliveryPlanVOList: this.planListOption.data
+      // };
+      // // console.log('params: ' + JSON.stringify(params));
+      // await createOrder(action, params);
+      // this.$message({
+      //   type: 'success',
+      //   message: '发送成功!'
+      // });
+      // this.$router.push({ path: '/list' });
     },
 
     // 保存
@@ -419,50 +344,13 @@ export default {
         orderItemVOList: this.materielListOption.data,
         deliveryPlanVOList: this.planListOption.data
       };
-      console.log('params: ' + JSON.stringify(params));
+      // console.log('params: ' + JSON.stringify(params));
       await createOrder(action, params);
       this.$message({
         type: 'success',
         message: '保存成功!'
       });
       this.$router.push({ path: '/list' });
-
-      // this.$confirm('确定保存?', {
-      //   confirmButtonText: '确定',
-      //   cancelButtonText: '取消',
-      //   type: 'primary'
-      // })
-      //   .then(() => {
-      //     const action = 'createOrder';
-      //     let params = {
-      //       elsAccount: this.elsAccount,
-      //       elsSubAccount: this.elsSubAccount,
-      //       ...this.formOption.obj,
-      //       orderItemVOList: this.materielListOption.data,
-      //       deliveryPlanVOList: this.planListOption.data
-      //     };
-      //     console.log('params: ' + JSON.stringify(params));
-      //     return createOrder(action, params);
-      //   })
-      //   .then(() => {
-      //     this.$message({
-      //       type: 'success',
-      //       message: '保存成功!'
-      //     });
-      //     this.$router.push({ path: '/list' });
-      //   })
-      //   .catch(() => {});
-    },
-
-    uploadAfter(res, done, loading) {
-      console.log('after upload', res);
-      done();
-    },
-    uploadBefore(file, done, loading) {
-      console.log('before upload', file);
-      // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
-      const newFile = new File([file], '1234', { type: file.type });
-      done(newFile);
     },
     onSaveForm(form) {
       // todo
@@ -503,6 +391,9 @@ export default {
 <style scoped lang="scss">
 .avue-crud {
   width: 100%;
+}
+.avue-tabs {
+  padding: 0;
 }
 .form-header {
   display: flex;

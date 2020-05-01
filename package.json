@@ -14,7 +14,7 @@
     "axios": "^0.19.0",
     "core-js": "^3.4.4",
     "element-ui": "^2.13.0",
-    "fast2render": "^0.2.9",
+    "fast2render": "^0.2.10",
     "js-cookie": "^2.2.1",
     "js-md5": "^0.7.3",
     "vue": "^2.6.10",

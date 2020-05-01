@@ -1,25 +1,16 @@
 <template>
   <basic-container>
     <form-header
-      titleText="修改"
+      titleText="预览"
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
       @on-submit="handleRelease"
       @on-save="handleSave"
+      @on-sendProvider="handleSendProvider"
     ></form-header>
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
-    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form">
-      <template slot="purchasePerson">
-        <el-input v-model="formOption.obj.purchasePerson" :readonly="true">
-          <i
-            slot="suffix"
-            class=" el-input_icon el-icon-search pointer"
-            @click="purchaseDialogOpen"
-          ></i>
-        </el-input>
-      </template>
-    </avue-form>
+    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
     <span v-if="tabActive.prop === 'detail'">
@@ -33,9 +24,6 @@
         @row-del="handleDeleteRow"
         ref="crud"
       >
-        <template slot="menuLeft">
-          <button-group :option="btnOption" @item-add="itemAdd"></button-group>
-        </template>
         <template slot="materialNumberForm">
           <el-input v-model="crudObj.materialNumber" :readonly="true">
             <i
@@ -60,12 +48,8 @@
       </avue-crud>
     </span>
     <span v-if="tabActive.prop === 'files'">
-      <avue-form
-        :option="fileOption.option"
-        v-model="filesForm"
-        :upload-before="uploadBefore"
-        :upload-after="uploadAfter"
-      ></avue-form>
+      <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
+      </avue-crud>
     </span>
     <selectDialog
       ref="materialDialog"
@@ -76,15 +60,6 @@
       actionPath="findPageList"
       @save="materialDialogSave"
     ></selectDialog>
-    <selectDialog3
-      ref="purchaseDialog"
-      :dialogVisible.sync="dialogPurchaseVisible"
-      :title="'添加采购方负责人'"
-      :column="purchaseOption.option.column"
-      :elsAccount="elsAccount"
-      actionPath="findPageList"
-      @save="purchaseDialogSave"
-    ></selectDialog3>
   </basic-container>
 </template>
 
@@ -93,19 +68,16 @@ import FormHeader from '@/components/formHeader';
 import tabOption from '@/const/order/tabs';
 import formOption from '@/const/order/detail';
 import fileOption from '@/const/order/files';
-import purchaseOption from '@/const/order/purchaseList';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielList';
 import { getOrderList, getDataDic, createOrder } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
-import selectDialog3 from '@/common/selectDialog3';
 import { getUserInfo } from '@/util/utils.js';
 export default {
   components: {
     FormHeader,
-    selectDialog,
-    selectDialog3
+    selectDialog
   },
   name: 'Detail',
   props: {
@@ -146,54 +118,35 @@ export default {
         pageSize: 10
       },
       dialogVisible: false,
-      dialogPurchaseVisible: false,
       materialOption: materialOption,
-      purchaseOption: purchaseOption,
       formOption: formOption,
       planListOption: planListOption,
       crudObj: {},
       crudOption: {},
-      uploadObj: {},
-      uploadData: [],
-      uploadCrudOption: {
-        dialogDirection: 'rtl',
-        dialogType: 'drawer',
-        border: true,
-        stripe: true,
-        page: false,
-        addBtn: true,
-        align: 'center',
-        menuAlign: 'center',
-        menuWidth: '180',
-        column: [
-          {
-            label: '文件ID',
-            prop: 'profileID'
-          },
-          {
-            label: '创建者',
-            prop: 'creator'
-          },
-          {
-            label: '创建人',
-            prop: 'createPeople'
-          },
-          {
-            label: '文件类型',
-            prop: 'fileType'
-          },
-          {
-            label: '行项目号',
-            prop: 'lineNumber'
-          }
-        ]
-      },
       headerButtons: [
         {
           text: '返回',
           type: 'primary',
           size: 'small',
           action: 'on-cancel'
+        },
+        {
+          text: '撤回',
+          type: 'primary',
+          size: 'small',
+          action: 'on-reset'
+        },
+        {
+          text: '发给供方',
+          type: 'primary',
+          size: 'small',
+          action: 'on-sendProvider'
+        },
+        {
+          text: '发送货通知单',
+          type: 'primary',
+          size: 'small',
+          action: 'on-sendMenu'
         },
         {
           text: '保存',
@@ -207,15 +160,6 @@ export default {
           size: 'small',
           action: 'on-submit'
         }
-      ],
-      btnOption: [
-        {
-          name: 'btn-add',
-          label: '添加行',
-          size: 'small',
-          action: 'item-add',
-          align: 'btn-left'
-        }
       ]
     };
   },
@@ -226,6 +170,8 @@ export default {
     this.tabActive = this.tabOption.option.column[0];
     this.tableData();
     this.getDicData();
+    this.materielListOption.option.header = false;
+    this.materielListOption.option.menu = false;
   },
   methods: {
     // 获取数据字典下拉列表
@@ -301,7 +247,7 @@ export default {
             orderItemVOList: this.materielListOption.data,
             deliveryPlanVOList: this.planListOption.data
           };
-          console.log('params: ' + JSON.stringify(params));
+          // console.log('params: ' + JSON.stringify(params));
           return createOrder(action, params);
         })
         .then(() => {
@@ -317,23 +263,10 @@ export default {
     handleTabClick(value) {
       this.tabActive = value;
       console.log(this.tabActive.prop);
-      sessionStorage.setItem('materialRow', JSON.stringify(this.materielListOption.data));
+
       if (this.tabActive.prop === 'plan') {
-        let sessionCateCode = sessionStorage.getItem('materialRow');
-        this.planListOption.data = JSON.parse(sessionCateCode);
-        this.planListOption.data.forEach((item) => {
-          JSON.parse(sessionCateCode).forEach((i) => {
-            if (i.orderItemNumber === item.orderItemNumber) {
-              item.requestDeliveryDate = i.deliveryDate;
-              item.requestDeliveryQuantity = i.quantity;
-              item.deliveryItemNumber = '1';
-            }
-          });
-        });
+        this.tableData();
       }
-    },
-    itemAdd() {
-      this.$refs.crud.rowAdd();
     },
     // 删除行数据
     handleDeleteRow(row, index) {
@@ -383,6 +316,26 @@ export default {
       }
       done();
     },
+    // 发送供方
+    async handleSendProvider() {
+      this.tabActive = this.tabOption.option.column[2];
+      this.handleTabClick(this.tabActive);
+      const action = 'sendOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
+      console.log('params: ' + JSON.stringify(params.orderItemVOList));
+      await createOrder(action, params);
+      this.$message({
+        type: 'success',
+        message: '发送成功!'
+      });
+      this.$router.push({ path: '/list' });
+    },
     rowSavePlan(row, done, loading) {
       // 保存新增的数据
       if (this.crudPlanData === undefined) {
@@ -415,16 +368,6 @@ export default {
       this.$router.back();
     },
     handleRelease() {},
-    uploadAfter(res, done, loading) {
-      console.log('after upload', res);
-      done();
-    },
-    uploadBefore(file, done, loading) {
-      console.log('before upload', file);
-      // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
-      const newFile = new File([file], '1234', { type: file.type });
-      done(newFile);
-    },
     onSaveForm(form) {
       // todo
     },
@@ -437,15 +380,6 @@ export default {
         this.crudObj.materialDesc = selectColumns[0].materialDesc;
         this.crudObj.materialSpecifications = selectColumns[0].materialSpecifications;
         this.crudObj.baseUnit = selectColumns[0].baseUnit;
-      }
-    },
-    purchaseDialogOpen() {
-      this.dialogPurchaseVisible = true;
-    },
-    purchaseDialogSave(selectColumns) {
-      if (selectColumns.length !== 0) {
-        this.formOption.obj.purchasePerson =
-          selectColumns[0].elsSubAccount + '_' + selectColumns[0].name;
       }
     }
   }

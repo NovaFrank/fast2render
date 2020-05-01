@@ -5,7 +5,7 @@
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
-      @on-submit="handleRelease"
+      @on-submit="handleSubmit"
       @on-save="handleSave"
     ></form-header>
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
@@ -60,12 +60,8 @@
       </avue-crud>
     </span>
     <span v-if="tabActive.prop === 'files'">
-      <avue-form
-        :option="fileOption.option"
-        v-model="filesForm"
-        :upload-before="uploadBefore"
-        :upload-after="uploadAfter"
-      ></avue-form>
+      <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
+      </avue-crud>
     </span>
     <selectDialog
       ref="materialDialog"
@@ -92,7 +88,7 @@
 import FormHeader from '@/components/formHeader';
 import tabOption from '@/const/order/tabs';
 import formOption from '@/const/order/detail';
-import fileOption from '@/const/order/files';
+import fileOption from '@/const/order/newFiles';
 import purchaseOption from '@/const/order/purchaseList';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
@@ -429,26 +425,8 @@ export default {
       //   });
     },
 
-    // 发送订单
-    async handleRelease() {
-      this.tabActive = this.tabOption.option.column[2];
-      this.handleTabClick(this.tabActive);
-      const action = 'sendOrder';
-      let params = {
-        elsAccount: this.elsAccount,
-        elsSubAccount: this.elsSubAccount,
-        ...this.formOption.obj,
-        orderItemVOList: this.materielListOption.data,
-        deliveryPlanVOList: this.planListOption.data
-      };
-      console.log('params: ' + JSON.stringify(params.orderItemVOList));
-      await createOrder(action, params);
-      this.$message({
-        type: 'success',
-        message: '修改成功!'
-      });
-      this.$router.push({ path: '/list' });
-
+    // 提交审批
+    async handleSubmit() {
       // this.$confirm(`确认提交修改？`, {
       //   confirmButtonText: '确定',
       //   cancelButtonText: '取消',

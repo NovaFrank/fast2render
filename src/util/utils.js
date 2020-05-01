@@ -25,6 +25,13 @@ export const getUserInfo = () => {
   return getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
 };
 
+export const getSupplierInfo = () => {
+  if (window.frames.length === parent.frames.length) {
+    getLocalToken(true);
+  }
+  return getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
+};
+
 export const getAccount = () => {
   let userInfo = getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
   if (userInfo && userInfo.elsAccount) {
@@ -37,14 +44,14 @@ export const getAccount = () => {
   };
 };
 
-export const getLocalToken = () => {
+export const getLocalToken = (supplier) => {
   const params = {
-    elsAccount: '307000',
+    elsAccount: supplier ? '3070027' : '307000',
     elsSubAccount: '1001',
     elsSubAccountPassword: md5('123')
   };
   login(params).then((res) => {
-    console.log(res.data.data.token);
+    console.log(res.data);
     setToken(res.data.data.token);
     let params2 = {
       name: 'userInfo',

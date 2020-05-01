@@ -100,7 +100,7 @@ import materielListOption from '@/const/supplierOrder/materielList';
 import { getOrderList, getDataDic, createOrder } from '@/api/supplierOrder.js';
 import selectDialog from '@/common/selectDialog';
 import selectDialog3 from '@/common/selectDialog3';
-import { getUserInfo } from '@/util/utils.js';
+import { getSupplierInfo } from '@/util/utils.js';
 export default {
   components: {
     FormHeader,
@@ -220,7 +220,7 @@ export default {
     };
   },
   async created() {
-    const userInfo = getUserInfo();
+    const userInfo = getSupplierInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
     this.tabActive = this.tabOption.option.column[0];

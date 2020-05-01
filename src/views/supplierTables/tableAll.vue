@@ -13,7 +13,7 @@
         ref="crud"
       >
         <template slot-scope="{ row }" slot="orderNumber">
-          <router-link :to="`edit/${row.orderNumber}_${row.elsAccount}`">
+          <router-link :to="`orderEdit/${row.orderNumber}_${row.elsAccount}`">
             <el-tag>{{ row.orderNumber }}</el-tag>
           </router-link>
         </template>
@@ -23,7 +23,7 @@
 </template>
 <script>
 import formOption from '@/const/supplierOrder/orderFormOption';
-import { getUserInfo } from '@/util/utils.js';
+import { getSupplierInfo } from '@/util/utils.js';
 import { getOrderList } from '@/api/supplierOrder.js';
 // import { getUnfamiliarDataList } from '@/api/supplier/supplier.js';
 // import { btnList } from '../data';
@@ -48,7 +48,7 @@ export default {
     };
   },
   created() {
-    const userInfo = getUserInfo();
+    const userInfo = getSupplierInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
   },

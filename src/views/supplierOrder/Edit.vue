@@ -9,17 +9,7 @@
       @on-save="handleSave"
     ></form-header>
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
-    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form">
-      <template slot="purchasePerson">
-        <el-input v-model="formOption.obj.purchasePerson" :readonly="true">
-          <i
-            slot="suffix"
-            class=" el-input_icon el-icon-search pointer"
-            @click="purchaseDialogOpen"
-          ></i>
-        </el-input>
-      </template>
-    </avue-form>
+    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
     <span v-if="tabActive.prop === 'detail'">
@@ -76,15 +66,6 @@
       actionPath="findPageList"
       @save="materialDialogSave"
     ></selectDialog>
-    <selectDialog3
-      ref="purchaseDialog"
-      :dialogVisible.sync="dialogPurchaseVisible"
-      :title="'添加采购方负责人'"
-      :column="purchaseOption.option.column"
-      :elsAccount="elsAccount"
-      actionPath="findPageList"
-      @save="purchaseDialogSave"
-    ></selectDialog3>
   </basic-container>
 </template>
 
@@ -93,19 +74,16 @@ import FormHeader from '@/components/formHeader';
 import tabOption from '@/const/order/tabs';
 import formOption from '@/const/order/detail';
 import fileOption from '@/const/order/files';
-import purchaseOption from '@/const/order/purchaseList';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielList';
 import { getOrderList, getDataDic, createOrder } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
-import selectDialog3 from '@/common/selectDialog3';
 import { getUserInfo } from '@/util/utils.js';
 export default {
   components: {
     FormHeader,
-    selectDialog,
-    selectDialog3
+    selectDialog
   },
   name: 'Detail',
   props: {
@@ -148,7 +126,6 @@ export default {
       dialogVisible: false,
       dialogPurchaseVisible: false,
       materialOption: materialOption,
-      purchaseOption: purchaseOption,
       formOption: formOption,
       planListOption: planListOption,
       crudObj: {},

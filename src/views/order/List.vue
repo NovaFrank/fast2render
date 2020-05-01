@@ -61,7 +61,21 @@
         </span>
       </template>
       <template slot-scope="{ row }" slot="orderNumber">
-        <router-link :to="`edit/${row.orderNumber}_${row.elsAccount}`">
+        <router-link
+          v-if="
+            row.orderStatus === '1' ||
+              row.orderStatus === '2' ||
+              row.orderStatus === '3' ||
+              row.orderStatus === '4'
+          "
+          :to="`detail/${row.orderNumber}_${row.elsAccount}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '0'"
+          :to="`edit/${row.orderNumber}_${row.elsAccount}`"
+        >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
       </template>

@@ -6,6 +6,7 @@ export default {
     pageSize: 10
   },
   option: {
+    header: false,
     menu: false,
     border: true,
     stripe: true,

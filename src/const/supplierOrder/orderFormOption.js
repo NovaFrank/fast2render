@@ -53,11 +53,11 @@ export default {
         dicData: [
           {
             label: '已确认',
-            value: 1
+            value: '1'
           },
           {
             label: '未确认',
-            value: 0
+            value: '0'
           }
         ]
       },
@@ -70,19 +70,19 @@ export default {
         dicData: [
           {
             label: '变更已发送',
-            value: 3
+            value: '3'
           },
           {
             label: '变更未发送',
-            value: 2
+            value: '2'
           },
           {
             label: '已发送',
-            value: 1
+            value: '1'
           },
           {
             label: '未发送',
-            value: 0
+            value: '0'
           }
         ]
       },
@@ -95,23 +95,23 @@ export default {
         dicData: [
           {
             label: '超量交收',
-            value: 4
+            value: '4'
           },
           {
             label: '全部交收',
-            value: 3
+            value: '3'
           },
           {
             label: '部分交收',
-            value: 2
+            value: '2'
           },
           {
             label: '订单发货在途',
-            value: 1
+            value: '1'
           },
           {
             label: '未交收',
-            value: 0
+            value: '0'
           }
         ]
       }

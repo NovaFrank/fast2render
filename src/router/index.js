@@ -24,18 +24,18 @@ const routes = [
     name: 'Edit'
   },
   {
-    path: '/detail',
+    path: '/detail/:id',
     component: () => import('@/views/order/Detail'),
     name: 'Detail'
   },
   {
     path: '/orderList',
     name: 'orderList',
-    component: () => import('@/views/supplierOrder/List.vue')
+    component: () => import('@/views/supplierOrder/List')
   },
   {
-    path: '/orderDetail/:id',
-    component: () => import('@/views/supplierOrder/Detail'),
+    path: '/orderEdit/:id',
+    component: () => import('@/views/supplierOrder/Edit'),
     name: 'orderDetail'
   }
 ];

@@ -197,7 +197,9 @@ export function isValidateMobile(phone) {
  */
 export function validateName(name) {
   var regName = /^[\u4e00-\u9fa5]{2,4}$/;
-  if (!regName.test(name)) return false;
+  if (!regName.test(name)) {
+    return false;
+  }
   return true;
 }
 /**
@@ -206,10 +208,14 @@ export function validateName(name) {
 export function validateNum(num, type) {
   let regName = /[^\d.]/g;
   if (type === 1) {
-    if (!regName.test(num)) return false;
+    if (!regName.test(num)) {
+      return false;
+    }
   } else if (type === 2) {
     regName = /[^\d]/g;
-    if (!regName.test(num)) return false;
+    if (!regName.test(num)) {
+      return false;
+    }
   }
   return true;
 }
@@ -219,10 +225,14 @@ export function validateNum(num, type) {
 export function validateDecimal(num, type) {
   let regName = /[^\d.]/g;
   if (type === 1) {
-    if (!regName.test(num)) return false;
+    if (!regName.test(num)) {
+      return false;
+    }
   } else if (type === 2) {
     regName = /[^\d.]/g;
-    if (!regName.test(num)) return false;
+    if (!regName.test(num)) {
+      return false;
+    }
   }
   return true;
 }
@@ -237,12 +247,17 @@ export function validateNull(val) {
     return false;
   }
   if (val instanceof Array) {
-    if (val.length === 0) return true;
-  } else if (val instanceof Object) {
-    if (JSON.stringify(val) === '{}') return true;
-  } else {
-    if (val === 'null' || val == null || val === 'undefined' || val === undefined || val === '')
+    if (val.length === 0) {
       return true;
+    }
+  } else if (val instanceof Object) {
+    if (JSON.stringify(val) === '{}') {
+      return true;
+    }
+  } else {
+    if (val === 'null' || val == null || val === 'undefined' || val === undefined || val === '') {
+      return true;
+    }
     return false;
   }
   return false;
@@ -270,7 +285,9 @@ export const validateColumn = (column) => {
   }
   column.forEach((ele) => {
     Object.keys(ele).forEach((key) => {
-      if (vaild(ele, key)) delete ele[key];
+      if (vaild(ele, key)) {
+        delete ele[key];
+      }
     });
   });
   return column;

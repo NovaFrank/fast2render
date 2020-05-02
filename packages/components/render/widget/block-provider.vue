@@ -1,11 +1,11 @@
 <template>
-  <div v-if="finaloption">
+  <div>
     <slot :list="list" :option="finaloption"></slot>
   </div>
 </template>
 <script>
-import { getStore, setStore } from '../lib/store';
-import { mergeColumn, vaildData } from '../lib/utils';
+import { getStore } from '../lib/store';
+import { mergeColumn, vaildData, loadJson } from '../lib/utils';
 export default {
   name: 'BlockProvider',
   props: {
@@ -39,6 +39,16 @@ export default {
       finaloption: null
     };
   },
+  watch: {
+    finaloption(val) {
+      if (val) {
+        this.$emit('update-option', val);
+      }
+    }
+  },
+  created() {
+    this.loadDic('common');
+  },
   mounted() {
     let configFilePath = localStorage.getItem('configFilePath');
     if (configFilePath && configFilePath !== '') {
@@ -47,40 +57,36 @@ export default {
     if (this.path) {
       this.filePath = this.path;
     }
-    this.version ? this.onLoad(this.version) : (this.finaloption = this.option);
+    if (this.version) {
+      this.onLoad(this.version);
+    } else {
+      this.finaloption = vaildData(this.option, { column: [] });
+      this.finaloption.column = this.handleColumn(this.finaloption.column);
+    }
   },
   methods: {
     onLoad(slug = this.version) {
       const url = `${this.filePath}${this.fileType}/${slug}.json`;
       let list = getStore({ name: slug, timer: 1200 });
-      let _this = this;
       if (list) {
         this.handlerLayoutData(list);
-        return;
+      } else {
+        loadJson(url, slug);
       }
-      const xhr = new XMLHttpRequest();
-      xhr.open('get', url, true);
-
-      xhr.responseType = 'json';
-
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-          _this.handlerLayoutData(xhr.response);
-          console.log('获取发布版本OK', url);
-          setStore({ name: slug, content: xhr.response });
-        } else {
-          console.log('获取配置文件失败', xhr.status, xhr.statusText);
-          this.$message.error('获取配置文件失败', xhr.statusText);
-        }
-      };
-
-      xhr.onerror = function() {
-        console.log('获取配置文件失败', xhr.status, xhr.statusText);
-        this.$message.error('获取配置文件失败', xhr.statusText);
-      };
-      xhr.send();
+    },
+    loadDic() {
+      const url = `${this.filePath}dic/index.json`;
+      let dic = getStore({ name: 'commondic', timer: 1200 });
+      if (dic) {
+        this.dics = dic;
+      } else {
+        loadJson(url, 'commondic');
+      }
     },
     handlerLayoutData(list) {
+      if (!list) {
+        return;
+      }
       this.list = list;
       let finaloption = vaildData(this.option, { column: [] });
       let findStr = {
@@ -88,16 +94,32 @@ export default {
         form: 'detailLayout',
         detail: 'detailLayout'
       };
-      let option = this.list.find((item) => {
+      let options = list.filter((item) => {
         return item.id === findStr[this.type];
       });
+      let option = options[0] || {};
       option = vaildData(option, { data: { column: [] } });
       let column = mergeColumn(option.data.column, finaloption.column);
-      column = column.map((item) => {
+      this.finaloption = JSON.parse(JSON.stringify(finaloption));
+      this.finaloption.column = this.handleColumn(column);
+    },
+    handleColumn(column) {
+      let newcolumn = column.map((item) => {
         return this.fixColumn(item);
       });
-      this.finaloption = finaloption;
-      this.finaloption.column = column;
+      return newcolumn;
+    },
+    replaceLocalDic(config) {
+      if (!config.dicUrl.includes('layout/dics')) {
+        return;
+      }
+      let slug = config.dicUrl.split('layout/dics/value/')[1];
+      if (slug && this.dics && this.dics[slug]) {
+        delete config.dicUrl;
+        config.dicData = this.dics[slug];
+        console.log('使用本地词典', config.dicData);
+      }
+      return config;
     },
     fixColumn(config) {
       if (!config || !config.dicUrl) {
@@ -108,6 +130,7 @@ export default {
         config.dicFlag = false;
         return config;
       }
+      config = this.replaceLocalDic(config);
       if (config.span) {
         config.span = config.span * 1;
       }

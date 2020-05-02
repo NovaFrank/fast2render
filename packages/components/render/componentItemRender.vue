@@ -44,8 +44,11 @@ export default {
     getComponent(component) {
       let KEY_COMPONENT_NAME = 'item-';
       let result = 'normal';
-      if (component === 'attachment') result = component;
-      else if (component === 'block-tabs') result = 'tab';
+      if (component === 'attachment') {
+        result = component;
+      } else if (component === 'block-tabs') {
+        result = 'tab';
+      }
       this.mycomponent = KEY_COMPONENT_NAME + result;
       return this.mycomponent;
     }

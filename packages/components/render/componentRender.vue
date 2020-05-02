@@ -144,9 +144,13 @@ export default {
     getComponent(type, component) {
       let KEY_COMPONENT_NAME = 'item-';
       let result = 'normal';
-      if (!this.validatenull(component)) result = component;
-      else if (type === 'attachment') result = type;
-      else if (type === 'block-tabs') result = 'tab';
+      if (!this.validatenull(component)) {
+        result = component;
+      } else if (type === 'attachment') {
+        result = type;
+      } else if (type === 'block-tabs') {
+        result = 'tab';
+      }
       this.mycomponent = KEY_COMPONENT_NAME + result;
       return this.mycomponent;
     }

@@ -9,6 +9,8 @@ import PageProvider from './components/render/widget/page-provider';
 import ThemeProvider from './components/render/widget/theme-provider';
 import TemplateProvider from './components/render/widget/template-provider';
 
+import SelectDialog from './components/render/selectDialog/selectDialog';
+
 export default {
   install(Vue) {
     Vue.component('Fast2' + Fast2Render.name, Fast2Render);
@@ -22,5 +24,7 @@ export default {
     Vue.component('Fast2' + ThemeProvider.name, ThemeProvider);
 
     Vue.component(ButtonGroupRender.name, ButtonGroupRender);
+
+    Vue.component(SelectDialog.name, SelectDialog);
   }
 };

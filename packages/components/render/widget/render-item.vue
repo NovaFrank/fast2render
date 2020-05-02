@@ -56,11 +56,15 @@ export default {
     getComponent(type, component) {
       let KEY_COMPONENT_NAME = 'item-';
       let result = 'normal';
-      if (!this.validatenull(component)) result = component;
+      if (!this.validatenull(component)) {
+        result = component;
+      }
 
       // 已定义组件列表
       let existType = ['img', 'url', 'multi-line', 'html', 'header', 'divider'];
-      if (existType.includes(type)) result = type;
+      if (existType.includes(type)) {
+        result = type;
+      }
 
       this.mycomponent = KEY_COMPONENT_NAME + result;
       return this.mycomponent;

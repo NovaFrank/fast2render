@@ -1,5 +1,6 @@
 import { validateNull } from './validate';
 import _ from 'lodash';
+import { setStore } from './store';
 
 /**
  * 验证表单
@@ -315,6 +316,27 @@ export function isJSON(str) {
   }
   console.log('It is not a string!');
 }
+
+export const loadJson = (url, name) => {
+  const xhr = new XMLHttpRequest();
+  xhr.open('get', url, true);
+  xhr.responseType = 'json';
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      console.log('获取文件', url);
+      setStore({ name, content: xhr.response });
+    } else {
+      console.log('获取文件失败', xhr.status, xhr.statusText);
+      this.$message.error('获取文件失败', xhr.statusText);
+    }
+  };
+
+  xhr.onerror = function() {
+    console.log('获取文件失败', xhr.status, xhr.statusText);
+    this.$message.error('获取文件失败', xhr.statusText);
+  };
+  xhr.send();
+};
 
 export const makeBlockOutputJson = (page) => {
   let outputJson = util._initComponentsList(page, page);

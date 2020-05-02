@@ -1,6 +1,9 @@
 export default {
   dialogDirection: 'rtl',
   dialogType: 'drawer',
+  dialogModal: false,
+  dialogEscape: false,
+  highlightCurrentRow: true,
   border: true,
   stripe: true,
   index: true,

@@ -1,15 +1,18 @@
 <template>
   <div>
-    <fast2-block-provider :option="finalOption" :version="version" :type="type" v-on="$listeners">
-      <template v-slot="component">
-        <div v-if="spanMethodData.prop">
-          <slot :option="component.option" :data="myData" :spanMethod="spanMethod"></slot>
-        </div>
-        <div v-else>
-          <slot :option="component.option" :data="myData"></slot>
-        </div>
-      </template>
+    <fast2-block-provider
+      :option="finalOption"
+      :version="version"
+      :type="type"
+      @update-option="updateOption"
+    >
     </fast2-block-provider>
+    <div v-if="spanMethodData.prop">
+      <slot :option="componentOption" :data="myData" :spanMethod="spanMethod"></slot>
+    </div>
+    <div v-else>
+      <slot :option="componentOption" :data="myData"></slot>
+    </div>
   </div>
 </template>
 <script>
@@ -17,7 +20,7 @@ import BigListTemplate from '../lib/crud-biglist';
 import SmallListTemplate from '../lib/crud-small';
 import BigFormTemplate from '../lib/form-big';
 import SmallFormTemplate from '../lib/form-small';
-import { mySpanMethod, sortArrys } from '../lib/utils.js';
+import { mySpanMethod } from '../lib/utils.js';
 import _ from 'lodash';
 
 export default {
@@ -60,7 +63,9 @@ export default {
   },
   computed: {
     finalOption: function() {
-      if (this.type === 'crud') return this.handlerOption(this.option, this.theme === 'page');
+      if (this.type === 'crud') {
+        return this.handlerOption(this.option, this.theme === 'page');
+      }
       return this.handlerOptionForm(this.option, this.theme === 'page');
     },
     myData: function() {
@@ -95,6 +100,9 @@ export default {
     handlerOptionForm(option, isBig) {
       let newOption = Object.assign(isBig ? BigFormTemplate : SmallFormTemplate, option);
       return newOption;
+    },
+    updateOption(option) {
+      this.componentOption = option;
     },
     spanMethod({ row, columnIndex }) {
       return mySpanMethod(

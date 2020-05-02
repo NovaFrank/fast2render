@@ -10,8 +10,11 @@ export const setStore = (params) => {
     type: type,
     datetime: new Date().getTime()
   };
-  if (type) window.sessionStorage.setItem(name, JSON.stringify(obj));
-  else window.localStorage.setItem(name, JSON.stringify(obj));
+  if (type) {
+    window.sessionStorage.setItem(name, JSON.stringify(obj));
+  } else {
+    window.localStorage.setItem(name, JSON.stringify(obj));
+  }
 };
 /**
  * 获取localStorage
@@ -22,8 +25,12 @@ export const getStore = (params) => {
   let obj = {};
   let content;
   obj = window.sessionStorage.getItem(name);
-  if (validateNull(obj)) obj = window.localStorage.getItem(name);
-  if (validateNull(obj)) return;
+  if (validateNull(obj)) {
+    obj = window.localStorage.getItem(name);
+  }
+  if (validateNull(obj)) {
+    return;
+  }
   obj = JSON.parse(obj);
   if (debug) {
     return obj;

@@ -45,3 +45,12 @@ export const queryDetailAction = (action, enquiryNumber) =>
     url: `${prefix}/inquiry/PurchaseEnquiryService/${action}/${enquiryNumber}`,
     method: 'get'
   });
+
+// 比价 报价历史 POST /PurchaseOrderService/findOrderItemList
+// {elsAccount:'采购ELS账号',orderNumber:'采购订单号'} materialNumber?
+export const materialOrderHistory = (params) =>
+  request({
+    url: `${prefix}/inquiry/PurchaseOrderService/findOrderItemList`,
+    method: 'post',
+    data: { ...params }
+  });

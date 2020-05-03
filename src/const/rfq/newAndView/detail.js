@@ -24,13 +24,13 @@ export default {
     },
     {
       formslot: true,
-      type: 'date',
+      type: 'datetime',
       display: true,
-      format: 'yyyy-MM-dd',
-      valueFormat: 'yyyy-MM-dd',
-      label: '截止日期',
+      format: 'yyyy-MM-dd hh:mm:ss',
+      valueFormat: 'timestamp',
+      label: '报价截止时间',
       span: 6,
-      prop: 'endDate'
+      prop: 'quoteEndTime'
     },
     {
       label: '负责人',

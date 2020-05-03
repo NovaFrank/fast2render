@@ -27,16 +27,16 @@ export default {
       ]
     },
     {
-      type: 'date',
-      format: 'yyyy-MM-dd',
+      type: 'datetime',
+      format: 'yyyy-MM-dd hh:mm:ss',
       valueFormat: 'timestamp',
-      label: '截止日期',
+      label: '报价截止时间',
       span: 6,
-      prop: 'endDate',
+      prop: 'quoteEndTime',
       rules: [
         {
           required: true,
-          message: '请选择截止日期',
+          message: '请选择报价截止时间',
           trigger: 'blur'
         }
       ]

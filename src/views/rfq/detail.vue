@@ -4,16 +4,20 @@
       titleText="预览"
       showButton
       :buttons="headerButtons"
+      :timeHistory="timeHistory"
       @on-close="handleClose"
+      @on-history="handleShowHistory"
+      @on-new-supplier="handleNewSupplier"
       @on-submit-approval="handleSubmit"
-      @on-update-end="handleUpdateEndDate"
+      @on-update-end="handleUpdateQuoteEndTime"
+      @show-time-history="handleShowTimeHistory"
     ></form-header>
     <avue-detail ref="form" v-model="detailObj" :option="formOption">
-      <template slot="endDateForm">
+      <template slot="quoteEndTimeForm">
         <el-date-picker
-          v-model="detailObj.endDate"
-          type="date"
-          placeholder="选择日期"
+          v-model="detailObj.quoteEndTime"
+          type="datetime"
+          placeholder="选择日期时间"
           value-format="timestamp"
         ></el-date-picker>
         <!-- @change="handleYearChange" -->
@@ -43,9 +47,13 @@
       :page.sync="inquiryListOption.page"
       v-model="inquiryListOption.obj"
       :span-method="spanMethod"
-      @size-change="sizeChange"
       @current-change="currentChange"
+      @row-click="handleDetailItemClick"
+      @size-change="sizeChange"
     >
+      <template slot="menuLeft">
+        <el-button size="small" @click.stop="handleShowSupplierSelect()">新供应商</el-button>
+      </template>
       <template slot="taxRate" slot-scope="scope">
         <span v-if="scope.row.itemStatus === '2'">**</span>
       </template>
@@ -53,7 +61,7 @@
         <span v-if="scope.row.itemStatus === '2'">**</span>
       </template>
       <template slot-scope="scope" slot="option">
-        <el-row :gutter="24">
+        <el-row v-if="scope.row.itemStatus === '2'" :gutter="24">
           <el-col :span="12">
             <avue-radio
               v-model="scope.row.itemStatus"
@@ -81,6 +89,17 @@
       @on-save-form="onSaveForm"
       @close-field-dialog="closeFieldDialog"
     ></field-dialog>
+    <!-- 报价历史记录 -->
+    <history :dialogVisible="historyVisible" :data="historyList"></history>
+    <!-- 新供应商选择 -->
+    <select-supplier-dialog
+      ref="suppliersDialog"
+      :dialogVisible.sync="suppliersDialogVisable"
+      :title="'供应商'"
+      :data="suppliersDialogOptionColumn.data"
+      :crudObj="currentDetailItem"
+      @on-save="suppliersDialogSaveTransfer"
+    ></select-supplier-dialog>
   </div>
 </template>
 
@@ -94,16 +113,25 @@ import tabOption from '@/const/rfq/newAndView/tabs';
 import inquiryListOption from '@/const/rfq/newAndView/detailInquiryList';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
+import { getUserInfo } from '@/util/utils.js';
 import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
-import { dataDicAPI } from '@/api/rfq/common';
+import { dataDicAPI, supplierMasterListAction } from '@/api/rfq/common';
+import history from './history';
+import { validatenull } from '@/util/validate';
+import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
+import selectSupplierDialog from '@/components/views/selectSupplierDialog';
 
 export default {
   components: {
     FormHeader,
-    fieldDialog
+    fieldDialog,
+    history,
+    selectSupplierDialog
   },
   data() {
     return {
+      elsAccount: '',
+      elsSubAccount: '',
       dic: [
         {
           label: '接受', // 行信息 itemStatus
@@ -130,13 +158,25 @@ export default {
         { power: true, text: '返回', type: '', size: '', action: 'on-back' },
         { power: true, text: '更新时间', type: 'primary', size: '', action: 'on-update-end' },
         { power: true, text: '提交审批', type: 'primary', size: '', action: 'on-submit-approval' },
+        { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
         { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-        { power: true, text: '开启', type: 'primary', size: '', action: 'on-open' }
+        { power: true, text: '开启', type: 'primary', size: '', action: 'on-open' },
+        { power: true, text: '发布新供应商', type: 'primary', size: '', action: 'on-new-supplier' }
       ],
+      historyVisible: false,
+      historyList: [],
+      suppliersDialogVisable: false,
+      suppliersDialogOptionColumn: supplierSelectDialog.option.column,
+      currentDetailItem: {}, // 当前选中物料行
+      currentDetailItemSelected: [], // 当前选中物料行已有供应商 toElsAccount,
+      timeHistory: [],
       currentEnquiryNumber: ''
     };
   },
   created() {
+    const userInfo = getUserInfo();
+    this.elsAccount = userInfo.elsAccount;
+    this.elsSubAccount = userInfo.elsSubAccount;
     this.currentEnquiryNumber = this.$route.params.enquiryNumber;
     this.tableData();
     this.initDetail();
@@ -204,6 +244,37 @@ export default {
         });
       });
     },
+    handleDetailItemClick(row, event, column) {
+      this.currentDetailItemSelected = this.inquiryListOption.data
+        .filter((item) => item.materialNumber === row.materialNumber)
+        .map((item) => {
+          return item.toElsAccount;
+        });
+      this.currentDetailItem = {
+        ...row,
+        selectedSupplier: this.currentDetailItemSelected
+      };
+    },
+    handleNewSupplier() {
+      this.$confirm('是否发布新供应商？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const params = {
+          enquiryNumber: this.currentEnquiryNumber,
+          quoteEndTime: this.detailObj.quoteEndTime,
+          itemList: this.inquiryListOption.data
+        };
+        purchaseEnquiryAction('newSupplierPublish', params).then((res) => {
+          if (res.data.statusCode !== '200') {
+            this.$message.error(res.data.message);
+            return;
+          }
+          this.$message.success('新供应商发布成功');
+        });
+      });
+    },
     handleRadioChange(value, scope) {
       this.inquiryListOption.data[scope.row.$index].itemStatus = value;
       if (value === '5') {
@@ -213,8 +284,26 @@ export default {
         this.inquiryListOption.data[scope.row.$index].$cellEdit = true;
       }
     },
+    handleShowHistory() {
+      queryDetailAction('queryQuote', this.currentEnquiryNumber).then((res) => {
+        this.historyList = res.data.pageData.rows;
+      });
+      this.historyVisible = true;
+    },
+    handleShowTimeHistory() {
+      queryDetailAction('queryUpdateQuoteEndTime', this.currentEnquiryNumber).then((res) => {
+        this.timeHistory = res.data.pageData.rows;
+      });
+    },
     handleTabChange(value) {
       this.tabActive = value.prop;
+    },
+    handleShowSupplierSelect() {
+      if (validatenull(this.currentDetailItem)) {
+        this.$message.warning('请选择物料');
+        return;
+      }
+      this.suppliersDialogVisable = true;
     },
     handleSubmit() {
       this.$confirm('是否提交审批？', '提示', {
@@ -235,13 +324,12 @@ export default {
         });
       });
     },
-    handleUpdateEndDate() {
+    handleUpdateQuoteEndTime() {
       this.$confirm('是否更新截止时间？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        console.log('detailObj', this.detailObj);
         purchaseEnquiryAction('updateQuoteEndTime', this.detailObj).then((res) => {
           if (res.data.statusCode !== '200') {
             this.$message.error(res.data.message);
@@ -269,6 +357,7 @@ export default {
         if (!this.initDetailError(res)) return;
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
           return {
+            id: item.uuid,
             $cellEdit: item.itemStatus === '4',
             ...item
           };
@@ -277,7 +366,6 @@ export default {
     },
     // 配额保存
     onSaveForm(form) {
-      console.log('form', form);
       this.fieldDialogVisible = false;
       this.inquiryListOption.data[form.index].quote = form.quote;
     },
@@ -292,11 +380,53 @@ export default {
       return mySpanMethod(
         this.inquiryListOption.data,
         [1, 2, 3, 4],
-        'materialNo',
-        'uuid',
+        'materialNumber',
+        'id',
         columnIndex,
         row
       );
+    },
+    suppliersDialogSaveTransfer(selectedSupplier) {
+      const newSuppliers = selectedSupplier.filter(
+        (item) => !this.currentDetailItemSelected.includes(item)
+      );
+      const itemList = newSuppliers.map((item, index) => {
+        return {
+          id: `${index}`,
+          materialNumber: this.currentDetailItem.materialNumber,
+          materialName: this.currentDetailItem.materialName,
+          materialDesc: this.currentDetailItem.materialDesc,
+          materialSpecifications: this.currentDetailItem.materialSpecifications,
+          baseUnit: this.currentDetailItem.baseUnit,
+          deliveryDate: this.currentDetailItem.deliveryDate,
+          quantity: this.currentDetailItem.quantity,
+          elsAccount: this.currentDetailItem.elsAccount,
+          toElsAccount: item,
+          canDeliveryDate: this.currentDetailItem.canDeliveryDate,
+          quoteMethod: this.currentDetailItem.quoteMethod,
+          itemStatus: '1',
+          taxRate: '',
+          priceIncludingTax: '',
+          quota: '',
+          $cellEdit: false
+        };
+      });
+      const compare = function(prop) {
+        return function(obj1, obj2) {
+          const val1 = obj1[prop];
+          const val2 = obj2[prop];
+          if (val1 < val2) {
+            return -1;
+          } else if (val1 > val2) {
+            return 1;
+          } else {
+            return 0;
+          }
+        };
+      };
+      this.inquiryListOption.data = this.inquiryListOption.data
+        .concat(itemList)
+        .sort(compare('materialNumber'));
     },
     tableData(data) {
       dataDicAPI('enquiryType').then((res) => {
@@ -305,6 +435,30 @@ export default {
             return {
               ...item,
               dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 供应商列表 supplierMasterListAction
+      supplierMasterListAction({ elsAccount: this.elsAccount }).then((res) => {
+        this.supplierList = res.data.pageData.rows;
+        this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
+          return {
+            label: item.toElsAccount,
+            key: item.toElsAccount
+          };
+        });
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
+          if (item.prop === 'toElsAccountList') {
+            return {
+              dicData: this.supplierList.map((item) => {
+                return {
+                  label: item.toElsAccount,
+                  value: item.toElsAccount
+                };
+              }),
+              ...item
             };
           }
           return item;

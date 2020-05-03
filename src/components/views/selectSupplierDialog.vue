@@ -75,8 +75,7 @@ export default {
       this.visable = false;
     },
     handleSubmit() {
-      console.log('this.form', this.form);
-      this.$emit('save', this.form);
+      this.$emit('on-save', this.form.selectedSupplier);
       this.visable = false;
     }
   }

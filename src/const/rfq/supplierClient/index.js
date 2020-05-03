@@ -45,10 +45,10 @@ export default {
       //   prop: 'beginDate'
       // },
       // {
-      //   type: 'date',
-      //   format: 'yyyy-MM-dd',
-      //   label: '截至日期',
-      //   prop: 'endDate'
+      //   type: 'datetime',
+      //   format: 'yyyy-MM-dd hh:mm:ss',
+      //   label: '截止时间',
+      //   prop: 'quoteEndTime'
       // },
       {
         label: '采购负责人',

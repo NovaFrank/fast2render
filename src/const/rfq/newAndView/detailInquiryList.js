@@ -6,11 +6,12 @@ export default {
     pageSize: 10
   },
   option: {
-    header: false,
+    addBtn: false,
+    refreshBtn: false,
     menu: false,
     indexLabel: '#',
     border: true,
-    // highlightCurrentRow: true,
+    highlightCurrentRow: true,
     index: true,
     keyId: 'uuid',
     cellBtn: true,

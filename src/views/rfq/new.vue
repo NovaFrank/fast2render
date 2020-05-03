@@ -268,7 +268,7 @@ export default {
             const params = {
               elsAccount: this.elsAccount,
               beginDate: this.form.beginDate,
-              endDate: this.form.endDate,
+              quoteEndTime: this.form.quoteEndTime,
               enquiryType: this.form.enquiryType,
               // companyCode: this.form.companyCode,
               responsible: this.form.responsible,
@@ -303,7 +303,7 @@ export default {
               enquiryNumber: this.currentEnquiryNumber,
               elsAccount: this.elsAccount,
               beginDate: this.form.beginDate,
-              endDate: this.form.endDate,
+              quoteEndTime: this.form.quoteEndTime,
               enquiryType: this.form.enquiryType,
               // companyCode: this.form.companyCode,
               responsible: this.form.responsible,

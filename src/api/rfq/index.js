@@ -26,6 +26,7 @@ export const elsFromColumnSta = (action, param) =>
 // 关闭 close post
 // 更新截止时间 updateQuoteEndTime post
 // 重报价 againQuote post
+// 发布新供应商 newSupplierPublish post
 export const purchaseEnquiryAction = (action, params) =>
   request({
     url: `${prefix}/inquiry/PurchaseEnquiryService/${action}`,
@@ -37,6 +38,8 @@ export const purchaseEnquiryAction = (action, params) =>
 // 询价单行明细查询 findItemDetails/${enquiryNumber} get
 // 询价单删除 delete/${enquiryNumber} get
 // 退回 goBack get
+// 报价记录 queryQuote get
+// 查询更新截止时间记录 queryUpdateQuoteEndTime get
 export const queryDetailAction = (action, enquiryNumber) =>
   request({
     url: `${prefix}/inquiry/PurchaseEnquiryService/${action}/${enquiryNumber}`,

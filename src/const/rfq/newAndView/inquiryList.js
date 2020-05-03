@@ -6,10 +6,7 @@ export default {
     pageSize: 10
   },
   option: {
-    addBtn: false,
-    refreshBtn: false,
-    columnBtn: false,
-    searchBtn: false,
+    header: false,
     menuAlign: 'left',
     delBtn: false,
     editBtn: false,

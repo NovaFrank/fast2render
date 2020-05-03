@@ -44,8 +44,8 @@ export default {
       //   prop: 'beginDate'
       // },
       // {
-      //   label: '报价截止日期',
-      //   prop: 'endDate'
+      //   label: '报价截止时间',
+      //   prop: 'quoteEndTime'
       // },
       {
         label: '物料名称',

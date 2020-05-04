@@ -23,7 +23,7 @@
  * 进入屏蔽其他操作状态，单纯进行布局， 保存 及 发布 ， 可维护类型为 表格 表单 详情， 组合， 可 维护 模版 页面  模块
  * block 内含一组组件
  */
-import RenderDynamicTab from './widget/block-provider';
+import RenderDynamicTab from './widget/page-provider';
 
 const BLOCK_TYPE = {
   LIST: 'crud',

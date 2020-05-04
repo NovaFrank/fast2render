@@ -4,10 +4,10 @@ import ComponentItemRender from './components/render/componentItemRender.vue';
 
 import TabRender from './components/render/tabRender';
 import ButtonGroupRender from './components/render/widget/render-button-group';
-import BlockProvider from './components/render/widget/block-provider';
 import PageProvider from './components/render/widget/page-provider';
 import ThemeProvider from './components/render/widget/theme-provider';
 import TemplateProvider from './components/render/widget/template-provider';
+import PageHeader from './components/render/widget/page-header';
 
 import SelectDialog from './components/render/selectDialog/selectDialog';
 
@@ -18,13 +18,12 @@ export default {
     Vue.component('Fast2' + ComponentItemRender.name, ComponentItemRender);
     Vue.component('Fast2' + TabRender.name, TabRender);
     Vue.component('Fast2' + ButtonGroupRender.name, ButtonGroupRender);
-    Vue.component('Fast2' + BlockProvider.name, BlockProvider);
     Vue.component('Fast2' + PageProvider.name, PageProvider);
     Vue.component('Fast2' + TemplateProvider.name, TemplateProvider);
     Vue.component('Fast2' + ThemeProvider.name, ThemeProvider);
 
     Vue.component(ButtonGroupRender.name, ButtonGroupRender);
-
+    Vue.component(PageHeader.name, PageHeader);
     Vue.component(SelectDialog.name, SelectDialog);
   }
 };

@@ -1,6 +1,6 @@
 import { validateNull } from './validate';
 import _ from 'lodash';
-import { setStore } from './store';
+import { setStore, getStore } from './store';
 
 /**
  * 验证表单
@@ -299,23 +299,36 @@ export const getItemFormArrayStr = (str, obj) => {
 };
 
 export function isJSON(str) {
-  console.log(str, getObjType(str), '转换对象');
-  if (getObjType(str) === 'string') {
-    try {
-      var obj = JSON.parse(str);
-      console.log(getObjType(obj), '是否对象');
-      if ((getObjType(obj) === 'object' || getObjType(obj) === 'array') && obj) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      console.log('error：' + str + '!!!' + e);
-      return false;
-    }
+  if (getObjType(str) !== 'string') {
+    return false;
   }
-  console.log('It is not a string!');
+  try {
+    var obj = JSON.parse(str);
+    return (getObjType(obj) === 'object' || getObjType(obj) === 'array') && obj;
+  } catch (e) {
+    console.log('error：' + str + '!!!' + e);
+    return false;
+  }
 }
+
+export const getDicItem = (action) => {
+  let dicLib = getStore({ name: 'commondic' });
+  if (dicLib) {
+    let dic = dicLib[action];
+    if (dic) {
+      return dic;
+    }
+  } else {
+    loadDic();
+  }
+  return [];
+};
+
+export const loadDic = () => {
+  let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
+  let url = `${filePath}dic/index.json`;
+  loadJson(url, 'commondic');
+};
 
 export const loadJson = (url, name) => {
   const xhr = new XMLHttpRequest();

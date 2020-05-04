@@ -8,7 +8,7 @@ export default {
   stripe: true,
   index: true,
   indexLabel: '序号',
-  page: false,
+  page: true,
   align: 'center',
   menuAlign: 'left',
   menuWidth: '140',

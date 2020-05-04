@@ -46,6 +46,7 @@ export default {
   methods: {
     doAction(action, data) {
       this.$emit(action, data);
+      this.$emit('do-action', action);
       // this.$message.success(action)
     }
   }

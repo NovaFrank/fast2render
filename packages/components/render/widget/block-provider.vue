@@ -5,7 +5,7 @@
 </template>
 <script>
 import { getStore } from '../lib/store';
-import { mergeColumn, vaildData, loadJson } from '../lib/utils';
+import { mergeColumn, vaildData, loadJson, loadDic } from '../lib/utils';
 export default {
   name: 'BlockProvider',
   props: {
@@ -47,7 +47,8 @@ export default {
     }
   },
   created() {
-    this.loadDic('common');
+    this.checkDic();
+    console.log('load dic file');
   },
   mounted() {
     let configFilePath = localStorage.getItem('configFilePath');
@@ -72,15 +73,15 @@ export default {
         this.handlerLayoutData(list);
       } else {
         loadJson(url, slug);
+        setTimeout(this.onLoad, 1000);
       }
     },
-    loadDic() {
-      const url = `${this.filePath}dic/index.json`;
+    checkDic() {
       let dic = getStore({ name: 'commondic', timer: 1200 });
       if (dic) {
         this.dics = dic;
       } else {
-        loadJson(url, 'commondic');
+        loadDic();
       }
     },
     handlerLayoutData(list) {
@@ -111,7 +112,7 @@ export default {
     },
     replaceLocalDic(config) {
       if (!config.dicUrl.includes('layout/dics')) {
-        return;
+        return config;
       }
       let slug = config.dicUrl.split('layout/dics/value/')[1];
       if (slug && this.dics && this.dics[slug]) {

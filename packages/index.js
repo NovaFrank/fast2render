@@ -9,8 +9,8 @@ import PageProvider from "./components/render/widget/page-provider";
 import ThemeProvider from "./components/render/widget/theme-provider";
 import TemplateProvider from "./components/render/widget/template-provider";
 import PageHeader from "./components/render/widget/page-header";
-import util, { loadDic, getDicItem } from "./components/render/lib/utils";
-import auth from "./components/render/lib/auth";
+import util, { loadDic, getDicItem } from "./lib/utils";
+import auth from "./lib/auth";
 import SelectDialog from "./components/render/selectDialog/selectDialog";
 
 export default {

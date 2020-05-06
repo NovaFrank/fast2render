@@ -4,8 +4,8 @@
   </div>
 </template>
 <script>
-import { getStore } from '../lib/store';
-import { mergeColumn, vaildData, loadJson, loadDic } from '../lib/utils';
+import { getStore } from '../../../lib/store';
+import { mergeColumn, vaildData, loadJson, loadDic } from '../../../lib/utils';
 export default {
   name: 'BlockProvider',
   props: {

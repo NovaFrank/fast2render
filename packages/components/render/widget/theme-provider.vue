@@ -12,12 +12,12 @@
   </div>
 </template>
 <script>
-import BigListTemplate from '../lib/crud-biglist';
-import SmallListTemplate from '../lib/crud-small';
-import BigFormTemplate from '../lib/form-big';
-import SmallFormTemplate from '../lib/form-small';
-import { mySpanMethod } from '../lib/utils.js';
-import { loadBlockConfig, handleColumn } from '../lib/blockHander.js';
+import BigListTemplate from '../../../lib/crud-biglist';
+import SmallListTemplate from '../../../lib/crud-small';
+import BigFormTemplate from '../../../lib/form-big';
+import SmallFormTemplate from '../../../lib/form-small';
+import { mySpanMethod } from '../../../lib/utils.js';
+import { loadBlockConfig, handleColumn } from '../../../lib/blockHander.js';
 
 import _ from 'lodash';
 
@@ -113,7 +113,8 @@ export default {
       let localOption = this.getIntiOption();
       let remoteOption = loadBlockConfig(this.version, localOption, this.type);
       if (remoteOption) {
-        this.finalOption = localOption;
+        this.finalOption = remoteOption;
+
         this.$forceUpdate();
       } else {
         setTimeout(() => {

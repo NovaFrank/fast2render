@@ -25,7 +25,7 @@
   </div>
 </template>
 <script>
-import { deepClone } from '../lib/utils';
+import { deepClone } from '../../../lib/utils';
 export default {
   name: 'selectDialogTable',
   props: {

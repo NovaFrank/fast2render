@@ -113,7 +113,7 @@ import tabOption from '@/const/rfq/newAndView/tabs';
 import inquiryListOption from '@/const/rfq/newAndView/detailInquiryList';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
-import { getUserInfo } from '@/util/utils.js';
+import { getUserInfo, compare } from '@/util/utils.js';
 import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
 import { dataDicAPI, supplierMasterListAction } from '@/api/rfq/common';
 import history from './history';
@@ -411,19 +411,6 @@ export default {
           $cellEdit: false
         };
       });
-      const compare = function(prop) {
-        return function(obj1, obj2) {
-          const val1 = obj1[prop];
-          const val2 = obj2[prop];
-          if (val1 < val2) {
-            return -1;
-          } else if (val1 > val2) {
-            return 1;
-          } else {
-            return 0;
-          }
-        };
-      };
       this.inquiryListOption.data = this.inquiryListOption.data
         .concat(itemList)
         .sort(compare('materialNumber'));

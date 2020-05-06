@@ -6,8 +6,9 @@ export default {
     pageSize: 10
   },
   option: {
-    header: false,
     menuAlign: 'left',
+    addBtn: false,
+    refreshBtn: false,
     delBtn: false,
     editBtn: false,
     indexLabel: '#',
@@ -63,6 +64,11 @@ export default {
         valueFormat: 'timestamp',
         label: '交货日期',
         prop: 'canDeliveryDate'
+      },
+      {
+        slot: true,
+        label: '报价方式',
+        prop: 'quoteMethod'
       }
     ]
   }

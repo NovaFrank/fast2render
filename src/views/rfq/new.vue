@@ -34,6 +34,17 @@
       @size-change="sizeChange"
       @current-change="currentChange"
     >
+      <template slot-scope="scope" slot="quoteMethod">
+        <span v-if="scope.row.quoteMethod === '0'">常规报价</span>
+        <p
+          style="margin: 0"
+          v-else-if="scope.row.quoteMethod === '1'"
+          v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
+          :key="ladder.ladderGrade"
+        >
+          {{ ladder.ladderGrade }}
+        </p>
+      </template>
       <template slot="menuLeft">
         <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>
       </template>
@@ -92,7 +103,7 @@
       :title="'供应商'"
       :data="suppliersDialogOptionColumn.data"
       :crudObj="currentDetailItem"
-      @save="suppliersDialogSaveTransfer"
+      @on-save="suppliersDialogSaveTransfer"
     ></select-supplier-dialog>
   </div>
 </template>
@@ -161,7 +172,8 @@ export default {
       suppliersDialogQueryParam: {},
       suppliersDialogPageParam: { pageNo: 1, pageSize: 10 },
       suppliersSelect: [],
-      currentDetailItem: {},
+      currentDetailItem: {}, // 当前选中物料行
+      currentDetailItemSelected: [], // 当前选中物料行已有供应商 toElsAccount,
       currentEnquiryNumber: ''
     };
   },
@@ -359,7 +371,7 @@ export default {
         (item) => item.materialNumber === form.materialNumber
       );
       const currentMaterial = this.materialList[materialIndex];
-      const item = {
+      let item = {
         materialNumber: currentMaterial.materialNumber,
         materialName: currentMaterial.materialName,
         materialDesc: currentMaterial.materialDesc,
@@ -369,9 +381,22 @@ export default {
         quantity: form.quantity,
         elsAccount: form.elsAccount,
         canDeliveryDate: form.canDeliveryDate,
+        toElsAccountList: form.toElsAccountList.toString(),
         quoteMethod: form.quoteMethod // 0、1
-        // toElsAccountList: form.toElsAccountList.toString()
       };
+      if (form.quoteMethod === '1') {
+        item = {
+          ...item,
+          ladderPriceJson: JSON.stringify(
+            form.ladderPriceJson.map((item) => {
+              return {
+                ladderQuantity: item.ladderQuantity,
+                ladderGrade: item.ladderGrade
+              };
+            })
+          )
+        };
+      }
       if (this.dialogTitle === '添加询价明细') {
         this.inquiryListOption.data.push(item);
       } else if (this.dialogTitle === '修改询价明细') {
@@ -404,12 +429,13 @@ export default {
         }
       });
     },
-    suppliersDialogSaveTransfer(form) {
-      const index = form.$index;
-      console.log(index, form.selectedSupplier);
-      this.inquiryListOption.data[index].toElsAccountList = form.selectedSupplier.toString();
-      console.log(this.inquiryListOption.data[index].toElsAccountList);
-      this.suppliersDialogVisable = false;
+    suppliersDialogSaveTransfer(selectedSupplier) {
+      const index = this.currentDetailItem.$index;
+      this.$set(
+        this.inquiryListOption.data[index],
+        'toElsAccountList',
+        selectedSupplier.toString()
+      );
     },
     suppliersHandleList() {
       // let listParams = deepClone(this.materialsDialogQueryParam);

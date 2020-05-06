@@ -3,6 +3,22 @@ import { getStore, setStore } from '@/util/store.js';
 import { login } from '@/api/index';
 import { setToken } from '@/util/auth.js';
 import md5 from 'js-md5';
+
+// 对象数组排序
+export const compare = function(prop) {
+  return function(obj1, obj2) {
+    const val1 = obj1[prop];
+    const val2 = obj2[prop];
+    if (val1 < val2) {
+      return -1;
+    } else if (val1 > val2) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+};
+
 /**
  * 验证表单
  *

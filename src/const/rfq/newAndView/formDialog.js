@@ -54,8 +54,10 @@ export default {
       prop: 'quoteMethod' // 0、1
     },
     {
-      label: '设置成本报价',
-      prop: 'setQuote'
+      span: 24,
+      formslot: true,
+      label: '',
+      prop: 'ladderPriceJson'
     }
     // {
     //   type: 'tree',
@@ -68,8 +70,5 @@ export default {
   ],
   menuBtn: true,
   emptyBtn: false,
-  submitBtn: false,
-  submitSize: 'medium',
-  submitText: '保存',
-  menuPosition: 'center'
+  submitBtn: false
 };

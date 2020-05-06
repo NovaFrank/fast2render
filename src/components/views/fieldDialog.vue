@@ -7,6 +7,21 @@
     :before-close="closeDialog"
   >
     <avue-form ref="form" :option="dialogOption" v-model="form" class="new-field">
+      <template v-if="form.quoteMethod === '1'" slot="ladderPriceJson">
+        <div>
+          <avue-form
+            @submit="submitLadderForm"
+            :option="ladderFormOption.option"
+            v-model="ladderFormOption.form"
+          ></avue-form>
+          <avue-crud
+            :data="ladderOption.data"
+            :option="ladderOption.option"
+            @row-del="delLadderUpdate"
+          >
+          </avue-crud>
+        </div>
+      </template>
       <template slot="suppliers">
         <avue-crud
           :data="form.suppliers"
@@ -28,6 +43,8 @@
 </template>
 
 <script>
+import ladderFormOption from '@/const/rfq/newAndView/ladderForm';
+import ladderOption from '@/const/rfq/newAndView/ladder';
 import supplierList from '@/const/rfq/newAndView/supplierList';
 
 export default {
@@ -49,6 +66,7 @@ export default {
         return {
           elsAccount: '',
           fromBusiness: '',
+          ladderPriceJson: [],
           suppliers: []
         };
       }
@@ -57,7 +75,10 @@ export default {
   data() {
     return {
       supplierList: supplierList,
+      ladderOption: ladderOption,
+      ladderFormOption: ladderFormOption,
       form: {
+        ladderPriceJson: [],
         suppliers: []
       }
     };
@@ -66,18 +87,21 @@ export default {
     field(newVal) {
       console.log('newVal', newVal);
       this.form = newVal;
+      this.ladderOption.data = JSON.parse(newVal.ladderPriceJson) || [];
     }
   },
   methods: {
     closeDialog() {
       this.$emit('close-field-dialog');
     },
+    delLadderUpdate(row, index) {
+      this.ladderOption.data.splice(index, 1);
+      this.updateLadder();
+    },
     handleDeleteSupplier(row, index) {
-      console.log(row, index);
       this.form.suppliers.splice(index, 1);
     },
     handleSaveSupplier(row, done) {
-      console.log(row);
       this.form.suppliers.push(row);
       done();
     },
@@ -87,7 +111,44 @@ export default {
     handleSubmit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
+          if (this.form.quoteMethod === '1') {
+            this.form.ladderPriceJson = this.ladderOption.data;
+          }
           this.$emit('on-save-form', this.form);
+        }
+      });
+    },
+    submitLadderForm(form, done) {
+      const length = this.ladderOption.data.length;
+      if (
+        this.ladderOption.data.length >= 1 &&
+        Number.parseInt(form.ladderQuantity) <
+          Number.parseInt(this.ladderOption.data[length - 1].ladderQuantity)
+      ) {
+        this.$message.error('阶梯数量必须大于上一阶梯数量');
+        done();
+        return;
+      }
+      this.ladderOption.data.push(form);
+      this.updateLadder();
+      this.ladderFormOption.form.ladderQuantity = '';
+      done();
+    },
+    updateLadder() {
+      const length = this.ladderOption.data.length;
+      this.ladderOption.data = this.ladderOption.data.map((item, index) => {
+        if (index === length - 1) {
+          return {
+            ...item,
+            ladderGrade: `${item.ladderQuantity} <= x`
+          };
+        } else {
+          return {
+            ...item,
+            ladderGrade: `${item.ladderQuantity} <= x < ${
+              this.ladderOption.data[index + 1].ladderQuantity
+            }`
+          };
         }
       });
     }

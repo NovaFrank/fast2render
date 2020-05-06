@@ -5,6 +5,7 @@
       showButton
       :buttons="headerButtons"
       :timeHistory="timeHistory"
+      @on-back="handleBack"
       @on-close="handleClose"
       @on-history="handleShowHistory"
       @on-new-supplier="handleNewSupplier"
@@ -222,8 +223,8 @@ export default {
         });
       });
     },
-    handleCancel() {
-      this.$router.back();
+    handleBack() {
+      this.$router.push({ path: '/list' });
     },
     handleClose() {
       this.$confirm('是否关闭？', '提示', {

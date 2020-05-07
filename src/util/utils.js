@@ -115,3 +115,19 @@ export const getLocalToken = (supplier) => {
     setStore(params2);
   });
 };
+
+/// 格式化文件大小的JS方法
+/// <param name="filesize">文件的大小,传入的是一个bytes为单位的参数</param>
+/// <returns>格式化后的值</returns>
+export const renderSize = (filesize) => {
+  if (filesize === null || filesize === '') {
+    return '0 Bytes';
+  }
+  const unitArr = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  let index = 0;
+  const srcsize = parseFloat(filesize);
+  index = Math.floor(Math.log(srcsize) / Math.log(1024));
+  let size = srcsize / Math.pow(1024, index);
+  size = size.toFixed(2); // 保留的小数位数
+  return size + unitArr[index];
+};

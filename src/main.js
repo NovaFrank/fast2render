@@ -7,8 +7,10 @@ import Avue from '@smallwei/avue';
 import '@smallwei/avue/lib/index.css';
 import axios from './router/axios';
 import VueAxios from 'vue-axios';
+import Fast2Render from 'fast2render';
 
 Vue.use(VueAxios, axios);
+Vue.use(Fast2Render);
 Vue.use(ElementUI);
 Vue.use(Avue);
 Vue.config.productionTip = false;

@@ -81,15 +81,6 @@
         </el-row>
       </template>
     </avue-crud>
-    <field-dialog
-      :dialogTitle="dialogTitle"
-      :dialogOption="dialogOption"
-      :field="fieldDialogForm"
-      :fieldDialogVisible="fieldDialogVisible"
-      :dialogWidth="dialogWidth"
-      @on-save-form="onSaveForm"
-      @close-field-dialog="closeFieldDialog"
-    ></field-dialog>
     <!-- 报价历史记录 -->
     <history :dialogVisible="historyVisible" :data="historyList"></history>
     <!-- 新供应商选择 -->
@@ -107,8 +98,6 @@
 <script>
 import { mySpanMethod } from '@/util/utils';
 import FormHeader from '@/components/views/formHeader';
-import fieldDialog from '@/components/views/fieldDialog';
-import fieldDialogOption from '@/const/rfq/newAndView/quoteDialog';
 import formOption from '@/const/rfq/newAndView/detail';
 import tabOption from '@/const/rfq/newAndView/tabs';
 import inquiryListOption from '@/const/rfq/newAndView/detailInquiryList';
@@ -125,7 +114,6 @@ import selectSupplierDialog from '@/components/views/selectSupplierDialog';
 export default {
   components: {
     FormHeader,
-    fieldDialog,
     history,
     selectSupplierDialog
   },
@@ -150,11 +138,6 @@ export default {
       tabActive: 'detail',
       detailObj: {},
       filesForm: {},
-      fieldDialogForm: {},
-      fieldDialogVisible: false,
-      dialogTitle: '',
-      dialogWidth: '30%',
-      dialogOption: fieldDialogOption,
       headerButtons: [
         { power: true, text: '返回', type: '', size: '', action: 'on-back' },
         { power: true, text: '更新时间', type: 'primary', size: '', action: 'on-update-end' },
@@ -184,24 +167,12 @@ export default {
   },
   watch: {},
   methods: {
-    closeFieldDialog() {
-      this.fieldDialogVisible = false;
-    },
     currentChange(val) {
       this.inquiryListOption.page.currentPage = val;
       this.tableData({
         currentPage: val,
         pageSize: this.inquiryListOption.page.pageSize
       });
-    },
-    handleAcceptShow(scope) {
-      this.fieldDialogForm = {
-        index: scope.index,
-        quote: scope.row.quote
-      };
-      fieldDialogOption.column[0].label = `${scope.row.materialNo}配额`;
-      this.dialogTitle = `${scope.row.supplier}(${scope.row.elsCount})供应商授标配额`;
-      this.fieldDialogVisible = true;
     },
     handleAgainQuote(row) {
       this.$confirm('确定要该供应商物料重报价？', '提示', {
@@ -365,11 +336,6 @@ export default {
         });
       });
     },
-    // 配额保存
-    onSaveForm(form) {
-      this.fieldDialogVisible = false;
-      this.inquiryListOption.data[form.index].quote = form.quote;
-    },
     sizeChange(val) {
       this.inquiryListOption.page.pageSize = val;
       this.tableData({
@@ -387,6 +353,7 @@ export default {
         row
       );
     },
+    // 保存供应商选项
     suppliersDialogSaveTransfer(selectedSupplier) {
       const newSuppliers = selectedSupplier.filter(
         (item) => !this.currentDetailItemSelected.includes(item)
@@ -409,6 +376,7 @@ export default {
           taxRate: '',
           priceIncludingTax: '',
           quota: '',
+          ladderPriceJson: this.currentDetailItem.ladderPriceJson || '',
           $cellEdit: false
         };
       });
@@ -436,20 +404,6 @@ export default {
             label: item.toElsAccount,
             key: item.toElsAccount
           };
-        });
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'toElsAccountList') {
-            return {
-              dicData: this.supplierList.map((item) => {
-                return {
-                  label: item.toElsAccount,
-                  value: item.toElsAccount
-                };
-              }),
-              ...item
-            };
-          }
-          return item;
         });
       });
     },

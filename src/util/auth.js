@@ -1,5 +1,14 @@
+import { getStore } from './store';
 const TokenKey = 'token';
 const RefreshTokenKey = 'refresh-token';
+
+export function getUserInfo() {
+  let userInfo = getStore({ name: 'userInfo' });
+  if (userInfo && userInfo.elsAccount) {
+    return userInfo;
+  }
+  return { elsAccount: '307000', elsSubAccount: '1001' };
+}
 
 export function getToken() {
   return localStorage.getItem(TokenKey);

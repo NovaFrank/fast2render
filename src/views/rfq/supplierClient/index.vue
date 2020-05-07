@@ -81,23 +81,7 @@ export default {
       this.$refs.list.toggleSelection([val]);
     },
     handleDelete(row) {
-      this.$confirm('确定删除？', '提示').then(() => {
-        // let params = {
-        //   elsAccount: row.elsAccount,
-        //   whetherDefault: row.whetherDefault,
-        //   fromDesc: row.fromDesc,
-        //   fromBusiness: row.fromBusiness,
-        //   fbk1: this.fbk1
-        // };
-        // elsFromSta('delElsFromSta', params).then((res) => {
-        //   if (res.data.statusCode) {
-        //     this.$message.error(res.data.message);
-        //     return;
-        //   }
-        //   this.$message.success('删除成功');
-        //   this.tableData();
-        // });
-      });
+      this.$confirm('确定删除？', '提示').then(() => {});
     },
     handleEditRow(scope) {
       this.$router.push({ path: '/new', query: { enquiryNumber: scope.row.enquiryNumber } });

@@ -7,12 +7,12 @@ export default {
   },
   option: {
     header: false,
-    menu: false,
+    // menu: false,
+    editBtn: false,
+    delBtn: false,
     indexLabel: '#',
     border: true,
     index: true,
-    keyId: 'uuid',
-    cellBtn: true,
     fit: true,
     column: [
       {
@@ -45,33 +45,30 @@ export default {
         prop: 'deliveryDate'
       },
       {
-        dicUrl: '/layout/dics/value/enquiryMethod',
-        dicMethod: 'get',
-        type: 'select',
+        // dicUrl: '/layout/dics/value/enquiryMethod',
+        // dicMethod: 'get',
+        // type: 'select',
+        slot: true,
         label: '报价方式',
         prop: 'quoteMethod'
       },
       {
         label: '含税价',
-        prop: 'priceIncludingTax',
-        cell: true
+        prop: 'priceIncludingTax'
       },
       {
         label: '税率',
-        prop: 'taxRate',
-        cell: true
+        prop: 'taxRate'
       },
       {
         label: '不含税价',
-        prop: 'priceExcludingTax',
-        cell: true
+        prop: 'priceExcludingTax'
       },
       {
         slot: true,
         label: '是否报价',
         type: 'switch',
-        prop: 'quote',
-        cell: true
+        prop: 'quote'
       }
     ]
   }

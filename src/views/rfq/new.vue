@@ -17,13 +17,14 @@
       </template>
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
-    <avue-form
+    <!-- <avue-form
       v-if="tabActive === 'files'"
       :option="filesOption.option"
       v-model="filesForm"
       :upload-before="uploadBefore"
       :upload-after="uploadAfter"
-    ></avue-form>
+    ></avue-form> -->
+    <attachment-list v-if="tabActive === 'files'"></attachment-list>
     <avue-crud
       v-if="tabActive === 'detail'"
       :data="inquiryListOption.data"
@@ -129,13 +130,15 @@ import {
 } from '@/api/rfq/common';
 import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
 import { validatenull } from '@/util/validate';
+import AttachmentList from '@/components/views/attachmentList';
 
 export default {
   components: {
     FormHeader,
     fieldDialog,
     // SelectDialogTable,
-    selectSupplierDialog
+    selectSupplierDialog,
+    AttachmentList
   },
   data() {
     return {
@@ -388,7 +391,7 @@ export default {
         quantity: form.quantity,
         elsAccount: form.elsAccount,
         canDeliveryDate: form.canDeliveryDate,
-        toElsAccountList: form.toElsAccountList.toString(),
+        toElsAccountList: form.toElsAccountList ? form.toElsAccountList.toString() : '',
         quoteMethod: form.quoteMethod // 0、1
       };
       if (form.quoteMethod === '1') {
@@ -519,8 +522,8 @@ export default {
         this.supplierList = res.data.pageData.rows;
         this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
           return {
-            label: `${item.elsAccount}_${item.supplierName}`,
-            key: `${item.elsAccount}_${item.supplierName}`
+            label: `${item.toElsAccount}_${item.supplierName}`,
+            key: `${item.toElsAccount}_${item.supplierName}`
           };
         });
         this.dialogOption.column = this.dialogOption.column.map((item) => {
@@ -528,8 +531,8 @@ export default {
             return {
               dicData: this.supplierList.map((item) => {
                 return {
-                  label: `${item.elsAccount}_${item.supplierName}`,
-                  value: `${item.elsAccount}_${item.supplierName}`
+                  label: `${item.toElsAccount}_${item.supplierName}`,
+                  value: `${item.toElsAccount}_${item.supplierName}`
                 };
               }),
               ...item

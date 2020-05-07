@@ -1,24 +1,6 @@
 import request from '@/router/axios';
 let prefix = '/apis';
 
-// TODO: 临时，需要删除
-// 列表 queryElsFromSta、更新 saveElsFromSta、新增 insertElsFromSta、删除 delElsFromSta
-export const elsFromSta = (action, param) =>
-  request({
-    url: `${prefix}/ElsFromStaService/${action}`,
-    method: 'post',
-    data: { ...param }
-  });
-
-// TODO: 临时，需要删除
-// 列表 queryElsFromColumnSta、保存（新增、更新、删除） delElsFromColumnSta
-export const elsFromColumnSta = (action, param) =>
-  request({
-    url: `${prefix}/ElsFromColumnStaService/${action}`,
-    method: 'post',
-    data: { ...param }
-  });
-
 // 询报价信息列表的查询 findPageList post
 // 保存询价单 save post
 // 发布 publishEnquiry post

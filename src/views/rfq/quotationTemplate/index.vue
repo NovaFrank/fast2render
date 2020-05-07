@@ -33,7 +33,6 @@
 <script>
 import tableOption from '@/const/rfq/quotationTemplate';
 import columnsOption from '@/const/rfq/quotationTemplate/columns';
-import { elsFromSta } from '@/api/rfq';
 
 export default {
   components: {},
@@ -106,30 +105,7 @@ export default {
     handleTabChange(value) {
       this.tabActive = value.prop;
     },
-    onSaveForm(form) {
-      let params = {
-        elsAccount: form.elsAccount,
-        whetherDefault: form.whetherDefault,
-        fromDesc: form.fromDesc,
-        fromBusiness: form.fromBusiness
-      };
-      let action = 'saveElsFromSta';
-      if (this.dialogTitle === '新建类型') {
-        action = 'insertElsFromSta';
-        params = {
-          ...params,
-          fbk1: this.fbk1
-        };
-      }
-      elsFromSta(action, params).then((res) => {
-        if (res.data.statusCode) {
-          this.$message.error(res.data.message);
-          return;
-        }
-        this.$message.success('保存成功');
-        this.tableData();
-      });
-    },
+    onSaveForm(form) {},
     sizeChange(val) {
       this.tableOption.page.pageSize = val;
       this.tableData({
@@ -137,22 +113,7 @@ export default {
         pageSize: val
       });
     },
-    tableData(data) {
-      const params = {
-        pageSize: this.tableOption.page.pageSize || 10,
-        currentPage: 1,
-        ...data,
-        tabActive: this.tabActive
-      };
-      elsFromSta('queryElsFromSta', params).then((res) => {
-        if (res.data.statusCode) {
-          this.$message.error(res.data.message);
-          return;
-        }
-        this.tableOption.data = res.data.rows;
-        this.tableOption.page.total = res.data.total;
-      });
-    }
+    tableData(data) {}
   }
 };
 </script>

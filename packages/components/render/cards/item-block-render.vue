@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <avue-crud :option="outputJson"></avue-crud>
-  </div>
+  <fast2-component-render :list="item.data" :providerData="providerData"></fast2-component-render>
 </template>
 <script>
 // 属性信息展示卡 - 单条模式
@@ -18,6 +16,14 @@ export default {
           position: 'left',
           slug: '',
           outputJson: {}
+        };
+      }
+    },
+    ProviderData: {
+      type: Object,
+      default: () => {
+        return {
+          tableData: []
         };
       }
     }

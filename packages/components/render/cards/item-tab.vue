@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div class="tabBox">
     <template v-if="list && list.length">
       <el-tabs v-model="active">
         <template v-for="subItem in list">
           <el-tab-pane :label="subItem.label" :name="subItem.prop" :key="subItem.prop">
             <fast2-block-provider :version="subItem.version">
-              <template slot-scope="component">
-                <fast2-component-render :ProviderData="subItem.data" :list="component.list">
+              <template v-slot="component">
+                <fast2-component-render :providerData="providerData" :list="component.list">
                 </fast2-component-render> </template
             ></fast2-block-provider> </el-tab-pane></template
       ></el-tabs>
@@ -22,18 +22,8 @@
  * block 内含一组组件
  */
 
-const BLOCK_TYPE = {
-  LIST: 'crud',
-  FORM: 'form',
-  DETAIL: 'detail',
-  FIELD: 'field',
-  BUTTONS: 'button',
-  COMPONENT: 'block',
-  DYNAMIC: 'dynamicBlock'
-};
-
 export default {
-  name: 'item-tab',
+  name: 'item-block-tabs',
   props: {
     list: {
       type: Array,
@@ -41,7 +31,7 @@ export default {
         return [];
       }
     },
-    ProviderData: {
+    providerData: {
       type: Object,
       default: () => {
         return {
@@ -52,7 +42,6 @@ export default {
   },
   data() {
     return {
-      BLOCK_TYPE,
       tableObj: {},
       tableData: {},
       active: ''
@@ -61,24 +50,11 @@ export default {
   mounted() {
     console.log('启动tab组件');
     this.active = this.list[0].prop;
-  },
-  methods: {
-    listRowUpdate(row, index, done, loading) {
-      // 行修改
-      this.$set(this.ProviderData.tableData, index, row);
-      loading();
-      this.$emit('change', this.ProviderData);
-      done();
-    },
-    listRowSave(payload, done) {
-      this.ProviderData.tableData.push(payload);
-      this.$emit('change', this.ProviderData);
-      done();
-    },
-    listRowDel(payload) {
-      this.ProviderData.tableData.splice(payload.index, 1);
-    }
   }
 };
 </script>
-<style scoped></style>
+<style scoped>
+.tabBox {
+  background-color: #fff;
+}
+</style>

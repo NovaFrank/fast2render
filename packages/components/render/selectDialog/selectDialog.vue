@@ -9,9 +9,8 @@
       :title="title"
       :column="column"
       :multiple="multiple"
-      :actionPath="actionPath"
-      :requestMethod="requestMethod"
       @save="dialogSave"
+      @getData="getData"
     ></SelectDialogTable>
   </div>
 </template>
@@ -26,8 +25,6 @@ export default {
     value: { type: String, default: '' },
     title: { type: String, default: '' }, // dialog标题
     multiple: { type: Boolean, default: false }, // 是否多选
-    actionPath: { type: String, default: null }, // 数据接口地址
-    requestMethod: { type: String, default: 'GET' }, // 请求接口METHOD
     // 表格的列配置
     column: {
       type: Array,
@@ -52,9 +49,13 @@ export default {
     // 采购组选择框弹出
     dialogOpen() {
       this.dialogVisable = true;
+      this.$refs.selectDialog.handleList();
     },
     dialogSave(selectColumn) {
       this.$emit('save', selectColumn);
+    },
+    getData(param) {
+      this.$emit('getData', param);
     }
   }
 };

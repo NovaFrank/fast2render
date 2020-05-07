@@ -29,6 +29,7 @@
     :tip="item.tip"
     :type="item.type"
     :tags="item.tags"
+    :providerData="providerData"
     :value-format="item.valueFormat"
     :voidIconClass="item.voidIconClass"
     :is-img="item.isImg"
@@ -41,17 +42,18 @@ import itemMultiLine from '../cards/item-multi-line';
 import itemImg from '../cards/item-img';
 import itemHtml from '../cards/item-html';
 import itemHeader from '../cards/item-header';
+import itemBlock from '../cards/item-block-render';
 
 export default {
   name: 'render-item',
-  props: ['item'],
+  props: ['item', 'providerData'],
   data() {
     return {
       form: {},
       mycomponent: ''
     };
   },
-  components: { itemNormal, itemUrl, itemMultiLine, itemImg, itemHtml, itemHeader },
+  components: { itemNormal, itemUrl, itemMultiLine, itemImg, itemHtml, itemHeader, itemBlock },
   methods: {
     getComponent(type, component) {
       let KEY_COMPONENT_NAME = 'item-';
@@ -61,7 +63,7 @@ export default {
       }
 
       // 已定义组件列表
-      let existType = ['img', 'url', 'multi-line', 'html', 'header', 'divider'];
+      let existType = ['img', 'url', 'multi-line', 'html', 'header', 'divider', 'block'];
       if (existType.includes(type)) {
         result = type;
       }

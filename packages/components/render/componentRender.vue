@@ -3,28 +3,16 @@
     <slot></slot>
     <template v-for="item in list">
       <template v-if="!item.hide">
-        <template v-if="item.type === BLOCK_TYPE.DETAIL">
-          <div :key="item.slug">
-            <slot name="detail-header"></slot>
-            <avue-detail
-              :option="item.data"
-              v-model="ProviderData.fieldData"
-              :ref="item.slug"
-              v-on="$listeners"
-              ><slot name="form-slot"></slot>
-              <slot name="detail-slot"></slot>
-            </avue-detail>
-            <slot name="detail-footer"></slot>
-          </div>
-        </template>
-        <template v-if="item.type === BLOCK_TYPE.FORM || item.type === BLOCK_TYPE.FIELD">
+        <template
+          v-if="
+            item.type === BLOCK_TYPE.DETAIL ||
+              item.type === BLOCK_TYPE.FORM ||
+              item.type === BLOCK_TYPE.FIELD
+          "
+        >
           <div :key="item.slug">
             <slot name="form-header"></slot>
-            <avue-form
-              :option="item.data"
-              v-model="ProviderData.fieldData"
-              :ref="item.slug"
-              v-on="$listeners"
+            <avue-form :option="item.data" v-model="providerData" :ref="item.slug" v-on="$listeners"
               ><slot name="form-slot"></slot>
             </avue-form>
             <slot name="form-footer"></slot>
@@ -36,7 +24,7 @@
               ><template v-slot="component">
                 <slot name="crud-header">
                   <h4>
-                    {{ item.name }} <el-button size="mini" @click="listRowAdd">新增行</el-button>
+                    <el-button size="mini" @click="listRowAdd">新增行</el-button>
                   </h4>
                 </slot>
                 <avue-crud
@@ -44,7 +32,7 @@
                   @row-save="listRowSave"
                   @row-del="listRowDel"
                   @row-update="listRowUpdate"
-                  :data="ProviderData.tableData"
+                  :data="providerData[item.slug]"
                   v-model="tableData"
                   v-on="$listeners"
                   ref="table"
@@ -58,8 +46,8 @@
           <div :key="item.slug">
             <component
               :is="getComponent(item.type, item.component)"
-              :list="item.data"
-              :ProviderData="ProviderData.dynamicTabData"
+              :list="item.data && item.data.tableData ? item.data.tableData : item.data"
+              :providerData="providerData"
               v-on="$listeners"
             ></component>
           </div>
@@ -84,7 +72,7 @@
  * 进入屏蔽其他操作状态，单纯进行布局， 保存 及 发布 ， 可维护类型为 表格 表单 详情， 组合， 可 维护 模版 页面  模块
  * block 内含一组组件
  */
-import itemTab from './cards/item-tab';
+import itemBlockTabs from './cards/item-tab';
 import itemAttachment from './cards/item-attachment';
 const BLOCK_TYPE = {
   LIST: 'crud',
@@ -98,7 +86,7 @@ const BLOCK_TYPE = {
 
 export default {
   name: 'ComponentRender',
-  components: { itemTab, itemAttachment },
+  components: { itemBlockTabs, itemAttachment },
   props: {
     list: {
       type: Array,
@@ -106,7 +94,7 @@ export default {
         return [];
       }
     },
-    ProviderData: {
+    providerData: {
       type: Object,
       default: () => {
         return {
@@ -119,24 +107,24 @@ export default {
     return {
       BLOCK_TYPE,
       tableObj: {},
-      tableData: {}
+      tableData: []
     };
   },
   methods: {
     listRowUpdate(row, index, done, loading) {
       // 行修改
-      this.$set(this.ProviderData.tableData, index, row);
+      this.$set(this.tableData, index, row);
       loading();
       this.$emit('change', this.ProviderData);
       done();
     },
     listRowSave(payload, done) {
-      this.ProviderData.tableData.push(payload);
+      this.tableData.push(payload);
       this.$emit('change', this.ProviderData);
       done();
     },
     listRowDel(payload) {
-      this.ProviderData.tableData.splice(payload.index, 1);
+      this.tableData.splice(payload.index, 1);
     },
     listRowAdd() {
       this.$refs.table[0].rowAdd();
@@ -148,8 +136,6 @@ export default {
         result = component;
       } else if (type === 'attachment') {
         result = type;
-      } else if (type === 'block-tabs') {
-        result = 'tab';
       }
       this.mycomponent = KEY_COMPONENT_NAME + result;
       return this.mycomponent;

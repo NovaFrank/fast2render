@@ -376,7 +376,6 @@ export const mergeColumn = (remoteColumn = [], localColum = []) => {
     let isExist = newColumn.find((subitem) => {
       return subitem.prop === item.prop;
     });
-    console.log('是否有重复项', isExist);
     if (!isExist) {
       newColumn.push(item);
     }

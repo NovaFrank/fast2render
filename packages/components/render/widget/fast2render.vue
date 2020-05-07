@@ -35,6 +35,7 @@
               :column="column"
               :item="column"
               :index="index"
+              :providerData="data"
               :label="column.label"
               :prop="column.prop"
             >

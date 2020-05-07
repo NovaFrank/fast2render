@@ -7,7 +7,6 @@
         :data.sync="crudData"
         :option.sync="crudOption"
         :page.sync="crudPage"
-        :requestMethod="requestMethod"
         @selection-change="selectionChange"
         @search-change="searchChange"
         @refresh-change="refreshChange"
@@ -35,8 +34,6 @@ export default {
     title: { type: String, default: '' }, // dialog标题
     dialogVisible: { type: Boolean, default: false }, // dialog显隐
     multiple: { type: Boolean, default: false }, // 是否多选
-    actionPath: { type: String, default: null }, // 数据接口地址
-    requestMethod: { type: String, default: 'GET' }, // 请求接口METHOD
     // 表格的列配置
     column: {
       type: Array,
@@ -89,7 +86,7 @@ export default {
     this.crudMultiple = this.multiple;
     this.crudOption.selection = this.multiple;
     this.crudOption.highlightCurrentRow = !this.multiple;
-    this.handleList();
+    // this.handleList();
   },
   watch: {
     page: function(newValue) {
@@ -114,35 +111,10 @@ export default {
       let listParams = deepClone(this.crudQueryParam);
       Object.assign(listParams, this.crudPageParam);
       listParams.elsAccount = this.elsAccount;
-      this.getCrudData(this.actionPath, listParams);
+      this.getCrudData(this.crudData, listParams);
     },
-    getCrudData(url, param) {
-      const xhr = new XMLHttpRequest();
-      xhr.open(this.requestMethod, url, true);
-      xhr.responseType = 'json';
-      let dia = this;
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-          let data = JSON.parse(xhr.response);
-          if (data.statusCode !== '200') {
-            this.$message.error('数据查询失败', data.message);
-          } else {
-            let pageData = data.pageData;
-            dia.crudData = pageData.rows;
-            dia.crudPage.total = pageData.total;
-            dia.crudPage.currentPage = dia.crudPageParam.currentPage;
-            dia.crudPage.pageSize = dia.crudPageParam.pageSize;
-          }
-        } else {
-          console.log('数据查询失败', xhr.status, xhr.statusText);
-          this.$message.error('数据查询失败', xhr.statusText);
-        }
-      };
-      xhr.onerror = function() {
-        console.log('数据查询失败', xhr.status, xhr.statusText);
-        this.$message.error('数据查询失败', xhr.statusText);
-      };
-      xhr.send(param);
+    getCrudData(param) {
+      this.$emit('getData', param);
     },
     crudSave() {
       let selectItems = this.selectColumns;

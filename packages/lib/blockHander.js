@@ -2,8 +2,14 @@ import { getStore } from '../lib/store';
 import { vaildData, loadJson, loadDic } from '../lib/utils';
 import _ from 'lodash';
 
-const filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
+let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
 const fileType = 'block';
+
+let customFilePath = getStore({ name: 'customFilePath' });
+if (customFilePath) {
+  filePath = customFilePath;
+}
+
 export const loadBlockConfig = (slug, option, type) => {
   const url = `${filePath}${fileType}/${slug}.json`;
   let list = getStore({ name: slug, timer: 1200 });
@@ -81,14 +87,36 @@ export const mergeColumn = (remoteColumn = [], localColum = []) => {
 
 export const replaceLocalDic = (config) => {
   let dics = checkDic();
-  if (!config.dicUrl.includes('layout/dics')) {
+  if (!(config.dicUrl.includes('layout/dics') || config.datatype === 'remoteDic')) {
     return config;
   }
-  let slug = config.dicUrl.split('layout/dics/value/')[1];
+  let slug = config.dicUrl.includes('layout/dics')
+    ? config.dicUrl.split('layout/dics/value/')[1]
+    : config.dicUrl;
   if (slug && dics && dics[slug]) {
     delete config.dicUrl;
     config.dicData = dics[slug];
     console.log('使用本地词典', config.dicData);
+  }
+  return config;
+};
+export const fixRemoteDic = (config) => {
+  config.type = 'select';
+  let path = config.res ? config.res : 'list';
+  config.dicFormatter = (res) => {
+    return res.data[path];
+  };
+  config.props = {
+    label: config.dicLabel,
+    value: config.dicValue
+  };
+  if (config.dicQueryStr && config.dicMethod === "post") {
+    try {
+      let query = JSON.parse(config.dicQueryStr);
+      config.dicQuery = query;
+    } catch (err) {
+      delete config.dicQuery;
+    }
   }
   return config;
 };
@@ -102,7 +130,11 @@ export const fixColumn = (config) => {
     config.dicFlag = false;
     return config;
   }
+  config.type = 'select';
   config = replaceLocalDic(config);
+  if (config.datatype === 'apiDic') {
+    config = fixRemoteDic(config);
+  }
   if (config.span) {
     config.span = config.span * 1;
   }

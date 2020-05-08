@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showUpdate">
+  <div>
     <h4>
       <i class="el-icon-link"></i> 附件
       <el-button size="mini" v-if="addBtn" @click="listRowAdd">新增行</el-button>
@@ -98,7 +98,7 @@ export default {
   watch: {
     id(newValue) {
       this.showUpdate = !validatenull(newValue);
-      console.log('this.showUpdate', this.showUpdate);
+      // console.log('this.showUpdate', this.showUpdate);
     }
   },
   methods: {
@@ -108,7 +108,6 @@ export default {
     },
     // 可增加行方法
     downloadFile(row) {
-      console.log('row', row);
       if (row.attachmentUrl) {
         let params = {
           elsAccount: row.elsAccount,
@@ -233,8 +232,9 @@ export default {
             elsSubAccount: res.data.data.elsSubAccount,
             attachmentType: res.data.data.attachmentType,
             createUser: res.data.data.createUser,
-            createDate: formatDate(new Date(res.data.data.createDate), 'yyyy-MM-dd hh:mm:ss')
+            createDate: formatDate(new Date(res.data.data.lastUpdateDate), 'yyyy-MM-dd hh:mm:ss')
           };
+          console.log(formatDate(new Date(res.data.data.lastUpdateDate), 'yyyy-MM-dd hh:mm:ss'));
           this.fileList = this.fileList.map((item) => {
             return item[checkProp] === uploadRow[checkProp] ? uploadRow : item;
           });

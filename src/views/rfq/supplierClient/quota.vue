@@ -46,12 +46,6 @@
         </p>
       </template>
       <template slot-scope="scope" slot="quote">
-        <!-- <avue-switch
-          v-if="scope.row.itemStatus === '1'"
-          v-model="scope.row.noQuoted"
-          @change="(value) => handleSwitchChange(value, scope.row)"
-          :dic="dic"
-        ></avue-switch> -->
         <avue-radio
           v-model="scope.row.noQuoted"
           :disabled="!['1', '3'].includes(scope.row.itemStatus)"
@@ -70,22 +64,31 @@
         </el-button>
       </template>
     </avue-crud>
-    <!-- 报价 -->
+    <!-- 常规报价 -->
     <quote-dialog
       :dialogTitle="dialogTitle"
       :field="fieldDialogForm"
-      :fieldDialogVisible="fieldDialogVisible"
+      :fieldDialogVisible="quoteVisible"
       :dialogWidth="dialogWidth"
       @on-save-form="onSaveForm"
       @close-field-dialog="closeFieldDialog"
     ></quote-dialog>
+    <!-- 阶梯报价 -->
+    <quote-ladder-dialog
+      :dialogTitle="dialogTitle"
+      :field="fieldDialogForm"
+      :fieldDialogVisible="ladderQuoteVisible"
+      :dialogWidth="dialogWidth"
+      @on-save-form="onSaveLadderForm"
+      @close-field-dialog="closeFieldDialog"
+    ></quote-ladder-dialog>
   </div>
 </template>
 
 <script>
 import FormHeader from '@/components/views/formHeader';
-import quoteDialog from '@/components/views/quoteDialog';
-import fieldDialogOption from '@/const/rfq/newAndView/quoteDialog';
+import quoteLadderDialog from '@/components/views/quoteDialog'; // 阶梯报价
+import quoteDialog from '@/components/views/quoteDialog0'; // 常规报价
 import formOption from '@/const/rfq/newAndView/detail';
 import tabOption from '@/const/rfq/newAndView/tabs';
 import filesOption from '@/const/rfq/newAndView/fileList';
@@ -102,7 +105,8 @@ import {
 export default {
   components: {
     FormHeader,
-    quoteDialog
+    quoteDialog,
+    quoteLadderDialog
   },
   data() {
     return {
@@ -124,10 +128,10 @@ export default {
       detailObj: {},
       filesForm: {},
       fieldDialogForm: {},
-      fieldDialogVisible: false,
+      ladderQuoteVisible: false,
+      quoteVisible: false,
       dialogTitle: '',
       dialogWidth: '50%',
-      dialogOption: fieldDialogOption,
       headerButtons: [
         { power: true, text: '返回', type: '', size: '', action: 'on-back' },
         { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
@@ -145,7 +149,8 @@ export default {
   watch: {},
   methods: {
     closeFieldDialog() {
-      this.fieldDialogVisible = false;
+      this.ladderQuoteVisible = false;
+      this.quoteVisible = false;
     },
     currentChange(val) {
       this.inquiryListOption.page.currentPage = val;
@@ -159,13 +164,21 @@ export default {
     },
     // 显示报价弹窗
     handleQuoteRow(scope) {
+      this.dialogTitle = `${scope.row.materialNumber}(${scope.row.materialName})物料报价弹框`;
+      if (scope.row.quoteMethod === '0') {
+        this.quoteVisible = true;
+        this.fieldDialogForm = {
+          index: scope.index,
+          remark: scope.row.remark || ''
+        };
+        return;
+      }
       this.fieldDialogForm = {
         index: scope.index,
         ladderPriceJson: scope.row.ladderPriceJson,
         remark: scope.row.remark || ''
       };
-      this.dialogTitle = `${scope.row.materialNumber}(${scope.row.materialName})物料报价弹框`;
-      this.fieldDialogVisible = true;
+      this.ladderQuoteVisible = true;
     },
     handleRadioChange(value, scope) {
       if (value === 'N') {
@@ -173,8 +186,14 @@ export default {
         this.inquiryListOption.data[scope.row.$index].taxRate = '';
         this.inquiryListOption.data[scope.row.$index].priceExcludingTax = '';
         this.inquiryListOption.data[scope.row.$index].cellEdit = false; // $cellEdit = false;
+        // if (scope.row.quoteMethod === '0') {
+        //   this.inquiryListOption.data[scope.row.$index].$cellEdit = false;
+        // }
       } else {
         this.inquiryListOption.data[scope.row.$index].cellEdit = true; // $cellEdit = true;
+        // if (scope.row.quoteMethod === '0') {
+        //   this.inquiryListOption.data[scope.row.$index].$cellEdit = true;
+        // }
       }
     },
     handleSave() {
@@ -245,9 +264,25 @@ export default {
         });
       });
     },
-    // 行信息报价保存
+    // 行信息 - 常规报价保存
     onSaveForm(form) {
-      this.fieldDialogVisible = false;
+      this.quoteVisible = false;
+      this.$set(
+        this.inquiryListOption.data[form.index],
+        'priceIncludingTax',
+        form.priceIncludingTax
+      );
+      this.$set(this.inquiryListOption.data[form.index], 'taxRate', form.taxRate);
+      this.$set(
+        this.inquiryListOption.data[form.index],
+        'priceExcludingTax',
+        form.priceExcludingTax
+      );
+      this.$set(this.inquiryListOption.data[form.index], 'remark', form.remark);
+    },
+    // 行信息 - 阶梯报价保存
+    onSaveLadderForm(form) {
+      this.ladderQuoteVisible = false;
       this.$set(this.inquiryListOption.data[form.index], 'ladderPriceJson', form.ladderPriceJson);
       this.$set(this.inquiryListOption.data[form.index], 'remark', form.remark);
     },

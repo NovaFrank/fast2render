@@ -66,6 +66,7 @@ export default {
         prop: 'taxRate'
       },
       {
+        width: 300,
         slot: true,
         label: '报价',
         prop: 'priceIncludingTax'

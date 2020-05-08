@@ -44,8 +44,5 @@ export default {
   ],
   menuBtn: true,
   emptyBtn: false,
-  submitBtn: false,
-  submitSize: 'medium',
-  submitText: '保存',
-  menuPosition: 'center'
+  submitBtn: false
 };

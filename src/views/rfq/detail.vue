@@ -25,6 +25,8 @@
       </template>
     </avue-detail>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
+    <!-- 附件 -->
+    <!-- <attachment-list :id="form.uuid" v-if="tabActive === 'files'"></attachment-list> -->
     <avue-crud
       v-if="tabActive === 'files'"
       :data="filesOption.data"
@@ -56,13 +58,35 @@
         <el-button size="small" @click.stop="handleShowSupplierSelect()">新供应商</el-button>
       </template>
       <template slot="taxRate" slot-scope="scope">
-        <span v-if="scope.row.itemStatus === '2'">**</span>
+        {{
+          scope.row.itemStatus === '2' && detailObj.quoteEndTime > new Date().getTime()
+            ? '**'
+            : scope.row.taxRate
+        }}
       </template>
       <template slot="priceIncludingTax" slot-scope="scope">
-        <span v-if="scope.row.itemStatus === '2'">**</span>
+        <div>
+          <span
+            v-if="scope.row.itemStatus === '2' && detailObj.quoteEndTime > new Date().getTime()"
+          >
+            **
+          </span>
+          <avue-crud
+            :cell-style="cellStyle"
+            :header-cell-class-name="cHeaderStyle"
+            :data="JSON.parse(scope.row.ladderPriceJson)"
+            :option="quoteListOption.option"
+            v-else-if="
+              scope.row.itemStatus === '2' && detailObj.quoteEndTime < new Date().getTime()
+            "
+          ></avue-crud>
+        </div>
       </template>
       <template slot-scope="scope" slot="option">
-        <el-row v-if="scope.row.itemStatus === '2'" :gutter="24">
+        <el-row
+          v-if="scope.row.itemStatus === '2' && detailObj.quoteEndTime < new Date().getTime()"
+          :gutter="24"
+        >
           <el-col :span="12">
             <avue-radio
               v-model="scope.row.itemStatus"
@@ -110,11 +134,14 @@ import history from './history';
 import { validatenull } from '@/util/validate';
 import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
 import selectSupplierDialog from '@/components/views/selectSupplierDialog';
+// import AttachmentList from '@/components/views/attachmentList';
+import quoteListOption from '@/const/rfq/newAndView/detailInquiryQuote';
 
 export default {
   components: {
     FormHeader,
     history,
+    // AttachmentList,
     selectSupplierDialog
   },
   data() {
@@ -134,6 +161,7 @@ export default {
       formOption: formOption,
       tabOption: tabOption,
       inquiryListOption: inquiryListOption,
+      quoteListOption: quoteListOption,
       filesOption: filesOption,
       tabActive: 'detail',
       detailObj: {},
@@ -167,6 +195,14 @@ export default {
   },
   watch: {},
   methods: {
+    cellStyle() {
+      return {
+        borderRight: 'none !important'
+      };
+    },
+    cHeaderStyle() {
+      return 'none-border-right';
+    },
     currentChange(val) {
       this.inquiryListOption.page.currentPage = val;
       this.tableData({
@@ -420,3 +456,9 @@ export default {
   }
 };
 </script>
+
+<style>
+.none-border-right {
+  border-right: none !important;
+}
+</style>

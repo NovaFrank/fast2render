@@ -47,6 +47,7 @@ import ladderFormOption from '@/const/rfq/newAndView/ladderForm';
 import ladderOption from '@/const/rfq/newAndView/ladder';
 import supplierList from '@/const/rfq/newAndView/supplierList';
 
+// 采购方添加询价明细
 export default {
   name: 'field-dialog',
   components: {},

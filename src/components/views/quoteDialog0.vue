@@ -7,9 +7,6 @@
     :before-close="closeDialog"
   >
     <avue-form ref="form" :option="quoteFormOption.option" v-model="form" class="new-field">
-      <template slot="ladderPriceJson">
-        <avue-crud :data="ladderOption.data" :option="ladderOption.option"> </avue-crud>
-      </template>
       <template slot="menuForm">
         <el-button @click="closeDialog">取消</el-button>
         <el-button type="primary" @click="handleSubmit">保存</el-button>
@@ -19,12 +16,12 @@
 </template>
 
 <script>
-import quoteFormOption from '@/const/rfq/supplierClient/quoteForm';
+import quoteFormOption from '@/const/rfq/supplierClient/quoteForm0';
 import ladderOption from '@/const/rfq/supplierClient/quoteList';
 
-// 销售方阶梯报价
+// 销售方常规报价
 export default {
-  name: 'quote-ladder-dialog',
+  name: 'quote-dialog',
   components: {},
   created: function() {},
   props: {
@@ -56,19 +53,7 @@ export default {
   },
   watch: {
     field(newVal) {
-      console.log('newVal', newVal);
       this.form = newVal;
-      this.ladderOption.data =
-        JSON.parse(newVal.ladderPriceJson).map((item) => {
-          return {
-            ladderQuantity: item.ladderQuantity,
-            ladderGrade: item.ladderGrade,
-            priceIncludingTax: item.priceIncludingTax || '',
-            taxRate: item.taxRate || '',
-            priceExcludingTax: item.priceExcludingTax || '',
-            $cellEdit: true
-          };
-        }) || [];
     }
   },
   methods: {
@@ -81,7 +66,6 @@ export default {
     handleSubmit() {
       const params = {
         ...this.form,
-        ladderPriceJson: JSON.stringify(this.ladderOption.data),
         remark: this.form.remark
       };
       this.$emit('on-save-form', params);

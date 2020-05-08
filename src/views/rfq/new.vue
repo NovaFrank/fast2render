@@ -24,7 +24,7 @@
       :upload-before="uploadBefore"
       :upload-after="uploadAfter"
     ></avue-form> -->
-    <attachment-list v-if="tabActive === 'files'"></attachment-list>
+    <attachment-list :id="form.uuid" v-if="tabActive === 'files'"></attachment-list>
     <avue-crud
       v-if="tabActive === 'detail'"
       :data="inquiryListOption.data"
@@ -148,7 +148,7 @@ export default {
         { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
         { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
         { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
-        { power: true, text: '发布/提交审批', type: 'primary', size: '', action: 'on-release' },
+        { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
         { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
         { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' }
       ],

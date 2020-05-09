@@ -33,7 +33,7 @@
  */
 
 export default {
-  name: 'item-block-tabs',
+  name: 'ConfigTab',
   props: {
     list: {
       type: Array,

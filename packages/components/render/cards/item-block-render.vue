@@ -1,16 +1,25 @@
 <template>
-  <fast2-component-render :list="item.data" :providerData="providerData"></fast2-component-render>
+  <div>
+    <fast2-component-render
+      :list="item.data"
+      :mode="mode"
+      v-on="$listeners"
+      v-bind="$attrs"
+    ></fast2-component-render>
+  </div>
 </template>
 <script>
 // 属性信息展示卡 - 单条模式
 export default {
   name: 'item-block',
+  inheritAttrs: false,
   props: {
     item: {
       type: Object,
       default: function() {
         return {
           content: '<p>静态资源占位符号</p>',
+          data: '',
           lable: 'lable',
           type: 'list',
           position: 'left',
@@ -19,13 +28,17 @@ export default {
         };
       }
     },
-    ProviderData: {
+    providerData: {
       type: Object,
       default: () => {
         return {
           tableData: []
         };
       }
+    },
+    mode: {
+      type: String,
+      default: null
     }
   }
 };

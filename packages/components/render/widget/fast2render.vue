@@ -23,21 +23,30 @@
           </el-col>
           <el-col
             class="widget-tab"
-            v-else-if="column.type == 'tab'"
+            v-else-if="column.type == 'block-tabs' && mode === 'setting'"
             :key="index"
             :md="column.span || 12"
             :xs="24"
           >
-            <render-tab :data="data" :column="column" :index="index"> </render-tab>
+            <render-config-tab :providerData="data" :template="template" :index="index">
+            </render-config-tab>
+          </el-col>
+          <el-col
+            class="widget-tab"
+            v-else-if="column.type == 'block-tabs'"
+            :key="index"
+            :md="column.span || 12"
+            :xs="24"
+          >
+            <render-tab :data="data" :template="column.data" :index="index"> </render-tab>
           </el-col>
           <el-col v-else :key="index" :md="column.span || 12" class="widget-item" :xs="24">
             <render-item
-              :column="column"
               :item="column"
-              :index="index"
               :providerData="data"
               :label="column.label"
               :prop="column.prop"
+              v-bind="$attrs"
             >
             </render-item>
           </el-col>
@@ -52,15 +61,61 @@ import RenderItem from './render-item';
 import RenderCard from './render-card';
 import RenderGroup from './render-group';
 import RenderTab from './render-tab';
+import RenderConfigTab from './render-config-tab';
 
 export default {
   name: 'Render',
-  components: { RenderItem, RenderCard, RenderGroup, RenderTab },
-  props: ['option', 'data'],
+  components: {
+    RenderItem,
+    RenderCard,
+    RenderGroup,
+    RenderTab,
+    RenderConfigTab
+  },
+  props: ['option', 'data', 'mode', 'config'],
   data() {
     return {
-      selectWidget: this.select
+      selectWidget: this.select,
+      fullData: {},
+      templateConfig: this.config || {},
+      template: {}
     };
+  },
+  mounted() {
+    this.$root.$on('change-form', this.updateProviderData);
+    this.$root.$on('change-table', this.updateProviderTableData);
+    this.$root.$on('update-template-config', this.updateTemplate);
+  },
+  unmounted() {
+    this.$root.$off('change-form', this.updateProviderData);
+    this.$root.$off('change-table', this.updateProviderTableData);
+    this.$root.$off('update-template-config', this.updateTemplate);
+  },
+  methods: {
+    updateProviderData(data) {
+      this.fullData = {
+        ...this.fullData,
+        ...data
+      };
+    },
+    updateProviderTableData(data) {
+      this.fullData = {
+        ...this.fullData,
+        ...data
+      };
+    },
+    updateTemplate(config) {
+      this.option.column.map((item) => {
+        if (item.type === 'block-tabs') {
+          item.data = config.template;
+        }
+      });
+      this.template = this.option;
+      this.templateConfig = config.templateConfig;
+    },
+    getConfig() {
+      return this.templateConfig;
+    }
   }
 };
 </script>

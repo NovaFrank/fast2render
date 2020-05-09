@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slot :list="list" :option="finaloption"></slot>
+    <slot :list="list" :field="field" :option="finaloption" v-bind="$attrs"></slot>
   </div>
 </template>
 <script>
@@ -8,6 +8,7 @@ import { getStore } from '../../../lib/store';
 import { mergeColumn, vaildData, loadJson, loadDic } from '../../../lib/utils';
 export default {
   name: 'BlockProvider',
+  inheritAttrs: false,
   props: {
     version: {
       type: String,
@@ -35,6 +36,7 @@ export default {
   data() {
     return {
       list: [],
+      field: [],
       filePath: 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/',
       finaloption: null
     };

@@ -5,7 +5,7 @@
       :is="getComponent(item.component)"
       :list="item.data.tableData"
       :setting="item"
-      :ProviderData="ProviderData.dynamicTabData"
+      :providerData="providerData.dynamicTabData"
       v-on="$listeners"
     ></component>
   </div>
@@ -31,7 +31,7 @@ export default {
         return {};
       }
     },
-    ProviderData: {
+    providerData: {
       type: Object,
       default: () => {
         return {

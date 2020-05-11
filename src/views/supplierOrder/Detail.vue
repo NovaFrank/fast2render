@@ -1,7 +1,7 @@
 <template>
   <basic-container>
     <form-header
-      titleText="确认订单"
+      titleText="未确认订单预览"
       showButton
       :buttons="headerButtons"
       @on-submit="handleRelease"
@@ -221,7 +221,6 @@ export default {
           const action = 'updateOrder';
           let params = {
             elsAccount: this.elsAccount,
-            elsSubAccount: this.elsSubAccount,
             ...this.formOption.obj,
             orderItemReceiveVOList: this.materielListOption.data,
             deliveryPlanReceiveVOList: this.planListOption.data
@@ -234,7 +233,7 @@ export default {
             type: 'success',
             message: '修改成功!'
           });
-          this.$router.push({ path: '/orderList' });
+          this.$router.push({ path: '/supplier/orderList' });
         });
     },
     // 退回订单
@@ -248,7 +247,6 @@ export default {
           const action = 'backToOrder';
           let params = {
             elsAccount: this.elsAccount,
-            elsSubAccount: this.elsSubAccount,
             ...this.formOption.obj,
             orderItemReceiveVOList: this.materielListOption.data,
             deliveryPlanReceiveVOList: this.planListOption.data

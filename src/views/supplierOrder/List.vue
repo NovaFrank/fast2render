@@ -28,7 +28,16 @@
         </span>
       </template>
       <template slot-scope="{ row }" slot="orderNumber">
-        <router-link :to="`orderDetail/${row.orderNumber}_${row.elsAccount}`">
+        <router-link
+          v-if="row.orderStatus === '0'"
+          :to="`orderDetail/${row.orderNumber}_${row.elsAccount}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '1'"
+          :to="`orderView/${row.orderNumber}_${row.elsAccount}`"
+        >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
       </template>

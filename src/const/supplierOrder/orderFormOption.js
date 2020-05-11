@@ -62,31 +62,6 @@ export default {
         ]
       },
       {
-        label: '订单发送状态',
-        prop: 'sendStatus',
-        span: 6,
-        type: 'select',
-        disabled: true,
-        dicData: [
-          {
-            label: '变更已发送',
-            value: '3'
-          },
-          {
-            label: '变更未发送',
-            value: '2'
-          },
-          {
-            label: '已发送',
-            value: '1'
-          },
-          {
-            label: '未发送',
-            value: '0'
-          }
-        ]
-      },
-      {
         label: '订单交收状态',
         prop: 'deliveryStatus',
         span: 6,

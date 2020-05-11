@@ -13,8 +13,8 @@ export default {
         disabled: true
       },
       {
-        label: '订单类型',
-        prop: 'orderType',
+        label: '采购方名称',
+        prop: 'elsAccountName',
         span: 6,
         type: 'select',
         disabled: true
@@ -27,24 +27,17 @@ export default {
         disabled: true
       },
       {
-        label: '供应商',
+        label: '销售方负责人',
+        prop: 'salePerson',
+        span: 6,
+        type: 'input',
+        disabled: true
+      },
+      {
+        label: '采购方ELS',
         prop: 'toElsAccount',
         span: 6,
         type: 'input',
-        disabled: true
-      },
-      {
-        label: '供应商名称',
-        prop: 'toElsAccountName',
-        span: 6,
-        type: 'input',
-        disabled: true
-      },
-      {
-        label: '采购类别',
-        prop: 'purchaseType',
-        span: 6,
-        type: 'select',
         disabled: true
       },
       {
@@ -56,35 +49,10 @@ export default {
         dicData: [
           {
             label: '已确认',
-            value: 1
-          },
-          {
-            label: '未确认',
-            value: 0
-          }
-        ]
-      },
-      {
-        label: '订单发送状态',
-        prop: 'sendStatus',
-        span: 6,
-        type: 'select',
-        disabled: true,
-        dicData: [
-          {
-            label: '变更已发送',
-            value: '3'
-          },
-          {
-            label: '变更未发送',
-            value: '2'
-          },
-          {
-            label: '已发送',
             value: '1'
           },
           {
-            label: '未发送',
+            label: '未确认',
             value: '0'
           }
         ]

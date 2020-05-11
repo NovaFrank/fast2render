@@ -17,6 +17,7 @@ export default {
         prop: 'elsAccountName',
         span: 6,
         type: 'select',
+        placeholder: ' ',
         disabled: true
       },
       {
@@ -24,6 +25,7 @@ export default {
         prop: 'purchasePerson',
         span: 6,
         type: 'input',
+        placeholder: ' ',
         disabled: true
       },
       {
@@ -31,6 +33,7 @@ export default {
         prop: 'salePerson',
         span: 6,
         type: 'input',
+        placeholder: ' ',
         disabled: true
       },
       {

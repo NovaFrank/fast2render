@@ -61,7 +61,7 @@ export default {
             value: '3'
           },
           {
-            label: '供方变更',
+            label: '供方已退回',
             value: '2'
           },
           {

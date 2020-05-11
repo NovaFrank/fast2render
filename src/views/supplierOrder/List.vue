@@ -35,7 +35,7 @@
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
-          v-if="row.orderStatus === '1'"
+          v-if="row.orderStatus === '1' || row.orderStatus === '2'"
           :to="`orderView/${row.orderNumber}_${row.elsAccount}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>

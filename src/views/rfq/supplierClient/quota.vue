@@ -4,6 +4,7 @@
       titleText="报价详情"
       showButton
       :buttons="headerButtons"
+      @on-back="handleBack"
       @on-save="handleSave"
       @on-send="handleSend"
     ></form-header>
@@ -159,7 +160,7 @@ export default {
         pageSize: this.inquiryListOption.page.pageSize
       });
     },
-    handleCancel() {
+    handleBack() {
       this.$router.back();
     },
     // 显示报价弹窗

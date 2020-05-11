@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <basic-container>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <avue-crud
       ref="list"
@@ -32,7 +32,7 @@
         </span>
       </template>
     </avue-crud>
-  </div>
+  </basic-container>
 </template>
 
 <script>

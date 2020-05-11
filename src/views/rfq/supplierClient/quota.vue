@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <basic-container>
     <form-header
       titleText="报价详情"
       showButton
@@ -82,7 +82,7 @@
       @on-save-form="onSaveLadderForm"
       @close-field-dialog="closeFieldDialog"
     ></quote-ladder-dialog>
-  </div>
+  </basic-container>
 </template>
 
 <script>

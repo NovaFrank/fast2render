@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <basic-container>
     <div>
       <el-button type="primary" size="small" @click="handleCreate">
         新建
@@ -82,7 +82,7 @@
         </el-button>
       </template> -->
     </avue-crud>
-  </div>
+  </basic-container>
 </template>
 
 <script>

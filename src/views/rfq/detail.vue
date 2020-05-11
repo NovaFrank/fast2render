@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <basic-container>
     <form-header
       titleText="预览"
       showButton
@@ -116,7 +116,7 @@
       :crudObj="currentDetailItem"
       @on-save="suppliersDialogSaveTransfer"
     ></select-supplier-dialog>
-  </div>
+  </basic-container>
 </template>
 
 <script>

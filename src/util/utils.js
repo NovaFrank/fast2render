@@ -27,7 +27,7 @@ export const getUserInfo = () => {
 
 export const getSupplierInfo = () => {
   if (window.frames.length === parent.frames.length) {
-    getLocalToken(true);
+    getLocalToken();
   }
   return getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
 };

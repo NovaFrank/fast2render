@@ -25,9 +25,6 @@
         slot-scope="scope"
         slot="status"
       >
-        <!-- // All orderStatus ''
-            // Create orderStatus 0
-            // ProviderPending itemStatus 6 -->
         <span>
           {{
             scope.row.orderStatus === ''
@@ -47,9 +44,6 @@
         slot-scope="scope"
         slot="status"
       >
-        <!-- // Pending auditStatus 0
-            // Approval auditStatus 1
-            // Reject auditStatus 2 -->
         <span>
           {{
             scope.row.auditStatus === '0'

@@ -6,6 +6,7 @@ export default {
     pageSize: 10
   },
   option: {
+    header: false,
     dialogDirection: 'rtl',
     dialogType: 'drawer',
     border: true,
@@ -17,8 +18,8 @@ export default {
     menuAlign: 'center',
     menuWidth: '180',
     addBtn: false,
-    editBtn: true,
-    delBtn: true,
+    editBtn: false,
+    delBtn: false,
     refreshBtn: false,
     columnBtn: false,
     // addRowBtn: true,

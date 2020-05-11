@@ -34,8 +34,8 @@ const routes = [
     component: () => import('@/views/supplierOrder/List')
   },
   {
-    path: '/orderEdit/:id',
-    component: () => import('@/views/supplierOrder/Edit'),
+    path: '/orderDetail/:id',
+    component: () => import('@/views/supplierOrder/Detail'),
     name: 'orderDetail'
   }
 ];

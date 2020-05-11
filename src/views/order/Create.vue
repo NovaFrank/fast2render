@@ -182,7 +182,7 @@ export default {
           action: 'on-save'
         },
         {
-          text: '提交审批',
+          text: '提交审核',
           type: 'primary',
           size: 'small',
           action: 'on-submit'
@@ -311,7 +311,7 @@ export default {
     handleCancel() {
       this.$router.back();
     },
-    // 提交审批
+    // 提交审核
     async handleSubmit() {
       // this.tabActive = this.tabOption.option.column[2];
       // this.handleTabClick(this.tabActive);
@@ -323,8 +323,9 @@ export default {
       //   orderItemVOList: this.materielListOption.data,
       //   deliveryPlanVOList: this.planListOption.data
       // };
-      // // console.log('params: ' + JSON.stringify(params));
+      // console.log('params: ' + JSON.stringify(params));
       // await createOrder(action, params);
+      // // console.log('params: ' + JSON.stringify(resp));
       // this.$message({
       //   type: 'success',
       //   message: '发送成功!'

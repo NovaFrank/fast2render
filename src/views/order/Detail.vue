@@ -71,7 +71,7 @@ import fileOption from '@/const/order/files';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielList';
-import { getOrderList, getDataDic, createOrder } from '@/api/order.js';
+import { getOrderList, dataDicAPI, createOrder } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import { getUserInfo } from '@/util/utils.js';
 export default {
@@ -174,24 +174,29 @@ export default {
     this.materielListOption.option.menu = false;
   },
   methods: {
-    // 获取数据字典下拉列表
     async getDicData(data) {
-      const action = 'orderType';
-      const action2 = 'purchaseType';
-      const resp = await getDataDic(action);
-      const resp2 = await getDataDic(action2);
-      this.formOption.option.column[1].dicData = [];
-      for (let item of resp.data) {
-        const orderTypeList = {};
-        orderTypeList.value = item.label;
-        this.formOption.option.column[1].dicData.push(orderTypeList);
-      }
-      this.formOption.option.column[5].dicData = [];
-      for (let item of resp2.data) {
-        const purchaseTypeList = {};
-        purchaseTypeList.value = item.label;
-        this.formOption.option.column[5].dicData.push(purchaseTypeList);
-      }
+      dataDicAPI('orderType').then((res) => {
+        this.formOption.option.column = this.formOption.option.column.map((item) => {
+          if (item.prop === 'orderType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      dataDicAPI('purchaseType').then((res) => {
+        this.formOption.option.column = this.formOption.option.column.map((item) => {
+          if (item.prop === 'purchaseType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
     },
     // 获取头数据和行数据findDeliveryPlanList
     async tableData(data) {
@@ -328,7 +333,7 @@ export default {
         orderItemVOList: this.materielListOption.data,
         deliveryPlanVOList: this.planListOption.data
       };
-      console.log('params: ' + JSON.stringify(params.orderItemVOList));
+      // console.log('params: ' + JSON.stringify(params.orderItemVOList));
       await createOrder(action, params);
       this.$message({
         type: 'success',

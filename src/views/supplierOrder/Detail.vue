@@ -1,25 +1,14 @@
 <template>
   <basic-container>
     <form-header
-      titleText="修改"
+      titleText="确认订单"
       showButton
       :buttons="headerButtons"
-      @on-cancel="handleCancel"
       @on-submit="handleRelease"
       @on-save="handleSave"
     ></form-header>
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
-    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form">
-      <template slot="purchasePerson">
-        <el-input v-model="formOption.obj.purchasePerson" :readonly="true">
-          <i
-            slot="suffix"
-            class=" el-input_icon el-icon-search pointer"
-            @click="purchaseDialogOpen"
-          ></i>
-        </el-input>
-      </template>
-    </avue-form>
+    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
     <span v-if="tabActive.prop === 'detail'">
@@ -28,14 +17,8 @@
         :option="materielListOption.option"
         v-model="crudObj"
         :page.sync="page"
-        @row-save="rowSave"
-        @row-update="rowUpdate"
-        @row-del="handleDeleteRow"
         ref="crud"
       >
-        <template slot="menuLeft">
-          <button-group :option="btnOption" @item-add="itemAdd"></button-group>
-        </template>
         <template slot="materialNumberForm">
           <el-input v-model="crudObj.materialNumber" :readonly="true">
             <i
@@ -53,19 +36,12 @@
         :option="planListOption.option"
         v-model="planListOption.planObj"
         :page.sync="planListOption.page"
-        @row-save="rowSavePlan"
-        @row-del="rowDelPlan"
-        @row-update="rowUpdatePlan"
       >
       </avue-crud>
     </span>
     <span v-if="tabActive.prop === 'files'">
-      <avue-form
-        :option="fileOption.option"
-        v-model="filesForm"
-        :upload-before="uploadBefore"
-        :upload-after="uploadAfter"
-      ></avue-form>
+      <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
+      </avue-crud>
     </span>
     <selectDialog
       ref="materialDialog"
@@ -97,7 +73,7 @@ import purchaseOption from '@/const/supplierOrder/purchaseList';
 import planListOption from '@/const/supplierOrder/planList';
 import materialOption from '@/const/supplierOrder/materiaList';
 import materielListOption from '@/const/supplierOrder/materielList';
-import { getOrderList, getDataDic, createOrder } from '@/api/supplierOrder.js';
+import { getOrderList, createOrder, dataDicAPI } from '@/api/supplierOrder.js';
 import selectDialog from '@/common/selectDialog';
 import selectDialog3 from '@/common/selectDialog3';
 import { getSupplierInfo } from '@/util/utils.js';
@@ -153,68 +129,18 @@ export default {
       planListOption: planListOption,
       crudObj: {},
       crudOption: {},
-      uploadObj: {},
-      uploadData: [],
-      uploadCrudOption: {
-        dialogDirection: 'rtl',
-        dialogType: 'drawer',
-        border: true,
-        stripe: true,
-        page: false,
-        addBtn: true,
-        align: 'center',
-        menuAlign: 'center',
-        menuWidth: '180',
-        column: [
-          {
-            label: '文件ID',
-            prop: 'profileID'
-          },
-          {
-            label: '创建者',
-            prop: 'creator'
-          },
-          {
-            label: '创建人',
-            prop: 'createPeople'
-          },
-          {
-            label: '文件类型',
-            prop: 'fileType'
-          },
-          {
-            label: '行项目号',
-            prop: 'lineNumber'
-          }
-        ]
-      },
       headerButtons: [
         {
-          text: '返回',
-          type: 'primary',
-          size: 'small',
-          action: 'on-cancel'
-        },
-        {
-          text: '保存',
+          text: '确认',
           type: 'primary',
           size: 'small',
           action: 'on-save'
         },
         {
-          text: '提交审批',
+          text: '退回',
           type: 'primary',
           size: 'small',
           action: 'on-submit'
-        }
-      ],
-      btnOption: [
-        {
-          name: 'btn-add',
-          label: '添加行',
-          size: 'small',
-          action: 'item-add',
-          align: 'btn-left'
         }
       ]
     };
@@ -228,30 +154,36 @@ export default {
     this.getDicData();
   },
   methods: {
-    // 获取数据字典下拉列表
     async getDicData(data) {
-      const action = 'orderType';
-      const action2 = 'purchaseType';
-      const resp = await getDataDic(action);
-      const resp2 = await getDataDic(action2);
-      this.formOption.option.column[1].dicData = [];
-      for (let item of resp.data) {
-        const orderTypeList = {};
-        orderTypeList.value = item.label;
-        this.formOption.option.column[1].dicData.push(orderTypeList);
-      }
-      this.formOption.option.column[5].dicData = [];
-      for (let item of resp2.data) {
-        const purchaseTypeList = {};
-        purchaseTypeList.value = item.label;
-        this.formOption.option.column[5].dicData.push(purchaseTypeList);
-      }
+      dataDicAPI('orderType').then((res) => {
+        this.formOption.option.column = this.formOption.option.column.map((item) => {
+          if (item.prop === 'orderType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      dataDicAPI('purchaseType').then((res) => {
+        this.formOption.option.column = this.formOption.option.column.map((item) => {
+          if (item.prop === 'purchaseType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
     },
-    // 获取头数据和行数据findDeliveryPlanList
+
+    // 获取头数据和行数据
     async tableData(data) {
-      const action = 'findOrderHeadVO';
-      const action2 = 'findOrderItemList';
-      const action3 = 'findDeliveryPlanList';
+      const action = 'findOrderHeadReceiveVO';
+      const action2 = 'findOrderItemReceiveList';
+      const action3 = 'findDeliveryPlanReceiveList';
       const params = {
         elsAccount: this.$route.params && this.$route.params.id.split('_')[1],
         orderStatus: '',
@@ -276,18 +208,11 @@ export default {
       this.formOption.obj = resp.data.data;
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;
-      let orderItemArr = [];
-      resp2.data.data.forEach((i) => {
-        orderItemArr.push(Number(i.orderItemNumber));
-      });
-      sessionStorage.setItem('orderItemArr', JSON.stringify(orderItemArr));
     },
 
-    // 保存表头和表单
+    // 确认订单
     async handleSave() {
-      this.tabActive = this.tabOption.option.column[2];
-      this.handleTabClick(this.tabActive);
-      this.$confirm(`确认提交修改？`, {
+      this.$confirm(`确认提交？`, {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -298,10 +223,10 @@ export default {
             elsAccount: this.elsAccount,
             elsSubAccount: this.elsSubAccount,
             ...this.formOption.obj,
-            orderItemVOList: this.materielListOption.data,
-            deliveryPlanVOList: this.planListOption.data
+            orderItemReceiveVOList: this.materielListOption.data,
+            deliveryPlanReceiveVOList: this.planListOption.data
           };
-          console.log('params: ' + JSON.stringify(params));
+          // console.log('params: ' + JSON.stringify(params));
           return createOrder(action, params);
         })
         .then(() => {
@@ -309,41 +234,40 @@ export default {
             type: 'success',
             message: '修改成功!'
           });
-          this.$router.push({ path: '/list' });
+          this.$router.push({ path: '/orderList' });
         });
     },
-
+    // 退回订单
+    async handleRelease() {
+      this.$confirm(`确认退回？`, {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          const action = 'backToOrder';
+          let params = {
+            elsAccount: this.elsAccount,
+            elsSubAccount: this.elsSubAccount,
+            ...this.formOption.obj,
+            orderItemReceiveVOList: this.materielListOption.data,
+            deliveryPlanReceiveVOList: this.planListOption.data
+          };
+          // console.log('params: ' + JSON.stringify(params));
+          return createOrder(action, params);
+        })
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: '退回成功!'
+          });
+          this.$router.push({ path: '/orderList' });
+        });
+    },
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
       console.log(this.tabActive.prop);
-      sessionStorage.setItem('materialRow', JSON.stringify(this.materielListOption.data));
-      if (this.tabActive.prop === 'plan') {
-        let sessionCateCode = sessionStorage.getItem('materialRow');
-        this.planListOption.data = JSON.parse(sessionCateCode);
-        this.planListOption.data.forEach((item) => {
-          JSON.parse(sessionCateCode).forEach((i) => {
-            if (i.orderItemNumber === item.orderItemNumber) {
-              item.requestDeliveryDate = i.deliveryDate;
-              item.requestDeliveryQuantity = i.quantity;
-              item.deliveryItemNumber = '1';
-            }
-          });
-        });
-      }
-    },
-    itemAdd() {
-      this.$refs.crud.rowAdd();
-    },
-    // 删除行数据
-    handleDeleteRow(row, index) {
-      this.$confirm('确定将选择数据删除?', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.materielListOption.data.splice(index, 1);
-      });
     },
     // 生成excel模板
     generateExcelTemp() {
@@ -360,61 +284,10 @@ export default {
       console.log('file.raw :', file);
     },
 
-    // 保存新增的数据
-    rowSave(row, done, loading) {
-      if (this.materielListOption.data === undefined) {
-        this.materielListOption.data = [];
-      }
-
-      if (this.materielListOption.data.length <= 0) {
-        row.deliveryItemNumber = '1';
-        row.orderItemNumber = '1';
-        this.materielListOption.data.push(row);
-        this.params.addList.push(row);
-      } else {
-        row.deliveryItemNumber = '1';
-        let sessionItemArr = sessionStorage.getItem('orderItemArr');
-        let maxNum = JSON.parse(sessionItemArr).reduce((a, b) => {
-          return b > a ? b : a;
-        });
-        row.orderItemNumber = (maxNum + 1).toString();
-        this.materielListOption.data.push(row);
-        this.params.addList.push(row);
-      }
-      done();
-    },
-    rowSavePlan(row, done, loading) {
-      // 保存新增的数据
-      if (this.crudPlanData === undefined) {
-        this.crudPlanData = [];
-      }
-      this.crudPlanData.push(row);
-      // this.params.addList.push(row);
-      done();
-    },
-    rowUpdate(row, index, done, loading) {
-      loading();
-      this.$set(this.materielListOption.data, index, row);
-      done();
-    },
-    rowUpdatePlan(row, index, done, loading) {
-      loading();
-      done();
-    },
-    rowDelPlan(row, index) {
-      // 删除
-      this.crudPlanData.splice(index, 1);
-      this.params.deleteList.push(row);
-    },
-    rowDel(row, index) {
-      // 删除
-      this.crudData.splice(index, 1);
-      this.params.deleteList.push(row);
-    },
     handleCancel() {
       this.$router.back();
     },
-    handleRelease() {},
+
     uploadAfter(res, done, loading) {
       console.log('after upload', res);
       done();

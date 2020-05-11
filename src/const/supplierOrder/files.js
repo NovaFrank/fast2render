@@ -1,13 +1,34 @@
 export default {
+  data: [],
   option: {
-    labelWidth: 0,
-    submitBtn: false,
-    emptyBtn: false,
+    header: false,
+    border: true,
+    stripe: true,
+    page: false,
+    addBtn: true,
+    align: 'center',
+    menuAlign: 'center',
+    menuWidth: '180',
     column: [
       {
-        prop: 'imgUrl',
-        type: 'upload',
-        tip: '只能上传jpg/png文件，且不超过500kb'
+        label: '文件ID',
+        prop: 'profileID'
+      },
+      {
+        label: '创建者',
+        prop: 'creator'
+      },
+      {
+        label: '创建人',
+        prop: 'createPeople'
+      },
+      {
+        label: '文件类型',
+        prop: 'fileType'
+      },
+      {
+        label: '行项目号',
+        prop: 'lineNumber'
       }
     ]
   }

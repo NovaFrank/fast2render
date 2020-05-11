@@ -14,6 +14,13 @@ export const login = (params) => {
     }
   });
 };
+// 配置平台数据字典查询
+export const dataDicAPI = (code) => {
+  return axios({
+    url: `/layout/dics/value/${code}`,
+    method: 'get'
+  });
+};
 // 获取物料列表
 export const getCrudData = (action, params) => {
   return axios({
@@ -57,14 +64,6 @@ export const createOrder = (action, params) => {
       // elsAccount: elsAccount,
       ...params
     }
-  });
-};
-
-// 获取配置数据字典
-export const getDataDic = (code) => {
-  return axios({
-    url: `/layout/dics/value/${code}`,
-    method: 'get'
   });
 };
 

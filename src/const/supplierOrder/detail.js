@@ -24,12 +24,7 @@ export default {
         prop: 'purchasePerson',
         span: 6,
         type: 'input',
-        formslot: true,
-        rules: [
-          {
-            required: true
-          }
-        ]
+        disabled: true
       },
       {
         label: '供应商',
@@ -50,14 +45,7 @@ export default {
         prop: 'purchaseType',
         span: 6,
         type: 'select',
-        dicData: [],
-        // dicUrl: '/layout/dics/value/purchaseType',
-        // dicMethod: 'get',
-        rules: [
-          {
-            required: true
-          }
-        ]
+        disabled: true
       },
       {
         label: '订单状态',

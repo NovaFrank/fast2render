@@ -69,7 +69,7 @@ export default {
             value: '1'
           },
           {
-            label: '未发送',
+            label: '订单未确认',
             value: '0'
           }
         ]

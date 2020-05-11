@@ -67,8 +67,14 @@
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
-          v-if="row.orderStatus === '0'"
+          v-if="row.orderStatus === '0' && row.sendStatus === '0'"
           :to="`edit/${row.orderNumber}_${row.elsAccount}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '0' && row.sendStatus === '1'"
+          :to="`view/${row.orderNumber}_${row.elsAccount}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>

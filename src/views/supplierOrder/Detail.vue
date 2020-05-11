@@ -225,7 +225,7 @@ export default {
             orderItemReceiveVOList: this.materielListOption.data,
             deliveryPlanReceiveVOList: this.planListOption.data
           };
-          // console.log('params: ' + JSON.stringify(params));
+          console.log('params: ' + JSON.stringify(params));
           return createOrder(action, params);
         })
         .then(() => {
@@ -251,7 +251,7 @@ export default {
             orderItemReceiveVOList: this.materielListOption.data,
             deliveryPlanReceiveVOList: this.planListOption.data
           };
-          // console.log('params: ' + JSON.stringify(params));
+          console.log('params: ' + JSON.stringify(params));
           return createOrder(action, params);
         })
         .then(() => {
@@ -259,7 +259,7 @@ export default {
             type: 'success',
             message: '退回成功!'
           });
-          this.$router.push({ path: '/orderList' });
+          this.$router.push({ path: '/supplier/orderList' });
         });
     },
     // 切换表格

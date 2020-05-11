@@ -47,7 +47,7 @@
 
 <script>
 import tabOption from '@/const/supplierOrder/navTabs';
-import formOption from '@/const/order/orderFormOption';
+import formOption from '@/const/supplierOrder/orderFormOption';
 import { getUserInfo } from '@/util/utils.js';
 // import { getOrderList } from '@/api/order.js';
 import { getOrderList } from '@/api/supplierOrder.js';

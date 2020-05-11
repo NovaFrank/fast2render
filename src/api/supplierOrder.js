@@ -58,7 +58,7 @@ export const getOrderList = (action, params) => {
 // 新增订单-修改订单
 export const createOrder = (action, params) => {
   return axios({
-    url: `${baseUrl}/order//PurchaseOrderService/${action}`,
+    url: `${baseUrl}/order/SaleOrderService/${action}`,
     method: 'post',
     data: {
       // elsAccount: elsAccount,

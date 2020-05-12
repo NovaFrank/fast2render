@@ -5,7 +5,6 @@
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
-      @on-submit="handleSubmit"
       @on-send="handleSend"
     ></form-header>
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
@@ -52,7 +51,7 @@ import purchaseOption from '@/const/order/purchaseList';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielListDetail';
-import { getOrderList, getDataDic, createOrder } from '@/api/order.js';
+import { getOrderList, getDataDic } from '@/api/order.js'; // createOrder
 import { getUserInfo } from '@/util/utils.js';
 export default {
   components: {
@@ -147,13 +146,7 @@ export default {
           action: 'on-cancel'
         },
         {
-          text: '提交审批',
-          type: 'primary',
-          size: 'small',
-          action: 'on-submit'
-        },
-        {
-          text: '发送',
+          text: '返回需求池',
           type: 'primary',
           size: 'small',
           action: 'on-send'
@@ -344,32 +337,32 @@ export default {
       // this.$router.push({ path: '/list' });
     },
 
-    // 发送
+    // 返回需求池
     async handleSend() {
-      this.$confirm(`确认发送？`, {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(async () => {
-          const action = 'sendOrder';
-          let params = {
-            elsAccount: this.elsAccount,
-            elsSubAccount: this.elsSubAccount,
-            ...this.formOption.obj,
-            orderItemVOList: this.materielListOption.data,
-            deliveryPlanVOList: this.planListOption.data
-          };
-          await createOrder(action, params);
-          // console.log('params: ' + JSON.stringify(params));
-        })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          });
-          this.$router.push({ path: '/list' });
-        });
+      // this.$confirm(`确认返回需求池？`, {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // })
+      //   .then(async () => {
+      //     const action = 'sendOrder';
+      //     let params = {
+      //       elsAccount: this.elsAccount,
+      //       elsSubAccount: this.elsSubAccount,
+      //       ...this.formOption.obj,
+      //       orderItemVOList: this.materielListOption.data,
+      //       deliveryPlanVOList: this.planListOption.data
+      //     };
+      //     await createOrder(action, params);
+      //     // console.log('params: ' + JSON.stringify(params));
+      //   })
+      //   .then(() => {
+      //     this.$message({
+      //       type: 'success',
+      //       message: '返回成功!'
+      //     });
+      //     this.$router.push({ path: '/list' });
+      //   });
     },
     uploadAfter(res, done, loading) {
       console.log('after upload', res);

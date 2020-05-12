@@ -70,7 +70,7 @@ import formOption from '@/const/order/detail';
 import fileOption from '@/const/order/files';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
-import materielListOption from '@/const/order/materielList';
+import materielListOption from '@/const/order/materielListDetail';
 import { getOrderList, dataDicAPI, createOrder } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import { getUserInfo } from '@/util/utils.js';
@@ -370,7 +370,7 @@ export default {
       this.params.deleteList.push(row);
     },
     handleCancel() {
-      this.$router.back();
+      this.$router.push({ path: '/list' });
     },
     handleRelease() {},
     onSaveForm(form) {

@@ -48,6 +48,13 @@ export default {
         disabled: true
       },
       {
+        label: '采购组',
+        prop: 'purchaseGroup',
+        span: 6,
+        type: 'input',
+        disabled: true
+      },
+      {
         label: '订单状态',
         prop: 'orderStatus',
         span: 6,
@@ -55,19 +62,27 @@ export default {
         disabled: true,
         dicData: [
           {
-            label: '供方已确认',
+            label: '对方变更退回',
+            value: '5'
+          },
+          {
+            label: '变更对方确认',
+            value: '4'
+          },
+          {
+            label: '变更对方未确认',
             value: '3'
           },
           {
-            label: '供方变更',
+            label: '对方已退回',
             value: '2'
           },
           {
-            label: '已发送',
+            label: '对方已确认',
             value: '1'
           },
           {
-            label: '未发送',
+            label: '订单未确认',
             value: '0'
           }
         ]

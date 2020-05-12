@@ -283,7 +283,7 @@ export default {
     },
 
     handleCancel() {
-      this.$router.back();
+      this.$router.push({ path: '/supplier/orderList' });
     },
 
     uploadAfter(res, done, loading) {

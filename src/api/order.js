@@ -86,3 +86,13 @@ export const getPurchasePerson = (action, params) => {
     }
   });
 };
+// 获取采购组列表
+export const getPurchaseGroup = (action, params) => {
+  return axios({
+    url: `${baseUrl}/ElsOrgCategoryService/${action}`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};

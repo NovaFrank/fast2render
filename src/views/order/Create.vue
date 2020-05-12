@@ -28,6 +28,15 @@
           ></i>
         </el-input>
       </template>
+      <template slot="purchaseGroup">
+        <el-input v-model="formOption.obj.purchaseGroup" :readonly="true">
+          <i
+            slot="suffix"
+            class=" el-input_icon el-icon-search pointer"
+            @click="purchaseGroupDialogOpen"
+          ></i>
+        </el-input>
+      </template>
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
     <span v-if="tabActive.prop === 'detail'">
@@ -98,6 +107,15 @@
       actionPath="findPageList"
       @save="purchaseDialogSave"
     ></selectDialog3>
+    <selectDialog4
+      ref="purchaseGroupDialog"
+      :dialogVisible.sync="dialogPurchaseGroupVisible"
+      :title="'添加采购组'"
+      :column="purchaseGroupOption.option.column"
+      :elsAccount="elsAccount"
+      actionPath="findPageList"
+      @save="purchaseGroupDialogSave"
+    ></selectDialog4>
   </basic-container>
 </template>
 
@@ -111,10 +129,12 @@ import materielListOption from '@/const/order/materielList';
 import materialOption from '@/const/order/materiaList';
 import supplierOption from '@/const/order/supplierList';
 import purchaseOption from '@/const/order/purchaseList';
+import purchaseGroupOption from '@/const/order/purchaseGroupList';
 import planListOption from '@/const/order/planList';
 import selectDialog from '@/common/selectDialog';
 import selectDialog2 from '@/common/selectDialog2';
 import selectDialog3 from '@/common/selectDialog3';
+import selectDialog4 from '@/common/selectDialog4';
 import { getUserInfo } from '@/util/utils.js';
 import { getDataDic, createOrder } from '@/api/order.js';
 export default {
@@ -123,7 +143,8 @@ export default {
     ButtonGroup,
     selectDialog,
     selectDialog2,
-    selectDialog3
+    selectDialog3,
+    selectDialog4
   },
   name: 'Detail',
   props: {
@@ -144,8 +165,10 @@ export default {
       dialogVisible: false,
       dialogSupplierVisible: false,
       dialogPurchaseVisible: false,
+      dialogPurchaseGroupVisible: false,
       tabOption: tabOption,
       fileOption: fileOption,
+      purchaseGroupOption: purchaseGroupOption,
       filesForm: {},
       materielListOption: materielListOption,
       params: {
@@ -309,7 +332,7 @@ export default {
       this.params.deleteList.push(row);
     },
     handleCancel() {
-      this.$router.back();
+      this.$router.push({ path: '/list' });
     },
     // 提交审核
     async handleSubmit() {
@@ -365,6 +388,9 @@ export default {
     purchaseDialogOpen() {
       this.dialogPurchaseVisible = true;
     },
+    purchaseGroupDialogOpen() {
+      this.dialogPurchaseGroupVisible = true;
+    },
     materialDialogSave(selectColumns) {
       if (selectColumns.length !== 0) {
         this.crudObj.materialNumber = selectColumns[0].materialNumber;
@@ -383,6 +409,11 @@ export default {
       if (selectColumns.length !== 0) {
         this.formOption.obj.purchasePerson =
           selectColumns[0].elsSubAccount + '_' + selectColumns[0].name;
+      }
+    },
+    purchaseGroupDialogSave(selectColumns) {
+      if (selectColumns.length !== 0) {
+        this.formOption.obj.purchaseGroup = selectColumns[0].orgCategoryDesc;
       }
     }
   }

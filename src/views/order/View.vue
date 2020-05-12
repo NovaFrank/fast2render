@@ -337,7 +337,7 @@ export default {
       this.params.deleteList.push(row);
     },
     handleCancel() {
-      this.$router.back();
+      this.$router.push({ path: '/list' });
     },
     handleRelease() {},
     onSaveForm(form) {

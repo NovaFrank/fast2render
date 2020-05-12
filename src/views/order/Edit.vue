@@ -377,7 +377,7 @@ export default {
       this.params.deleteList.push(row);
     },
     handleCancel() {
-      this.$router.back();
+      this.$router.push({ path: '/list' });
     },
     // 保存表头和表单
     async handleSave() {

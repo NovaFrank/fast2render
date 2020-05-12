@@ -8,17 +8,7 @@
       @on-submit="handleSubmit"
       @on-send="handleSend"
     ></form-header>
-    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form">
-      <template slot="toElsAccount">
-        <el-input v-model="formOption.obj.toElsAccount" :readonly="true">
-          <i
-            slot="suffix"
-            class=" el-input_icon el-icon-search pointer"
-            @click="supplierDialogOpen"
-          ></i>
-        </el-input>
-      </template>
-    </avue-form>
+    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
     <span v-if="tabActive.prop === 'detail'">
@@ -32,15 +22,6 @@
         @row-del="handleDeleteRow"
         ref="crud"
       >
-        <template slot="materialNumberForm">
-          <el-input v-model="crudObj.materialNumber" :readonly="true">
-            <i
-              slot="suffix"
-              class=" el-input_icon el-icon-search pointer"
-              @click="materialDialogOpen"
-            ></i>
-          </el-input>
-        </template>
       </avue-crud>
     </span>
     <span v-if="tabActive.prop === 'plan'">
@@ -59,16 +40,6 @@
       <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
       </avue-crud>
     </span>
-
-    <selectDialog2
-      ref="supplierDialog"
-      :dialogVisible.sync="dialogSupplierVisible"
-      :title="'添加供应商'"
-      :column="supplierOption.option.column"
-      :elsAccount="elsAccount"
-      actionPath="findPageList"
-      @save="supplierDialogSave"
-    ></selectDialog2>
   </basic-container>
 </template>
 
@@ -80,14 +51,12 @@ import fileOption from '@/const/order/newFiles';
 import purchaseOption from '@/const/order/purchaseList';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
-import materielListOption from '@/const/order/materielList';
+import materielListOption from '@/const/order/materielListDetail';
 import { getOrderList, getDataDic, createOrder } from '@/api/order.js';
-import selectDialog2 from '@/common/selectDialog2';
 import { getUserInfo } from '@/util/utils.js';
 export default {
   components: {
-    FormHeader,
-    selectDialog2
+    FormHeader
   },
   name: 'Detail',
   props: {
@@ -351,7 +320,7 @@ export default {
       this.params.deleteList.push(row);
     },
     handleCancel() {
-      this.$router.back();
+      this.$router.push({ path: '/list' });
     },
     // 保存表头和表单
     async handleSubmit() {
@@ -420,9 +389,6 @@ export default {
         this.formOption.obj.toElsAccount = selectColumns[0].toElsAccount;
         this.formOption.obj.toElsAccountName = selectColumns[0].toElsAccountName;
       }
-    },
-    supplierDialogOpen() {
-      this.dialogSupplierVisible = true;
     }
   }
 };

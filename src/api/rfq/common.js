@@ -36,3 +36,11 @@ export const accountListAction = (param) =>
     method: 'post',
     data: { ...param }
   });
+
+// 组织（公司）列表 POST /ElsOrgInfoService/findPageList
+export const orgList = (param) =>
+  request({
+    url: `${prefix}/ElsOrgInfoService/findPageList`,
+    method: 'post',
+    data: { pageSize: 100, ...param }
+  });

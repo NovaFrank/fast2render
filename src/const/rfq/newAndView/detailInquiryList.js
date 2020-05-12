@@ -57,6 +57,8 @@ export default {
         dicData: [
           { label: '已报价', value: '2' },
           { label: '报价中', value: '1' },
+          { label: '已接受', value: '4' },
+          { label: '已拒绝', value: '5' },
           { label: '重报价', value: '3' }
         ]
       },

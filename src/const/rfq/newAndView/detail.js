@@ -1,9 +1,22 @@
+const validateQuoteEndTime = (rule, value, callback) => {
+  if (value < new Date().getTime()) {
+    callback(new Error('截至时间不得小于当前时间'));
+  } else {
+    callback();
+  }
+};
 export default {
   column: [
     {
       label: '询价单号',
       span: 6,
       prop: 'enquiryNumber',
+      disabled: true
+    },
+    {
+      label: '询价名称',
+      span: 6,
+      prop: 'enquiryDesc',
       disabled: true
     },
     {
@@ -33,7 +46,15 @@ export default {
       valueFormat: 'timestamp',
       label: '报价截止时间',
       span: 6,
-      prop: 'quoteEndTime'
+      prop: 'quoteEndTime',
+      rules: [
+        {
+          required: true,
+          message: '请选择报价截止时间',
+          trigger: 'blur'
+        },
+        { trigger: 'blur', validator: validateQuoteEndTime }
+      ]
     },
     {
       label: '负责人',

@@ -8,7 +8,15 @@
   >
     <avue-form ref="form" :option="quoteFormOption.option" v-model="form" class="new-field">
       <template slot="ladderPriceJson">
-        <avue-crud :data="ladderOption.data" :option="ladderOption.option"> </avue-crud>
+        <avue-crud :data="ladderOption.data" :option="ladderOption.option">
+          <template slot-scope="scope" slot="priceIncludingTax">
+            <el-input
+              placeholder="请输入 含税价"
+              v-model="scope.row.priceIncludingTax"
+              @blur="(event) => handleInputPrice(event, scope)"
+            ></el-input>
+          </template>
+        </avue-crud>
       </template>
       <template slot="menuForm">
         <el-button @click="closeDialog">取消</el-button>
@@ -64,7 +72,7 @@ export default {
             ladderQuantity: item.ladderQuantity,
             ladderGrade: item.ladderGrade,
             priceIncludingTax: item.priceIncludingTax || '',
-            taxRate: item.taxRate || '',
+            taxRate: item.taxRate || newVal.taxRate,
             priceExcludingTax: item.priceExcludingTax || '',
             $cellEdit: true
           };
@@ -77,6 +85,11 @@ export default {
     },
     handleDeleteSupplier(row, index) {
       this.form.suppliers.splice(index, 1);
+    },
+    handleInputPrice(event, scope) {
+      const currentItem = this.ladderOption.data[scope.row.$index];
+      currentItem.priceExcludingTax =
+        Math.floor((event.target.value / (1 + currentItem.taxRate)) * 100) / 100;
     },
     handleSubmit() {
       const params = {

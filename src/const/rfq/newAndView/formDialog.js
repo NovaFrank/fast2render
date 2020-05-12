@@ -20,14 +20,6 @@ export default {
     //   label: '物料描述',
     //   prop: 'materialDesc'
     // },
-    // {
-    //   label: '规格',
-    //   prop: 'materialSpecifications'
-    // },
-    // {
-    //   label: '单位',
-    //   prop: 'baseUnit '
-    // },
     {
       type: 'date',
       format: 'yyyy-MM-dd',
@@ -45,6 +37,19 @@ export default {
       valueFormat: 'timestamp',
       label: '交货日期',
       prop: 'canDeliveryDate'
+    },
+    {
+      label: '税码',
+      prop: 'taxCode'
+    },
+    {
+      label: '税率',
+      prop: 'taxRate'
+    },
+    {
+      type: 'tree',
+      label: '币别',
+      prop: 'currency'
     },
     {
       dicUrl: '/layout/dics/value/enquiryMethod',

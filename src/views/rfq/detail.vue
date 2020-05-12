@@ -20,8 +20,8 @@
           type="datetime"
           placeholder="选择日期时间"
           value-format="timestamp"
+          @change="handleQuoteEndTime"
         ></el-date-picker>
-        <!-- @change="handleYearChange" -->
       </template>
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
@@ -67,7 +67,10 @@
       <template slot="priceIncludingTax" slot-scope="scope">
         <div>
           <span
-            v-if="scope.row.itemStatus === '2' && detailObj.quoteEndTime > new Date().getTime()"
+            v-if="
+              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
+                detailObj.quoteEndTime > new Date().getTime()
+            "
           >
             **
           </span>
@@ -77,7 +80,8 @@
             :data="JSON.parse(scope.row.ladderPriceJson)"
             :option="quoteListOption.option"
             v-else-if="
-              scope.row.itemStatus === '2' && detailObj.quoteEndTime < new Date().getTime()
+              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
+                detailObj.quoteEndTime < new Date().getTime()
             "
           ></avue-crud>
         </div>
@@ -182,6 +186,7 @@ export default {
       currentDetailItem: {}, // 当前选中物料行
       currentDetailItemSelected: [], // 当前选中物料行已有供应商 toElsAccount,
       timeHistory: [],
+      quoteEndTimeChange: null,
       currentEnquiryNumber: ''
     };
   },
@@ -283,6 +288,10 @@ export default {
         });
       });
     },
+    handleQuoteEndTime(value) {
+      console.log(value);
+      this.quoteEndTimeChange = value;
+    },
     handleRadioChange(value, scope) {
       this.inquiryListOption.data[scope.row.$index].itemStatus = value;
       if (value === '5') {
@@ -338,6 +347,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.detailObj.quoteEndTime = this.quoteEndTimeChange;
         purchaseEnquiryAction('updateQuoteEndTime', this.detailObj).then((res) => {
           if (res.data.statusCode !== '200') {
             this.$message.error(res.data.message);

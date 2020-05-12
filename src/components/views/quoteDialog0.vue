@@ -7,6 +7,9 @@
     :before-close="closeDialog"
   >
     <avue-form ref="form" :option="quoteFormOption.option" v-model="form" class="new-field">
+      <template slot="priceIncludingTax">
+        <el-input placeholder="请输入 含税价" v-model="form.priceIncludingTax"></el-input>
+      </template>
       <template slot="menuForm">
         <el-button @click="closeDialog">取消</el-button>
         <el-button type="primary" @click="handleSubmit">保存</el-button>
@@ -35,9 +38,7 @@ export default {
     field: {
       type: Object,
       default: () => {
-        return {
-          ladderPriceJson: []
-        };
+        return {};
       }
     }
   },
@@ -46,7 +47,6 @@ export default {
       quoteFormOption: quoteFormOption,
       ladderOption: ladderOption,
       form: {
-        ladderPriceJson: [],
         remark: ''
       }
     };
@@ -54,6 +54,9 @@ export default {
   watch: {
     field(newVal) {
       this.form = newVal;
+    },
+    'form.priceIncludingTax'(newVal) {
+      this.form.priceExcludingTax = Math.floor((newVal / (1 + this.form.taxRate)) * 100) / 100;
     }
   },
   methods: {

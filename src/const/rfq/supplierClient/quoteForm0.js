@@ -11,6 +11,7 @@ export default {
     fit: true,
     column: [
       {
+        formslot: true,
         span: 8,
         label: '含税价',
         prop: 'priceIncludingTax'
@@ -18,12 +19,14 @@ export default {
       {
         span: 8,
         label: '税率',
-        prop: 'taxRate'
+        prop: 'taxRate',
+        disabled: true
       },
       {
         span: 8,
         label: '不含税价',
-        prop: 'priceExcludingTax'
+        prop: 'priceExcludingTax',
+        disabled: true
       },
       {
         span: 24,

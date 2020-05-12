@@ -46,7 +46,7 @@
           {{ ladder.ladderGrade }}
         </p>
       </template>
-      <template slot="menuLeft">
+      <template slot="menuLeft" v-if="!form.purchaseRequestNumber">
         <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>
       </template>
       <template slot="menuLeft">
@@ -123,6 +123,7 @@ import selectSupplierDialog from '@/components/views/selectSupplierDialog';
 import { getUserInfo } from '@/util/utils.js';
 
 import {
+  orgList,
   dataDicAPI,
   materialListAction,
   supplierMasterListAction,
@@ -192,7 +193,31 @@ export default {
       this.currentEnquiryNumber = '';
     }
   },
-  watch: {},
+  watch: {
+    form(newVal) {
+      if (this.form.purchaseRequestNumber) {
+        this.inquiryListOption.option.menu = false;
+        this.headerButtons = [
+          { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
+          { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
+          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
+          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+          { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' }
+        ];
+      } else {
+        this.inquiryListOption.option.menu = true;
+        this.headerButtons = [
+          { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
+          // { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
+          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
+          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+          { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' }
+        ];
+      }
+    }
+  },
   methods: {
     closeFieldDialog() {
       this.fieldDialogVisible = false;
@@ -281,12 +306,14 @@ export default {
               return;
             }
             let params = {
+              enquiryNumber: this.currentEnquiryNumber,
               elsAccount: this.elsAccount,
-              beginDate: this.form.beginDate,
+              // beginDate: this.form.beginDate,
               quoteEndTime: this.form.quoteEndTime,
               enquiryType: this.form.enquiryType,
-              // companyCode: this.form.companyCode,
-              responsible: this.form.responsible,
+              enquiryDesc: this.form.enquiryDesc,
+              companyCode: this.form.companyCode,
+              // responsible: this.form.responsible,
               enquiryMethod: this.form.enquiryMethod,
               itemList: this.inquiryListOption.data
             };
@@ -324,11 +351,12 @@ export default {
             const params = {
               enquiryNumber: this.currentEnquiryNumber,
               elsAccount: this.elsAccount,
-              beginDate: this.form.beginDate,
+              // beginDate: this.form.beginDate,
               quoteEndTime: this.form.quoteEndTime,
               enquiryType: this.form.enquiryType,
-              // companyCode: this.form.companyCode,
-              responsible: this.form.responsible,
+              enquiryDesc: this.form.enquiryDesc,
+              companyCode: this.form.companyCode,
+              // responsible: this.form.responsible,
               enquiryMethod: this.form.enquiryMethod,
               itemList: this.inquiryListOption.data
             };
@@ -389,6 +417,9 @@ export default {
         baseUnit: currentMaterial.baseUnit,
         deliveryDate: form.deliveryDate,
         quantity: form.quantity,
+        taxCode: form.taxCode,
+        taxRate: form.taxRate,
+        currency: form.currency,
         elsAccount: form.elsAccount,
         canDeliveryDate: form.canDeliveryDate,
         toElsAccountList: form.toElsAccountList ? form.toElsAccountList.toString() : '',
@@ -463,6 +494,36 @@ export default {
       // });
     },
     tableData(data) {
+      // 币别
+      dataDicAPI('currency').then((res) => {
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
+          if (item.prop === 'currency') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 组织列表（公司）
+      orgList().then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'companyCode') {
+            return {
+              ...item,
+              dicData: res.data.pageData.rows.map((item) => {
+                return {
+                  ...item,
+                  value: item.orgId,
+                  label: item.orgId // `${item.orgId}_${item.orgDesc}`
+                };
+              })
+            };
+          }
+          return item;
+        });
+      });
       // 询价类型 数据字典（临时），最好写option dicUrl
       dataDicAPI('enquiryType').then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {

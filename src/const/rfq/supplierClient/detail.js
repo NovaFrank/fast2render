@@ -7,6 +7,12 @@ export default {
       disabled: true
     },
     {
+      label: '询价名称',
+      span: 6,
+      prop: 'enquiryDesc',
+      disabled: true
+    },
+    {
       type: 'select',
       // dicData: DIC.TABLE_CONFIG_DEFAULT,
       dicUrl: '/layout/dics/value/enquiryType',

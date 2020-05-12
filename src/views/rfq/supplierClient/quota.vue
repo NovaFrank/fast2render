@@ -184,16 +184,18 @@ export default {
         this.quoteVisible = true;
         this.fieldDialogForm = {
           index: scope.index,
+          taxRate: scope.row.taxRate,
           remark: scope.row.remark || ''
         };
-        return;
+      } else {
+        this.fieldDialogForm = {
+          index: scope.index,
+          taxRate: scope.row.taxRate,
+          ladderPriceJson: scope.row.ladderPriceJson,
+          remark: scope.row.remark || ''
+        };
+        this.ladderQuoteVisible = true;
       }
-      this.fieldDialogForm = {
-        index: scope.index,
-        ladderPriceJson: scope.row.ladderPriceJson,
-        remark: scope.row.remark || ''
-      };
-      this.ladderQuoteVisible = true;
     },
     handleRadioChange(value, scope) {
       if (value === 'N') {
@@ -234,6 +236,7 @@ export default {
         type: 'warning'
       }).then(() => {
         const params = {
+          quoteEndTime: this.detailObj.quoteEndTime,
           enquiryNumber: this.currentEnquiryNumber,
           toElsAccount: this.detailObj.toElsAccount,
           saleItemList: this.inquiryListOption.data

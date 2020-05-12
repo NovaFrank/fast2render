@@ -17,19 +17,17 @@ export default {
         prop: 'ladderGrade'
       },
       {
+        slot: true,
         label: '含税价',
-        prop: 'priceIncludingTax',
-        cell: true
+        prop: 'priceIncludingTax'
       },
       {
         label: '税率',
-        prop: 'taxRate',
-        cell: true
+        prop: 'taxRate'
       },
       {
         label: '不含税价',
-        prop: 'priceExcludingTax',
-        cell: true
+        prop: 'priceExcludingTax'
       }
     ]
   }

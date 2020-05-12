@@ -238,8 +238,8 @@ export default {
         attachmentName: file.fileName,
         attachmentDesc: file.fileName,
         attachmentUrl: file.filePath,
-        businessModule: 'inspectTableAudit',
-        businessElsAccount: '307000',
+        businessModule: this.businessModule,
+        businessElsAccount: this.businessElsAccount,
         businessId: this.id
       };
       delete uploadRow.createDate;
@@ -254,7 +254,6 @@ export default {
             createUser: res.data.data.createUser,
             createDate: formatDate(new Date(res.data.data.lastUpdateDate), 'yyyy-MM-dd hh:mm:ss')
           };
-          console.log(formatDate(new Date(res.data.data.lastUpdateDate), 'yyyy-MM-dd hh:mm:ss'));
           this.fileList = this.fileList.map((item) => {
             return item[checkProp] === uploadRow[checkProp] ? uploadRow : item;
           });

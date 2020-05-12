@@ -6,6 +6,7 @@ export default {
     pageSize: 10
   },
   option: {
+    selection: true,
     menuAlign: 'left',
     addBtn: false,
     refreshBtn: false,

@@ -26,10 +26,10 @@
     ></avue-form> -->
     <!-- 表单文件 -->
     <attachment-list
-      :id="form.uuid"
+      :id="form.enquiryNumber"
       :elsAccount="elsAccount"
       :businessElsAccount="elsAccount"
-      businessModule="rfq"
+      businessModule="enquiry"
       v-if="tabActive === 'files' && form.uuid"
     ></attachment-list>
     <avue-crud
@@ -38,9 +38,10 @@
       :option="inquiryListOption.option"
       :page.sync="inquiryListOption.page"
       v-model="inquiryListOption.obj"
+      @current-change="currentChange"
       @row-click="handleDetailItemClick"
       @size-change="sizeChange"
-      @current-change="currentChange"
+      @selection-change="handleMaterialSelectChange"
     >
       <template slot-scope="scope" slot="quoteMethod">
         <span v-if="scope.row.quoteMethod === '0'">常规报价</span>
@@ -184,6 +185,7 @@ export default {
       suppliersDialogPageParam: { pageNo: 1, pageSize: 10 },
       suppliersSelect: [],
       currentDetailItem: {}, // 当前选中物料行
+      currentSelectionDetailItems: [],
       currentDetailItemSelected: [], // 当前选中物料行已有供应商 toElsAccount,
       currentEnquiryNumber: ''
     };
@@ -309,6 +311,10 @@ export default {
         selectedSupplier: row.toElsAccountList ? row.toElsAccountList.split(',') : []
       };
     },
+    handleMaterialSelectChange(selection) {
+      console.log(selection);
+      this.currentSelectionDetailItems = selection;
+    },
     // 发布/提交审批
     handleRelease() {
       this.$confirm('是否发布？', '提示', {
@@ -391,11 +397,15 @@ export default {
       });
     },
     handleShowSupplierSelect() {
-      if (validatenull(this.currentDetailItem)) {
-        this.$message.warning('请选择询价明细');
+      console.log(
+        'this.currentSelectionDetailItems.length',
+        this.currentSelectionDetailItems.length
+      );
+      if (!validatenull(this.currentDetailItem) || this.currentSelectionDetailItems.length > 0) {
+        this.suppliersDialogVisable = true;
         return;
       }
-      this.suppliersDialogVisable = true;
+      this.$message.warning('请选择询价明细');
     },
     handleTabChange(value) {
       this.tabActive = value.prop;
@@ -488,12 +498,26 @@ export default {
       });
     },
     suppliersDialogSaveTransfer(selectedSupplier) {
+      // this.currentSelectionDetailItems;
+      if (this.currentSelectionDetailItems.length > 0) {
+        this.currentSelectionDetailItems.forEach((item) => {
+          const index = item.$index;
+          this.$set(
+            this.inquiryListOption.data[index],
+            'toElsAccountList',
+            selectedSupplier.toString()
+          );
+        });
+        return;
+      }
       const index = this.currentDetailItem.$index;
       this.$set(
         this.inquiryListOption.data[index],
         'toElsAccountList',
         selectedSupplier.toString()
       );
+      this.currentDetailItem = {};
+      this.currentSelectionDetailItems = [];
     },
     suppliersHandleList() {
       // let listParams = deepClone(this.materialsDialogQueryParam);

@@ -27,16 +27,21 @@
           }}
         </span>
       </template>
-      <!-- orderStatus: "0":"未确认","1":"已确认" -->
+      <!-- orderStatus: "0":"未确认","1":"已确认","2":"已退回","3":"变更未确认","4":"变更确认","5":"变更退回" -->
       <template slot-scope="{ row }" slot="orderNumber">
         <router-link
-          v-if="row.orderStatus === '0'"
+          v-if="row.orderStatus === '0' || row.orderStatus === '3'"
           :to="`orderDetail/${row.orderNumber}_${row.elsAccount}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
-          v-if="row.orderStatus === '1' || row.orderStatus === '2'"
+          v-if="
+            row.orderStatus === '1' ||
+              row.orderStatus === '2' ||
+              row.orderStatus === '4' ||
+              row.orderStatus === '5'
+          "
           :to="`orderView/${row.orderNumber}_${row.elsAccount}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>

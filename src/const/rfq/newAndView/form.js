@@ -11,21 +11,21 @@ export default {
       prop: 'enquiryNumber',
       value: '待生成'
     },
-    {
-      type: 'date',
-      format: 'yyyy-MM-dd',
-      valueFormat: 'timestamp',
-      label: '询价日期',
-      span: 6,
-      prop: 'beginDate',
-      rules: [
-        {
-          required: true,
-          message: '请选择询价日期',
-          trigger: 'blur'
-        }
-      ]
-    },
+    // {
+    //   type: 'date',
+    //   format: 'yyyy-MM-dd',
+    //   valueFormat: 'timestamp',
+    //   label: '询价日期',
+    //   span: 6,
+    //   prop: 'beginDate',
+    //   rules: [
+    //     {
+    //       required: true,
+    //       message: '请选择询价日期',
+    //       trigger: 'blur'
+    //     }
+    //   ]
+    // },
     {
       type: 'datetime',
       format: 'yyyy-MM-dd hh:mm:ss',
@@ -106,5 +106,6 @@ export default {
       ]
     }
   ],
+  labelWidth: 120,
   menuBtn: false
 };

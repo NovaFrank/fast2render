@@ -5,10 +5,11 @@
       showButton
       :buttons="headerButtons"
       @on-back="handleBack"
+      @on-history="handleShowHistory"
       @on-save="handleSave"
       @on-send="handleSend"
     ></form-header>
-    <avue-detail ref="form" v-model="detailObj" :option="formOption"> </avue-detail>
+    <avue-form ref="form" v-model="detailObj" :option="formOption"></avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <avue-crud
       v-if="tabActive === 'files'"
@@ -83,6 +84,8 @@
       @on-save-form="onSaveLadderForm"
       @close-field-dialog="closeFieldDialog"
     ></quote-ladder-dialog>
+    <!-- 报价历史记录 -->
+    <history :dialogVisible="historyVisible" :data="historyList"></history>
   </basic-container>
 </template>
 
@@ -90,12 +93,14 @@
 import FormHeader from '@/components/views/formHeader';
 import quoteLadderDialog from '@/components/views/quoteDialog'; // 阶梯报价
 import quoteDialog from '@/components/views/quoteDialog0'; // 常规报价
-import formOption from '@/const/rfq/newAndView/detail';
+import formOption from '@/const/rfq/supplierClient/detail';
 import tabOption from '@/const/rfq/newAndView/tabs';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
+import { queryDetailAction } from '@/api/rfq';
 import { getAction, postAction } from '@/api/rfq/supplierClient';
 import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
+import history from './../history';
 import {
   dataDicAPI
   // materialListAction,
@@ -107,7 +112,8 @@ export default {
   components: {
     FormHeader,
     quoteDialog,
-    quoteLadderDialog
+    quoteLadderDialog,
+    history
   },
   data() {
     return {
@@ -131,6 +137,8 @@ export default {
       fieldDialogForm: {},
       ladderQuoteVisible: false,
       quoteVisible: false,
+      historyVisible: false,
+      historyList: [],
       dialogTitle: '',
       dialogWidth: '50%',
       headerButtons: [
@@ -162,6 +170,12 @@ export default {
     },
     handleBack() {
       this.$router.back();
+    },
+    handleShowHistory() {
+      queryDetailAction('queryQuote', this.currentEnquiryNumber).then((res) => {
+        this.historyList = res.data.pageData.rows;
+      });
+      this.historyVisible = true;
     },
     // 显示报价弹窗
     handleQuoteRow(scope) {

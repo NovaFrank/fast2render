@@ -26,14 +26,14 @@ export default {
       disabled: true
     },
     {
-      formslot: true,
       type: 'datetime',
       display: true,
       format: 'yyyy-MM-dd hh:mm:ss',
       valueFormat: 'timestamp',
       label: '报价截止时间',
       span: 6,
-      prop: 'quoteEndTime'
+      prop: 'quoteEndTime',
+      disabled: true
     },
     {
       label: '负责人',

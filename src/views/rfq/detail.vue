@@ -13,8 +13,8 @@
       @on-update-end="handleUpdateQuoteEndTime"
       @show-time-history="handleShowTimeHistory"
     ></form-header>
-    <avue-detail ref="form" v-model="detailObj" :option="formOption">
-      <template slot="quoteEndTimeForm">
+    <avue-form ref="form" v-model="detailObj" :option="formOption">
+      <template slot="quoteEndTime">
         <el-date-picker
           v-model="detailObj.quoteEndTime"
           type="datetime"
@@ -23,7 +23,7 @@
         ></el-date-picker>
         <!-- @change="handleYearChange" -->
       </template>
-    </avue-detail>
+    </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <!-- 附件 -->
     <!-- <attachment-list :id="form.uuid" v-if="tabActive === 'files'"></attachment-list> -->

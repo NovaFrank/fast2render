@@ -7,6 +7,7 @@
 </template>
 <script>
 import historyOption from '@/const/rfq/newAndView/history';
+import { dataDicAPI } from '@/api/rfq/common';
 export default {
   name: 'history',
   props: {
@@ -83,8 +84,26 @@ export default {
     },
     dialogVisible: function(newValue) {
       this.visable = newValue;
+    },
+    crudOption: function(newValue) {
+      this.initData();
     }
   },
-  methods: {}
+  methods: {
+    initData() {
+      // 报价方式 数据字典
+      dataDicAPI('quoteMethod').then((res) => {
+        this.crudOption.column = this.crudOption.column.map((item) => {
+          if (item.prop === 'quoteMethod') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+    }
+  }
 };
 </script>

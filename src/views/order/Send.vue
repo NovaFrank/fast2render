@@ -1,11 +1,11 @@
 <template>
   <basic-container>
     <form-header
-      titleText="未确认订单预览"
+      titleText="预览"
       showButton
       :buttons="headerButtons"
-      @on-submit="handleRelease"
-      @on-save="handleSave"
+      @on-cancel="handleCancel"
+      @on-sendOrder="handleSendOrder"
     ></form-header>
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
@@ -17,6 +17,9 @@
         :option="materielListOption.option"
         v-model="crudObj"
         :page.sync="page"
+        @row-save="rowSave"
+        @row-update="rowUpdate"
+        @row-del="handleDeleteRow"
         ref="crud"
       >
         <template slot="materialNumberForm">
@@ -36,6 +39,8 @@
         :option="planListOption.option"
         v-model="planListOption.planObj"
         :page.sync="planListOption.page"
+        @row-save="rowSavePlan"
+        @row-del="rowDelPlan"
         @row-update="rowUpdatePlan"
       >
       </avue-crud>
@@ -53,36 +58,24 @@
       actionPath="findPageList"
       @save="materialDialogSave"
     ></selectDialog>
-    <selectDialog3
-      ref="purchaseDialog"
-      :dialogVisible.sync="dialogPurchaseVisible"
-      :title="'添加采购方负责人'"
-      :column="purchaseOption.option.column"
-      :elsAccount="elsAccount"
-      actionPath="findPageList"
-      @save="purchaseDialogSave"
-    ></selectDialog3>
   </basic-container>
 </template>
 
 <script>
 import FormHeader from '@/components/formHeader';
-import tabOption from '@/const/supplierOrder/tabs';
-import formOption from '@/const/supplierOrder/detail';
-import fileOption from '@/const/supplierOrder/files';
-import purchaseOption from '@/const/supplierOrder/purchaseList';
-import planListOption from '@/const/supplierOrder/planEdit';
-import materialOption from '@/const/supplierOrder/materiaList';
-import materielListOption from '@/const/supplierOrder/materielList';
-import { getOrderList, createOrder, dataDicAPI } from '@/api/supplierOrder.js';
+import tabOption from '@/const/order/tabs';
+import formOption from '@/const/order/detail';
+import fileOption from '@/const/order/files';
+import planListOption from '@/const/order/planList';
+import materialOption from '@/const/order/materiaList';
+import materielListOption from '@/const/order/materielList';
+import { getOrderList, dataDicAPI, createOrder } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
-import selectDialog3 from '@/common/selectDialog3';
-import { getSupplierInfo } from '@/util/utils.js';
+import { getUserInfo } from '@/util/utils.js';
 export default {
   components: {
     FormHeader,
-    selectDialog,
-    selectDialog3
+    selectDialog
   },
   name: 'Detail',
   props: {
@@ -123,36 +116,36 @@ export default {
         pageSize: 10
       },
       dialogVisible: false,
-      dialogPurchaseVisible: false,
       materialOption: materialOption,
-      purchaseOption: purchaseOption,
       formOption: formOption,
       planListOption: planListOption,
       crudObj: {},
       crudOption: {},
       headerButtons: [
         {
-          text: '确认',
+          text: '返回',
           type: 'primary',
           size: 'small',
-          action: 'on-save'
+          action: 'on-cancel'
         },
         {
-          text: '退回',
+          text: '发送货通知单',
           type: 'primary',
           size: 'small',
-          action: 'on-submit'
+          action: 'on-sendOrder'
         }
       ]
     };
   },
   async created() {
-    const userInfo = getSupplierInfo();
+    const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
     this.tabActive = this.tabOption.option.column[0];
     this.tableData();
     this.getDicData();
+    this.materielListOption.option.header = false;
+    this.materielListOption.option.menu = false;
   },
   methods: {
     async getDicData(data) {
@@ -179,12 +172,11 @@ export default {
         });
       });
     },
-
-    // 获取头数据和行数据
+    // 获取头数据和行数据findDeliveryPlanList
     async tableData(data) {
-      const action = 'findOrderHeadReceiveVO';
-      const action2 = 'findOrderItemReceiveList';
-      const action3 = 'findDeliveryPlanReceiveList';
+      const action = 'findOrderHeadVO';
+      const action2 = 'findOrderItemList';
+      const action3 = 'findDeliveryPlanList';
       const params = {
         elsAccount: this.$route.params && this.$route.params.id.split('_')[1],
         orderStatus: '',
@@ -209,15 +201,18 @@ export default {
       this.formOption.obj = resp.data.data;
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;
+      let orderItemArr = [];
+      resp2.data.data.forEach((i) => {
+        orderItemArr.push(Number(i.orderItemNumber));
+      });
+      sessionStorage.setItem('orderItemArr', JSON.stringify(orderItemArr));
     },
-    rowUpdatePlan(row, index, done, loading) {
-      loading();
-      this.$set(this.planListOption.data, index, row);
-      done();
-    },
-    // 确认订单
+
+    // 保存表头和表单
     async handleSave() {
-      this.$confirm(`确认提交？`, {
+      this.tabActive = this.tabOption.option.column[2];
+      this.handleTabClick(this.tabActive);
+      this.$confirm(`确认提交修改？`, {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -226,11 +221,12 @@ export default {
           const action = 'updateOrder';
           let params = {
             elsAccount: this.elsAccount,
+            elsSubAccount: this.elsSubAccount,
             ...this.formOption.obj,
-            orderItemReceiveVOList: this.materielListOption.data,
-            deliveryPlanReceiveVOList: this.planListOption.data
+            orderItemVOList: this.materielListOption.data,
+            deliveryPlanVOList: this.planListOption.data
           };
-          console.log('params: ' + JSON.stringify(params));
+          // console.log('params: ' + JSON.stringify(params));
           return createOrder(action, params);
         })
         .then(() => {
@@ -238,39 +234,28 @@ export default {
             type: 'success',
             message: '修改成功!'
           });
-          this.$router.push({ path: '/supplier/orderList' });
+          this.$router.push({ path: '/list' });
         });
     },
-    // 退回订单
-    async handleRelease() {
-      this.$confirm(`确认退回？`, {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          const action = 'backToOrder';
-          let params = {
-            elsAccount: this.elsAccount,
-            ...this.formOption.obj,
-            orderItemReceiveVOList: this.materielListOption.data,
-            deliveryPlanReceiveVOList: this.planListOption.data
-          };
-          console.log('params: ' + JSON.stringify(params));
-          return createOrder(action, params);
-        })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '退回成功!'
-          });
-          this.$router.push({ path: '/supplier/orderList' });
-        });
-    },
+
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
       console.log(this.tabActive.prop);
+
+      if (this.tabActive.prop === 'plan') {
+        this.tableData();
+      }
+    },
+    // 删除行数据
+    handleDeleteRow(row, index) {
+      this.$confirm('确定将选择数据删除?', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.materielListOption.data.splice(index, 1);
+      });
     },
     // 生成excel模板
     generateExcelTemp() {
@@ -286,21 +271,84 @@ export default {
     async beforeUploadExcel(file) {
       console.log('file.raw :', file);
     },
-
-    handleCancel() {
-      this.$router.push({ path: '/supplier/orderList' });
+    handleSendOrder() {
+      alert('进行中...');
     },
+    // 保存新增的数据
+    rowSave(row, done, loading) {
+      if (this.materielListOption.data === undefined) {
+        this.materielListOption.data = [];
+      }
 
-    uploadAfter(res, done, loading) {
-      console.log('after upload', res);
+      if (this.materielListOption.data.length <= 0) {
+        row.deliveryItemNumber = '1';
+        row.orderItemNumber = '1';
+        this.materielListOption.data.push(row);
+        this.params.addList.push(row);
+      } else {
+        row.deliveryItemNumber = '1';
+        let sessionItemArr = sessionStorage.getItem('orderItemArr');
+        let maxNum = JSON.parse(sessionItemArr).reduce((a, b) => {
+          return b > a ? b : a;
+        });
+        row.orderItemNumber = (maxNum + 1).toString();
+        this.materielListOption.data.push(row);
+        this.params.addList.push(row);
+      }
       done();
     },
-    uploadBefore(file, done, loading) {
-      console.log('before upload', file);
-      // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
-      const newFile = new File([file], '1234', { type: file.type });
-      done(newFile);
+    // 发送供方
+    async handleSendProvider() {
+      this.tabActive = this.tabOption.option.column[2];
+      this.handleTabClick(this.tabActive);
+      const action = 'sendOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
+      // console.log('params: ' + JSON.stringify(params.orderItemVOList));
+      await createOrder(action, params);
+      this.$message({
+        type: 'success',
+        message: '发送成功!'
+      });
+      this.$router.push({ path: '/list' });
     },
+    rowSavePlan(row, done, loading) {
+      // 保存新增的数据
+      if (this.crudPlanData === undefined) {
+        this.crudPlanData = [];
+      }
+      this.crudPlanData.push(row);
+      // this.params.addList.push(row);
+      done();
+    },
+    rowUpdate(row, index, done, loading) {
+      loading();
+      this.$set(this.materielListOption.data, index, row);
+      done();
+    },
+    rowUpdatePlan(row, index, done, loading) {
+      loading();
+      done();
+    },
+    rowDelPlan(row, index) {
+      // 删除
+      this.crudPlanData.splice(index, 1);
+      this.params.deleteList.push(row);
+    },
+    rowDel(row, index) {
+      // 删除
+      this.crudData.splice(index, 1);
+      this.params.deleteList.push(row);
+    },
+    handleCancel() {
+      this.$router.push({ path: '/list' });
+    },
+    handleRelease() {},
     onSaveForm(form) {
       // todo
     },
@@ -313,15 +361,6 @@ export default {
         this.crudObj.materialDesc = selectColumns[0].materialDesc;
         this.crudObj.materialSpecifications = selectColumns[0].materialSpecifications;
         this.crudObj.baseUnit = selectColumns[0].baseUnit;
-      }
-    },
-    purchaseDialogOpen() {
-      this.dialogPurchaseVisible = true;
-    },
-    purchaseDialogSave(selectColumns) {
-      if (selectColumns.length !== 0) {
-        this.formOption.obj.purchasePerson =
-          selectColumns[0].elsSubAccount + '_' + selectColumns[0].name;
       }
     }
   }

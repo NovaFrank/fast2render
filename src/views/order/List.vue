@@ -54,9 +54,11 @@
           }}
         </span>
       </template>
+      <!-- orderStatus: "0":"对方未确认","1":"对方已确认","2":"对方已退回","3":"变更对方未确认","4":"变更对方确认","5":"对方变更退回" -->
+      <!-- sendStatus: "0":"未发送","1":"已发送" -->
       <template slot-scope="{ row }" slot="orderNumber">
         <router-link
-          v-if="row.orderStatus === '1' || row.orderStatus === '3' || row.orderStatus === '4'"
+          v-if="row.orderStatus === '3' || row.orderStatus === '4'"
           :to="`detail/${row.orderNumber}_${row.elsAccount}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
@@ -76,6 +78,12 @@
         <router-link
           v-if="row.orderStatus === '0' && row.sendStatus === '1'"
           :to="`view/${row.orderNumber}_${row.elsAccount}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '1'"
+          :to="`send/${row.orderNumber}_${row.elsAccount}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>

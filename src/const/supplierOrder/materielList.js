@@ -15,6 +15,7 @@ export default {
     indexLabel: '序号',
     page: false,
     align: 'center',
+    menu: false,
     menuAlign: 'center',
     menuWidth: '180',
     addBtn: false,

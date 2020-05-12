@@ -27,6 +27,7 @@
           }}
         </span>
       </template>
+      <!-- orderStatus: "0":"未确认","1":"已确认" -->
       <template slot-scope="{ row }" slot="orderNumber">
         <router-link
           v-if="row.orderStatus === '0'"

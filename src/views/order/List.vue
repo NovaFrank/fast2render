@@ -58,7 +58,7 @@
       <!-- sendStatus: "0":"未发送","1":"已发送" -->
       <template slot-scope="{ row }" slot="orderNumber">
         <router-link
-          v-if="row.orderStatus === '3' || row.orderStatus === '4'"
+          v-if="row.orderStatus === '3'"
           :to="`detail/${row.orderNumber}_${row.elsAccount}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
@@ -82,7 +82,7 @@
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
-          v-if="row.orderStatus === '1'"
+          v-if="row.orderStatus === '1' || row.orderStatus === '4'"
           :to="`send/${row.orderNumber}_${row.elsAccount}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>

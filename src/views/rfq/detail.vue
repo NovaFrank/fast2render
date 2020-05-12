@@ -17,7 +17,7 @@
     <avue-form ref="form" v-model="detailObj" :option="formOption">
       <template slot="quoteEndTime">
         <el-date-picker
-          v-model="detailObj.quoteEndTime"
+          v-model="quoteEndTimeChange"
           type="datetime"
           placeholder="选择日期时间"
           value-format="timestamp"
@@ -220,7 +220,11 @@ export default {
     this.tableData();
     this.initDetail();
   },
-  watch: {},
+  watch: {
+    detailObj(newVal) {
+      this.quoteEndTimeChange = newVal.quoteEndTime;
+    }
+  },
   methods: {
     cellStyle() {
       return {
@@ -314,7 +318,6 @@ export default {
       });
     },
     handleQuoteEndTime(value) {
-      console.log(value);
       this.quoteEndTimeChange = value;
     },
     handleRadioChange(value, scope) {
@@ -376,13 +379,20 @@ export default {
       });
     },
     handleUpdateQuoteEndTime() {
+      if (this.quoteEndTimeChange < new Date().getTime()) {
+        this.$message.error('截至时间不得小于当前时间');
+        return;
+      }
       this.$confirm('是否更新截止时间？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.detailObj.quoteEndTime = this.quoteEndTimeChange;
-        purchaseEnquiryAction('updateQuoteEndTime', this.detailObj).then((res) => {
+        const params = {
+          ...this.detailObj,
+          quoteEndTime: this.quoteEndTimeChange
+        };
+        purchaseEnquiryAction('updateQuoteEndTime', params).then((res) => {
           if (res.data.statusCode !== '200') {
             this.$message.error(res.data.message);
             return;

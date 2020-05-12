@@ -52,8 +52,7 @@ export default {
           required: true,
           message: '请选择报价截止时间',
           trigger: 'blur'
-        },
-        { trigger: 'blur', validator: validateQuoteEndTime }
+        }
       ]
     },
     {

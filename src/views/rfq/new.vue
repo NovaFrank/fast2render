@@ -288,7 +288,7 @@ export default {
       });
     },
     handleCancel() {
-      this.$router.back();
+      this.$router.push({ path: '/list' });
     },
     handleDelete(row) {
       this.$confirm('确定删除？', '提示').then(() => {

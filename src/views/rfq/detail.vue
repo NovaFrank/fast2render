@@ -9,6 +9,7 @@
       @on-close="handleClose"
       @on-history="handleShowHistory"
       @on-new-supplier="handleNewSupplier"
+      @on-open="handleShowOpen"
       @on-submit-approval="handleSubmit"
       @on-update-end="handleUpdateQuoteEndTime"
       @show-time-history="handleShowTimeHistory"
@@ -127,6 +128,14 @@
       :crudObj="currentDetailItem"
       @on-save="suppliersDialogSaveTransfer"
     ></select-supplier-dialog>
+    <open-dialog
+      dialogTitle="开启密码"
+      dialogWidth="30%"
+      :fieldDialogVisible.sync="openDialogVisible"
+      :dialogOption="openFormOption.option"
+      @close-field-dialog="closeFieldDialog"
+      @on-save-form="handleOpenSubmit"
+    ></open-dialog>
   </basic-container>
 </template>
 
@@ -148,12 +157,16 @@ import selectSupplierDialog from '@/components/views/selectSupplierDialog';
 import AttachmentList from '@/components/views/attachmentList';
 import quoteListOption from '@/const/rfq/newAndView/detailInquiryQuote';
 
+import openDialog from '@/components/views/openDialog';
+import openFormOption from '@/const/rfq/newAndView/openForm';
+
 export default {
   components: {
     FormHeader,
     history,
     AttachmentList,
-    selectSupplierDialog
+    selectSupplierDialog,
+    openDialog
   },
   data() {
     return {
@@ -188,6 +201,8 @@ export default {
       ],
       historyVisible: false,
       historyList: [],
+      openDialogVisible: false,
+      openFormOption: openFormOption,
       suppliersDialogVisable: false,
       suppliersDialogOptionColumn: supplierSelectDialog.option.column,
       currentDetailItem: {}, // 当前选中物料行
@@ -214,6 +229,9 @@ export default {
     },
     cHeaderStyle() {
       return 'none-border-right';
+    },
+    closeFieldDialog() {
+      this.openDialogVisible = false;
     },
     currentChange(val) {
       this.inquiryListOption.page.currentPage = val;
@@ -314,10 +332,19 @@ export default {
       });
       this.historyVisible = true;
     },
+    // 开启
+    handleShowOpen() {
+      this.openDialogVisible = true;
+    },
     handleShowTimeHistory() {
       queryDetailAction('queryUpdateQuoteEndTime', this.currentEnquiryNumber).then((res) => {
         this.timeHistory = res.data.pageData.rows;
       });
+    },
+    handleOpenSubmit(form) {
+      console.log(form);
+      this.detailObj.quoteEndTime = new Date().getTime();
+      this.openDialogVisible = false;
     },
     handleTabChange(value) {
       this.tabActive = value.prop;

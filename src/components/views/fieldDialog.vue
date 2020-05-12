@@ -86,7 +86,6 @@ export default {
   },
   watch: {
     field(newVal) {
-      console.log('newVal', newVal);
       this.form = newVal;
       this.ladderOption.data = JSON.parse(newVal.ladderPriceJson) || [];
     }

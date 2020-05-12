@@ -38,7 +38,7 @@ export default {
         prop: 'requestDeliveryDate',
         type: 'date',
         format: 'yyyy-MM-dd',
-        valueFormat: 'yyyy-MM-dd',
+        valueFormat: 'timestamp',
         disabled: true
       },
       {

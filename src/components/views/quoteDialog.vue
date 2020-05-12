@@ -30,6 +30,8 @@
 import quoteFormOption from '@/const/rfq/supplierClient/quoteForm';
 import ladderOption from '@/const/rfq/supplierClient/quoteList';
 
+const execMathExpress = require('exec-mathexpress');
+
 // 销售方阶梯报价
 export default {
   name: 'quote-ladder-dialog',
@@ -88,8 +90,12 @@ export default {
     },
     handleInputPrice(event, scope) {
       const currentItem = this.ladderOption.data[scope.row.$index];
-      currentItem.priceExcludingTax =
-        Math.floor((event.target.value / (1 + currentItem.taxRate)) * 100) / 100;
+      const result = execMathExpress('v1 / ( v2 + v3 )', {
+        v1: event.target.value,
+        v2: 1,
+        v3: currentItem.taxRate
+      });
+      currentItem.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
     },
     handleSubmit() {
       const params = {

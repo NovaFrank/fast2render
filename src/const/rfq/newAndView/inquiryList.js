@@ -43,10 +43,10 @@ export default {
       //   label: '需求数量',
       //   prop: 'count'
       // },
-      {
-        label: 'ELS账号',
-        prop: 'elsAccount'
-      },
+      // {
+      //   label: 'ELS账号',
+      //   prop: 'elsAccount'
+      // },
       {
         label: '供应商',
         prop: 'toElsAccountList'

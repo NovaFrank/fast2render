@@ -52,7 +52,23 @@ export default {
   name: 'attachment-list',
   inheritAttrs: false,
   props: {
+    menu: {
+      type: Boolean,
+      default: true
+    },
     id: {
+      type: String,
+      default: null
+    },
+    elsAccount: {
+      type: String,
+      default: null
+    },
+    businessElsAccount: {
+      type: String,
+      default: null
+    },
+    businessModule: {
       type: String,
       default: null
     },
@@ -138,8 +154,8 @@ export default {
     getList() {
       let action = 'findList';
       let params = {
-        businessElsAccount: '307000',
-        businessModule: 'inspectTableAudit',
+        businessElsAccount: this.businessElsAccount,
+        businessModule: this.businessModule,
         businessId: this.id
       };
       commonApi.attachmentServer(action, params).then((res) => {
@@ -149,6 +165,10 @@ export default {
       });
     },
     handleDelete(row, index) {
+      if (!row.uuid) {
+        this.fileList.splice(index, 1);
+        return;
+      }
       this.$confirm('是否删除该附件？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

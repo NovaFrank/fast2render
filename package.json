@@ -15,6 +15,7 @@
     "core-js": "^3.4.4",
     "echarts": "^4.6.0",
     "element-ui": "^2.13.0",
+    "exec-mathexpress": "^1.0.15",
     "fast2render": "^0.2.28",
     "js-md5": "^0.7.3",
     "vue": "^2.6.10",

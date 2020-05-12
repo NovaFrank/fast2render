@@ -26,8 +26,15 @@
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <!-- 附件 -->
-    <!-- <attachment-list :id="form.uuid" v-if="tabActive === 'files'"></attachment-list> -->
-    <avue-crud
+    <attachment-list
+      :id="detailObj.uuid"
+      :elsAccount="elsAccount"
+      :businessElsAccount="elsAccount"
+      businessModule="rfq"
+      :menu="false"
+      v-if="tabActive === 'files'"
+    ></attachment-list>
+    <!-- <avue-crud
       v-if="tabActive === 'files'"
       :data="filesOption.data"
       :option="filesOption.option"
@@ -42,7 +49,7 @@
           </el-col>
         </el-row>
       </template>
-    </avue-crud>
+    </avue-crud> -->
     <avue-crud
       v-if="tabActive === 'detail'"
       :data="inquiryListOption.data"
@@ -138,14 +145,14 @@ import history from './history';
 import { validatenull } from '@/util/validate';
 import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
 import selectSupplierDialog from '@/components/views/selectSupplierDialog';
-// import AttachmentList from '@/components/views/attachmentList';
+import AttachmentList from '@/components/views/attachmentList';
 import quoteListOption from '@/const/rfq/newAndView/detailInquiryQuote';
 
 export default {
   components: {
     FormHeader,
     history,
-    // AttachmentList,
+    AttachmentList,
     selectSupplierDialog
   },
   data() {

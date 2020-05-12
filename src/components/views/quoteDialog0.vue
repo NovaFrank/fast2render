@@ -22,6 +22,8 @@
 import quoteFormOption from '@/const/rfq/supplierClient/quoteForm0';
 import ladderOption from '@/const/rfq/supplierClient/quoteList';
 
+const execMathExpress = require('exec-mathexpress');
+
 // 销售方常规报价
 export default {
   name: 'quote-dialog',
@@ -56,7 +58,12 @@ export default {
       this.form = newVal;
     },
     'form.priceIncludingTax'(newVal) {
-      this.form.priceExcludingTax = Math.floor((newVal / (1 + this.form.taxRate)) * 100) / 100;
+      const result = execMathExpress('v1 / ( v2 + v3 )', {
+        v1: newVal,
+        v2: 1,
+        v3: this.form.taxRate
+      });
+      this.form.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
     }
   },
   methods: {

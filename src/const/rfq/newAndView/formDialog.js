@@ -1,3 +1,10 @@
+const validateDateTime = (rule, value, callback) => {
+  if (value < new Date().getTime()) {
+    callback(new Error('时间不得小于当前时间'));
+  } else {
+    callback();
+  }
+};
 export default {
   column: [
     {
@@ -25,7 +32,8 @@ export default {
       format: 'yyyy-MM-dd',
       valueFormat: 'timestamp',
       label: '要求交期',
-      prop: 'deliveryDate'
+      prop: 'deliveryDate',
+      rules: [{ trigger: 'blur', validator: validateDateTime }]
     },
     {
       label: '需求数量',
@@ -36,7 +44,8 @@ export default {
       format: 'yyyy-MM-dd',
       valueFormat: 'timestamp',
       label: '交货日期',
-      prop: 'canDeliveryDate'
+      prop: 'canDeliveryDate',
+      rules: [{ trigger: 'blur', validator: validateDateTime }]
     },
     {
       label: '税码',

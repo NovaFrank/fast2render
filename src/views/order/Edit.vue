@@ -93,7 +93,7 @@ import purchaseOption from '@/const/order/purchaseList';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielList';
-import { getOrderList, getDataDic, createOrder } from '@/api/order.js';
+import { getOrderList, getDataDic, createOrder, submitAudit } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import selectDialog3 from '@/common/selectDialog3';
 import { getUserInfo } from '@/util/utils.js';
@@ -198,7 +198,7 @@ export default {
           action: 'on-save'
         },
         {
-          text: '发送',
+          text: '提交审批',
           type: 'primary',
           size: 'small',
           action: 'on-submit'
@@ -399,34 +399,52 @@ export default {
       });
       this.$router.push({ path: '/list' });
     },
-
-    // 发送
+    // 提交审批
     async handleSubmit() {
-      this.$confirm(`确认发送？`, {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(async () => {
-          const action = 'sendOrder';
-          let params = {
-            elsAccount: this.elsAccount,
-            elsSubAccount: this.elsSubAccount,
-            ...this.formOption.obj,
-            orderItemVOList: this.materielListOption.data,
-            deliveryPlanVOList: this.planListOption.data
-          };
-          await createOrder(action, params);
-          console.log('params: ' + JSON.stringify(params));
-        })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          });
-          this.$router.push({ path: '/list' });
-        });
+      const action = 'submit';
+      let params = {
+        elsSubAccount: this.elsAccount,
+        toElsAccount: this.formOption.obj.toElsAccount,
+        businessType: 'orderAudit',
+        businessId: this.formOption.obj.orderNumber,
+        params: '{"key1":"123"}'
+      };
+      console.log('params: ' + JSON.stringify(params));
+      await submitAudit(action, params);
+      // console.log('params: ' + JSON.stringify(resp));
+      this.$message({
+        type: 'success',
+        message: '提交审批成功!'
+      });
+      this.$router.push({ path: '/list' });
     },
+    // 发送
+    // async handleSubmit() {
+    //   this.$confirm(`确认发送？`, {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     type: 'warning'
+    //   })
+    //     .then(async () => {
+    //       const action = 'sendOrder';
+    //       let params = {
+    //         elsAccount: this.elsAccount,
+    //         elsSubAccount: this.elsSubAccount,
+    //         ...this.formOption.obj,
+    //         orderItemVOList: this.materielListOption.data,
+    //         deliveryPlanVOList: this.planListOption.data
+    //       };
+    //       await createOrder(action, params);
+    //       console.log('params: ' + JSON.stringify(params));
+    //     })
+    //     .then(() => {
+    //       this.$message({
+    //         type: 'success',
+    //         message: '修改成功!'
+    //       });
+    //       this.$router.push({ path: '/list' });
+    //     });
+    // },
     uploadAfter(res, done, loading) {
       console.log('after upload', res);
       done();

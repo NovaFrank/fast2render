@@ -96,3 +96,14 @@ export const getPurchaseGroup = (action, params) => {
     }
   });
 };
+
+// 提交审批
+export const submitAudit = (action, params) => {
+  return axios({
+    url: `${baseUrl}/CommonAuditService/${action}`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};

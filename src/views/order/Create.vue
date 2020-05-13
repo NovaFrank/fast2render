@@ -334,27 +334,27 @@ export default {
     handleCancel() {
       this.$router.push({ path: '/list' });
     },
-    // 提交审核
-    async handleSubmit() {
-      // this.tabActive = this.tabOption.option.column[2];
-      // this.handleTabClick(this.tabActive);
-      // const action = 'sendOrder';
-      // let params = {
-      //   elsAccount: this.elsAccount,
-      //   elsSubAccount: this.elsSubAccount,
-      //   ...this.formOption.obj,
-      //   orderItemVOList: this.materielListOption.data,
-      //   deliveryPlanVOList: this.planListOption.data
-      // };
-      // console.log('params: ' + JSON.stringify(params));
-      // await createOrder(action, params);
-      // // console.log('params: ' + JSON.stringify(resp));
-      // this.$message({
-      //   type: 'success',
-      //   message: '发送成功!'
-      // });
-      // this.$router.push({ path: '/list' });
-    },
+    // 提交审批
+    // async handleSubmit() {
+    //   this.tabActive = this.tabOption.option.column[2];
+    //   this.handleTabClick(this.tabActive);
+    //   const action = 'submit';
+    //   let params = {
+    //     elsSubAccount: this.elsAccount,
+    //     toElsAccount: this.formOption.obj.toElsAccount,
+    //     businessType: "orderAudit",
+    //     businessId: "FI订单号",
+    //     params: "{\"key1\":\"123\"}"
+    //   };
+    //   console.log('params: ' + JSON.stringify(params));
+    //   await submitAudit(action, params);
+    //   // console.log('params: ' + JSON.stringify(resp));
+    //   this.$message({
+    //     type: 'success',
+    //     message: '提交审批成功!'
+    //   });
+    //   this.$router.push({ path: '/list' });
+    // },
 
     // 保存
     async handleSave() {
@@ -369,12 +369,14 @@ export default {
         deliveryPlanVOList: this.planListOption.data
       };
       // console.log('params: ' + JSON.stringify(params));
-      await createOrder(action, params);
+      const res = await createOrder(action, params);
       this.$message({
         type: 'success',
         message: '保存成功!'
       });
-      this.$router.push({ path: '/list' });
+      const orderNo = res.data.data.enquiryNumber;
+      this.$router.push({ path: '/edit', query: { orderNo } });
+      // this.$router.push({ path: '/list' });
     },
     onSaveForm(form) {
       // todo

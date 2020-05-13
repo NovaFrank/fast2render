@@ -108,13 +108,11 @@ export default {
       },
       {
         label: '含税价',
-        prop: 'orderAmountTax'
+        prop: 'price'
       },
       {
         label: '不含税价',
-        prop: 'orderAmount',
-        addDisplay: false,
-        editDisplay: false
+        prop: 'noTaxUnitPrice'
       }
     ]
   }

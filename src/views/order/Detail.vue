@@ -137,7 +137,7 @@ export default {
         //   action: 'on-reset'
         // },
         {
-          text: '发给供方',
+          text: '发送',
           type: 'primary',
           size: 'small',
           action: 'on-sendProvider'
@@ -170,8 +170,6 @@ export default {
     this.tabActive = this.tabOption.option.column[0];
     this.tableData();
     this.getDicData();
-    this.materielListOption.option.header = false;
-    this.materielListOption.option.menu = false;
   },
   methods: {
     async getDicData(data) {
@@ -252,7 +250,7 @@ export default {
             orderItemVOList: this.materielListOption.data,
             deliveryPlanVOList: this.planListOption.data
           };
-          // console.log('params: ' + JSON.stringify(params));
+          console.log('params: ' + JSON.stringify(params));
           return createOrder(action, params);
         })
         .then(() => {
@@ -260,7 +258,7 @@ export default {
             type: 'success',
             message: '修改成功!'
           });
-          this.$router.push({ path: '/list' });
+          // this.$router.push({ path: '/list' });
         });
     },
 
@@ -268,9 +266,19 @@ export default {
     handleTabClick(value) {
       this.tabActive = value;
       console.log(this.tabActive.prop);
-
+      sessionStorage.setItem('materialRow', JSON.stringify(this.materielListOption.data));
       if (this.tabActive.prop === 'plan') {
-        this.tableData();
+        let sessionCateCode = sessionStorage.getItem('materialRow');
+        this.planListOption.data = JSON.parse(sessionCateCode);
+        this.planListOption.data.forEach((item) => {
+          JSON.parse(sessionCateCode).forEach((i) => {
+            if (i.orderItemNumber === item.orderItemNumber) {
+              item.requestDeliveryDate = i.deliveryDate;
+              item.requestDeliveryQuantity = i.quantity;
+              item.deliveryItemNumber = '1';
+            }
+          });
+        });
       }
     },
     // 删除行数据
@@ -372,7 +380,9 @@ export default {
     handleCancel() {
       this.$router.push({ path: '/list' });
     },
-    handleRelease() {},
+    handleRelease() {
+      alert('进行中...');
+    },
     onSaveForm(form) {
       // todo
     },

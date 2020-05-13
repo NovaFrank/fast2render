@@ -14,6 +14,7 @@ export default {
     indexLabel: '序号',
     page: false,
     align: 'center',
+    menu: true,
     menuAlign: 'center',
     menuWidth: '180',
     addBtn: false,
@@ -28,37 +29,34 @@ export default {
       {
         label: '物料编码',
         prop: 'materialNumber',
-        formslot: true,
-        rules: [
-          {
-            required: true,
-            message: '请输入 物料编码',
-            trigger: 'blur'
-          }
-        ]
+        disabled: true
       },
       {
         label: '物料描述',
-        prop: 'materialDesc'
+        prop: 'materialDesc',
+        disabled: true
       },
       {
         label: '订单项号',
         prop: 'orderItemNumber',
         addDisplay: false,
-        editDisplay: false
+        editDisplay: false,
+        disabled: true
       },
       {
         label: '计划行号',
         prop: 'deliveryItemNumber',
         addDisplay: false,
         editDisplay: false,
-        hide: true
+        hide: true,
+        disabled: true
       },
       {
         label: '规格',
         prop: 'materialSpecifications',
         addDisplay: false,
-        editDisplay: false
+        editDisplay: false,
+        disabled: true
       },
       {
         label: '单位',
@@ -82,13 +80,15 @@ export default {
         label: 'ELS账号',
         prop: 'elsAccount',
         addDisplay: false,
-        editDisplay: false
+        editDisplay: false,
+        disabled: true
       },
       {
         label: '供应商',
         prop: 'toElsAccount',
         addDisplay: false,
-        editDisplay: false
+        editDisplay: false,
+        disabled: true
       },
       {
         label: '交货日期',
@@ -106,11 +106,11 @@ export default {
       },
       {
         label: '含税价',
-        prop: 'orderAmountTax'
+        prop: 'price'
       },
       {
         label: '不含税价',
-        prop: 'orderAmount'
+        prop: 'noTaxUnitPrice'
       }
     ]
   }

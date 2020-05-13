@@ -6,6 +6,7 @@
       :buttons="headerButtons"
       @on-cancel="handleCancel"
       @on-send="handleSend"
+      @on-sendprovider="handleSendProvider"
     ></form-header>
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
@@ -130,6 +131,12 @@ export default {
         },
         {
           text: '返回需求池',
+          type: 'primary',
+          size: 'small',
+          action: 'on-sendprovider'
+        },
+        {
+          text: '发送',
           type: 'primary',
           size: 'small',
           action: 'on-send'

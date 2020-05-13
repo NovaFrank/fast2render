@@ -2,7 +2,7 @@
 // import { DIC } from '../../dic';
 
 const validateQuoteEndTime = (rule, value, callback) => {
-  if (value < new Date().getTime()) {
+  if (value && value < new Date().getTime()) {
     callback(new Error('截至时间不得小于当前时间'));
   } else {
     callback();
@@ -23,7 +23,7 @@ export default {
     //   valueFormat: 'timestamp',
     //   label: '询价日期',
     //   span: 6,
-    //   prop: 'beginDate',
+    //   prop: 'createDate',
     //   rules: [
     //     {
     //       required: true,
@@ -42,14 +42,14 @@ export default {
     },
     {
       type: 'datetime',
-      format: 'yyyy-MM-dd hh:mm:ss',
+      format: 'yyyy-MM-dd HH:mm:ss',
       valueFormat: 'timestamp',
       label: '报价截止时间',
       span: 6,
       prop: 'quoteEndTime',
       rules: [
-        { required: true, message: '请选择报价截止时间', trigger: 'blur' },
-        { trigger: 'blur', validator: validateQuoteEndTime }
+        { required: true, message: '请选择报价截止时间', trigger: 'change' },
+        { trigger: 'change', validator: validateQuoteEndTime }
       ]
     },
     {
@@ -64,7 +64,7 @@ export default {
         {
           required: true,
           message: '请选择询价类型',
-          trigger: 'blur'
+          trigger: 'change'
         }
       ]
     }
@@ -82,7 +82,7 @@ export default {
     //   type: 'tree',
     //   label: '负责人',
     //   span: 6,
-    //   prop: 'responsible',
+    //   prop: 'createUser',
     //   rules: [
     //     {
     //       required: true,

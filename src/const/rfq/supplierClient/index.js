@@ -46,13 +46,13 @@ export default {
       // },
       // {
       //   type: 'datetime',
-      //   format: 'yyyy-MM-dd hh:mm:ss',
+      //   format: 'yyyy-MM-dd HH:mm:ss',
       //   label: '截止时间',
       //   prop: 'quoteEndTime'
       // },
       {
         label: '采购负责人',
-        prop: 'responsible'
+        prop: 'createUser'
       },
       {
         label: '采购商名称',

@@ -98,7 +98,7 @@ export default {
       this.gridData = newValue.map((item) => {
         return {
           id: item.id,
-          modifyTime: formatDate(new Date(item.modifyTime), 'yyyy-MM-dd hh:mm:ss'),
+          modifyTime: formatDate(new Date(item.modifyTime), 'yyyy-MM-dd HH:mm:ss'),
           modifier: item.modifier
         };
       });

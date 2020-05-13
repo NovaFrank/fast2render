@@ -41,7 +41,7 @@ export default {
       // },
       // {
       //   label: '询价日期',
-      //   prop: 'beginDate'
+      //   prop: 'createDate'
       // },
       // {
       //   label: '报价截止时间',
@@ -62,6 +62,7 @@ export default {
       {
         type: 'date',
         format: 'yyyy-MM-dd',
+        valueFormat: 'timestamp',
         label: '交货日期',
         prop: 'canDeliveryDate'
       },

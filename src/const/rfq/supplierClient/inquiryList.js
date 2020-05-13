@@ -41,6 +41,9 @@ export default {
         prop: 'count'
       },
       {
+        type: 'date',
+        format: 'yyyy-MM-dd',
+        valueFormat: 'timestamp',
         label: '交货日期',
         prop: 'deliveryDate'
       },

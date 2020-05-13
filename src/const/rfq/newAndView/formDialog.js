@@ -1,10 +1,20 @@
+import { validatenum, validatenumord } from '@/util/validate';
+
 const validateDateTime = (rule, value, callback) => {
-  if (value < new Date().getTime()) {
+  if (value && value < new Date().getTime()) {
     callback(new Error('时间不得小于当前时间'));
   } else {
     callback();
   }
 };
+const validateTaxRate = (rule, value, callback) => {
+  if (!validatenum(validatenum) || !validatenumord(value)) {
+    callback(new Error('请输入大于0的小数或整数'));
+  } else {
+    callback();
+  }
+};
+
 export default {
   column: [
     {
@@ -33,7 +43,7 @@ export default {
       valueFormat: 'timestamp',
       label: '要求交期',
       prop: 'deliveryDate',
-      rules: [{ trigger: 'blur', validator: validateDateTime }]
+      rules: [{ trigger: 'change', validator: validateDateTime }]
     },
     {
       label: '需求数量',
@@ -45,7 +55,7 @@ export default {
       valueFormat: 'timestamp',
       label: '交货日期',
       prop: 'canDeliveryDate',
-      rules: [{ trigger: 'blur', validator: validateDateTime }]
+      rules: [{ trigger: 'change', validator: validateDateTime }]
     },
     {
       label: '税码',
@@ -53,7 +63,8 @@ export default {
     },
     {
       label: '税率',
-      prop: 'taxRate'
+      prop: 'taxRate',
+      rules: [{ trigger: 'blur', validator: validateTaxRate }]
     },
     {
       type: 'tree',

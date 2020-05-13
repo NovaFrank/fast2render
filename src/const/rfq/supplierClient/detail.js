@@ -28,13 +28,13 @@ export default {
       valueFormat: 'timestamp',
       label: '询价日期',
       span: 6,
-      prop: 'beginDate',
+      prop: 'createDate',
       disabled: true
     },
     {
       type: 'datetime',
       display: true,
-      format: 'yyyy-MM-dd hh:mm:ss',
+      format: 'yyyy-MM-dd HH:mm:ss',
       valueFormat: 'timestamp',
       label: '报价截止时间',
       span: 6,
@@ -44,7 +44,7 @@ export default {
     {
       label: '负责人',
       span: 6,
-      prop: 'responsible',
+      prop: 'createUser',
       disabled: true
     }
     // {

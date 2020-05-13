@@ -1,10 +1,10 @@
-const validateQuoteEndTime = (rule, value, callback) => {
-  if (value < new Date().getTime()) {
-    callback(new Error('截至时间不得小于当前时间'));
-  } else {
-    callback();
-  }
-};
+// const validateQuoteEndTime = (rule, value, callback) => {
+//   if (value < new Date().getTime()) {
+//     callback(new Error('截至时间不得小于当前时间'));
+//   } else {
+//     callback();
+//   }
+// };
 export default {
   column: [
     {
@@ -35,14 +35,14 @@ export default {
       valueFormat: 'timestamp',
       label: '询价日期',
       span: 6,
-      prop: 'beginDate',
+      prop: 'createDate',
       disabled: true
     },
     {
       formslot: true,
       type: 'datetime',
       display: true,
-      format: 'yyyy-MM-dd hh:mm:ss',
+      format: 'yyyy-MM-dd HH:mm:ss',
       valueFormat: 'timestamp',
       label: '报价截止时间',
       span: 6,
@@ -58,7 +58,7 @@ export default {
     {
       label: '负责人',
       span: 6,
-      prop: 'responsible',
+      prop: 'createUser',
       disabled: true
     }
     // {

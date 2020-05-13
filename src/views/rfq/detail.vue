@@ -27,14 +27,14 @@
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <!-- 附件 -->
-    <attachment-list
-      :id="detailObj.uuid"
+    <fast2-attachment-list
+      :id="detailObj.enquiryNumber"
       :elsAccount="elsAccount"
       :businessElsAccount="elsAccount"
-      businessModule="rfq"
+      businessModule="enquiry"
       :menu="false"
       v-if="tabActive === 'files'"
-    ></attachment-list>
+    ></fast2-attachment-list>
     <!-- <avue-crud
       v-if="tabActive === 'files'"
       :data="filesOption.data"
@@ -154,7 +154,6 @@ import history from './history';
 import { validatenull } from '@/util/validate';
 import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
 import selectSupplierDialog from '@/components/views/selectSupplierDialog';
-import AttachmentList from '@/components/views/attachmentList';
 import quoteListOption from '@/const/rfq/newAndView/detailInquiryQuote';
 
 import openDialog from '@/components/views/openDialog';
@@ -164,7 +163,6 @@ export default {
   components: {
     FormHeader,
     history,
-    AttachmentList,
     selectSupplierDialog,
     openDialog
   },
@@ -424,6 +422,8 @@ export default {
             ...item
           };
         });
+
+        this.inquiryListOption.data = this.inquiryListOption.data.sort(compare('materialNumber'));
       });
     },
     sizeChange(val) {

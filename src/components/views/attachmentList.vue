@@ -52,6 +52,12 @@ export default {
   name: 'attachment-list',
   inheritAttrs: false,
   props: {
+    version: {
+      type: String,
+      default: () => {
+        return 'attahcment-fiels_2_2';
+      }
+    },
     menu: {
       type: Boolean,
       default: true
@@ -252,7 +258,7 @@ export default {
             elsSubAccount: res.data.data.elsSubAccount,
             attachmentType: res.data.data.attachmentType,
             createUser: res.data.data.createUser,
-            createDate: formatDate(new Date(res.data.data.lastUpdateDate), 'yyyy-MM-dd hh:mm:ss')
+            createDate: formatDate(new Date(res.data.data.lastUpdateDate), 'yyyy-MM-dd HH:mm:ss')
           };
           this.fileList = this.fileList.map((item) => {
             return item[checkProp] === uploadRow[checkProp] ? uploadRow : item;

@@ -25,13 +25,13 @@
       :upload-after="uploadAfter"
     ></avue-form> -->
     <!-- 表单文件 -->
-    <attachment-list
+    <fast2-attachment-list
       :id="form.enquiryNumber"
       :elsAccount="elsAccount"
       :businessElsAccount="elsAccount"
       businessModule="enquiry"
-      v-if="tabActive === 'files' && form.uuid"
-    ></attachment-list>
+      v-if="tabActive === 'files' && form.enquiryNumber"
+    ></fast2-attachment-list>
     <avue-crud
       v-if="tabActive === 'detail'"
       :data="inquiryListOption.data"
@@ -139,15 +139,13 @@ import {
 } from '@/api/rfq/common';
 import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
 import { validatenull } from '@/util/validate';
-import AttachmentList from '@/components/views/attachmentList';
 
 export default {
   components: {
     FormHeader,
     fieldDialog,
     // SelectDialogTable,
-    selectSupplierDialog,
-    AttachmentList
+    selectSupplierDialog
   },
   data() {
     return {

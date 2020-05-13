@@ -377,30 +377,30 @@ export default {
 
     // 返回需求池
     async handleSend() {
-      // this.$confirm(`确认返回需求池？`, {
-      //   confirmButtonText: '确定',
-      //   cancelButtonText: '取消',
-      //   type: 'warning'
-      // })
-      //   .then(async () => {
-      //     const action = 'sendOrder';
-      //     let params = {
-      //       elsAccount: this.elsAccount,
-      //       elsSubAccount: this.elsSubAccount,
-      //       ...this.formOption.obj,
-      //       orderItemVOList: this.materielListOption.data,
-      //       deliveryPlanVOList: this.planListOption.data
-      //     };
-      //     await createOrder(action, params);
-      //     // console.log('params: ' + JSON.stringify(params));
-      //   })
-      //   .then(() => {
-      //     this.$message({
-      //       type: 'success',
-      //       message: '返回成功!'
-      //     });
-      //     this.$router.push({ path: '/list' });
-      //   });
+      this.$confirm(`确认返回需求池？`, {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          const action = 'delete';
+          let params = {
+            elsAccount: this.elsAccount,
+            ...this.formOption.obj,
+            uuid: this.$route.params && this.$route.params.id.split('_')[2],
+            orderItemVOList: this.materielListOption.data,
+            deliveryPlanVOList: this.planListOption.data
+          };
+          await createOrder(action, params);
+          // console.log('params: ' + JSON.stringify(params));
+        })
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+          this.$router.push({ path: '/list' });
+        });
     },
     uploadAfter(res, done, loading) {
       console.log('after upload', res);

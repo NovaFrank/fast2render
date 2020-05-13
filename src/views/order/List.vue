@@ -102,6 +102,18 @@
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
+        <router-link
+          v-if="row.orderStatus === '2' && row.sendStatus === '1'"
+          :to="`view/${row.orderNumber}_${row.elsAccount}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '3' && row.sendStatus === '1'"
+          :to="`view/${row.orderNumber}_${row.elsAccount}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
         <!--send 供方确认 发送货通知单  -->
         <router-link
           v-if="row.orderStatus === '4' && row.sendStatus === '3'"
@@ -111,6 +123,12 @@
         </router-link>
         <router-link
           v-if="row.orderStatus === '1' && row.sendStatus === '1'"
+          :to="`send/${row.orderNumber}_${row.elsAccount}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '4' && row.sendStatus === '1'"
           :to="`send/${row.orderNumber}_${row.elsAccount}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>

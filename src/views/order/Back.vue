@@ -5,6 +5,7 @@
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
+      @on-send="handleSend"
     ></form-header>
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
@@ -126,6 +127,12 @@ export default {
           type: 'primary',
           size: 'small',
           action: 'on-cancel'
+        },
+        {
+          text: '返回需求池',
+          type: 'primary',
+          size: 'small',
+          action: 'on-send'
         }
       ]
     };
@@ -339,7 +346,65 @@ export default {
     handleCancel() {
       this.$router.push({ path: '/list' });
     },
-    handleRelease() {},
+    // 保存表头和表单
+    async handleSubmit() {
+      alert('进行中');
+      // this.tabActive = this.tabOption.option.column[2];
+      // this.handleTabClick(this.tabActive);
+      // const action = 'updateOrder';
+      // let params = {
+      //   elsAccount: this.elsAccount,
+      //   elsSubAccount: this.elsSubAccount,
+      //   ...this.formOption.obj,
+      //   orderItemVOList: this.materielListOption.data,
+      //   deliveryPlanVOList: this.planListOption.data
+      // };
+      // // console.log('params: ' + JSON.stringify(params.orderItemVOList));
+      // await createOrder(action, params);
+      // this.$message({
+      //   type: 'success',
+      //   message: '修改成功!'
+      // });
+      // this.$router.push({ path: '/list' });
+    },
+
+    // 返回需求池
+    async handleSend() {
+      // this.$confirm(`确认返回需求池？`, {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // })
+      //   .then(async () => {
+      //     const action = 'sendOrder';
+      //     let params = {
+      //       elsAccount: this.elsAccount,
+      //       elsSubAccount: this.elsSubAccount,
+      //       ...this.formOption.obj,
+      //       orderItemVOList: this.materielListOption.data,
+      //       deliveryPlanVOList: this.planListOption.data
+      //     };
+      //     await createOrder(action, params);
+      //     // console.log('params: ' + JSON.stringify(params));
+      //   })
+      //   .then(() => {
+      //     this.$message({
+      //       type: 'success',
+      //       message: '返回成功!'
+      //     });
+      //     this.$router.push({ path: '/list' });
+      //   });
+    },
+    uploadAfter(res, done, loading) {
+      console.log('after upload', res);
+      done();
+    },
+    uploadBefore(file, done, loading) {
+      console.log('before upload', file);
+      // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
+      const newFile = new File([file], '1234', { type: file.type });
+      done(newFile);
+    },
     onSaveForm(form) {
       // todo
     },

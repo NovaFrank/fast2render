@@ -48,8 +48,15 @@
       </avue-crud>
     </span>
     <span v-if="tabActive.prop === 'files'">
-      <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
-      </avue-crud>
+      <!-- <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
+      </avue-crud> -->
+      <fast2-attachment-list
+        :id="formOption.obj.orderNumber"
+        :elsAccount="elsAccount"
+        :businessElsAccount="formOption.obj.elsAccount"
+        :version="annexComponentVersion"
+        businessModule="order"
+      ></fast2-attachment-list>
     </span>
     <selectDialog
       ref="materialDialog"
@@ -81,6 +88,12 @@ export default {
   },
   name: 'Detail',
   props: {
+    annexComponentVersion: {
+      type: String,
+      default: () => {
+        return 'attahcment-fiels_4_2';
+      }
+    },
     isEdit: {
       type: Boolean,
       default: false

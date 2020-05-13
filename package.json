@@ -1,6 +1,6 @@
 {
   "name": "inquiry",
-  "version": "0.1.11",
+  "version": "0.2.01",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
@@ -14,7 +14,7 @@
     "axios": "^0.19.0",
     "core-js": "^3.4.4",
     "element-ui": "^2.13.0",
-    "fast2render": "^0.3.3",
+    "fast2render": "^0.3.4",
     "js-cookie": "^2.2.1",
     "js-md5": "^0.7.3",
     "vue": "^2.6.10",

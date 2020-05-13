@@ -122,7 +122,7 @@
 <script>
 import ButtonGroup from '@/common/ButtonGroup';
 import FormHeader from '@/components/formHeader';
-import tabOption from '@/const/order/tabs';
+import { tabOption4Create } from '@/const/order/tabs';
 import fileOption from '@/const/order/newFiles';
 import formOption from '@/const/order/orderForm';
 import materielListOption from '@/const/order/materielList';
@@ -166,7 +166,7 @@ export default {
       dialogSupplierVisible: false,
       dialogPurchaseVisible: false,
       dialogPurchaseGroupVisible: false,
-      tabOption: tabOption,
+      tabOption: tabOption4Create,
       fileOption: fileOption,
       purchaseGroupOption: purchaseGroupOption,
       filesForm: {},
@@ -203,13 +203,13 @@ export default {
           type: 'primary',
           size: 'small',
           action: 'on-save'
-        },
-        {
-          text: '提交审核',
-          type: 'primary',
-          size: 'small',
-          action: 'on-submit'
         }
+        // {
+        //   text: '提交审核',
+        //   type: 'primary',
+        //   size: 'small',
+        //   action: 'on-submit'
+        // }
       ],
       btnOption: [
         {

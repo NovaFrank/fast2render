@@ -10,7 +10,7 @@
       @on-history="handleShowHistory"
       @on-new-supplier="handleNewSupplier"
       @on-open="handleShowOpen"
-      @on-submit-approval="handleSubmit"
+      @on-submit-approval="handleSubmitApproval"
       @on-update-end="handleUpdateQuoteEndTime"
       @show-time-history="handleShowTimeHistory"
     ></form-header>
@@ -148,7 +148,7 @@ import inquiryListOption from '@/const/rfq/newAndView/detailInquiryList';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
 import { getUserInfo, compare } from '@/util/utils.js';
-import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
+import { purchaseEnquiryAction, queryDetailAction, submitAudit } from '@/api/rfq';
 import { dataDicAPI, supplierMasterListAction } from '@/api/rfq/common';
 import history from './history';
 import { validatenull } from '@/util/validate';
@@ -158,6 +158,7 @@ import quoteListOption from '@/const/rfq/newAndView/detailInquiryQuote';
 
 import openDialog from '@/components/views/openDialog';
 import openFormOption from '@/const/rfq/newAndView/openForm';
+import { setStore } from '@/util/store.js';
 
 export default {
   components: {
@@ -357,22 +358,34 @@ export default {
       }
       this.suppliersDialogVisable = true;
     },
-    handleSubmit() {
+    handleSubmitApproval() {
       this.$confirm('是否提交审批？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        const params = {
-          enquiryNumber: this.currentEnquiryNumber,
-          itemList: this.inquiryListOption.data
+        // const params = {
+        //   enquiryNumber: this.currentEnquiryNumber,
+        //   itemList: this.inquiryListOption.data
+        // };
+        // purchaseEnquiryAction('acceptOrRefuse', params).then((res) => {
+        //   if (res.data.statusCode !== '200') {
+        //     this.$message.error(res.data.message);
+        //     return;
+        //   }
+        //   this.$message.success('提交成功');
+        // });
+
+        const action = 'submit';
+        let params = {
+          elsAccount: this.detailObj.elsAccount,
+          toElsAccount: this.detailObj.toElsAccount,
+          businessType: 'bargainEnquiryAudit',
+          businessId: this.detailObj.enquiryNumber,
+          params: '{"key1":"123"}'
         };
-        purchaseEnquiryAction('acceptOrRefuse', params).then((res) => {
-          if (res.data.statusCode !== '200') {
-            this.$message.error(res.data.message);
-            return;
-          }
-          this.$message.success('提交成功');
+        submitAudit(action, params).then((res) => {
+          console.log(res);
         });
       });
     },
@@ -412,6 +425,14 @@ export default {
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
+
+        if (res.data.data.flowCode) {
+          let content = {
+            flowId: res.data.data.flowCode,
+            businessType: 'bargainEnquiryAudit'
+          };
+          setStore({ name: res.data.data.orderNumber, content, type: true });
+        }
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;

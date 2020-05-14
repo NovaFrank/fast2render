@@ -36,3 +36,14 @@ export const materialOrderHistory = (params) =>
     method: 'post',
     data: { ...params }
   });
+
+// 提交审批
+export const submitAudit = (action, params) => {
+  return request({
+    url: `${prefix}/CommonAuditService/${action}`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};

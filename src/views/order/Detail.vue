@@ -201,11 +201,13 @@ export default {
         orderItemArr.push(Number(i.orderItemNumber));
       });
       sessionStorage.setItem('orderItemArr', JSON.stringify(orderItemArr));
-      let content = {
-        flowId: resp.data.data.flowId,
-        businessType: 'orderAudit'
-      };
-      setStore({ name: resp.data.data.orderNumber, content, type: true });
+      if (resp.data.data.flowId) {
+        let content = {
+          flowId: resp.data.data.flowId,
+          businessType: 'orderAudit'
+        };
+        setStore({ name: resp.data.data.orderNumber, content, type: true });
+      }
     },
 
     // 保存表头和表单

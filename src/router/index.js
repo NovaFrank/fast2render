@@ -19,27 +19,27 @@ const routes = [
     name: 'Create'
   },
   {
-    path: '/edit/:id',
+    path: '/edit/:orderNumber',
     component: () => import('@/views/order/Edit'),
     name: 'edit'
   },
   {
-    path: '/detail/:id',
+    path: '/detail/:orderNumber',
     component: () => import('@/views/order/Detail'),
     name: 'detail'
   },
   {
-    path: '/view/:id',
+    path: '/view/:orderNumber',
     component: () => import('@/views/order/View'),
     name: 'view'
   },
   {
-    path: '/back/:id',
+    path: '/back/:orderNumber',
     component: () => import('@/views/order/Back'),
     name: 'Back'
   },
   {
-    path: '/send/:id',
+    path: '/send/:orderNumber',
     component: () => import('@/views/order/Send'),
     name: 'Send'
   },

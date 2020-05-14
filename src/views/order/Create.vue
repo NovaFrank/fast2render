@@ -410,7 +410,7 @@ export default {
         message: '保存成功!'
       });
       const orderNo = res.data.data.orderNumber;
-      this.$router.push({ name: 'edit', params: { id: orderNo + '_' + this.elsAccount } });
+      this.$router.push({ name: 'edit', params: { orderNumber: orderNo } });
       // this.$router.push({ path: '/list' });
     },
     onSaveForm(form) {

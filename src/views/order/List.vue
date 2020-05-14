@@ -61,12 +61,12 @@
       <!-- auditStatus: 0, "审批通过", 1, "未审批", 2, "审批中", 3, "审批拒绝" -->
       <template slot-scope="{ row }" slot="orderNumber">
         <!--back 供方退回 需求池过来不可更改任何东西 新建的订单可修改-日期、数量、价格  -->
-        <!-- <router-link
-          v-if="row.orderStatus === '2'"
-          :to="`back/${row.orderNumber}_${row.elsAccount}`"
+        <router-link
+          v-if="row.orderStatus === '2' && row.sendStatus === '0'"
+          :to="`back/${row.orderNumber}_${row.uuid}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
-        </router-link> -->
+        </router-link>
 
         <!--detail 详情 不可修改 只有返回  -->
         <router-link
@@ -77,25 +77,25 @@
         </router-link>
         <router-link
           v-if="row.orderStatus === '0' && row.sendStatus === '1'"
-          :to="`view/${row.orderNumber}`"
+          :to="`detail/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
           v-if="row.orderStatus === '3' && row.sendStatus === '3'"
-          :to="`view/${row.orderNumber}`"
+          :to="`detail/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
           v-if="row.orderStatus === '2' && row.sendStatus === '1'"
-          :to="`view/${row.orderNumber}`"
+          :to="`detail/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
           v-if="row.orderStatus === '3' && row.sendStatus === '1'"
-          :to="`view/${row.orderNumber}`"
+          :to="`detail/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
@@ -112,7 +112,12 @@
         </router-link>
 
         <!--view 可修改行数据  -->
-
+        <router-link
+          v-if="row.orderStatus === '3' && row.sendStatus === '2'"
+          :to="`view/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
         <!--send 供方确认 发送货通知单  -->
         <router-link v-if="row.auditStatus === '0'" :to="`send/${row.orderNumber}`">
           <el-tag>{{ row.orderNumber }}</el-tag>
@@ -189,7 +194,13 @@ export default {
         params = {
           ...params,
           auditStatus:
-            this.tabActive === 'Pending' ? '0' : this.tabActive === 'Approval' ? '1' : '2'
+            this.tabActive === 'Pending'
+              ? '2'
+              : this.tabActive === 'Approval'
+              ? '0'
+              : this.tabActive === 'Reject'
+              ? '3'
+              : '1'
         };
       }
       const resp = await getOrderList(action, params);

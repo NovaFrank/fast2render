@@ -5,10 +5,9 @@
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
-      @on-send="handleSend"
-      @on-sendprovider="handleSendProvider"
+      @on-send="handleSendProvider"
+      @on-delete="handleDelete"
     ></form-header>
-    <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
@@ -129,11 +128,17 @@ export default {
           size: 'small',
           action: 'on-cancel'
         },
+        // {
+        //   text: '返回需求池',
+        //   type: 'primary',
+        //   size: 'small',
+        //   action: 'on-sendprovider'
+        // },
         {
-          text: '返回需求池',
+          text: '删除',
           type: 'primary',
           size: 'small',
-          action: 'on-sendprovider'
+          action: 'on-delete'
         },
         {
           text: '发送',
@@ -152,7 +157,14 @@ export default {
     this.tableData();
     this.getDicData();
     this.materielListOption.option.header = false;
-    this.materielListOption.option.menu = false;
+    this.formOption.option.detail = true;
+    this.materielListOption.option.column.map((item) => {
+      if (item.prop === 'materialNumber') {
+        console.log(item);
+        item.formslot = false;
+        item.disabled = true;
+      }
+    });
   },
   methods: {
     async getDicData(data) {
@@ -187,19 +199,19 @@ export default {
       const params = {
         elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params.orderNumber,
+        orderNumber: this.$route.params && this.$route.params.orderNumber.split('_')[0],
         ...data
       };
       const params2 = {
         elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params.orderNumber,
+        orderNumber: this.$route.params && this.$route.params.orderNumber.split('_')[0],
         ...data
       };
       const params3 = {
         elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params.orderNumber,
+        orderNumber: this.$route.params && this.$route.params.orderNumber.split('_')[0],
         ...data
       };
       const resp = await getOrderList(action, params);
@@ -376,7 +388,7 @@ export default {
     },
 
     // 返回需求池
-    async handleSend() {
+    async handleDelete() {
       this.$confirm(`确认返回需求池？`, {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -387,7 +399,7 @@ export default {
           let params = {
             elsAccount: this.elsAccount,
             ...this.formOption.obj,
-            uuid: this.$route.params && this.$route.params.id.split('_')[2],
+            uuid: this.$route.params && this.$route.params.orderNumber.split('_')[1],
             orderItemVOList: this.materielListOption.data,
             deliveryPlanVOList: this.planListOption.data
           };

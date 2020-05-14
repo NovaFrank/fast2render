@@ -180,19 +180,19 @@ export default {
       const params = {
         elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params.id,
+        orderNumber: this.$route.params.orderNumber,
         ...data
       };
       const params2 = {
         elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params.id,
+        orderNumber: this.$route.params.orderNumber,
         ...data
       };
       const params3 = {
         elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params.id,
+        orderNumber: this.$route.params.orderNumber,
         ...data
       };
       const resp = await getOrderList(action, params);

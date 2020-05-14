@@ -84,7 +84,7 @@
       :dialogVisible.sync="dialogVisible"
       :title="'添加物料'"
       :column="materialOption.option.column"
-      :elsAccount="elsAccount"
+      :elsAccount="this.elsAccount"
       actionPath="findPageList"
       @save="materialDialogSave"
     ></selectDialog>
@@ -93,7 +93,7 @@
       :dialogVisible.sync="dialogPurchaseVisible"
       :title="'添加采购方负责人'"
       :column="purchaseOption.option.column"
-      :elsAccount="elsAccount"
+      :elsAccount="this.elsAccount"
       actionPath="findPageList"
       @save="purchaseDialogSave"
     ></selectDialog3>
@@ -102,7 +102,7 @@
       :dialogVisible.sync="dialogPurchaseGroupVisible"
       :title="'添加采购组'"
       :column="purchaseGroupOption.option.column"
-      :elsAccount="elsAccount"
+      :elsAccount="this.elsAccount"
       actionPath="findPageList"
       @save="purchaseGroupDialogSave"
     ></selectDialog4>
@@ -248,19 +248,19 @@ export default {
       const params = {
         elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params.id,
+        orderNumber: this.$route.params.orderNumber,
         ...data
       };
       const params2 = {
         elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params.id,
+        orderNumber: this.$route.params.orderNumber,
         ...data
       };
       const params3 = {
         elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params.id,
+        orderNumber: this.$route.params.orderNumber,
         ...data
       };
       const resp = await getOrderList(action, params);

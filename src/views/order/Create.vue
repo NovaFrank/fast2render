@@ -195,9 +195,13 @@ export default {
       headerButtons: [
         {
           text: '返回',
-          type: 'primary',
           size: 'small',
           action: 'on-cancel'
+        },
+        {
+          text: '添加附件',
+          size: 'small',
+          action: 'on-file'
         },
         {
           text: '保存',
@@ -210,12 +214,6 @@ export default {
           type: 'primary',
           size: 'small',
           action: 'on-submit'
-        },
-        {
-          text: '添加附件',
-          type: 'primary',
-          size: 'small',
-          action: 'on-file'
         }
       ],
       btnOption: [

@@ -184,7 +184,6 @@ export default {
       headerButtons: [
         {
           text: '返回',
-          type: 'primary',
           size: 'small',
           action: 'on-cancel'
         },

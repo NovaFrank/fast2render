@@ -81,6 +81,30 @@ export default {
         ]
       },
       {
+        label: '含税单价',
+        prop: 'price',
+        type: 'number',
+        rules: [
+          {
+            required: true,
+            message: '请输入 含税单价',
+            trigger: 'blur'
+          }
+        ]
+      },
+      {
+        label: '总金额',
+        prop: 'totalAmount',
+        type: 'number',
+        rules: [
+          {
+            required: true,
+            message: '请输入 总金额',
+            trigger: 'blur'
+          }
+        ]
+      },
+      {
         label: 'ELS账号',
         prop: 'elsAccount',
         addDisplay: false,
@@ -105,14 +129,6 @@ export default {
             trigger: 'blur'
           }
         ]
-      },
-      {
-        label: '含税价',
-        prop: 'price'
-      },
-      {
-        label: '不含税价',
-        prop: 'noTaxUnitPrice'
       }
     ]
   }

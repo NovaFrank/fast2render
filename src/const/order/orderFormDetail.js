@@ -9,50 +9,74 @@ export default {
         label: '订单单号',
         prop: 'orderNumber',
         span: 6,
-        type: 'input'
+        type: 'input',
+        disabled: true
       },
       {
         label: '订单类型',
         prop: 'orderType',
         span: 6,
-        type: 'select'
+        type: 'select',
+        disabled: true
       },
       {
         label: '采购方负责人',
         prop: 'purchasePerson',
         span: 6,
-        type: 'input'
+        type: 'input',
+        formslot: true,
+        rules: [
+          {
+            required: true
+          }
+        ]
       },
       {
         label: '供应商',
         prop: 'toElsAccount',
         span: 6,
-        type: 'input'
+        type: 'input',
+        disabled: true
       },
       {
         label: '供应商名称',
         prop: 'toElsAccountName',
         span: 6,
-        type: 'input'
+        type: 'input',
+        disabled: true
       },
       {
         label: '采购类别',
         prop: 'purchaseType',
         span: 6,
-        type: 'select'
+        type: 'select',
+        dicData: [],
+        // dicUrl: '/layout/dics/value/purchaseType',
+        // dicMethod: 'get',
+        rules: [
+          {
+            required: true
+          }
+        ]
       },
       {
         label: '采购组',
         prop: 'purchaseGroup',
         span: 6,
-        type: 'input'
+        type: 'input',
+        formslot: true,
+        rules: [
+          {
+            required: true
+          }
+        ]
       },
       {
         label: '订单状态',
         prop: 'orderStatus',
         span: 6,
         type: 'select',
-
+        disabled: true,
         dicData: [
           {
             label: '对方变更退回',
@@ -85,7 +109,7 @@ export default {
         prop: 'sendStatus',
         span: 6,
         type: 'select',
-
+        disabled: true,
         dicData: [
           {
             label: '变更已发送',
@@ -110,7 +134,7 @@ export default {
         prop: 'deliveryStatus',
         span: 6,
         type: 'select',
-
+        disabled: true,
         dicData: [
           {
             label: '超量交收',

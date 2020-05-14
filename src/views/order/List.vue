@@ -46,91 +46,75 @@
       >
         <span>
           {{
-            scope.row.auditStatus === '0'
+            scope.row.auditStatus === '2'
               ? '审批中'
-              : scope.row.auditStatus === '1'
+              : scope.row.auditStatus === '0'
               ? '审批通过'
-              : '审批驳回'
+              : scope.row.auditStatus === '3'
+              ? '审批驳回'
+              : '未审批'
           }}
         </span>
       </template>
       <!-- orderStatus: "0":"对方未确认","1":"对方已确认","2":"对方已退回","3":"变更对方未确认","4":"变更对方确认","5":"对方变更退回" -->
       <!-- sendStatus: "0":"未发送","1":"已发送", "2":"变更未发送","3":"变更已发送" -->
+      <!-- auditStatus: 0, "审批通过", 1, "未审批", 2, "审批中", 3, "审批拒绝" -->
       <template slot-scope="{ row }" slot="orderNumber">
         <!--back 供方退回 需求池过来不可更改任何东西 新建的订单可修改-日期、数量、价格  -->
-        <router-link
-          v-if="row.orderStatus === '2' && row.sendStatus === '2'"
-          :to="`detail/${row.orderNumber}_${row.elsAccount}`"
-        >
-          <el-tag>{{ row.orderNumber }}</el-tag>
-        </router-link>
-        <router-link
-          v-if="row.orderStatus === '3' && row.sendStatus === '2'"
-          :to="`detail/${row.orderNumber}_${row.elsAccount}`"
-        >
-          <el-tag>{{ row.orderNumber }}</el-tag>
-        </router-link>
-        <router-link
-          v-if="row.orderStatus === '2' && row.sendStatus === '0'"
-          :to="`detail/${row.orderNumber}_${row.elsAccount}`"
-        >
-          <el-tag>{{ row.orderNumber }}</el-tag>
-        </router-link>
         <!-- <router-link
           v-if="row.orderStatus === '2'"
           :to="`back/${row.orderNumber}_${row.elsAccount}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link> -->
-        <!--edit 保存未发送 可编辑修改 -->
+
+        <!--detail 详情 不可修改 只有返回  -->
         <router-link
-          v-if="row.orderStatus === '0' && row.sendStatus === '0'"
-          :to="`edit/${row.orderNumber}_${row.elsAccount}`"
+          v-if="row.orderStatus === '0' && row.sendStatus === '0' && row.auditStatus === '2'"
+          :to="`detail/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
-        <!--view 发送未确认 只能查看  -->
         <router-link
           v-if="row.orderStatus === '0' && row.sendStatus === '1'"
-          :to="`view/${row.orderNumber}_${row.elsAccount}`"
+          :to="`view/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
           v-if="row.orderStatus === '3' && row.sendStatus === '3'"
-          :to="`view/${row.orderNumber}_${row.elsAccount}`"
+          :to="`view/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
           v-if="row.orderStatus === '2' && row.sendStatus === '1'"
-          :to="`view/${row.orderNumber}_${row.elsAccount}`"
+          :to="`view/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
           v-if="row.orderStatus === '3' && row.sendStatus === '1'"
-          :to="`view/${row.orderNumber}_${row.elsAccount}`"
+          :to="`view/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
+
+        <!--edit 保存未发送 可编辑修改 -->
+        <router-link
+          v-if="row.orderStatus === '0' && row.sendStatus === '0' && row.auditStatus === '1'"
+          :to="`edit/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link v-if="row.auditStatus === '3'" :to="`edit/${row.orderNumber}`">
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+
+        <!--view 可修改行数据  -->
+
         <!--send 供方确认 发送货通知单  -->
-        <router-link
-          v-if="row.orderStatus === '4' && row.sendStatus === '3'"
-          :to="`send/${row.orderNumber}_${row.elsAccount}`"
-        >
-          <el-tag>{{ row.orderNumber }}</el-tag>
-        </router-link>
-        <router-link
-          v-if="row.orderStatus === '1' && row.sendStatus === '1'"
-          :to="`send/${row.orderNumber}_${row.elsAccount}`"
-        >
-          <el-tag>{{ row.orderNumber }}</el-tag>
-        </router-link>
-        <router-link
-          v-if="row.orderStatus === '4' && row.sendStatus === '1'"
-          :to="`send/${row.orderNumber}_${row.elsAccount}`"
-        >
+        <router-link v-if="row.auditStatus === '0'" :to="`send/${row.orderNumber}`">
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
       </template>

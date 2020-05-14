@@ -21,17 +21,17 @@ const routes = [
   {
     path: '/edit/:id',
     component: () => import('@/views/order/Edit'),
-    name: 'Edit'
+    name: 'edit'
   },
   {
     path: '/detail/:id',
     component: () => import('@/views/order/Detail'),
-    name: 'Detail'
+    name: 'detail'
   },
   {
     path: '/view/:id',
     component: () => import('@/views/order/View'),
-    name: 'View'
+    name: 'view'
   },
   {
     path: '/back/:id',

@@ -19,6 +19,15 @@
           ></i>
         </el-input>
       </template>
+      <template slot="purchaseGroup">
+        <el-input v-model="formOption.obj.purchaseGroup" :readonly="true">
+          <i
+            slot="suffix"
+            class=" el-input_icon el-icon-search pointer"
+            @click="purchaseGroupDialogOpen"
+          ></i>
+        </el-input>
+      </template>
     </avue-form>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
@@ -88,27 +97,39 @@
       actionPath="findPageList"
       @save="purchaseDialogSave"
     ></selectDialog3>
+    <selectDialog4
+      ref="purchaseGroupDialog"
+      :dialogVisible.sync="dialogPurchaseGroupVisible"
+      :title="'添加采购组'"
+      :column="purchaseGroupOption.option.column"
+      :elsAccount="elsAccount"
+      actionPath="findPageList"
+      @save="purchaseGroupDialogSave"
+    ></selectDialog4>
   </basic-container>
 </template>
 
 <script>
 import FormHeader from '@/components/formHeader';
 import tabOption from '@/const/order/tabs';
-import formOption from '@/const/order/detail';
+import formOption from '@/const/order/orderFormDetail';
 import fileOption from '@/const/order/newFiles';
 import purchaseOption from '@/const/order/purchaseList';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielList';
+import purchaseGroupOption from '@/const/order/purchaseGroupList';
 import { getOrderList, getDataDic, createOrder, submitAudit } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import selectDialog3 from '@/common/selectDialog3';
+import selectDialog4 from '@/common/selectDialog4';
 import { getUserInfo } from '@/util/utils.js';
 export default {
   components: {
     FormHeader,
     selectDialog,
-    selectDialog3
+    selectDialog3,
+    selectDialog4
   },
   name: 'Detail',
   props: {
@@ -131,13 +152,10 @@ export default {
     return {
       elsAccount: '',
       elsSubAccount: '',
-      inputParamJson: {
-        // 业务类型转换传入的值
-        itemList: []
-      },
       tabOption: tabOption,
       tabActive: {},
       fileOption: fileOption,
+      purchaseGroupOption: purchaseGroupOption,
       filesForm: {},
       materielListOption: materielListOption,
       params: {
@@ -156,47 +174,13 @@ export default {
       },
       dialogVisible: false,
       dialogPurchaseVisible: false,
+      dialogPurchaseGroupVisible: false,
       materialOption: materialOption,
       purchaseOption: purchaseOption,
       formOption: formOption,
       planListOption: planListOption,
       crudObj: {},
       crudOption: {},
-      uploadObj: {},
-      uploadData: [],
-      uploadCrudOption: {
-        dialogDirection: 'rtl',
-        dialogType: 'drawer',
-        border: true,
-        stripe: true,
-        page: false,
-        addBtn: true,
-        align: 'center',
-        menuAlign: 'center',
-        menuWidth: '180',
-        column: [
-          {
-            label: '文件ID',
-            prop: 'profileID'
-          },
-          {
-            label: '创建者',
-            prop: 'creator'
-          },
-          {
-            label: '创建人',
-            prop: 'createPeople'
-          },
-          {
-            label: '文件类型',
-            prop: 'fileType'
-          },
-          {
-            label: '行项目号',
-            prop: 'lineNumber'
-          }
-        ]
-      },
       headerButtons: [
         {
           text: '返回',
@@ -262,21 +246,21 @@ export default {
       const action2 = 'findOrderItemList';
       const action3 = 'findDeliveryPlanList';
       const params = {
-        elsAccount: this.$route.params && this.$route.params.id.split('_')[1],
+        elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params && this.$route.params.id.split('_')[0],
+        orderNumber: this.$route.params.id,
         ...data
       };
       const params2 = {
-        elsAccount: this.$route.params && this.$route.params.id.split('_')[1],
+        elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params && this.$route.params.id.split('_')[0],
+        orderNumber: this.$route.params.id,
         ...data
       };
       const params3 = {
-        elsAccount: this.$route.params && this.$route.params.id.split('_')[1],
+        elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params && this.$route.params.id.split('_')[0],
+        orderNumber: this.$route.params.id,
         ...data
       };
       const resp = await getOrderList(action, params);
@@ -394,6 +378,33 @@ export default {
     },
     // 保存表头和表单
     async handleSave() {
+      if (this.materielListOption.data.length === 0) {
+        alert('请添加一条数据！');
+        return false;
+      }
+      this.tabActive = this.tabOption.option.column[2];
+      this.handleTabClick(this.tabActive);
+      const action = 'updateOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
+      await createOrder(action, params);
+      this.$message({
+        type: 'success',
+        message: '修改成功!'
+      });
+      this.$router.push({ path: '/list' });
+    },
+    // 提交审批
+    async handleSubmit() {
+      if (this.materielListOption.data.length === 0) {
+        alert('请添加一条数据！');
+        return false;
+      }
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
       const action = 'updateOrder';
@@ -406,28 +417,21 @@ export default {
       };
       console.log('params: ' + JSON.stringify(params.orderItemVOList));
       await createOrder(action, params);
-      this.$message({
-        type: 'success',
-        message: '修改成功!'
-      });
-      this.$router.push({ path: '/list' });
-    },
-    // 提交审批
-    async handleSubmit() {
-      const action = 'submit';
-      let params = {
-        elsSubAccount: this.elsAccount,
+
+      const action2 = 'submit';
+      let params2 = {
+        elsAccount: this.elsAccount,
         toElsAccount: this.formOption.obj.toElsAccount,
         businessType: 'orderAudit',
         businessId: this.formOption.obj.orderNumber,
         params: '{"key1":"123"}'
       };
-      console.log('params: ' + JSON.stringify(params));
-      await submitAudit(action, params);
+      // console.log('params: ' + JSON.stringify(params2));
+      await submitAudit(action2, params2);
       // console.log('params: ' + JSON.stringify(resp));
       this.$message({
         type: 'success',
-        message: '提交审批成功!'
+        message: '已提交审批!'
       });
       this.$router.push({ path: '/list' });
     },
@@ -489,6 +493,14 @@ export default {
       if (selectColumns.length !== 0) {
         this.formOption.obj.purchasePerson =
           selectColumns[0].elsSubAccount + '_' + selectColumns[0].name;
+      }
+    },
+    purchaseGroupDialogOpen() {
+      this.dialogPurchaseGroupVisible = true;
+    },
+    purchaseGroupDialogSave(selectColumns) {
+      if (selectColumns.length !== 0) {
+        this.formOption.obj.purchaseGroup = selectColumns[0].orgCategoryDesc;
       }
     }
   }

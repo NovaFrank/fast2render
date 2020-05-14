@@ -1,9 +1,5 @@
 import axios from './request';
-// import { getUserInfo } from '@/util/utils.js';
 let baseUrl = '/apis';
-// const userInfo = getUserInfo();
-// const elsAccount = userInfo.elsAccount;
-// const elsSubAccount = userInfo.elsSubAccount;
 // 获取登录信息
 export const login = (params) => {
   return axios({
@@ -49,7 +45,6 @@ export const getOrderList = (action, params) => {
     url: `${baseUrl}/order/PurchaseOrderService/${action}`,
     method: 'post',
     data: {
-      // elsAccount: elsAccount,
       ...params
     }
   });
@@ -61,7 +56,6 @@ export const createOrder = (action, params) => {
     url: `${baseUrl}/order/PurchaseOrderService/${action}`,
     method: 'post',
     data: {
-      // elsAccount: elsAccount,
       ...params
     }
   });
@@ -81,7 +75,6 @@ export const getPurchasePerson = (action, params) => {
     url: `${baseUrl}/ElsAccountService/${action}`,
     method: 'post',
     data: {
-      // elsAccount: elsAccount,
       ...params
     }
   });

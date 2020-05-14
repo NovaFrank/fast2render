@@ -5,9 +5,6 @@
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
-      @on-submit="handleRelease"
-      @on-save="handleSave"
-      @on-sendProvider="handleSendProvider"
     ></form-header>
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
@@ -48,15 +45,8 @@
       </avue-crud>
     </span>
     <span v-if="tabActive.prop === 'files'">
-      <!-- <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
-      </avue-crud> -->
-      <fast2-attachment-list
-        :id="formOption.obj.orderNumber"
-        :elsAccount="elsAccount"
-        :businessElsAccount="formOption.obj.elsAccount"
-        :version="annexComponentVersion"
-        businessModule="order"
-      ></fast2-attachment-list>
+      <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
+      </avue-crud>
     </span>
     <selectDialog
       ref="materialDialog"
@@ -77,10 +67,11 @@ import formOption from '@/const/order/detail';
 import fileOption from '@/const/order/files';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
-import materielListOption from '@/const/order/materielListDetail';
+import materielListOption from '@/const/order/materielList';
 import { getOrderList, dataDicAPI, createOrder } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import { getUserInfo } from '@/util/utils.js';
+import { setStore } from '@/util/store.js';
 export default {
   components: {
     FormHeader,
@@ -88,12 +79,6 @@ export default {
   },
   name: 'Detail',
   props: {
-    annexComponentVersion: {
-      type: String,
-      default: () => {
-        return 'attahcment-fiels_4_2';
-      }
-    },
     isEdit: {
       type: Boolean,
       default: false
@@ -142,36 +127,6 @@ export default {
           type: 'primary',
           size: 'small',
           action: 'on-cancel'
-        },
-        // {
-        //   text: '撤回',
-        //   type: 'primary',
-        //   size: 'small',
-        //   action: 'on-reset'
-        // },
-        {
-          text: '发送',
-          type: 'primary',
-          size: 'small',
-          action: 'on-sendProvider'
-        },
-        // {
-        //   text: '发送货通知单',
-        //   type: 'primary',
-        //   size: 'small',
-        //   action: 'on-sendMenu'
-        // },
-        {
-          text: '保存',
-          type: 'primary',
-          size: 'small',
-          action: 'on-save'
-        },
-        {
-          text: '提交审批',
-          type: 'primary',
-          size: 'small',
-          action: 'on-submit'
         }
       ]
     };
@@ -183,6 +138,9 @@ export default {
     this.tabActive = this.tabOption.option.column[0];
     this.tableData();
     this.getDicData();
+    this.materielListOption.option.header = false;
+    this.materielListOption.option.menu = false;
+    this.formOption.option.detail = true;
   },
   methods: {
     async getDicData(data) {
@@ -215,21 +173,21 @@ export default {
       const action2 = 'findOrderItemList';
       const action3 = 'findDeliveryPlanList';
       const params = {
-        elsAccount: this.$route.params && this.$route.params.id.split('_')[1],
+        elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params && this.$route.params.id.split('_')[0],
+        orderNumber: this.$route.params.id,
         ...data
       };
       const params2 = {
-        elsAccount: this.$route.params && this.$route.params.id.split('_')[1],
+        elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params && this.$route.params.id.split('_')[0],
+        orderNumber: this.$route.params.id,
         ...data
       };
       const params3 = {
-        elsAccount: this.$route.params && this.$route.params.id.split('_')[1],
+        elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params && this.$route.params.id.split('_')[0],
+        orderNumber: this.$route.params.id,
         ...data
       };
       const resp = await getOrderList(action, params);
@@ -243,6 +201,11 @@ export default {
         orderItemArr.push(Number(i.orderItemNumber));
       });
       sessionStorage.setItem('orderItemArr', JSON.stringify(orderItemArr));
+      let content = {
+        flowId: resp.data.data.flowId,
+        businessType: 'orderAudit'
+      };
+      setStore({ name: resp.data.data.orderNumber, content, type: true });
     },
 
     // 保存表头和表单
@@ -263,7 +226,7 @@ export default {
             orderItemVOList: this.materielListOption.data,
             deliveryPlanVOList: this.planListOption.data
           };
-          console.log('params: ' + JSON.stringify(params));
+          // console.log('params: ' + JSON.stringify(params));
           return createOrder(action, params);
         })
         .then(() => {
@@ -271,7 +234,7 @@ export default {
             type: 'success',
             message: '修改成功!'
           });
-          // this.$router.push({ path: '/list' });
+          this.$router.push({ path: '/list' });
         });
     },
 
@@ -279,19 +242,9 @@ export default {
     handleTabClick(value) {
       this.tabActive = value;
       console.log(this.tabActive.prop);
-      sessionStorage.setItem('materialRow', JSON.stringify(this.materielListOption.data));
+
       if (this.tabActive.prop === 'plan') {
-        let sessionCateCode = sessionStorage.getItem('materialRow');
-        this.planListOption.data = JSON.parse(sessionCateCode);
-        this.planListOption.data.forEach((item) => {
-          JSON.parse(sessionCateCode).forEach((i) => {
-            if (i.orderItemNumber === item.orderItemNumber) {
-              item.requestDeliveryDate = i.deliveryDate;
-              item.requestDeliveryQuantity = i.quantity;
-              item.deliveryItemNumber = '1';
-            }
-          });
-        });
+        this.tableData();
       }
     },
     // 删除行数据
@@ -393,9 +346,7 @@ export default {
     handleCancel() {
       this.$router.push({ path: '/list' });
     },
-    handleRelease() {
-      alert('进行中...');
-    },
+    handleRelease() {},
     onSaveForm(form) {
       // todo
     },

@@ -178,21 +178,21 @@ export default {
       const action2 = 'findOrderItemList';
       const action3 = 'findDeliveryPlanList';
       const params = {
-        elsAccount: this.$route.params && this.$route.params.id.split('_')[1],
+        elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params && this.$route.params.id.split('_')[0],
+        orderNumber: this.$route.params.id,
         ...data
       };
       const params2 = {
-        elsAccount: this.$route.params && this.$route.params.id.split('_')[1],
+        elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params && this.$route.params.id.split('_')[0],
+        orderNumber: this.$route.params.id,
         ...data
       };
       const params3 = {
-        elsAccount: this.$route.params && this.$route.params.id.split('_')[1],
+        elsAccount: this.elsAccount,
         orderStatus: '',
-        orderNumber: this.$route.params && this.$route.params.id.split('_')[0],
+        orderNumber: this.$route.params.id,
         ...data
       };
       const resp = await getOrderList(action, params);

@@ -5,8 +5,9 @@
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
-      @on-submit="handleSubmit"
       @on-save="handleSave"
+      @on-file="handleFile"
+      @on-submit="handleSubmit"
     ></form-header>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form">
@@ -203,13 +204,19 @@ export default {
           type: 'primary',
           size: 'small',
           action: 'on-save'
+        },
+        {
+          text: '提交审核',
+          type: 'primary',
+          size: 'small',
+          action: 'on-submit'
+        },
+        {
+          text: '添加附件',
+          type: 'primary',
+          size: 'small',
+          action: 'on-file'
         }
-        // {
-        //   text: '提交审核',
-        //   type: 'primary',
-        //   size: 'small',
-        //   action: 'on-submit'
-        // }
       ],
       btnOption: [
         {
@@ -255,6 +262,10 @@ export default {
       }
     },
     itemAdd() {
+      if (!this.formOption.obj.toElsAccount) {
+        alert('请选择供应商！');
+        return false;
+      }
       this.$refs.crud.rowAdd();
     },
 
@@ -303,10 +314,6 @@ export default {
       }
       done();
     },
-    // onLoadPlan() {
-    //   let sessionCateCode = sessionStorage.getItem('materialRow');
-    //   console.log('this.params.addList2:' + sessionCateCode);
-    // },
     rowSavePlan(row, done, loading) {
       // 保存新增的数据
       if (this.crudPlanData === undefined) {
@@ -335,30 +342,35 @@ export default {
       this.$router.push({ path: '/list' });
     },
     // 提交审批
-    // async handleSubmit() {
-    //   this.tabActive = this.tabOption.option.column[2];
-    //   this.handleTabClick(this.tabActive);
-    //   const action = 'submit';
-    //   let params = {
-    //     elsSubAccount: this.elsAccount,
-    //     toElsAccount: this.formOption.obj.toElsAccount,
-    //     businessType: "orderAudit",
-    //     businessId: "FI订单号",
-    //     params: "{\"key1\":\"123\"}"
-    //   };
-    //   console.log('params: ' + JSON.stringify(params));
-    //   await submitAudit(action, params);
-    //   // console.log('params: ' + JSON.stringify(resp));
-    //   this.$message({
-    //     type: 'success',
-    //     message: '提交审批成功!'
-    //   });
-    //   this.$router.push({ path: '/list' });
-    // },
+    async handleSubmit() {
+      alert('请先保存！');
+      // this.tabActive = this.tabOption.option.column[2];
+      // this.handleTabClick(this.tabActive);
+      // const action = 'submit';
+      // let params = {
+      //   elsSubAccount: this.elsAccount,
+      //   toElsAccount: this.formOption.obj.toElsAccount,
+      //   businessType: "orderAudit",
+      //   businessId: "FI订单号",
+      //   params: "{\"key1\":\"123\"}"
+      // };
+      // console.log('params: ' + JSON.stringify(params));
+      // await submitAudit(action, params);
+      // // console.log('params: ' + JSON.stringify(resp));
+      // this.$message({
+      //   type: 'success',
+      //   message: '提交审批成功!'
+      // });
+      // this.$router.push({ path: '/list' });
+    },
 
-    // 保存
+    // 保存 跳转到list
     async handleSave() {
-      this.tabActive = this.tabOption.option.column[2];
+      if (this.materielListOption.data.length === 0) {
+        alert('请添加一条数据！');
+        return false;
+      }
+      this.tabActive = this.tabOption.option.column[1];
       this.handleTabClick(this.tabActive);
       const action = 'createOrder';
       let params = {
@@ -369,13 +381,36 @@ export default {
         deliveryPlanVOList: this.planListOption.data
       };
       // console.log('params: ' + JSON.stringify(params));
+      await createOrder(action, params);
+      this.$message({
+        type: 'success',
+        message: '保存成功!'
+      });
+      this.$router.push({ path: '/list' });
+    },
+    // 添加附件 保存跳转到list
+    async handleFile() {
+      if (this.materielListOption.data.length === 0) {
+        alert('请添加一条数据！');
+        return false;
+      }
+      this.tabActive = this.tabOption.option.column[1];
+      this.handleTabClick(this.tabActive);
+      const action = 'createOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
       const res = await createOrder(action, params);
       this.$message({
         type: 'success',
         message: '保存成功!'
       });
-      const orderNo = res.data.data.enquiryNumber;
-      this.$router.push({ path: '/edit', query: { orderNo } });
+      const orderNo = res.data.data.orderNumber;
+      this.$router.push({ name: 'edit', params: { id: orderNo + '_' + this.elsAccount } });
       // this.$router.push({ path: '/list' });
     },
     onSaveForm(form) {

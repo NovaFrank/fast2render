@@ -145,14 +145,18 @@ export default {
         dicData: [
           {
             label: '审批驳回',
-            value: '2'
-          },
-          {
-            label: '审批通过',
-            value: '1'
+            value: '3'
           },
           {
             label: '审批中',
+            value: '2'
+          },
+          {
+            label: '未审批',
+            value: '1'
+          },
+          {
+            label: '审批通过',
             value: '0'
           }
         ]

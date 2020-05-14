@@ -23,6 +23,8 @@
               ? '未发布'
               : scope.row.itemStatus === '1'
               ? '报价中'
+              : scope.row.itemStatus === '2'
+              ? '已报价'
               : ['4', '5'].includes(scope.row.itemStatus)
               ? '定价'
               : scope.row.itemStatus === '6'
@@ -40,6 +42,7 @@ import tabOption from '@/const/rfq/supplierClient/navTabs';
 import tableOption from '@/const/rfq/supplierClient/index';
 import { postAction } from '@/api/rfq/supplierClient';
 import { getSupplierInfo } from '@/util/utils.js';
+import { dataDicAPI } from '@/api/rfq/common';
 
 export default {
   components: {},
@@ -57,6 +60,7 @@ export default {
     const userInfo = getSupplierInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
+    this.initDicData();
     this.tableData();
   },
   watch: {
@@ -96,6 +100,32 @@ export default {
         total: 0,
         pageSize: 10
       };
+    },
+    initDicData() {
+      // 询价类型 数据字典（临时），最好写option dicUrl
+      dataDicAPI('enquiryType').then((res) => {
+        this.tableOption.option.column = this.tableOption.option.column.map((item) => {
+          if (item.prop === 'enquiryType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 报价方式 数据字典（临时），最好写option dicUrl
+      dataDicAPI('quoteMethod').then((res) => {
+        this.tableOption.option.column = this.tableOption.option.column.map((item) => {
+          if (item.prop === 'quoteMethod') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
     },
     sizeChange(val) {
       this.tableOption.page.pageSize = val;

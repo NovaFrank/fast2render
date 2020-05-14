@@ -36,18 +36,10 @@ export default {
         prop: 'baseUnit',
         span: 4
       },
-      // {
-      //   label: '要求交期',
-      //   prop: 'requireTime'
-      // },
-      // {
-      //   label: '需求数量',
-      //   prop: 'count'
-      // },
-      // {
-      //   label: 'ELS账号',
-      //   prop: 'elsAccount'
-      // },
+      {
+        label: '需求数量',
+        prop: 'quantity'
+      },
       {
         label: '供应商',
         prop: 'toElsAccountList'

@@ -33,12 +33,15 @@ export default {
         span: 4
       },
       {
+        type: 'date',
+        format: 'yyyy-MM-dd',
+        valueFormat: 'timestamp',
         label: '要求交期',
-        prop: 'requireTime'
+        prop: 'deliveryDate'
       },
       {
         label: '需求数量',
-        prop: 'count'
+        prop: 'quantity'
       },
       {
         type: 'date',

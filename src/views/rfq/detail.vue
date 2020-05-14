@@ -466,7 +466,7 @@ export default {
           taxRate: '',
           priceIncludingTax: '',
           quota: '',
-          ladderPriceJson: this.currentDetailItem.ladderPriceJson || '',
+          ladderPriceJson: this.currentDetailItem.ladderPriceJson || null,
           $cellEdit: false
         };
       });

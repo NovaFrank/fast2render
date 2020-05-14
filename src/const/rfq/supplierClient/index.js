@@ -26,30 +26,41 @@ export default {
         label: '询价单号',
         prop: 'enquiryNumber'
       },
-      // {
-      //   label: '询价类型',
-      //   prop: 'enquiryType'
-      // },
+      {
+        label: '询价类型',
+        prop: 'enquiryType'
+      },
+      {
+        label: '物料编号',
+        prop: 'materialNumber'
+      },
       {
         label: '物料描述',
         prop: 'materialDesc'
       },
       {
+        dicUrl: '/layout/dics/value/enquiryMethod',
+        dicMethod: 'get',
+        type: 'select',
+        label: '报价方式',
+        prop: 'quoteMethod'
+      },
+      {
         label: '需求数量',
         prop: 'quantity'
       },
-      // {
-      //   type: 'date',
-      //   format: 'yyyy-MM-dd',
-      //   label: '询价日期',
-      //   prop: 'beginDate'
-      // },
-      // {
-      //   type: 'datetime',
-      //   format: 'yyyy-MM-dd HH:mm:ss',
-      //   label: '截止时间',
-      //   prop: 'quoteEndTime'
-      // },
+      {
+        type: 'date',
+        format: 'yyyy-MM-dd',
+        label: '询价日期',
+        prop: 'createDate'
+      },
+      {
+        type: 'datetime',
+        format: 'yyyy-MM-dd HH:mm:ss',
+        label: '截止时间',
+        prop: 'quoteEndTime'
+      },
       {
         label: '采购负责人',
         prop: 'createUser'

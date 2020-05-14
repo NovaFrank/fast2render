@@ -172,7 +172,7 @@ export default {
       },
       fieldDialogVisible: false,
       dialogTitle: '',
-      dialogWidth: '50%',
+      dialogWidth: '70%',
       dialogOption: fieldDialogOption, // 询价明细 表单option
       // 供应商选择框
       suppliersDialogVisable: false,
@@ -247,6 +247,35 @@ export default {
       });
     },
     handleAddShow(title, row) {
+      // 币别
+      dataDicAPI('currency').then((res) => {
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
+          if (item.prop === 'currency') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 币别
+      dataDicAPI('taxRate').then((res) => {
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
+          if (item.prop === 'taxCode') {
+            return {
+              ...item,
+              dicData: res.data.map((item) => {
+                return {
+                  label: `${item.value}`,
+                  value: `${item.label}_${item.value}`
+                };
+              })
+            };
+          }
+          return item;
+        });
+      });
       this.fieldDialogForm = title === '添加' ? {} : row;
       this.dialogTitle = `${title}询价明细`;
       this.fieldDialogVisible = true;
@@ -533,18 +562,6 @@ export default {
       // });
     },
     tableData(data) {
-      // 币别
-      dataDicAPI('currency').then((res) => {
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'currency') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
       // 组织列表（公司）
       orgList().then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {

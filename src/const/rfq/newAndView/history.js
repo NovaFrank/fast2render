@@ -51,8 +51,8 @@ export default {
       },
       {
         type: 'date',
-        format: 'yyyy-MM-dd hh:MM',
-        valueFormat: 'yyyy-MM-dd hh:MM',
+        format: 'yyyy-MM-dd HH:mm:ss',
+        valueFormat: 'timestamp',
         label: '报价时间',
         prop: 'createDate'
       }

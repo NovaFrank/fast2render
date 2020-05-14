@@ -57,7 +57,7 @@
       </template>
       <template slot-scope="scope" slot="menu">
         <el-button
-          v-if="scope.row.noQuoted !== 'N'"
+          v-if="scope.row.noQuoted !== 'N' && ['1', '3'].includes(scope.row.itemStatus)"
           @click.stop="handleQuoteRow(scope)"
           class="el-button el-button--text el-button--small"
         >
@@ -191,7 +191,7 @@ export default {
         this.fieldDialogForm = {
           index: scope.index,
           taxRate: scope.row.taxRate,
-          ladderPriceJson: scope.row.ladderPriceJson,
+          ladderPriceJson: scope.row.ladderPriceJson || null,
           remark: scope.row.remark || ''
         };
         this.ladderQuoteVisible = true;
@@ -301,7 +301,11 @@ export default {
     // 行信息 - 阶梯报价保存
     onSaveLadderForm(form) {
       this.ladderQuoteVisible = false;
-      this.$set(this.inquiryListOption.data[form.index], 'ladderPriceJson', form.ladderPriceJson);
+      this.$set(
+        this.inquiryListOption.data[form.index],
+        'ladderPriceJson',
+        form.ladderPriceJson || null
+      );
       this.$set(this.inquiryListOption.data[form.index], 'remark', form.remark);
     },
     sizeChange(val) {

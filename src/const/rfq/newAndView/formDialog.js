@@ -21,13 +21,7 @@ export default {
       type: 'tree',
       label: '物料编号',
       prop: 'materialNumber',
-      rules: [
-        {
-          required: true,
-          message: '请选择物料编号',
-          trigger: 'blur'
-        }
-      ]
+      rules: [{ required: true, message: '请选择物料编号', trigger: 'blur' }]
     },
     // {
     //   label: '物料名称',
@@ -47,7 +41,8 @@ export default {
     },
     {
       label: '需求数量',
-      prop: 'quantity'
+      prop: 'quantity',
+      rules: [{ required: true, message: '请填写需求数量', trigger: 'change' }]
     },
     {
       type: 'date',
@@ -58,12 +53,16 @@ export default {
       rules: [{ trigger: 'change', validator: validateDateTime }]
     },
     {
+      dicUrl: '/layout/dics/value/taxCode',
+      dicMethod: 'get',
+      type: 'select',
       label: '税码',
       prop: 'taxCode'
     },
     {
       label: '税率',
       prop: 'taxRate',
+      disabled: true,
       rules: [{ trigger: 'blur', validator: validateTaxRate }]
     },
     {
@@ -76,7 +75,8 @@ export default {
       dicMethod: 'get',
       type: 'select',
       label: '报价方式',
-      prop: 'quoteMethod' // 0、1
+      prop: 'quoteMethod', // 0、1
+      rules: [{ required: true, message: '请选择报价方式', trigger: 'change' }]
     },
     {
       span: 24,

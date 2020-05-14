@@ -88,6 +88,10 @@ export default {
     field(newVal) {
       this.form = newVal;
       this.ladderOption.data = JSON.parse(newVal.ladderPriceJson) || [];
+    },
+    'form.taxCode'(newVal) {
+      console.log(newVal);
+      this.form.taxRate = newVal.split('_')[0];
     }
   },
   methods: {
@@ -109,11 +113,15 @@ export default {
       this.$emit('show-supplier-select');
     },
     handleSubmit() {
+      if (this.form.quoteMethod === '1') {
+        if (this.ladderOption.data.length === 0) {
+          this.$message.error('请添加阶梯数量');
+          return;
+        }
+        this.form.ladderPriceJson = this.ladderOption.data;
+      }
       this.$refs.form.validate((valid) => {
         if (valid) {
-          if (this.form.quoteMethod === '1') {
-            this.form.ladderPriceJson = this.ladderOption.data;
-          }
           this.$emit('on-save-form', this.form);
         }
       });

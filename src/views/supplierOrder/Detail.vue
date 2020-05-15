@@ -153,6 +153,8 @@ export default {
     this.tabActive = this.tabOption.option.column[0];
     this.tableData();
     this.getDicData();
+    this.formOption.option.detail = true;
+    this.formOption.obj.salePerson = '1001';
   },
   methods: {
     async getDicData(data) {

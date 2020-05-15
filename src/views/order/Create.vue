@@ -210,7 +210,7 @@ export default {
           action: 'on-save'
         },
         {
-          text: '提交审核',
+          text: '提交审批',
           type: 'primary',
           size: 'small',
           action: 'on-submit'

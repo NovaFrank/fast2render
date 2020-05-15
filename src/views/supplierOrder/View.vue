@@ -1,7 +1,7 @@
 <template>
   <basic-container>
     <form-header
-      titleText="已确认订单预览"
+      titleText="订单预览"
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
@@ -145,6 +145,8 @@ export default {
     this.tabActive = this.tabOption.option.column[0];
     this.tableData();
     this.getDicData();
+    this.formOption.option.detail = true;
+    this.formOption.obj.salePerson = '1001';
   },
   methods: {
     async getDicData(data) {

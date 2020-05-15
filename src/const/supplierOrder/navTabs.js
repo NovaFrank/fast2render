@@ -12,6 +12,10 @@ export default {
       {
         label: '已确认',
         prop: 'Approval'
+      },
+      {
+        label: '已退回',
+        prop: 'Reject'
       }
     ]
   }

@@ -13,7 +13,7 @@
       ref="crud"
     >
       <template
-        v-if="['All', 'UnApproval', 'Approval'].includes(tabActive)"
+        v-if="['All', 'UnApproval', 'Approval', 'Reject'].includes(tabActive)"
         slot-scope="scope"
         slot="status"
       >
@@ -21,9 +21,11 @@
           {{
             scope.row.orderStatus === ''
               ? '全部'
-              : scope.row.orderStatus === '0'
+              : scope.row.orderStatus === '0' || '3'
               ? '未确认'
-              : '已确认'
+              : scope.row.orderStatus === '1' || '4'
+              ? '已确认'
+              : '已退回'
           }}
         </span>
       </template>
@@ -92,14 +94,17 @@ export default {
         elsAccount: this.elsAccount,
         ...data
       };
-      if (
-        ['All', 'UnApproval', 'Approval', 'ProviderChanged', 'ProviderApproval'].includes(
-          this.tabActive
-        )
-      ) {
+      if (['All', 'UnApproval', 'Approval', 'Reject'].includes(this.tabActive)) {
         params = {
           ...params,
-          orderStatus: this.tabActive === 'All' ? '' : this.tabActive === 'UnApproval' ? '0' : '1'
+          orderStatus:
+            this.tabActive === 'All'
+              ? ''
+              : this.tabActive === 'UnApproval'
+              ? '0' || '3'
+              : this.tabActive === 'Approval'
+              ? '1' || '4'
+              : '2' || '5'
         };
       }
       const resp = await getOrderList(action, params);

@@ -58,7 +58,8 @@ export default {
         label: '供应商名称',
         prop: 'toElsAccountName',
         span: 6,
-        type: 'input'
+        type: 'input',
+        disabled: true
       },
       {
         label: '采购类别',

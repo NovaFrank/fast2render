@@ -51,6 +51,22 @@ export default {
         disabled: true,
         dicData: [
           {
+            label: '变更退回',
+            value: '5'
+          },
+          {
+            label: '变更已确认',
+            value: '4'
+          },
+          {
+            label: '变更未确认',
+            value: '3'
+          },
+          {
+            label: '已退回',
+            value: '2'
+          },
+          {
             label: '已确认',
             value: '1'
           },

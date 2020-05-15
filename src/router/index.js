@@ -44,6 +44,11 @@ const routes = [
     name: 'Send'
   },
   {
+    path: '/sendToProvider/:orderNumber',
+    component: () => import('@/views/order/sendToProvider'),
+    name: 'Send'
+  },
+  {
     path: '/supplier/orderList',
     name: 'orderList',
     component: () => import('@/views/supplierOrder/List')

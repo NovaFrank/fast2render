@@ -118,8 +118,15 @@
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
+        <!--sendtoprovider-->
+        <router-link v-if="row.auditStatus === '0'" :to="`sendToProvider/${row.orderNumber}`">
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
         <!--send 供方确认 发送货通知单  -->
-        <router-link v-if="row.auditStatus === '0'" :to="`send/${row.orderNumber}`">
+        <router-link
+          v-if="row.orderStatus === '1' && row.orderStatus === '4'"
+          :to="`send/${row.orderNumber}`"
+        >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
       </template>

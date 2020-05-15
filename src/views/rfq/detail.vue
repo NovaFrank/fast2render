@@ -30,9 +30,9 @@
     <fast2-attachment-list
       :id="detailObj.enquiryNumber"
       :elsAccount="elsAccount"
-      :businessElsAccount="elsAccount"
+      :businessElsAccount="detailObj.elsAccount"
       businessModule="enquiry"
-      :menu="false"
+      :readonly="true"
       v-if="tabActive === 'files'"
     ></fast2-attachment-list>
     <!-- <avue-crud
@@ -118,7 +118,11 @@
       </template>
     </avue-crud>
     <!-- 报价历史记录 -->
-    <history :dialogVisible="historyVisible" :data="historyList"></history>
+    <history
+      :dialogVisible="historyVisible"
+      :data="historyList"
+      :quoteMethodData="quoteMethodData"
+    ></history>
     <!-- 新供应商选择 -->
     <select-supplier-dialog
       ref="suppliersDialog"
@@ -200,6 +204,7 @@ export default {
       ],
       historyVisible: false,
       historyList: [],
+      quoteMethodData: [],
       openDialogVisible: false,
       openFormOption: openFormOption,
       suppliersDialogVisable: false,
@@ -391,7 +396,7 @@ export default {
     },
     handleUpdateQuoteEndTime() {
       if (this.quoteEndTimeChange < new Date().getTime()) {
-        this.$message.error('截至时间不得小于当前时间');
+        this.$message.error('截止时间不得小于当前时间');
         return;
       }
       this.$confirm('是否更新截止时间？', '提示', {
@@ -496,6 +501,10 @@ export default {
         .sort(compare('materialNumber'));
     },
     tableData(data) {
+      // 报价方式 数据字典
+      dataDicAPI('quoteMethod').then((res) => {
+        this.quoteMethodData = res.data;
+      });
       dataDicAPI('enquiryType').then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {
           if (item.prop === 'enquiryType') {

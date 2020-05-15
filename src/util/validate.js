@@ -200,29 +200,11 @@ export function validatename(name) {
   if (!regName.test(name)) return false;
   return true;
 }
-/**
- * 判断是否为整数
- */
-export function validatenum(num, type) {
-  let regName = /[^\d.]/g;
-  if (type === 1) {
-    if (!regName.test(num)) return false;
-  } else if (type === 2) {
-    regName = /[^\d]/g;
-    if (!regName.test(num)) return false;
-  }
-  return true;
-}
-/**
- * 判断是否为小数
- */
-export function validatenumord(num, type) {
-  let regName = /[^\d.]/g;
-  if (type === 1) {
-    if (!regName.test(num)) return false;
-  } else if (type === 2) {
-    regName = /[^\d.]/g;
-    if (!regName.test(num)) return false;
+// 非负数
+export function validateNumber(num) {
+  var regNumber = /^(?!(0[0-9]{0,}$))[0-9]{1,}[.]{0,}[0-9]{0,}$/;
+  if (regNumber.test(num) === false) {
+    return false;
   }
   return true;
 }

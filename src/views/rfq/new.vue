@@ -45,14 +45,16 @@
     >
       <template slot-scope="scope" slot="quoteMethod">
         <span v-if="scope.row.quoteMethod === '0'">常规报价</span>
-        <p
-          style="margin: 0"
-          v-else-if="scope.row.quoteMethod === '1'"
-          v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
-          :key="ladder.ladderGrade"
-        >
-          {{ ladder.ladderGrade }}
-        </p>
+        <div v-else-if="scope.row.quoteMethod === '1'">
+          <span>阶梯报价</span>
+          <p
+            style="margin: 0"
+            v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
+            :key="ladder.ladderGrade"
+          >
+            {{ ladder.ladderGrade }}
+          </p>
+        </div>
       </template>
       <template slot="menuLeft" v-if="!form.purchaseRequestNumber">
         <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>
@@ -502,6 +504,7 @@ export default {
         this.inquiryListOption.data.splice(form.$index, 1, item);
       }
       this.fieldDialogVisible = false;
+      this.$message.success('保存成功');
     },
     sizeChange(val) {
       this.inquiryListOption.page.pageSize = val;

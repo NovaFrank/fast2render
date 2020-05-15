@@ -1,3 +1,14 @@
+import { validateNumber } from '@/util/validate';
+
+const validateQuantity = (rule, value, callback) => {
+  console.log('value', validateNumber(value));
+  if (!validateNumber(value)) {
+    callback(new Error('请输入大于0的小数或整数'));
+  } else {
+    callback();
+  }
+};
+
 export default {
   form: {
     ladderQuantity: ''
@@ -11,11 +22,8 @@ export default {
         label: '阶梯数量',
         prop: 'ladderQuantity',
         rules: [
-          {
-            required: true,
-            message: '请输入阶梯数量',
-            trigger: 'blur'
-          }
+          { required: true, message: '请输入阶梯数量', trigger: 'blur' },
+          { trigger: 'change', validator: validateQuantity }
         ]
       }
     ]

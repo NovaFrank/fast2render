@@ -3,7 +3,7 @@
 
 const validateQuoteEndTime = (rule, value, callback) => {
   if (value && value < new Date().getTime()) {
-    callback(new Error('截至时间不得小于当前时间'));
+    callback(new Error('截止时间不得小于当前时间'));
   } else {
     callback();
   }

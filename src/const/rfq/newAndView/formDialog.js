@@ -1,4 +1,4 @@
-import { validatenum, validatenumord } from '@/util/validate';
+import { validateNumber } from '@/util/validate';
 
 const validateDateTime = (rule, value, callback) => {
   if (value && value < new Date().getTime()) {
@@ -8,7 +8,15 @@ const validateDateTime = (rule, value, callback) => {
   }
 };
 const validateTaxRate = (rule, value, callback) => {
-  if (!validatenum(validatenum) || !validatenumord(value)) {
+  if (!validateNumber(value)) {
+    callback(new Error('请输入大于0的小数或整数'));
+  } else {
+    callback();
+  }
+};
+
+const validateQuantity = (rule, value, callback) => {
+  if (!validateNumber(value)) {
     callback(new Error('请输入大于0的小数或整数'));
   } else {
     callback();
@@ -42,7 +50,10 @@ export default {
     {
       label: '需求数量',
       prop: 'quantity',
-      rules: [{ required: true, message: '请填写需求数量', trigger: 'change' }]
+      rules: [
+        { required: true, message: '请填写需求数量', trigger: 'blur' },
+        { trigger: 'change', validator: validateQuantity }
+      ]
     },
     {
       type: 'date',

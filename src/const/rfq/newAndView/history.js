@@ -54,7 +54,7 @@ export default {
         format: 'yyyy-MM-dd HH:mm:ss',
         valueFormat: 'timestamp',
         label: '报价时间',
-        prop: 'createDate'
+        prop: 'quoteDate' // createDate
       }
     ]
   }

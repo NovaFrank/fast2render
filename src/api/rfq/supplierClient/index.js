@@ -20,3 +20,9 @@ export const getAction = (action, enquiryNumber) =>
     url: `${prefix}/inquiry/SaleEnquiryService/${action}/${enquiryNumber}`,
     method: 'get'
   });
+// GET /SaleEnquiryService/queryQuote/{enquiryNumber}/{toElsAccount}
+export const queryQuote = (params) =>
+  request({
+    url: `${prefix}/inquiry/SaleEnquiryService/queryQuote/${params.enquiryNumber}/${params.toElsAccount}`,
+    method: 'get'
+  });

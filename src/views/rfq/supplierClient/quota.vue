@@ -11,22 +11,14 @@
     ></form-header>
     <avue-form ref="form" v-model="detailObj" :option="formOption"></avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
-    <avue-crud
+    <fast2-attachment-list
+      :id="detailObj.enquiryNumber"
+      :elsAccount="elsAccount"
+      :businessElsAccount="detailObj.elsAccount"
+      businessModule="enquiry"
+      :readonly="true"
       v-if="tabActive === 'files'"
-      :data="filesOption.data"
-      :option="filesOption.option"
-      :page.sync="filesOption.page"
-      @size-change="sizeChange"
-      @current-change="currentChange"
-    >
-      <template slot-scope="scope" slot="menu">
-        <el-row :gutter="24">
-          <el-col :span="6">
-            <a :href="scope.url">下载</a>
-          </el-col>
-        </el-row>
-      </template>
-    </avue-crud>
+    ></fast2-attachment-list>
     <avue-crud
       v-if="tabActive === 'detail'"
       :data="inquiryListOption.data"
@@ -85,7 +77,11 @@
       @close-field-dialog="closeFieldDialog"
     ></quote-ladder-dialog>
     <!-- 报价历史记录 -->
-    <history :dialogVisible="historyVisible" :data="historyList"></history>
+    <history
+      :dialogVisible="historyVisible"
+      :data="historyList"
+      :quoteMethodData="quoteMethodData"
+    ></history>
   </basic-container>
 </template>
 
@@ -97,8 +93,7 @@ import formOption from '@/const/rfq/supplierClient/detail';
 import tabOption from '@/const/rfq/newAndView/tabs';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
-import { queryDetailAction } from '@/api/rfq';
-import { getAction, postAction } from '@/api/rfq/supplierClient';
+import { getAction, postAction, queryQuote } from '@/api/rfq/supplierClient';
 import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
 import history from './../history';
 import { validatenull } from '@/util/validate';
@@ -140,6 +135,7 @@ export default {
       quoteVisible: false,
       historyVisible: false,
       historyList: [],
+      quoteMethodData: [],
       dialogTitle: '',
       dialogWidth: '50%',
       headerButtons: [
@@ -173,7 +169,10 @@ export default {
       this.$router.back();
     },
     handleShowHistory() {
-      queryDetailAction('queryQuote', this.currentEnquiryNumber).then((res) => {
+      queryQuote({
+        enquiryNumber: this.detailObj.enquiryNumber,
+        toElsAccount: this.detailObj.toElsAccount
+      }).then((res) => {
         this.historyList = res.data.pageData.rows;
       });
       this.historyVisible = true;
@@ -336,6 +335,10 @@ export default {
       });
     },
     tableData(data) {
+      // 报价方式 数据字典
+      dataDicAPI('quoteMethod').then((res) => {
+        this.quoteMethodData = res.data;
+      });
       // 询价类型 数据字典（临时），最好写option dicUrl
       dataDicAPI('enquiryType').then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {

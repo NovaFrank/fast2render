@@ -39,21 +39,38 @@ export default {
       //   label: '公司名称',
       //   prop: 'companyShortName'
       // },
-      // {
-      //   label: '询价日期',
-      //   prop: 'createDate'
-      // },
-      // {
-      //   label: '报价截止时间',
-      //   prop: 'quoteEndTime'
-      // },
+      {
+        label: '物料编码',
+        prop: 'materialNumber'
+      },
       {
         label: '物料名称',
         prop: 'materialName'
       },
+      // {
+      //   label: '物料描述',
+      //   prop: 'materialDesc'
+      // },
       {
-        label: '物料描述',
-        prop: 'materialDesc'
+        dicUrl: '/layout/dics/value/enquiryType',
+        dicMethod: 'get',
+        type: 'select',
+        label: '询价类型',
+        prop: 'enquiryType'
+      },
+      {
+        type: 'date',
+        format: 'yyyy-MM-dd',
+        valueFormat: 'timestamp',
+        label: '询价日期',
+        prop: 'createDate'
+      },
+      {
+        type: 'datetime',
+        format: 'yyyy-MM-dd',
+        valueFormat: 'timestamp',
+        label: '报价截止日期',
+        prop: 'quoteEndTime'
       },
       {
         label: '数量',

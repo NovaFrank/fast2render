@@ -27,10 +27,6 @@ export default {
         prop: 'enquiryNumber'
       },
       {
-        label: '询价类型',
-        prop: 'enquiryType'
-      },
-      {
         label: '物料编号',
         prop: 'materialNumber'
       },
@@ -50,6 +46,13 @@ export default {
         prop: 'quantity'
       },
       {
+        dicUrl: '/layout/dics/value/enquiryType',
+        dicMethod: 'get',
+        type: 'select',
+        label: '询价类型',
+        prop: 'enquiryType'
+      },
+      {
         type: 'date',
         format: 'yyyy-MM-dd',
         label: '询价日期',
@@ -57,8 +60,9 @@ export default {
       },
       {
         type: 'datetime',
-        format: 'yyyy-MM-dd HH:mm:ss',
-        label: '截止时间',
+        format: 'yyyy-MM-dd',
+        valueFormat: 'timestamp',
+        label: '报价截止时间',
         prop: 'quoteEndTime'
       },
       {

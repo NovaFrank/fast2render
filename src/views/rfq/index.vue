@@ -90,6 +90,7 @@ import tabOption from '@/const/rfq/navTabs';
 import tableOption from '@/const/rfq/index';
 import { purchaseEnquiryAction } from '@/api/rfq';
 import { getUserInfo } from '@/util/utils.js';
+import { dataDicAPI } from '@/api/rfq/common';
 
 export default {
   components: {},
@@ -163,6 +164,18 @@ export default {
       });
     },
     tableData(data) {
+      // 询价类型 数据字典（临时），最好写option dicUrl
+      dataDicAPI('enquiryType').then((res) => {
+        this.tableOption.option.column = this.tableOption.option.column.map((item) => {
+          if (item.prop === 'enquiryType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
       let params = {
         pageSize: this.tableOption.page.pageSize || 10,
         currentPage: 1,

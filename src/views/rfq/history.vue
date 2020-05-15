@@ -7,7 +7,6 @@
 </template>
 <script>
 import historyOption from '@/const/rfq/newAndView/history';
-import { dataDicAPI } from '@/api/rfq/common';
 export default {
   name: 'history',
   props: {
@@ -46,6 +45,12 @@ export default {
     multiple: {
       type: Boolean,
       default: false
+    },
+    quoteMethodData: {
+      type: Array,
+      default: () => {
+        return [];
+      }
     }
   },
   data() {
@@ -70,6 +75,17 @@ export default {
     this.$emit('handleList');
   },
   watch: {
+    quoteMethodData: function(newValue) {
+      this.crudOption.option.column = this.crudOption.option.column.map((item) => {
+        if (item.prop === 'quoteMethod') {
+          return {
+            ...item,
+            dicData: newValue
+          };
+        }
+        return item;
+      });
+    },
     data: function(newValue) {
       this.crudData = newValue;
     },
@@ -80,30 +96,16 @@ export default {
       this.crudOption.column = newValue;
     },
     visable: function(newValue) {
+      this.initData();
       this.$emit('update:dialogVisible', newValue);
     },
     dialogVisible: function(newValue) {
       this.visable = newValue;
     },
-    crudOption: function(newValue) {
-      this.initData();
-    }
+    crudOption: function(newValue) {}
   },
   methods: {
-    initData() {
-      // 报价方式 数据字典
-      dataDicAPI('quoteMethod').then((res) => {
-        this.crudOption.column = this.crudOption.column.map((item) => {
-          if (item.prop === 'quoteMethod') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
-    }
+    initData() {}
   }
 };
 </script>

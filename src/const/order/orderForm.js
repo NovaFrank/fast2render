@@ -23,7 +23,8 @@ export default {
         // dicMethod: 'get',
         rules: [
           {
-            required: true
+            required: true,
+            message: '请选择订单类型'
           }
         ]
       },
@@ -35,7 +36,8 @@ export default {
         formslot: true,
         rules: [
           {
-            required: true
+            required: true,
+            message: '请选择采购方负责人'
           }
         ]
       },
@@ -47,7 +49,8 @@ export default {
         formslot: true,
         rules: [
           {
-            required: true
+            required: true,
+            message: '请选择供应商'
           }
         ]
       },
@@ -67,7 +70,8 @@ export default {
         // dicMethod: 'get',
         rules: [
           {
-            required: true
+            required: true,
+            message: '请选择采购类别'
           }
         ]
       },
@@ -79,7 +83,8 @@ export default {
         formslot: true,
         rules: [
           {
-            required: true
+            required: true,
+            message: '请选择采购组'
           }
         ]
       },

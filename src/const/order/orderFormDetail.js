@@ -17,7 +17,13 @@ export default {
         prop: 'orderType',
         span: 6,
         type: 'select',
-        disabled: true
+        disabled: true,
+        rules: [
+          {
+            required: true,
+            message: '请选择订单类型'
+          }
+        ]
       },
       {
         label: '采购方负责人',
@@ -27,7 +33,8 @@ export default {
         formslot: true,
         rules: [
           {
-            required: true
+            required: true,
+            message: '请选择采购方负责人'
           }
         ]
       },
@@ -36,7 +43,13 @@ export default {
         prop: 'toElsAccount',
         span: 6,
         type: 'input',
-        disabled: true
+        disabled: true,
+        rules: [
+          {
+            required: true,
+            message: '请选择供应商'
+          }
+        ]
       },
       {
         label: '供应商名称',
@@ -55,7 +68,8 @@ export default {
         // dicMethod: 'get',
         rules: [
           {
-            required: true
+            required: true,
+            message: '请选择采购类别'
           }
         ]
       },
@@ -67,7 +81,8 @@ export default {
         formslot: true,
         rules: [
           {
-            required: true
+            required: true,
+            message: '请选择采购组'
           }
         ]
       },

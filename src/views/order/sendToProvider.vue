@@ -137,7 +137,7 @@ export default {
       crudOption: {},
       headerButtons: [
         {
-          text: '发送',
+          text: '发给供方',
           size: 'small',
           action: 'on-submit',
           type: 'primary'

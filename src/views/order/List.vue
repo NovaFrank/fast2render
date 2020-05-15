@@ -17,11 +17,7 @@
       ref="crud"
     >
       <template
-        v-if="
-          ['All', 'Create', 'ProviderPending', 'ProviderChanged', 'ProviderApproval'].includes(
-            tabActive
-          )
-        "
+        v-if="['All', 'ProviderPending', 'ProviderChanged', 'ProviderApproval'].includes(tabActive)"
         slot-scope="scope"
         slot="status"
       >
@@ -29,8 +25,6 @@
           {{
             scope.row.orderStatus === ''
               ? '全部'
-              : scope.row.orderStatus === '0'
-              ? '未提交'
               : scope.row.orderStatus === '1'
               ? '已发送'
               : scope.row.orderStatus === '2'
@@ -40,19 +34,19 @@
         </span>
       </template>
       <template
-        v-else-if="['Pending', 'Approval', 'Reject'].includes(tabActive)"
+        v-else-if="['Create', 'Pending', 'Approval', 'Reject'].includes(tabActive)"
         slot-scope="scope"
         slot="status"
       >
         <span>
           {{
-            scope.row.auditStatus === '2'
+            scope.row.orderStatus === '0'
+              ? '未提交'
+              : scope.row.auditStatus === '2'
               ? '审批中'
               : scope.row.auditStatus === '0'
               ? '审批通过'
-              : scope.row.auditStatus === '3'
-              ? '审批驳回'
-              : '未审批'
+              : '审批驳回'
           }}
         </span>
       </template>
@@ -180,27 +174,25 @@ export default {
       const action = 'findPageList';
       let params = {
         elsAccount: this.elsAccount,
+        currentPage: this.formOption.page.currentPage,
+        pageSize: this.formOption.page.pageSize,
         ...data
       };
       if (
-        ['All', 'Create', 'ProviderPending', 'ProviderChanged', 'ProviderApproval'].includes(
-          this.tabActive
-        )
+        ['All', 'ProviderPending', 'ProviderChanged', 'ProviderApproval'].includes(this.tabActive)
       ) {
         params = {
           ...params,
           orderStatus:
             this.tabActive === 'All'
               ? ''
-              : this.tabActive === 'Create'
-              ? '0'
               : this.tabActive === 'ProviderPending'
               ? '1'
               : this.tabActive === 'ProviderChanged'
               ? '2'
               : '3'
         };
-      } else if (['Pending', 'Approval', 'Reject'].includes(this.tabActive)) {
+      } else if (['Create', 'Pending', 'Approval', 'Reject'].includes(this.tabActive)) {
         params = {
           ...params,
           auditStatus:

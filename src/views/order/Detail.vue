@@ -5,6 +5,7 @@
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
+      @on-reset="handleReset"
     ></form-header>
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
@@ -134,7 +135,21 @@ export default {
       planListOption: planListOption,
       crudObj: {},
       crudOption: {},
-      headerButtons: [
+      headerButtons: [],
+      audit1: [
+        {
+          text: '返回',
+          size: 'small',
+          action: 'on-cancel'
+        },
+        {
+          text: '撤回',
+          size: 'small',
+          action: 'on-reset',
+          type: 'primary'
+        }
+      ],
+      audit2: [
         {
           text: '返回',
           size: 'small',
@@ -205,6 +220,13 @@ export default {
       const resp = await getOrderList(action, params);
       const resp2 = await getOrderList(action2, params2);
       const resp3 = await getOrderList(action3, params3);
+      // auditStatus: 0, "审批通过", 1, "未审批", 2, "审批中", 3, "审批拒绝"
+      this.auditStatus = resp.data.data.auditStatus;
+      if (this.auditStatus === '2') {
+        this.headerButtons = this.audit1;
+      } else if (this.auditStatus === '0') {
+        this.headerButtons = this.audit2;
+      }
       this.formOption.obj = resp.data.data;
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;
@@ -329,6 +351,8 @@ export default {
       });
       this.$router.push({ path: '/list' });
     },
+    // 审批撤回
+    handleReset() {},
     rowSavePlan(row, done, loading) {
       // 保存新增的数据
       if (this.crudPlanData === undefined) {

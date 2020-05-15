@@ -17,11 +17,7 @@
       ref="crud"
     >
       <template
-        v-if="
-          ['All', 'Create', 'ProviderPending', 'ProviderChanged', 'ProviderApproval'].includes(
-            tabActive
-          )
-        "
+        v-if="['All', 'ProviderPending', 'ProviderChanged', 'ProviderApproval'].includes(tabActive)"
         slot-scope="scope"
         slot="status"
       >
@@ -29,18 +25,18 @@
           {{
             scope.row.orderStatus === ''
               ? '全部'
-              : scope.row.orderStatus === '0'
-              ? '未提交'
               : scope.row.orderStatus === '1'
               ? '已发送'
               : scope.row.orderStatus === '2'
               ? '供方变更'
-              : '供方已确认'
+              : scope.row.orderStatus === '4'
+              ? '供方已确认'
+              : ''
           }}
         </span>
       </template>
       <template
-        v-else-if="['Pending', 'Approval', 'Reject'].includes(tabActive)"
+        v-else-if="['Create', 'Pending', 'Approval', 'Reject'].includes(tabActive)"
         slot-scope="scope"
         slot="status"
       >
@@ -52,7 +48,7 @@
               ? '审批通过'
               : scope.row.auditStatus === '3'
               ? '审批驳回'
-              : '未审批'
+              : '未提交'
           }}
         </span>
       </template>
@@ -181,26 +177,22 @@ export default {
       let params = {
         elsAccount: this.elsAccount,
         ...data
-      };
+      }; // orderStatus: "0":"对方未确认","1":"对方已确认","2":"对方已退回","3":"变更对方未确认","4":"变更对方确认","5":"对方变更退回"
       if (
-        ['All', 'Create', 'ProviderPending', 'ProviderChanged', 'ProviderApproval'].includes(
-          this.tabActive
-        )
+        ['All', 'ProviderPending', 'ProviderChanged', 'ProviderApproval'].includes(this.tabActive)
       ) {
         params = {
           ...params,
           orderStatus:
             this.tabActive === 'All'
               ? ''
-              : this.tabActive === 'Create'
-              ? '0'
               : this.tabActive === 'ProviderPending'
               ? '1'
               : this.tabActive === 'ProviderChanged'
               ? '2'
-              : '3'
+              : '4'
         };
-      } else if (['Pending', 'Approval', 'Reject'].includes(this.tabActive)) {
+      } else if (['Create', 'Pending', 'Approval', 'Reject'].includes(this.tabActive)) {
         params = {
           ...params,
           auditStatus:

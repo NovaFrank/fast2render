@@ -26,7 +26,7 @@ export default {
         prop: 'ProviderPending'
       },
       {
-        label: '供方变更',
+        label: '供方退回',
         prop: 'ProviderChanged'
       },
       {

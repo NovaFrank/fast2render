@@ -380,6 +380,15 @@ export default {
       if (this.materielListOption.data.length === 0) {
         alert('请添加一条数据！');
         return false;
+      } else if (this.formOption.obj.purchasePerson === '') {
+        alert('请选择采购方负责人!');
+        return false;
+      } else if (this.formOption.obj.purchaseType === '') {
+        alert('请选择采购类别!');
+        return false;
+      } else if (this.formOption.obj.purchaseGroup === '') {
+        alert('请选择采购组!');
+        return false;
       }
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
@@ -402,6 +411,15 @@ export default {
     async handleSubmit() {
       if (this.materielListOption.data.length === 0) {
         alert('请添加一条数据！');
+        return false;
+      } else if (this.formOption.obj.purchasePerson === '') {
+        alert('请选择采购方负责人!');
+        return false;
+      } else if (this.formOption.obj.purchaseType === '') {
+        alert('请选择采购类别!');
+        return false;
+      } else if (this.formOption.obj.purchaseGroup === '') {
+        alert('请选择采购组!');
         return false;
       }
       this.tabActive = this.tabOption.option.column[2];

@@ -285,6 +285,10 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        });
         this.materielListOption.data.splice(index, 1);
       });
     },

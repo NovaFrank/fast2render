@@ -29,7 +29,9 @@
               ? '已发送'
               : scope.row.orderStatus === '2'
               ? '供方变更'
-              : '供方已确认'
+              : scope.row.orderStatus === '4'
+              ? '供方已确认'
+              : ''
           }}
         </span>
       </template>
@@ -40,13 +42,13 @@
       >
         <span>
           {{
-            scope.row.orderStatus === '0'
-              ? '未提交'
-              : scope.row.auditStatus === '2'
+            scope.row.auditStatus === '2'
               ? '审批中'
               : scope.row.auditStatus === '0'
               ? '审批通过'
-              : '审批驳回'
+              : scope.row.auditStatus === '3'
+              ? '审批驳回'
+              : '未提交'
           }}
         </span>
       </template>
@@ -177,7 +179,7 @@ export default {
         currentPage: this.formOption.page.currentPage,
         pageSize: this.formOption.page.pageSize,
         ...data
-      };
+      }; // orderStatus: "0":"对方未确认","1":"对方已确认","2":"对方已退回","3":"变更对方未确认","4":"变更对方确认","5":"对方变更退回"
       if (
         ['All', 'ProviderPending', 'ProviderChanged', 'ProviderApproval'].includes(this.tabActive)
       ) {
@@ -190,7 +192,7 @@ export default {
               ? '1'
               : this.tabActive === 'ProviderChanged'
               ? '2'
-              : '3'
+              : '4'
         };
       } else if (['Create', 'Pending', 'Approval', 'Reject'].includes(this.tabActive)) {
         params = {

@@ -247,3 +247,11 @@ export function validatenull(val) {
   }
   return false;
 }
+// 非负数
+export function validateNumber(num) {
+  var regNumber = /^(?!(0[0-9]{0,}$))[0-9]{1,}[.]{0,}[0-9]{0,}$/;
+  if (regNumber.test(num) === false) {
+    return false;
+  }
+  return true;
+}

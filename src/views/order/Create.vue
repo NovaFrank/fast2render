@@ -137,7 +137,7 @@ import selectDialog2 from '@/common/selectDialog2';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
 import { getUserInfo } from '@/util/utils.js';
-import { getDataDic, createOrder } from '@/api/order.js';
+import { createOrder, dataDicAPI } from '@/api/order.js';
 export default {
   components: {
     FormHeader,
@@ -227,6 +227,12 @@ export default {
       ]
     };
   },
+  watch: {
+    'crudObj.taxCode'(newVal) {
+      console.log('newVal:' + JSON.stringify(newVal));
+      this.crudObj.taxRate = newVal.split('_')[0];
+    }
+  },
   async created() {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
@@ -242,22 +248,47 @@ export default {
   methods: {
     // 获取数据字典下拉列表
     async getDicData(data) {
-      const action = 'orderType';
-      const action2 = 'purchaseType';
-      const resp = await getDataDic(action);
-      const resp2 = await getDataDic(action2);
-      this.formOption.option.column[0].dicData = [];
-      for (let item of resp.data) {
-        const orderTypeList = {};
-        orderTypeList.value = item.label;
-        this.formOption.option.column[0].dicData.push(orderTypeList);
-      }
-      this.formOption.option.column[4].dicData = [];
-      for (let item of resp2.data) {
-        const purchaseTypeList = {};
-        purchaseTypeList.value = item.label;
-        this.formOption.option.column[4].dicData.push(purchaseTypeList);
-      }
+      dataDicAPI('orderType').then((res) => {
+        this.formOption.option.column = this.formOption.option.column.map((item) => {
+          if (item.prop === 'orderType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      dataDicAPI('purchaseType').then((res) => {
+        this.formOption.option.column = this.formOption.option.column.map((item) => {
+          if (item.prop === 'purchaseType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 税码
+      dataDicAPI('taxRate').then((res) => {
+        this.materielListOption.option.column = this.materielListOption.option.column.map(
+          (item) => {
+            if (item.prop === 'taxCode') {
+              return {
+                ...item,
+                dicData: res.data.map((item) => {
+                  return {
+                    label: `${item.value}`,
+                    value: `${item.label}_${item.value}`
+                  };
+                })
+              };
+            }
+            return item;
+          }
+        );
+      });
     },
     itemAdd() {
       if (!this.formOption.obj.toElsAccount) {
@@ -291,6 +322,10 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        });
         this.materielListOption.data.splice(index, 1);
       });
     },
@@ -310,6 +345,10 @@ export default {
         this.materielListOption.data.push(row);
         this.params.addList.push(row);
       }
+      this.$message({
+        type: 'success',
+        message: '保存成功!'
+      });
       done();
     },
     rowSavePlan(row, done, loading) {
@@ -324,6 +363,10 @@ export default {
     rowUpdate(row, index, done, loading) {
       loading();
       this.$set(this.materielListOption.data, index, row);
+      this.$message({
+        type: 'success',
+        message: '修改成功!'
+      });
       done();
     },
     rowUpdatePlan(row, index, done, loading) {

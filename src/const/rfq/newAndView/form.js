@@ -12,6 +12,13 @@ const validateQuoteEndTime = (rule, value, callback) => {
 export default {
   column: [
     {
+      formslot: true,
+      type: 'input',
+      label: '询价单号',
+      span: 6,
+      prop: 'enquiryNumber'
+    },
+    {
       type: 'input',
       label: '询价名称',
       span: 6,

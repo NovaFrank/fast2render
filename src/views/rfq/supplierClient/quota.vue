@@ -101,6 +101,7 @@ import { queryDetailAction } from '@/api/rfq';
 import { getAction, postAction } from '@/api/rfq/supplierClient';
 import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
 import history from './../history';
+import { validatenull } from '@/util/validate';
 import {
   dataDicAPI
   // materialListAction,
@@ -230,6 +231,25 @@ export default {
       });
     },
     handleSend() {
+      let result = true;
+      this.inquiryListOption.data.forEach((item) => {
+        console.log(item.noQuoted, item.inquiryListOption, item);
+        if (item.quoteMethod === '0' && validatenull(item.priceIncludingTax)) {
+          // 常规报价
+          result = false;
+        }
+        if (item.quoteMethod === '1') {
+          JSON.parse(item.ladderPriceJson).forEach((ladder) => {
+            if (validatenull(ladder.priceIncludingTax)) {
+              result = false;
+            }
+          });
+        }
+      });
+      if (!result) {
+        this.$message.error('请完善报价信息');
+        return;
+      }
       this.$confirm('是否发送报价？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

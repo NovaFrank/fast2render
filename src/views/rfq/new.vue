@@ -12,8 +12,8 @@
       @on-save="handleSaveForm"
     ></form-header>
     <avue-form ref="form" v-model="form" :option="formOption">
-      <template slot-scope="scope" slot="enquiryNumber">
-        <span>{{ scope.value }}</span>
+      <template slot="enquiryNumber">
+        <span>{{ currentEnquiryNumber || '待生成' }}</span>
       </template>
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
@@ -231,8 +231,9 @@ export default {
           size: '',
           action: 'on-delete'
         });
-        this.$forceUpdate();
       }
+      this.inquiryListOption.data = [];
+      this.$forceUpdate();
     }
   },
   methods: {
@@ -417,6 +418,8 @@ export default {
               }
               this.$message.success('保存成功');
               const enquiryNumber = res.data.data.enquiryNumber;
+              this.currentEnquiryNumber = enquiryNumber;
+              this.$forceUpdate();
               this.$router.push({ path: '/new', query: { enquiryNumber } });
             });
           }
@@ -455,6 +458,7 @@ export default {
         if (!this.initDetailError(res)) return;
         this.inquiryListOption.data = res.data.pageData.rows;
       });
+      this.$forceUpdate();
     },
     // 明细行信息保存
     onSaveItemForm(form) {

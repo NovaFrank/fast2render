@@ -139,7 +139,8 @@ export default {
         {
           text: '发送',
           size: 'small',
-          action: 'on-submit'
+          action: 'on-submit',
+          type: 'primary'
         },
         {
           text: '返回',

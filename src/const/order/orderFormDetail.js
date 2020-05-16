@@ -18,6 +18,7 @@ export default {
         span: 6,
         type: 'select',
         disabled: true,
+        dicData: [],
         rules: [
           {
             required: true,

@@ -12,14 +12,14 @@ export default {
         type: 'input',
         disabled: true
       },
-      {
-        label: '采购方名称',
-        prop: 'elsAccountName',
-        span: 6,
-        type: 'select',
-        placeholder: ' ',
-        disabled: true
-      },
+      // {
+      //   label: '采购方名称',
+      //   prop: 'elsAccountName',
+      //   span: 6,
+      //   type: 'select',
+      //   placeholder: ' ',
+      //   disabled: true
+      // },
       {
         label: '采购方负责人',
         prop: 'purchasePerson',
@@ -37,7 +37,7 @@ export default {
         disabled: true
       },
       {
-        label: '采购方ELS',
+        label: '采购方ELS号',
         prop: 'toElsAccount',
         span: 6,
         type: 'input',

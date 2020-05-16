@@ -15,7 +15,16 @@ export default {
         label: '订单类型',
         prop: 'orderType',
         span: 6,
-        type: 'select'
+        type: 'select',
+        dicData: [],
+        // dicUrl: '/layout/dics/value/orderType',
+        // dicMethod: 'get',
+        rules: [
+          {
+            required: true,
+            message: '请选择订单类型'
+          }
+        ]
       },
       {
         label: '采购方负责人',

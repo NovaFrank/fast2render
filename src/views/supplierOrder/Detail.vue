@@ -62,13 +62,14 @@
       actionPath="findPageList"
       @save="purchaseDialogSave"
     ></selectDialog3>
-    <el-dialog
-      title="退回原因"
-      :visible.sync="dialogRejecctVisible"
-      width="30%"
-      :before-close="handleClose"
-    >
-      <textarea v-model="rejectObj" cols="30" rows="10" maxlength="50"></textarea>
+    <el-dialog title="退回原因" :visible.sync="dialogRejecctVisible" width="30%">
+      <textarea
+        v-model="rejectObj"
+        cols="30"
+        rows="10"
+        maxlength="50"
+        class="reject-textarea"
+      ></textarea>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogRejecctVisible = false">取 消</el-button>
         <el-button type="primary" @click="saveRejectReason">确 定</el-button>
@@ -167,8 +168,8 @@ export default {
     this.tabActive = this.tabOption.option.column[0];
     this.tableData();
     this.getDicData();
+
     this.formOption.option.detail = true;
-    this.formOption.obj.salePerson = '1001';
   },
   methods: {
     async getDicData(data) {
@@ -225,6 +226,7 @@ export default {
       this.formOption.obj = resp.data.data;
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;
+      this.formOption.obj.salePerson = '1001';
     },
     rowUpdatePlan(row, index, done, loading) {
       loading();
@@ -357,5 +359,8 @@ export default {
 .form-buttons {
   position: absolute;
   right: 20px;
+}
+.reject-textarea {
+  width: 100%;
 }
 </style>

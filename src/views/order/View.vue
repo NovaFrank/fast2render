@@ -180,8 +180,8 @@ export default {
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
     this.tabActive = this.tabOption.option.column[0];
-    this.tableData();
     this.getDicData();
+    this.tableData();
   },
   methods: {
     async getDicData(data) {

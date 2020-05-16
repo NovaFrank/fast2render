@@ -44,6 +44,7 @@ export default {
       {
         label: '需求数量',
         prop: 'requestDeliveryQuantity',
+        type: 'number',
         disabled: true
       },
       {

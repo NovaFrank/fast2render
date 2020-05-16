@@ -230,7 +230,7 @@ export default {
   watch: {
     'crudObj.taxCode'(newVal) {
       console.log('newVal:' + JSON.stringify(newVal));
-      this.crudObj.taxRate = newVal.split('_')[0];
+      this.crudObj.taxRate = newVal;
     }
   },
   async created() {
@@ -271,16 +271,17 @@ export default {
         });
       });
       // 税码
-      dataDicAPI('taxRate').then((res) => {
+      dataDicAPI('taxRateNo').then((res) => {
         this.materielListOption.option.column = this.materielListOption.option.column.map(
           (item) => {
             if (item.prop === 'taxCode') {
               return {
                 ...item,
                 dicData: res.data.map((item) => {
+                  console.log(item);
                   return {
-                    label: `${item.value}`,
-                    value: `${item.label}_${item.value}`
+                    label: `${item.label}`,
+                    value: `${item.value}`
                   };
                 })
               };

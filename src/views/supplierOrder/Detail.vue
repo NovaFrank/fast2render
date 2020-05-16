@@ -62,6 +62,18 @@
       actionPath="findPageList"
       @save="purchaseDialogSave"
     ></selectDialog3>
+    <el-dialog
+      title="退回原因"
+      :visible.sync="dialogRejecctVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <textarea v-model="rejectObj" cols="30" rows="10" maxlength="50"></textarea>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogRejecctVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRejectReason">确 定</el-button>
+      </span>
+    </el-dialog>
   </basic-container>
 </template>
 
@@ -124,12 +136,14 @@ export default {
       },
       dialogVisible: false,
       dialogPurchaseVisible: false,
+      dialogRejecctVisible: false,
       materialOption: materialOption,
       purchaseOption: purchaseOption,
       formOption: formOption,
       planListOption: planListOption,
       crudObj: {},
       crudOption: {},
+      rejectObj: '',
       headerButtons: [
         {
           text: '确认',
@@ -243,31 +257,27 @@ export default {
           this.$router.push({ path: '/supplier/orderList' });
         });
     },
+    async saveRejectReason() {
+      this.formOption.obj.rejectReason = this.rejectObj;
+      const action = 'backToOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        ...this.formOption.obj,
+        orderItemReceiveVOList: this.materielListOption.data,
+        deliveryPlanReceiveVOList: this.planListOption.data
+      };
+      console.log('params: ' + JSON.stringify(params));
+      await createOrder(action, params);
+
+      this.$message({
+        type: 'success',
+        message: '退回成功!'
+      });
+      this.$router.push({ path: '/supplier/orderList' });
+    },
     // 退回订单
     async handleRelease() {
-      this.$confirm(`确认退回？`, {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          const action = 'backToOrder';
-          let params = {
-            elsAccount: this.elsAccount,
-            ...this.formOption.obj,
-            orderItemReceiveVOList: this.materielListOption.data,
-            deliveryPlanReceiveVOList: this.planListOption.data
-          };
-          console.log('params: ' + JSON.stringify(params));
-          return createOrder(action, params);
-        })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '退回成功!'
-          });
-          this.$router.push({ path: '/supplier/orderList' });
-        });
+      this.dialogRejecctVisible = true;
     },
     // 切换表格
     handleTabClick(value) {

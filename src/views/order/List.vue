@@ -56,13 +56,13 @@
       <!-- sendStatus: "0":"未发送","1":"已发送", "2":"变更未发送","3":"变更已发送" -->
       <!-- auditStatus: 0, "审批通过", 1, "未审批", 2, "审批中", 3, "审批拒绝" -->
       <template slot-scope="{ row }" slot="orderNumber">
-        <!--back 供方退回 需求池过来不可更改任何东西 新建的订单可修改-日期、数量、价格  -->
-        <router-link
+        <!--back 供方退回 需求池过来不可更改任何东西   -->
+        <!-- <router-link
           v-if="row.orderStatus === '2' && row.sendStatus === '0'"
           :to="`back/${row.orderNumber}_${row.uuid}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
-        </router-link>
+        </router-link> -->
 
         <!--detail 详情 不可修改 只有返回  -->
         <router-link
@@ -111,6 +111,12 @@
         <router-link
           v-if="row.orderStatus === '3' && row.sendStatus === '2'"
           :to="`view/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '2' && row.sendStatus === '0'"
+          :to="`view/${row.orderNumber}_${row.uuid}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>

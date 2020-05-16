@@ -142,6 +142,12 @@ export default {
             value: '0'
           }
         ]
+      },
+      {
+        label: '退回原因',
+        prop: 'rejectReason',
+        span: 24,
+        type: 'input'
       }
     ]
   }

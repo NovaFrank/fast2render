@@ -76,7 +76,7 @@ import fileOption from '@/const/order/files';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielList';
-import { getOrderList, dataDicAPI, createOrder } from '@/api/order.js';
+import { getOrderList, dataDicAPI, createOrder, submitAudit } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import { getUserInfo } from '@/util/utils.js';
 import { setStore } from '@/util/store.js';
@@ -136,6 +136,7 @@ export default {
       crudObj: {},
       crudOption: {},
       headerButtons: [],
+      rootProcessId: '',
       audit1: [
         {
           text: '返回',
@@ -242,6 +243,7 @@ export default {
         };
         setStore({ name: resp.data.data.orderNumber, content, type: true });
       }
+      this.rootProcessId = resp.data.data.flowId;
     },
 
     // 保存表头和表单
@@ -352,7 +354,32 @@ export default {
       this.$router.push({ path: '/list' });
     },
     // 审批撤回
-    handleReset() {},
+    async handleReset() {
+      this.$confirm(`确认撤回审批？`, {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          const action2 = 'cancel';
+          let params2 = {
+            elsAccount: this.elsAccount,
+            toElsAccount: this.formOption.obj.toElsAccount,
+            businessType: 'orderAudit',
+            businessId: this.formOption.obj.orderNumber,
+            rootProcessInstanceId: this.rootProcessId,
+            params: '{"key1":"123"}'
+          };
+          await submitAudit(action2, params2);
+        })
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: '已撤回审批!'
+          });
+          this.$router.push({ path: '/list' });
+        });
+    },
     rowSavePlan(row, done, loading) {
       // 保存新增的数据
       if (this.crudPlanData === undefined) {

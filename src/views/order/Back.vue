@@ -241,6 +241,10 @@ export default {
 
     // 保存表头和表单
     async handleSave() {
+      if (this.materielListOption.data.length === 0) {
+        alert('请添加一条数据！');
+        return false;
+      }
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
       this.$confirm(`确认提交修改？`, {
@@ -309,6 +313,11 @@ export default {
 
     // 保存新增的数据
     rowSave(row, done, loading) {
+      if (this.crudObj.deliveryDate < new Date().getTime()) {
+        loading();
+        this.$message.error('截止时间不得小于当前时间');
+        return false;
+      }
       if (this.materielListOption.data === undefined) {
         this.materielListOption.data = [];
       }
@@ -328,6 +337,10 @@ export default {
         this.materielListOption.data.push(row);
         this.params.addList.push(row);
       }
+      this.$message({
+        type: 'success',
+        message: '保存成功!'
+      });
       done();
     },
     // 发送供方
@@ -360,8 +373,16 @@ export default {
       done();
     },
     rowUpdate(row, index, done, loading) {
-      loading();
+      if (this.crudObj.deliveryDate < new Date().getTime()) {
+        loading();
+        this.$message.error('截止时间不得小于当前时间');
+        return false;
+      }
       this.$set(this.materielListOption.data, index, row);
+      this.$message({
+        type: 'success',
+        message: '修改成功!'
+      });
       done();
     },
     rowUpdatePlan(row, index, done, loading) {

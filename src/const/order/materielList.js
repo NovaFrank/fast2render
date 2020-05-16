@@ -93,6 +93,7 @@ export default {
       {
         label: '需求数量',
         prop: 'quantity',
+        type: 'number',
         rules: [
           {
             required: true,

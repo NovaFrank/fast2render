@@ -119,7 +119,7 @@ import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielList';
 import purchaseGroupOption from '@/const/order/purchaseGroupList';
-import { getOrderList, getDataDic, createOrder, submitAudit } from '@/api/order.js';
+import { getOrderList, dataDicAPI, createOrder, submitAudit } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
@@ -211,6 +211,12 @@ export default {
       ]
     };
   },
+  watch: {
+    'crudObj.taxCode'(newVal) {
+      console.log('newVal:' + JSON.stringify(newVal));
+      this.crudObj.taxRate = newVal.split('_')[0];
+    }
+  },
   async created() {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
@@ -222,22 +228,47 @@ export default {
   methods: {
     // 获取数据字典下拉列表
     async getDicData(data) {
-      const action = 'orderType';
-      const action2 = 'purchaseType';
-      const resp = await getDataDic(action);
-      const resp2 = await getDataDic(action2);
-      this.formOption.option.column[1].dicData = [];
-      for (let item of resp.data) {
-        const orderTypeList = {};
-        orderTypeList.value = item.label;
-        this.formOption.option.column[1].dicData.push(orderTypeList);
-      }
-      this.formOption.option.column[5].dicData = [];
-      for (let item of resp2.data) {
-        const purchaseTypeList = {};
-        purchaseTypeList.value = item.label;
-        this.formOption.option.column[5].dicData.push(purchaseTypeList);
-      }
+      dataDicAPI('orderType').then((res) => {
+        this.formOption.option.column = this.formOption.option.column.map((item) => {
+          if (item.prop === 'orderType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      dataDicAPI('purchaseType').then((res) => {
+        this.formOption.option.column = this.formOption.option.column.map((item) => {
+          if (item.prop === 'purchaseType') {
+            return {
+              ...item,
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 税码
+      dataDicAPI('taxRate').then((res) => {
+        this.materielListOption.option.column = this.materielListOption.option.column.map(
+          (item) => {
+            if (item.prop === 'taxCode') {
+              return {
+                ...item,
+                dicData: res.data.map((item) => {
+                  return {
+                    label: `${item.value}`,
+                    value: `${item.label}_${item.value}`
+                  };
+                })
+              };
+            }
+            return item;
+          }
+        );
+      });
     },
     // 获取头数据和行数据findDeliveryPlanList
     async tableData(data) {
@@ -327,6 +358,11 @@ export default {
 
     // 保存新增的数据
     rowSave(row, done, loading) {
+      if (this.crudObj.deliveryDate < new Date().getTime()) {
+        loading();
+        this.$message.error('截止时间不得小于当前时间');
+        return false;
+      }
       if (this.materielListOption.data === undefined) {
         this.materielListOption.data = [];
       }
@@ -346,6 +382,10 @@ export default {
         this.materielListOption.data.push(row);
         this.params.addList.push(row);
       }
+      this.$message({
+        type: 'success',
+        message: '保存成功!'
+      });
       done();
     },
     rowSavePlan(row, done, loading) {
@@ -358,8 +398,16 @@ export default {
       done();
     },
     rowUpdate(row, index, done, loading) {
-      loading();
+      if (this.crudObj.deliveryDate < new Date().getTime()) {
+        loading();
+        this.$message.error('截止时间不得小于当前时间');
+        return false;
+      }
       this.$set(this.materielListOption.data, index, row);
+      this.$message({
+        type: 'success',
+        message: '修改成功!'
+      });
       done();
     },
     rowUpdatePlan(row, index, done, loading) {
@@ -407,7 +455,7 @@ export default {
       await createOrder(action, params);
       this.$message({
         type: 'success',
-        message: '修改成功!'
+        message: '保存成功!'
       });
       this.$router.push({ path: '/list' });
     },

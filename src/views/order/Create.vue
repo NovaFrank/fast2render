@@ -331,6 +331,12 @@ export default {
     },
 
     rowSave(row, done, loading) {
+      if (this.crudObj.deliveryDate < new Date().getTime()) {
+        loading();
+        this.$message.error('截止时间不得小于当前时间');
+        return false;
+      }
+
       // 保存新增的数据
       if (this.materielListOption.data === undefined) {
         this.materielListOption.data = [];
@@ -361,7 +367,12 @@ export default {
       done();
     },
     rowUpdate(row, index, done, loading) {
-      loading();
+      if (this.crudObj.deliveryDate < new Date().getTime()) {
+        loading();
+        this.$message.error('截止时间不得小于当前时间');
+        return false;
+      }
+      // loading();
       this.$set(this.materielListOption.data, index, row);
       this.$message({
         type: 'success',
@@ -517,6 +528,9 @@ export default {
       if (selectColumns.length !== 0) {
         this.formOption.obj.purchaseGroup = selectColumns[0].orgCategoryDesc;
       }
+    },
+    handleDeliveryDate(val) {
+      this.deliveryDateChange = val;
     }
   }
 };

@@ -7,8 +7,8 @@
       @on-cancel="handleCancel"
       @on-submit="handleRelease"
       @on-save="handleSave"
-      @on-sendProvider="handleSendProvider"
     ></form-header>
+    <!-- @on-sendProvider="handleSendProvider" -->
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
     <div class="clear" style="margin-bottom: 30px;"></div>
@@ -78,7 +78,7 @@ import fileOption from '@/const/order/files';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielListDetail';
-import { getOrderList, dataDicAPI, createOrder } from '@/api/order.js';
+import { getOrderList, dataDicAPI, createOrder, submitAudit } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import { getUserInfo } from '@/util/utils.js';
 export default {
@@ -148,12 +148,12 @@ export default {
         //   size: 'small',
         //   action: 'on-reset'
         // },
-        {
-          text: '发送',
-          type: 'primary',
-          size: 'small',
-          action: 'on-sendProvider'
-        },
+        // {
+        //   text: '发送',
+        //   type: 'primary',
+        //   size: 'small',
+        //   action: 'on-sendProvider'
+        // },
         // {
         //   text: '发送货通知单',
         //   type: 'primary',
@@ -246,32 +246,26 @@ export default {
 
     // 保存表头和表单
     async handleSave() {
+      if (this.materielListOption.data.length === 0) {
+        alert('请添加一条数据！');
+        return false;
+      }
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
-      this.$confirm(`确认提交修改？`, {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          const action = 'updateOrder';
-          let params = {
-            elsAccount: this.elsAccount,
-            elsSubAccount: this.elsSubAccount,
-            ...this.formOption.obj,
-            orderItemVOList: this.materielListOption.data,
-            deliveryPlanVOList: this.planListOption.data
-          };
-          console.log('params: ' + JSON.stringify(params));
-          return createOrder(action, params);
-        })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          });
-          // this.$router.push({ path: '/list' });
-        });
+      const action = 'updateOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
+      await createOrder(action, params);
+      this.$message({
+        type: 'success',
+        message: '保存成功!'
+      });
+      this.$router.push({ path: '/list' });
     },
 
     // 切换表格
@@ -300,6 +294,10 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        });
         this.materielListOption.data.splice(index, 1);
       });
     },
@@ -320,6 +318,11 @@ export default {
 
     // 保存新增的数据
     rowSave(row, done, loading) {
+      if (this.crudObj.deliveryDate < new Date().getTime()) {
+        loading();
+        this.$message.error('截止时间不得小于当前时间');
+        return false;
+      }
       if (this.materielListOption.data === undefined) {
         this.materielListOption.data = [];
       }
@@ -339,28 +342,32 @@ export default {
         this.materielListOption.data.push(row);
         this.params.addList.push(row);
       }
+      this.$message({
+        type: 'success',
+        message: '保存成功!'
+      });
       done();
     },
     // 发送供方
-    async handleSendProvider() {
-      this.tabActive = this.tabOption.option.column[2];
-      this.handleTabClick(this.tabActive);
-      const action = 'sendOrder';
-      let params = {
-        elsAccount: this.elsAccount,
-        elsSubAccount: this.elsSubAccount,
-        ...this.formOption.obj,
-        orderItemVOList: this.materielListOption.data,
-        deliveryPlanVOList: this.planListOption.data
-      };
-      // console.log('params: ' + JSON.stringify(params.orderItemVOList));
-      await createOrder(action, params);
-      this.$message({
-        type: 'success',
-        message: '发送成功!'
-      });
-      this.$router.push({ path: '/list' });
-    },
+    // async handleSendProvider() {
+    //   this.tabActive = this.tabOption.option.column[2];
+    //   this.handleTabClick(this.tabActive);
+    //   const action = 'sendOrder';
+    //   let params = {
+    //     elsAccount: this.elsAccount,
+    //     elsSubAccount: this.elsSubAccount,
+    //     ...this.formOption.obj,
+    //     orderItemVOList: this.materielListOption.data,
+    //     deliveryPlanVOList: this.planListOption.data
+    //   };
+    //   // console.log('params: ' + JSON.stringify(params.orderItemVOList));
+    //   await createOrder(action, params);
+    //   this.$message({
+    //     type: 'success',
+    //     message: '发送成功!'
+    //   });
+    //   this.$router.push({ path: '/list' });
+    // },
     rowSavePlan(row, done, loading) {
       // 保存新增的数据
       if (this.crudPlanData === undefined) {
@@ -371,8 +378,16 @@ export default {
       done();
     },
     rowUpdate(row, index, done, loading) {
-      loading();
+      if (this.crudObj.deliveryDate < new Date().getTime()) {
+        loading();
+        this.$message.error('截止时间不得小于当前时间');
+        return false;
+      }
       this.$set(this.materielListOption.data, index, row);
+      this.$message({
+        type: 'success',
+        message: '修改成功!'
+      });
       done();
     },
     rowUpdatePlan(row, index, done, loading) {
@@ -392,8 +407,40 @@ export default {
     handleCancel() {
       this.$router.push({ path: '/list' });
     },
-    handleRelease() {
-      alert('进行中...');
+    async handleRelease() {
+      if (this.materielListOption.data.length === 0) {
+        alert('请添加一条数据！');
+        return false;
+      }
+      this.tabActive = this.tabOption.option.column[2];
+      this.handleTabClick(this.tabActive);
+      const action = 'updateOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
+      console.log('params: ' + JSON.stringify(params.orderItemVOList));
+      await createOrder(action, params);
+
+      const action2 = 'submit';
+      let params2 = {
+        elsAccount: this.elsAccount,
+        toElsAccount: this.formOption.obj.toElsAccount,
+        businessType: 'orderAudit',
+        businessId: this.formOption.obj.orderNumber,
+        params: '{"key1":"123"}'
+      };
+      // console.log('params: ' + JSON.stringify(params2));
+      await submitAudit(action2, params2);
+      // console.log('params: ' + JSON.stringify(resp));
+      this.$message({
+        type: 'success',
+        message: '已提交审批!'
+      });
+      this.$router.push({ path: '/list' });
     },
     onSaveForm(form) {
       // todo

@@ -1,3 +1,26 @@
+import { validateNumber } from '@/util/validate';
+// const validateDateTime = (rule, value, callback) => {
+//   if (value && value < new Date().getTime()) {
+//     callback(new Error('时间不得小于当前时间'));
+//   } else {
+//     callback();
+//   }
+// };
+const validateTaxRate = (rule, value, callback) => {
+  if (!validateNumber(value)) {
+    callback(new Error('请输入大于0的小数或整数'));
+  } else {
+    callback();
+  }
+};
+
+const validateQuantity = (rule, value, callback) => {
+  if (!validateNumber(value)) {
+    callback(new Error('请输入大于0的小数或整数'));
+  } else {
+    callback();
+  }
+};
 export default {
   data: [],
   page: {
@@ -71,22 +94,59 @@ export default {
         rules: [
           {
             required: true,
-            message: '请输入 需求数量',
+            message: '请输入 大于0的需求数量',
+            trigger: 'change',
+            validator: validateQuantity
+          }
+        ]
+      },
+      {
+        label: '税码',
+        prop: 'taxCode',
+        dicUrl: '/layout/dics/value/taxCode',
+        dicMethod: 'get',
+        type: 'select',
+        disabled: true,
+        rules: [
+          {
+            required: true,
+            message: '请输入 税码',
             trigger: 'blur'
           }
         ]
       },
       {
+        label: '税率',
+        prop: 'taxRate',
+        type: 'input',
+        disabled: true,
+        rules: [{ trigger: 'blur', validator: validateTaxRate }]
+      },
+      {
         label: '含税单价',
         prop: 'price',
         type: 'number',
-        disabled: true
+        rules: [
+          {
+            required: true,
+            message: '请输入 大于0的含税单价',
+            trigger: 'blur',
+            validator: validateQuantity
+          }
+        ]
       },
       {
         label: '总金额',
         prop: 'totalAmount',
         type: 'number',
-        disabled: true
+        rules: [
+          {
+            required: true,
+            message: '请输入 大于0的总金额',
+            trigger: 'blur',
+            validator: validateQuantity
+          }
+        ]
       },
       {
         label: 'ELS账号',

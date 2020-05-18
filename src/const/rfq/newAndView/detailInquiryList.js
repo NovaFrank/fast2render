@@ -38,10 +38,15 @@ export default {
       //   label: '要求交期',
       //   prop: 'requireTime'
       // },
-      // {
-      //   label: '需求数量',
-      //   prop: 'count'
-      // },
+      {
+        label: '需求数量',
+        prop: 'quantity'
+      },
+      {
+        slot: true,
+        label: '报价方式',
+        prop: 'quoteMethod'
+      },
       // {
       //   label: 'ELS账号',
       //   prop: 'elsAccount'

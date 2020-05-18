@@ -65,6 +65,17 @@
       <template slot="menuLeft">
         <el-button size="small" @click.stop="handleShowSupplierSelect()">新供应商</el-button>
       </template>
+      <template slot-scope="scope" slot="quoteMethod">
+        <span v-if="scope.row.quoteMethod === '0'">常规报价</span>
+        <p
+          style="margin: 0"
+          v-else-if="scope.row.quoteMethod === '1'"
+          v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
+          :key="ladder.ladderGrade"
+        >
+          {{ ladder.ladderGrade }}
+        </p>
+      </template>
       <template slot="taxRate" slot-scope="scope">
         {{
           scope.row.itemStatus === '2' && detailObj.quoteEndTime > new Date().getTime()
@@ -95,10 +106,8 @@
         </div>
       </template>
       <template slot-scope="scope" slot="option">
-        <el-row
-          v-if="scope.row.itemStatus === '2' && detailObj.quoteEndTime < new Date().getTime()"
-          :gutter="24"
-        >
+        <el-row v-if="detailObj.quoteEndTime < new Date().getTime()" :gutter="24">
+          <!-- scope.row.itemStatus === '2' &&  -->
           <el-col :span="12">
             <avue-radio
               v-model="scope.row.itemStatus"
@@ -462,7 +471,7 @@ export default {
     spanMethod({ row, column, rowIndex, columnIndex }) {
       return mySpanMethod(
         this.inquiryListOption.data,
-        [1, 2, 3, 4],
+        [1, 2, 3, 4, 5, 6],
         'materialNumber',
         'id',
         columnIndex,

@@ -105,13 +105,13 @@ export default {
         ]
       },
       {
-        label: 'ELS账号',
+        label: '供应商ELS号',
         prop: 'elsAccount',
         addDisplay: false,
         editDisplay: false
       },
       {
-        label: '供应商',
+        label: '采购方ELS号',
         prop: 'toElsAccount',
         addDisplay: false,
         editDisplay: false

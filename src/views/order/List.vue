@@ -16,7 +16,7 @@
       ref="crud"
     >
       <template
-        v-if="['All', 'ProviderPending', 'ProviderChanged', 'ProviderApproval'].includes(tabActive)"
+        v-if="['All', 'ProviderChanged', 'ProviderApproval'].includes(tabActive)"
         slot-scope="scope"
         slot="status"
       >
@@ -24,8 +24,6 @@
           {{
             scope.row.orderStatus === ''
               ? '全部'
-              : scope.row.orderStatus === '1'
-              ? '已发送'
               : scope.row.orderStatus === '2'
               ? '供方变更'
               : scope.row.orderStatus === '4'
@@ -49,6 +47,15 @@
               ? '审批驳回'
               : '未提交'
           }}
+        </span>
+      </template>
+      <template
+        v-else-if="['ProviderPending'].includes(tabActive)"
+        slot-scope="scope"
+        slot="status"
+      >
+        <span>
+          {{ scope.row.sendStatus === '1' ? '已发送' : '' }}
         </span>
       </template>
       <!-- orderStatus: "0":"对方未确认","1":"对方已确认","2":"对方已退回","3":"变更对方未确认","4":"变更对方确认","5":"对方变更退回" -->
@@ -188,19 +195,11 @@ export default {
         pageSize: this.formOption.page.pageSize,
         ...data
       }; // orderStatus: "0":"对方未确认","1":"对方已确认","2":"对方已退回","3":"变更对方未确认","4":"变更对方确认","5":"对方变更退回"
-      if (
-        ['All', 'ProviderPending', 'ProviderChanged', 'ProviderApproval'].includes(this.tabActive)
-      ) {
+      if (['All', 'ProviderChanged', 'ProviderApproval'].includes(this.tabActive)) {
         params = {
           ...params,
           orderStatus:
-            this.tabActive === 'All'
-              ? ''
-              : this.tabActive === 'ProviderPending'
-              ? '1'
-              : this.tabActive === 'ProviderChanged'
-              ? '2'
-              : '4'
+            this.tabActive === 'All' ? '' : this.tabActive === 'ProviderChanged' ? '2' : '4'
         };
       } else if (['Create', 'Pending', 'Approval', 'Reject'].includes(this.tabActive)) {
         params = {
@@ -213,6 +212,11 @@ export default {
               : this.tabActive === 'Reject'
               ? '3'
               : '1'
+        };
+      } else if (['ProviderPending'].includes(this.tabActive)) {
+        params = {
+          ...params,
+          sendStatus: this.tabActive === 'ProviderPending' ? '1' : ''
         };
       }
       const resp = await getOrderList(action, params);

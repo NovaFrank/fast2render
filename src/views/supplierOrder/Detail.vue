@@ -64,7 +64,7 @@
     ></selectDialog3>
     <el-dialog title="退回原因" :visible.sync="dialogRejecctVisible" width="30%">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-        <el-form-item label="" prop="name">
+        <el-form-item label="" prop="rejectObj">
           <textarea
             v-model="ruleForm.rejectObj"
             cols="30"

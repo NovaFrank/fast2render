@@ -35,6 +35,7 @@
         :data="planListOption.data"
         :option="planListOption.option"
         v-model="planListOption.planObj"
+        :before-open="beforeOpen"
         :page.sync="planListOption.page"
         @row-update="rowUpdatePlan"
       >
@@ -338,6 +339,14 @@ export default {
         this.formOption.obj.purchasePerson =
           selectColumns[0].elsSubAccount + '_' + selectColumns[0].name;
       }
+    },
+    beforeOpen(done, type) {
+      if (['edit'].includes(type)) {
+        // 编辑
+        const data = this.planListOption.planObj.requestDeliveryQuantity;
+        window.sessionStorage.setItem('requestQuantity', JSON.stringify(data));
+      }
+      done();
     }
   }
 };

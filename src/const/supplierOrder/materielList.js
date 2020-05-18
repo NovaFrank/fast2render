@@ -84,6 +84,7 @@ export default {
         label: '含税单价',
         prop: 'price',
         type: 'number',
+        precision: 2,
         rules: [
           {
             required: true,
@@ -96,6 +97,7 @@ export default {
         label: '总金额',
         prop: 'totalAmount',
         type: 'number',
+        precision: 2,
         rules: [
           {
             required: true,

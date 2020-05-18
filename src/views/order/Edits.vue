@@ -123,6 +123,7 @@ import selectDialog from '@/common/selectDialog';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
 import { getUserInfo } from '@/util/utils.js';
+import { format, chain, bignumber } from 'mathjs';
 export default {
   components: {
     FormHeader,
@@ -356,6 +357,14 @@ export default {
         this.materielListOption.data.push(row);
         this.params.addList.push(row);
       }
+      const priceString = Number(row.price).toFixed(2);
+      const quantityString = row.quantity.toString();
+      const totalAmount = format(
+        chain(bignumber(priceString))
+          .multiply(bignumber(quantityString))
+          .done()
+      );
+      row.totalAmount = Number(totalAmount).toFixed(2);
       this.$message({
         type: 'success',
         message: '保存成功!'
@@ -377,6 +386,17 @@ export default {
         this.$message.error('截止时间不得小于当前时间');
         return false;
       }
+      const data = this.materielListOption.data[index];
+      console.log(data);
+      const priceString = Number(row.price).toFixed(2);
+      const quantityString = row.quantity.toString();
+
+      const totalAmount = format(
+        chain(bignumber(priceString))
+          .multiply(bignumber(quantityString))
+          .done()
+      );
+      row.totalAmount = Number(totalAmount).toFixed(2);
       this.$set(this.materielListOption.data, index, row);
       this.$message({
         type: 'success',

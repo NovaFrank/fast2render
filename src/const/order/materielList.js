@@ -128,6 +128,7 @@ export default {
         label: '含税单价',
         prop: 'price',
         type: 'number',
+        precision: 2,
         rules: [
           {
             required: true,
@@ -141,14 +142,9 @@ export default {
         label: '总金额',
         prop: 'totalAmount',
         type: 'number',
-        rules: [
-          {
-            required: true,
-            message: '请输入 大于0的总金额',
-            trigger: 'blur',
-            validator: validateQuantity
-          }
-        ]
+        precision: 2,
+        addDisplay: false,
+        editDisplay: false
       },
       {
         label: 'ELS账号',

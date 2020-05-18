@@ -203,6 +203,7 @@ export default {
       this.formOption.obj = resp.data.data;
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;
+      this.formOption.obj.salePerson = '1001';
     },
 
     // 确认订单

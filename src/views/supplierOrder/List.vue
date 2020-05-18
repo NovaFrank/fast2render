@@ -110,6 +110,9 @@ export default {
       const resp = await getOrderList(action, params);
       this.formOption.data = resp.data.pageData.rows;
       this.formOption.page.total = resp.data.pageData.total;
+      this.formOption.data.map((item) => {
+        item.salePerson = '1001';
+      });
     },
     // 分页
     currentChange(val) {

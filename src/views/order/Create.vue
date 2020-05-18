@@ -138,6 +138,7 @@ import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
 import { getUserInfo } from '@/util/utils.js';
 import { createOrder, dataDicAPI } from '@/api/order.js';
+import { format, chain, bignumber } from 'mathjs';
 export default {
   components: {
     FormHeader,
@@ -341,6 +342,15 @@ export default {
         this.materielListOption.data.push(row);
         this.params.addList.push(row);
       }
+      const priceString = Number(row.price).toFixed(2);
+      const quantityString = row.quantity.toString();
+      const totalAmount = format(
+        chain(bignumber(priceString))
+          .multiply(bignumber(quantityString))
+          .done()
+      );
+
+      row.totalAmount = Number(totalAmount).toFixed(2);
       this.$message({
         type: 'success',
         message: '保存成功!'
@@ -363,6 +373,18 @@ export default {
         return false;
       }
       // loading();
+      const data = this.materielListOption.data[index];
+      console.log(data);
+      const priceString = Number(row.price).toFixed(2);
+      const quantityString = row.quantity.toString();
+
+      const totalAmount = format(
+        chain(bignumber(priceString))
+          .multiply(bignumber(quantityString))
+          .done()
+      );
+
+      row.totalAmount = Number(totalAmount).toFixed(2);
       this.$set(this.materielListOption.data, index, row);
       this.$message({
         type: 'success',

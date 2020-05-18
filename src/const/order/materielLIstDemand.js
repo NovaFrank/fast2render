@@ -131,6 +131,7 @@ export default {
         prop: 'price',
         type: 'number',
         disabled: true,
+        precision: 2,
         rules: [
           {
             required: true,
@@ -145,14 +146,9 @@ export default {
         prop: 'totalAmount',
         type: 'number',
         disabled: true,
-        rules: [
-          {
-            required: true,
-            message: '请输入 大于0的总金额',
-            trigger: 'blur',
-            validator: validateQuantity
-          }
-        ]
+        precision: 2,
+        addDisplay: false,
+        editDisplay: false
       },
       {
         label: 'ELS账号',

@@ -28,6 +28,18 @@
       @size-change="sizeChange"
       @current-change="currentChange"
     >
+      <template slot-scope="scope" slot="priceIncludingTax">
+        <span v-if="scope.row.quoteMethod === '0'">{{ scope.row.priceIncludingTax }}</span>
+        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
+          {{ getPriceIndex(scope.row, 'priceIncludingTax') }}
+        </p>
+      </template>
+      <template slot-scope="scope" slot="priceExcludingTax">
+        <span v-if="scope.row.quoteMethod === '0'">{{ scope.row.priceExcludingTax }}</span>
+        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
+          {{ getPriceIndex(scope.row, 'priceExcludingTax') }}
+        </p>
+      </template>
       <template slot-scope="scope" slot="quoteMethod">
         <span v-if="scope.row.quoteMethod === '0'">常规报价</span>
         <p
@@ -154,6 +166,16 @@ export default {
   },
   watch: {},
   methods: {
+    getPriceIndex(row, column) {
+      console.log(row);
+      const quantity = row.quantity;
+      const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
+        return Number(item.ladderQuantity);
+      });
+      quantityList.push(quantity);
+      const index = quantityList.findIndex((item) => item === Number(quantity));
+      return JSON.parse(row.ladderPriceJson)[index - 1][column];
+    },
     closeFieldDialog() {
       this.ladderQuoteVisible = false;
       this.quoteVisible = false;

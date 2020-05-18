@@ -317,6 +317,7 @@ export default {
         type: 'warning'
       }).then(() => {
         const params = {
+          ...formOption.detailObj,
           enquiryNumber: this.currentEnquiryNumber,
           quoteEndTime: this.detailObj.quoteEndTime,
           itemList: this.inquiryListOption.data

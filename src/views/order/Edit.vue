@@ -8,7 +8,6 @@
       @on-submit="handleSubmit"
       @on-save="handleSave"
     ></form-header>
-    <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form">
       <template slot="purchasePerson">
         <el-input v-model="formOption.obj.purchasePerson" :readonly="true">
@@ -138,14 +137,6 @@ export default {
       default: () => {
         return 'attahcment-fiels_4_2';
       }
-    },
-    isEdit: {
-      type: Boolean,
-      default: false
-    },
-    isInApproval: {
-      type: Boolean,
-      default: false
     }
   },
   data() {
@@ -213,7 +204,6 @@ export default {
   },
   watch: {
     'crudObj.taxCode'(newVal) {
-      console.log('newVal:' + JSON.stringify(newVal));
       this.crudObj.taxRate = newVal;
     }
   },
@@ -258,7 +248,6 @@ export default {
               return {
                 ...item,
                 dicData: res.data.map((item) => {
-                  console.log(item);
                   return {
                     label: `${item.label}`,
                     value: `${item.value}`
@@ -309,7 +298,6 @@ export default {
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
-      console.log(this.tabActive.prop);
       sessionStorage.setItem('materialRow', JSON.stringify(this.materielListOption.data));
       if (this.tabActive.prop === 'plan') {
         let sessionCateCode = sessionStorage.getItem('materialRow');
@@ -342,21 +330,6 @@ export default {
         this.materielListOption.data.splice(index, 1);
       });
     },
-    // 生成excel模板
-    generateExcelTemp() {
-      // todo
-    },
-    // 下载excel模板
-    downloadExcelTemp() {
-      window.open(
-        `https://cs.51qqt.com/qqt-srm/servlet/downloadServlet?filePath=${this.downloadMessage}`
-      );
-    },
-    // 导入excel
-    async beforeUploadExcel(file) {
-      console.log('file.raw :', file);
-    },
-
     // 保存新增的数据
     rowSave(row, done, loading) {
       if (this.crudObj.deliveryDate < new Date().getTime()) {
@@ -485,7 +458,6 @@ export default {
         orderItemVOList: this.materielListOption.data,
         deliveryPlanVOList: this.planListOption.data
       };
-      console.log('params: ' + JSON.stringify(params.orderItemVOList));
       await createOrder(action, params);
 
       const action2 = 'submit';
@@ -505,33 +477,20 @@ export default {
       });
       this.$router.push({ path: '/list' });
     },
-    // 发送
-    // async handleSubmit() {
-    //   this.$confirm(`确认发送？`, {
-    //     confirmButtonText: '确定',
-    //     cancelButtonText: '取消',
-    //     type: 'warning'
-    //   })
-    //     .then(async () => {
-    //       const action = 'sendOrder';
-    //       let params = {
-    //         elsAccount: this.elsAccount,
-    //         elsSubAccount: this.elsSubAccount,
-    //         ...this.formOption.obj,
-    //         orderItemVOList: this.materielListOption.data,
-    //         deliveryPlanVOList: this.planListOption.data
-    //       };
-    //       await createOrder(action, params);
-    //       console.log('params: ' + JSON.stringify(params));
-    //     })
-    //     .then(() => {
-    //       this.$message({
-    //         type: 'success',
-    //         message: '修改成功!'
-    //       });
-    //       this.$router.push({ path: '/list' });
-    //     });
-    // },
+    // 生成excel模板
+    generateExcelTemp() {
+      // todo
+    },
+    // 下载excel模板
+    downloadExcelTemp() {
+      window.open(
+        `https://cs.51qqt.com/qqt-srm/servlet/downloadServlet?filePath=${this.downloadMessage}`
+      );
+    },
+    // 导入excel
+    async beforeUploadExcel(file) {
+      console.log('file.raw :', file);
+    },
     uploadAfter(res, done, loading) {
       console.log('after upload', res);
       done();

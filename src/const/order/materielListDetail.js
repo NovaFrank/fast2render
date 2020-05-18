@@ -95,7 +95,7 @@ export default {
           {
             required: true,
             message: '请输入 大于0的需求数量',
-            trigger: 'change',
+            trigger: 'blur',
             validator: validateQuantity
           }
         ]

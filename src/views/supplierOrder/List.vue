@@ -108,7 +108,6 @@ export default {
         };
       }
       const resp = await getOrderList(action, params);
-      console.log(resp);
       this.formOption.data = resp.data.pageData.rows;
       this.formOption.page.total = resp.data.pageData.total;
     },

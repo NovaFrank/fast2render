@@ -148,16 +148,7 @@ export default {
     selectDialog4
   },
   name: 'Detail',
-  props: {
-    isEdit: {
-      type: Boolean,
-      default: false
-    },
-    isInApproval: {
-      type: Boolean,
-      default: false
-    }
-  },
+  props: {},
   data() {
     return {
       elsAccount: '',
@@ -229,7 +220,6 @@ export default {
   },
   watch: {
     'crudObj.taxCode'(newVal) {
-      console.log('newVal:' + JSON.stringify(newVal));
       this.crudObj.taxRate = newVal;
     }
   },
@@ -278,7 +268,6 @@ export default {
               return {
                 ...item,
                 dicData: res.data.map((item) => {
-                  console.log(item);
                   return {
                     label: `${item.label}`,
                     value: `${item.value}`
@@ -397,24 +386,6 @@ export default {
     // 提交审批
     async handleSubmit() {
       alert('请先保存！');
-      // this.tabActive = this.tabOption.option.column[2];
-      // this.handleTabClick(this.tabActive);
-      // const action = 'submit';
-      // let params = {
-      //   elsSubAccount: this.elsAccount,
-      //   toElsAccount: this.formOption.obj.toElsAccount,
-      //   businessType: "orderAudit",
-      //   businessId: "FI订单号",
-      //   params: "{\"key1\":\"123\"}"
-      // };
-      // console.log('params: ' + JSON.stringify(params));
-      // await submitAudit(action, params);
-      // // console.log('params: ' + JSON.stringify(resp));
-      // this.$message({
-      //   type: 'success',
-      //   message: '提交审批成功!'
-      // });
-      // this.$router.push({ path: '/list' });
     },
 
     // 保存 跳转到list
@@ -488,7 +459,6 @@ export default {
       });
       const orderNo = res.data.data.orderNumber;
       this.$router.push({ name: 'edit', params: { orderNumber: orderNo } });
-      // this.$router.push({ path: '/list' });
     },
     onSaveForm(form) {
       // todo

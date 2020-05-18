@@ -248,7 +248,6 @@ export default {
             orderItemReceiveVOList: this.materielListOption.data,
             deliveryPlanReceiveVOList: this.planListOption.data
           };
-          console.log('params: ' + JSON.stringify(params));
           return createOrder(action, params);
         })
         .then(() => {
@@ -268,7 +267,6 @@ export default {
         orderItemReceiveVOList: this.materielListOption.data,
         deliveryPlanReceiveVOList: this.planListOption.data
       };
-      console.log('params: ' + JSON.stringify(params));
       await createOrder(action, params);
 
       this.$message({
@@ -284,7 +282,6 @@ export default {
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
-      console.log(this.tabActive.prop);
     },
     // 生成excel模板
     generateExcelTemp() {

@@ -7,7 +7,6 @@
       @on-cancel="handleCancel"
       @on-submit="handleSendProvider"
     ></form-header>
-    <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
@@ -262,8 +261,6 @@ export default {
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
-      console.log(this.tabActive.prop);
-
       if (this.tabActive.prop === 'plan') {
         this.tableData();
       }

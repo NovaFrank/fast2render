@@ -172,7 +172,6 @@ export default {
     this.formOption.option.detail = true;
     this.materielListOption.option.column.map((item) => {
       if (item.prop === 'materialNumber') {
-        console.log(item);
         item.formslot = false;
         item.disabled = true;
       }
@@ -276,7 +275,6 @@ export default {
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
-      console.log(this.tabActive.prop);
 
       if (this.tabActive.prop === 'plan') {
         this.tableData();

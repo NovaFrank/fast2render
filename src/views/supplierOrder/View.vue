@@ -262,7 +262,6 @@ export default {
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
-      console.log(this.tabActive.prop);
     },
     // 生成excel模板
     generateExcelTemp() {

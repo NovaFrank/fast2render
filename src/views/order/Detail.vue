@@ -279,8 +279,6 @@ export default {
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
-      console.log(this.tabActive.prop);
-
       if (this.tabActive.prop === 'plan') {
         this.tableData();
       }

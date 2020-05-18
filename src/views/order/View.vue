@@ -272,7 +272,6 @@ export default {
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
-      console.log(this.tabActive.prop);
       sessionStorage.setItem('materialRow', JSON.stringify(this.materielListOption.data));
       if (this.tabActive.prop === 'plan') {
         let sessionCateCode = sessionStorage.getItem('materialRow');
@@ -423,7 +422,6 @@ export default {
         orderItemVOList: this.materielListOption.data,
         deliveryPlanVOList: this.planListOption.data
       };
-      console.log('params: ' + JSON.stringify(params.orderItemVOList));
       await createOrder(action, params);
 
       const action2 = 'submit';

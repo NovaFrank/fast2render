@@ -4,7 +4,6 @@
       新建
     </el-button>
     <avue-tabs :option="tabOption.option" @change="handleClick"></avue-tabs>
-    <!-- <component :is="currentComponent"></component> -->
     <avue-crud
       v-if="formOption.option.column"
       :data="formOption.data"
@@ -131,9 +130,6 @@
 
 <script>
 import tabOption from '@/const/order/navTabs';
-// import tableAll from '../tables/tableAll';
-// import tableCreate from '../tables/tableCreate';
-// import tablePending from '../tables/tablePending';
 import formOption from '@/const/order/orderFormOption';
 import { getUserInfo } from '@/util/utils.js';
 import { getOrderList } from '@/api/order.js';
@@ -149,7 +145,6 @@ export default {
   data() {
     return {
       tabOption: tabOption,
-      currentComponent: 'tableAll',
       tabActive: 'all',
       crudObj: {},
       formOption: formOption
@@ -166,7 +161,6 @@ export default {
     handleClick(tab) {
       this.tabActive = tab.prop;
       this.tab = tab;
-      this.currentComponent = 'table' + this.tabActive;
     },
     async tableData(data) {
       const action = 'findPageList';
@@ -204,7 +198,6 @@ export default {
         };
       }
       const resp = await getOrderList(action, params);
-      console.log(resp);
       this.formOption.data = resp.data.pageData.rows;
       this.formOption.page.total = resp.data.pageData.total;
     },

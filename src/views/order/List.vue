@@ -91,9 +91,21 @@
         <router-link v-if="row.auditStatus === '2'" :to="`detail/${row.orderNumber}`">
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
+        <router-link
+          v-if="row.orderStatus === '1' && row.sendStatus === '1' && row.auditStatus === '0'"
+          :to="`detail/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
         <!--edit 保存未发送 可编辑修改 -->
         <router-link
           v-if="row.orderStatus === '0' && row.sendStatus === '0' && row.auditStatus === '1'"
+          :to="`edit/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '3' && row.sendStatus === '2' && row.auditStatus === '1'"
           :to="`edit/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
@@ -112,6 +124,12 @@
         <!--sendtoprovider-->
         <router-link
           v-if="row.orderStatus === '0' && row.sendStatus === '0' && row.auditStatus === '0'"
+          :to="`sendToProvider/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '3' && row.sendStatus === '2' && row.auditStatus === '0'"
           :to="`sendToProvider/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>

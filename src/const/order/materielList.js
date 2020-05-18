@@ -6,13 +6,13 @@ import { validateNumber } from '@/util/validate';
 //     callback();
 //   }
 // };
-const validateTaxRate = (rule, value, callback) => {
-  if (!validateNumber(value)) {
-    callback(new Error('请输入大于0的小数或整数'));
-  } else {
-    callback();
-  }
-};
+// const validateTaxRate = (rule, value, callback) => {
+//   if (!validateNumber(value)) {
+//     callback(new Error('请输入大于0的小数或整数'));
+//   } else {
+//     callback();
+//   }
+// };
 
 const validateQuantity = (rule, value, callback) => {
   if (!validateNumber(value)) {
@@ -108,21 +108,21 @@ export default {
         prop: 'taxCode',
         dicUrl: '/layout/dics/value/taxCode',
         dicMethod: 'get',
-        type: 'select',
-        rules: [
-          {
-            required: true,
-            message: '请输入 税码',
-            trigger: 'blur'
-          }
-        ]
+        type: 'select'
+        // rules: [
+        //   {
+        //     required: true,
+        //     message: '请输入 税码',
+        //     trigger: 'blur'
+        //   }
+        // ]
       },
       {
         label: '税率',
         prop: 'taxRate',
         type: 'input',
-        disabled: true,
-        rules: [{ trigger: 'blur', validator: validateTaxRate }]
+        disabled: true
+        // rules: [{ trigger: 'blur', validator: validateTaxRate }]
       },
       {
         label: '含税单价',

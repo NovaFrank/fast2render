@@ -37,12 +37,11 @@ export default {
     indexLabel: '序号',
     page: false,
     align: 'center',
-    menu: true,
     menuAlign: 'center',
     menuWidth: '180',
     addBtn: false,
     editBtn: true,
-    delBtn: true,
+    delBtn: false,
     refreshBtn: false,
     columnBtn: false,
     // addRowBtn: true,
@@ -52,6 +51,13 @@ export default {
       {
         label: '物料编码',
         prop: 'materialNumber',
+        rules: [
+          {
+            required: true,
+            message: '请输入 物料编码',
+            trigger: 'blur'
+          }
+        ],
         disabled: true
       },
       {
@@ -63,23 +69,20 @@ export default {
         label: '订单项号',
         prop: 'orderItemNumber',
         addDisplay: false,
-        editDisplay: false,
-        disabled: true
+        editDisplay: false
       },
       {
         label: '计划行号',
         prop: 'deliveryItemNumber',
         addDisplay: false,
         editDisplay: false,
-        hide: true,
-        disabled: true
+        hide: true
       },
       {
         label: '规格',
         prop: 'materialSpecifications',
         addDisplay: false,
-        editDisplay: false,
-        disabled: true
+        editDisplay: false
       },
       {
         label: '单位',
@@ -98,7 +101,8 @@ export default {
             trigger: 'blur',
             validator: validateQuantity
           }
-        ]
+        ],
+        disabled: true
       },
       {
         label: '税码',
@@ -106,14 +110,14 @@ export default {
         dicUrl: '/layout/dics/value/taxCode',
         dicMethod: 'get',
         type: 'select',
-        disabled: true
         // rules: [
         //   {
         //     required: true,
         //     message: '请输入 税码',
         //     trigger: 'blur'
         //   }
-        // ]
+        // ],
+        disabled: true
       },
       {
         label: '税率',
@@ -126,6 +130,7 @@ export default {
         label: '含税单价',
         prop: 'price',
         type: 'number',
+        disabled: true,
         rules: [
           {
             required: true,
@@ -139,6 +144,7 @@ export default {
         label: '总金额',
         prop: 'totalAmount',
         type: 'number',
+        disabled: true,
         rules: [
           {
             required: true,
@@ -152,15 +158,13 @@ export default {
         label: 'ELS账号',
         prop: 'elsAccount',
         addDisplay: false,
-        editDisplay: false,
-        disabled: true
+        editDisplay: false
       },
       {
         label: '供应商',
         prop: 'toElsAccount',
         addDisplay: false,
-        editDisplay: false,
-        disabled: true
+        editDisplay: false
       },
       {
         label: '交货日期',

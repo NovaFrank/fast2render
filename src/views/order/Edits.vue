@@ -1,25 +1,14 @@
 <template>
   <basic-container>
     <form-header
-      titleText="新建订单"
+      titleText="修改"
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
-      @on-save="handleSave"
-      @on-file="handleFile"
       @on-submit="handleSubmit"
+      @on-save="handleSave"
     ></form-header>
-    <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-form :option="formOption.option" v-model="formOption.obj" ref="form">
-      <template slot="toElsAccount">
-        <el-input v-model="formOption.obj.toElsAccount" :readonly="true">
-          <i
-            slot="suffix"
-            class=" el-input_icon el-icon-search pointer"
-            @click="supplierDialogOpen"
-          ></i>
-        </el-input>
-      </template>
       <template slot="purchasePerson">
         <el-input v-model="formOption.obj.purchasePerson" :readonly="true">
           <i
@@ -39,6 +28,7 @@
         </el-input>
       </template>
     </avue-form>
+    <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
     <span v-if="tabActive.prop === 'detail'">
       <avue-crud
@@ -78,33 +68,31 @@
       </avue-crud>
     </span>
     <span v-if="tabActive.prop === 'files'">
-      <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
-      </avue-crud>
+      <!-- <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
+      </avue-crud> -->
+      <fast2-attachment-list
+        :id="formOption.obj.orderNumber"
+        :elsAccount="elsAccount"
+        :businessElsAccount="formOption.obj.elsAccount"
+        :version="annexComponentVersion"
+        businessModule="order"
+      ></fast2-attachment-list>
     </span>
     <selectDialog
       ref="materialDialog"
       :dialogVisible.sync="dialogVisible"
       :title="'添加物料'"
       :column="materialOption.option.column"
-      :elsAccount="elsAccount"
+      :elsAccount="this.elsAccount"
       actionPath="findPageList"
       @save="materialDialogSave"
     ></selectDialog>
-    <selectDialog2
-      ref="supplierDialog"
-      :dialogVisible.sync="dialogSupplierVisible"
-      :title="'添加供应商'"
-      :column="supplierOption.option.column"
-      :elsAccount="elsAccount"
-      actionPath="findPageList"
-      @save="supplierDialogSave"
-    ></selectDialog2>
     <selectDialog3
       ref="purchaseDialog"
       :dialogVisible.sync="dialogPurchaseVisible"
       :title="'添加采购方负责人'"
       :column="purchaseOption.option.column"
-      :elsAccount="elsAccount"
+      :elsAccount="this.elsAccount"
       actionPath="findPageList"
       @save="purchaseDialogSave"
     ></selectDialog3>
@@ -113,7 +101,7 @@
       :dialogVisible.sync="dialogPurchaseGroupVisible"
       :title="'添加采购组'"
       :column="purchaseGroupOption.option.column"
-      :elsAccount="elsAccount"
+      :elsAccount="this.elsAccount"
       actionPath="findPageList"
       @save="purchaseGroupDialogSave"
     ></selectDialog4>
@@ -121,44 +109,42 @@
 </template>
 
 <script>
-import ButtonGroup from '@/common/ButtonGroup';
 import FormHeader from '@/components/formHeader';
-import { tabOption4Create } from '@/const/order/tabs';
+import tabOption from '@/const/order/tabs';
+import formOption from '@/const/order/orderFormDetail';
 import fileOption from '@/const/order/newFiles';
-import formOption from '@/const/order/orderForm';
-import materielListOption from '@/const/order/materielList';
-import materialOption from '@/const/order/materiaList';
-import supplierOption from '@/const/order/supplierList';
 import purchaseOption from '@/const/order/purchaseList';
-import purchaseGroupOption from '@/const/order/purchaseGroupList';
 import planListOption from '@/const/order/planList';
+import materialOption from '@/const/order/materiaList';
+import materielListOption from '@/const/order/materielList';
+import purchaseGroupOption from '@/const/order/purchaseGroupList';
+import { getOrderList, dataDicAPI, createOrder, submitAudit } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
-import selectDialog2 from '@/common/selectDialog2';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
 import { getUserInfo } from '@/util/utils.js';
-import { createOrder, dataDicAPI } from '@/api/order.js';
 export default {
   components: {
     FormHeader,
-    ButtonGroup,
     selectDialog,
-    selectDialog2,
     selectDialog3,
     selectDialog4
   },
   name: 'Detail',
-  props: {},
+  props: {
+    annexComponentVersion: {
+      type: String,
+      default: () => {
+        return 'attahcment-fiels_4_2';
+      }
+    }
+  },
   data() {
     return {
       elsAccount: '',
       elsSubAccount: '',
+      tabOption: tabOption,
       tabActive: {},
-      dialogVisible: false,
-      dialogSupplierVisible: false,
-      dialogPurchaseVisible: false,
-      dialogPurchaseGroupVisible: false,
-      tabOption: tabOption4Create,
       fileOption: fileOption,
       purchaseGroupOption: purchaseGroupOption,
       filesForm: {},
@@ -170,16 +156,19 @@ export default {
       },
       url: '', // 上传路径
       type: {},
+      downloadMessage: '',
       page: {
         // pageSizes: [10, 20, 30, 40],默认
         currentPage: 1,
         total: 0,
         pageSize: 10
       },
-      formOption: formOption,
+      dialogVisible: false,
+      dialogPurchaseVisible: false,
+      dialogPurchaseGroupVisible: false,
       materialOption: materialOption,
-      supplierOption: supplierOption,
       purchaseOption: purchaseOption,
+      formOption: formOption,
       planListOption: planListOption,
       crudObj: {},
       crudOption: {},
@@ -188,11 +177,6 @@ export default {
           text: '返回',
           size: 'small',
           action: 'on-cancel'
-        },
-        {
-          text: '添加附件',
-          size: 'small',
-          action: 'on-file'
         },
         {
           text: '保存',
@@ -227,13 +211,9 @@ export default {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
-    this.materielListOption.data = [];
-    this.fileOption.option.menu = true;
-    this.getDicData();
     this.tabActive = this.tabOption.option.column[0];
-    this.formOption.obj.orderStatus = '0';
-    this.formOption.obj.sendStatus = '0';
-    this.formOption.obj.deliveryStatus = '0';
+    this.tableData();
+    this.getDicData();
   },
   methods: {
     // 获取数据字典下拉列表
@@ -280,14 +260,41 @@ export default {
         );
       });
     },
-    itemAdd() {
-      if (!this.formOption.obj.toElsAccount) {
-        alert('请选择供应商！');
-        return false;
-      }
-      this.$refs.crud.rowAdd();
+    // 获取头数据和行数据findDeliveryPlanList
+    async tableData(data) {
+      const action = 'findOrderHeadVO';
+      const action2 = 'findOrderItemList';
+      const action3 = 'findDeliveryPlanList';
+      const params = {
+        elsAccount: this.elsAccount,
+        orderStatus: '',
+        orderNumber: this.$route.params.orderNumber,
+        ...data
+      };
+      const params2 = {
+        elsAccount: this.elsAccount,
+        orderStatus: '',
+        orderNumber: this.$route.params.orderNumber,
+        ...data
+      };
+      const params3 = {
+        elsAccount: this.elsAccount,
+        orderStatus: '',
+        orderNumber: this.$route.params.orderNumber,
+        ...data
+      };
+      const resp = await getOrderList(action, params);
+      const resp2 = await getOrderList(action2, params2);
+      const resp3 = await getOrderList(action3, params3);
+      this.formOption.obj = resp.data.data;
+      this.materielListOption.data = resp2.data.data;
+      this.planListOption.data = resp3.data.data;
+      let orderItemArr = [];
+      resp2.data.data.forEach((i) => {
+        orderItemArr.push(Number(i.orderItemNumber));
+      });
+      sessionStorage.setItem('orderItemArr', JSON.stringify(orderItemArr));
     },
-
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
@@ -295,17 +302,21 @@ export default {
       if (this.tabActive.prop === 'plan') {
         let sessionCateCode = sessionStorage.getItem('materialRow');
         this.planListOption.data = JSON.parse(sessionCateCode);
-
         this.planListOption.data.forEach((item) => {
           JSON.parse(sessionCateCode).forEach((i) => {
             if (i.orderItemNumber === item.orderItemNumber) {
               item.requestDeliveryDate = i.deliveryDate;
               item.requestDeliveryQuantity = i.quantity;
+              item.deliveryItemNumber = '1';
             }
           });
         });
       }
     },
+    itemAdd() {
+      this.$refs.crud.rowAdd();
+    },
+    // 删除行数据
     handleDeleteRow(row, index) {
       this.$confirm('确定将选择数据删除?', {
         confirmButtonText: '确定',
@@ -319,25 +330,29 @@ export default {
         this.materielListOption.data.splice(index, 1);
       });
     },
-
+    // 保存新增的数据
     rowSave(row, done, loading) {
       if (this.crudObj.deliveryDate < new Date().getTime()) {
         loading();
         this.$message.error('截止时间不得小于当前时间');
         return false;
       }
-
-      // 保存新增的数据
       if (this.materielListOption.data === undefined) {
         this.materielListOption.data = [];
       }
-      row.deliveryItemNumber = '1';
+
       if (this.materielListOption.data.length <= 0) {
+        row.deliveryItemNumber = '1';
         row.orderItemNumber = '1';
         this.materielListOption.data.push(row);
         this.params.addList.push(row);
       } else {
-        row.orderItemNumber = (this.params.addList.length + 1).toString();
+        row.deliveryItemNumber = '1';
+        let sessionItemArr = sessionStorage.getItem('orderItemArr');
+        let maxNum = JSON.parse(sessionItemArr).reduce((a, b) => {
+          return b > a ? b : a;
+        });
+        row.orderItemNumber = (maxNum + 1).toString();
         this.materielListOption.data.push(row);
         this.params.addList.push(row);
       }
@@ -362,7 +377,6 @@ export default {
         this.$message.error('截止时间不得小于当前时间');
         return false;
       }
-      // loading();
       this.$set(this.materielListOption.data, index, row);
       this.$message({
         type: 'success',
@@ -374,41 +388,40 @@ export default {
       loading();
       done();
     },
-
     rowDelPlan(row, index) {
       // 删除
       this.crudPlanData.splice(index, 1);
       this.params.deleteList.push(row);
     },
+    rowDel(row, index) {
+      // 删除
+      this.crudData.splice(index, 1);
+      this.params.deleteList.push(row);
+    },
     handleCancel() {
       this.$router.push({ path: '/list' });
     },
-    // 提交审批
-    async handleSubmit() {
-      alert('请先保存！');
-    },
-
-    // 保存 跳转到list
+    // 保存表头和表单
     async handleSave() {
       if (this.materielListOption.data.length === 0) {
-        alert('请添加一条数据!');
+        alert('请添加一条数据！');
         return false;
-      } else if (this.formOption.obj.orderType === '') {
-        alert('请选择订单类型!');
-        return false;
-      } else if (this.formOption.obj.purchasePerson === '') {
+      } else if (!this.formOption.obj.purchasePerson) {
         alert('请选择采购方负责人!');
         return false;
-      } else if (this.formOption.obj.purchaseType === '') {
+      } else if (!this.formOption.obj.orderType) {
+        alert('请选择订单类型!');
+        return false;
+      } else if (!this.formOption.obj.purchaseType) {
         alert('请选择采购类别!');
         return false;
-      } else if (this.formOption.obj.purchaseGroup === '') {
+      } else if (!this.formOption.obj.purchaseGroup) {
         alert('请选择采购组!');
         return false;
       }
-      this.tabActive = this.tabOption.option.column[1];
+      this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
-      const action = 'createOrder';
+      const action = 'updateOrder';
       let params = {
         elsAccount: this.elsAccount,
         elsSubAccount: this.elsSubAccount,
@@ -416,7 +429,6 @@ export default {
         orderItemVOList: this.materielListOption.data,
         deliveryPlanVOList: this.planListOption.data
       };
-      // console.log('params: ' + JSON.stringify(params));
       await createOrder(action, params);
       this.$message({
         type: 'success',
@@ -424,27 +436,27 @@ export default {
       });
       this.$router.push({ path: '/list' });
     },
-    // 添加附件 保存跳转到list
-    async handleFile() {
+    // 提交审批
+    async handleSubmit() {
       if (this.materielListOption.data.length === 0) {
         alert('请添加一条数据！');
         return false;
-      } else if (this.formOption.obj.orderType === '') {
-        alert('请选择订单类型!');
-        return false;
-      } else if (this.formOption.obj.purchasePerson === '') {
+      } else if (!this.formOption.obj.purchasePerson) {
         alert('请选择采购方负责人!');
         return false;
-      } else if (this.formOption.obj.purchaseType === '') {
+      } else if (!this.formOption.obj.orderType) {
+        alert('请选择订单类型!');
+        return false;
+      } else if (!this.formOption.obj.purchaseType) {
         alert('请选择采购类别!');
         return false;
-      } else if (this.formOption.obj.purchaseGroup === '') {
+      } else if (!this.formOption.obj.purchaseGroup) {
         alert('请选择采购组!');
         return false;
       }
-      this.tabActive = this.tabOption.option.column[1];
+      this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
-      const action = 'createOrder';
+      const action = 'updateOrder';
       let params = {
         elsAccount: this.elsAccount,
         elsSubAccount: this.elsSubAccount,
@@ -452,28 +464,54 @@ export default {
         orderItemVOList: this.materielListOption.data,
         deliveryPlanVOList: this.planListOption.data
       };
-      const res = await createOrder(action, params);
+      await createOrder(action, params);
+
+      const action2 = 'submit';
+      let params2 = {
+        elsAccount: this.elsAccount,
+        toElsAccount: this.formOption.obj.toElsAccount,
+        businessType: 'orderAudit',
+        businessId: this.formOption.obj.orderNumber,
+        params: '{"key1":"123"}'
+      };
+      // console.log('params: ' + JSON.stringify(params2));
+      await submitAudit(action2, params2);
+      // console.log('params: ' + JSON.stringify(resp));
       this.$message({
         type: 'success',
-        message: '保存成功!'
+        message: '已提交审批!'
       });
-      const orderNo = res.data.data.orderNumber;
-      this.$router.push({ name: 'edits', params: { orderNumber: orderNo } });
+      this.$router.push({ path: '/list' });
+    },
+    // 生成excel模板
+    generateExcelTemp() {
+      // todo
+    },
+    // 下载excel模板
+    downloadExcelTemp() {
+      window.open(
+        `https://cs.51qqt.com/qqt-srm/servlet/downloadServlet?filePath=${this.downloadMessage}`
+      );
+    },
+    // 导入excel
+    async beforeUploadExcel(file) {
+      console.log('file.raw :', file);
+    },
+    uploadAfter(res, done, loading) {
+      console.log('after upload', res);
+      done();
+    },
+    uploadBefore(file, done, loading) {
+      console.log('before upload', file);
+      // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
+      const newFile = new File([file], '1234', { type: file.type });
+      done(newFile);
     },
     onSaveForm(form) {
       // todo
     },
     materialDialogOpen() {
       this.dialogVisible = true;
-    },
-    supplierDialogOpen() {
-      this.dialogSupplierVisible = true;
-    },
-    purchaseDialogOpen() {
-      this.dialogPurchaseVisible = true;
-    },
-    purchaseGroupDialogOpen() {
-      this.dialogPurchaseGroupVisible = true;
     },
     materialDialogSave(selectColumns) {
       if (selectColumns.length !== 0) {
@@ -483,11 +521,8 @@ export default {
         this.crudObj.baseUnit = selectColumns[0].baseUnit;
       }
     },
-    supplierDialogSave(selectColumns) {
-      if (selectColumns.length !== 0) {
-        this.formOption.obj.toElsAccount = selectColumns[0].toElsAccount;
-        this.formOption.obj.toElsAccountName = selectColumns[0].toElsAccountName;
-      }
+    purchaseDialogOpen() {
+      this.dialogPurchaseVisible = true;
     },
     purchaseDialogSave(selectColumns) {
       if (selectColumns.length !== 0) {
@@ -495,13 +530,13 @@ export default {
           selectColumns[0].elsSubAccount + '_' + selectColumns[0].name;
       }
     },
+    purchaseGroupDialogOpen() {
+      this.dialogPurchaseGroupVisible = true;
+    },
     purchaseGroupDialogSave(selectColumns) {
       if (selectColumns.length !== 0) {
         this.formOption.obj.purchaseGroup = selectColumns[0].orgCategoryDesc;
       }
-    },
-    handleDeliveryDate(val) {
-      this.deliveryDateChange = val;
     }
   }
 };
@@ -510,9 +545,6 @@ export default {
 <style scoped lang="scss">
 .avue-crud {
   width: 100%;
-}
-.avue-tabs {
-  padding: 0;
 }
 .form-header {
   display: flex;
@@ -527,9 +559,5 @@ export default {
 .form-buttons {
   position: absolute;
   right: 20px;
-}
-.scope-btn {
-  color: #409eff;
-  cursor: pointer;
 }
 </style>

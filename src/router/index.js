@@ -24,6 +24,11 @@ const routes = [
     name: 'edit'
   },
   {
+    path: '/edits/:orderNumber',
+    component: () => import('@/views/order/Edits'),
+    name: 'edits'
+  },
+  {
     path: '/detail/:orderNumber',
     component: () => import('@/views/order/Detail'),
     name: 'detail'
@@ -32,6 +37,11 @@ const routes = [
     path: '/view/:orderNumber',
     component: () => import('@/views/order/View'),
     name: 'view'
+  },
+  {
+    path: '/views/:orderNumber',
+    component: () => import('@/views/order/Views'),
+    name: 'views'
   },
   {
     path: '/back/:orderNumber',

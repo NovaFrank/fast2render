@@ -69,7 +69,17 @@
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link> -->
-
+        <router-link
+          v-if="
+            row.sourceType === 'request' &&
+              row.orderStatus === '0' &&
+              row.sendStatus === '0' &&
+              row.auditStatus === '1'
+          "
+          :to="`edit/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
         <!--detail 详情 不可修改 只有返回  -->
         <router-link
           v-if="row.orderStatus === '0' && row.sendStatus === '1'"
@@ -106,25 +116,41 @@
         </router-link>
         <!--edit 保存未发送 可编辑修改 -->
         <router-link
-          v-if="row.orderStatus === '0' && row.sendStatus === '0' && row.auditStatus === '1'"
-          :to="`edit/${row.orderNumber}`"
+          v-if="
+            row.orderStatus === '0' &&
+              row.sendStatus === '0' &&
+              row.auditStatus === '1' &&
+              row.sourceType === ''
+          "
+          :to="`edits/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
-          v-if="row.orderStatus === '3' && row.sendStatus === '2' && row.auditStatus === '1'"
-          :to="`edit/${row.orderNumber}`"
+          v-if="
+            row.orderStatus === '3' &&
+              row.sendStatus === '2' &&
+              row.auditStatus === '1' &&
+              row.sourceType === ''
+          "
+          :to="`edits/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
-        <router-link v-if="row.auditStatus === '3'" :to="`edit/${row.orderNumber}`">
+        <router-link v-if="row.auditStatus === '3'" :to="`edits/${row.orderNumber}`">
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
 
         <!--view 可修改行数据  -->
         <router-link
-          v-if="row.orderStatus === '2' && row.sendStatus === '0'"
+          v-if="row.orderStatus === '2' && row.sendStatus === '0' && row.sourceType === ''"
           :to="`view/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '2' && row.sendStatus === '0' && row.sourceType === 'request'"
+          :to="`views/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>

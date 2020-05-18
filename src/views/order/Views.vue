@@ -1,34 +1,16 @@
 <template>
-  <!-- 需求转订单 -->
   <basic-container>
     <form-header
-      titleText="修改"
+      titleText="预览"
       showButton
       :buttons="headerButtons"
       @on-cancel="handleCancel"
-      @on-submit="handleSubmit"
+      @on-submit="handleRelease"
       @on-save="handleSave"
     ></form-header>
-    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form">
-      <template slot="purchasePerson">
-        <el-input v-model="formOption.obj.purchasePerson" :readonly="true">
-          <i
-            slot="suffix"
-            class=" el-input_icon el-icon-search pointer"
-            @click="purchaseDialogOpen"
-          ></i>
-        </el-input>
-      </template>
-      <template slot="purchaseGroup">
-        <el-input v-model="formOption.obj.purchaseGroup" :readonly="true">
-          <i
-            slot="suffix"
-            class=" el-input_icon el-icon-search pointer"
-            @click="purchaseGroupDialogOpen"
-          ></i>
-        </el-input>
-      </template>
-    </avue-form>
+    <!-- @on-sendProvider="handleSendProvider" -->
+    <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
+    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
     <span v-if="tabActive.prop === 'detail'">
@@ -42,9 +24,6 @@
         @row-del="handleDeleteRow"
         ref="crud"
       >
-        <template slot="menuLeft">
-          <button-group :option="btnOption" @item-add="itemAdd"></button-group>
-        </template>
         <template slot="materialNumberForm">
           <el-input v-model="crudObj.materialNumber" :readonly="true">
             <i
@@ -69,6 +48,8 @@
       </avue-crud>
     </span>
     <span v-if="tabActive.prop === 'files'">
+      <!-- <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
+      </avue-crud> -->
       <fast2-attachment-list
         :id="formOption.obj.orderNumber"
         :elsAccount="elsAccount"
@@ -82,52 +63,28 @@
       :dialogVisible.sync="dialogVisible"
       :title="'添加物料'"
       :column="materialOption.option.column"
-      :elsAccount="this.elsAccount"
+      :elsAccount="elsAccount"
       actionPath="findPageList"
       @save="materialDialogSave"
     ></selectDialog>
-    <selectDialog3
-      ref="purchaseDialog"
-      :dialogVisible.sync="dialogPurchaseVisible"
-      :title="'添加采购方负责人'"
-      :column="purchaseOption.option.column"
-      :elsAccount="this.elsAccount"
-      actionPath="findPageList"
-      @save="purchaseDialogSave"
-    ></selectDialog3>
-    <selectDialog4
-      ref="purchaseGroupDialog"
-      :dialogVisible.sync="dialogPurchaseGroupVisible"
-      :title="'添加采购组'"
-      :column="purchaseGroupOption.option.column"
-      :elsAccount="this.elsAccount"
-      actionPath="findPageList"
-      @save="purchaseGroupDialogSave"
-    ></selectDialog4>
   </basic-container>
 </template>
 
 <script>
 import FormHeader from '@/components/formHeader';
 import tabOption from '@/const/order/tabs';
-import formOption from '@/const/order/orderFormDetail';
-import fileOption from '@/const/order/newFiles';
-import purchaseOption from '@/const/order/purchaseList';
+import formOption from '@/const/order/detail';
+import fileOption from '@/const/order/files';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielLIstDemand';
-import purchaseGroupOption from '@/const/order/purchaseGroupList';
 import { getOrderList, dataDicAPI, createOrder, submitAudit } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
-import selectDialog3 from '@/common/selectDialog3';
-import selectDialog4 from '@/common/selectDialog4';
 import { getUserInfo } from '@/util/utils.js';
 export default {
   components: {
     FormHeader,
-    selectDialog,
-    selectDialog3,
-    selectDialog4
+    selectDialog
   },
   name: 'Detail',
   props: {
@@ -142,10 +99,13 @@ export default {
     return {
       elsAccount: '',
       elsSubAccount: '',
+      inputParamJson: {
+        // 业务类型转换传入的值
+        itemList: []
+      },
       tabOption: tabOption,
       tabActive: {},
       fileOption: fileOption,
-      purchaseGroupOption: purchaseGroupOption,
       filesForm: {},
       materielListOption: materielListOption,
       params: {
@@ -163,10 +123,7 @@ export default {
         pageSize: 10
       },
       dialogVisible: false,
-      dialogPurchaseVisible: false,
-      dialogPurchaseGroupVisible: false,
       materialOption: materialOption,
-      purchaseOption: purchaseOption,
       formOption: formOption,
       planListOption: planListOption,
       crudObj: {},
@@ -177,6 +134,24 @@ export default {
           size: 'small',
           action: 'on-cancel'
         },
+        // {
+        //   text: '撤回',
+        //   type: 'primary',
+        //   size: 'small',
+        //   action: 'on-reset'
+        // },
+        // {
+        //   text: '发送',
+        //   type: 'primary',
+        //   size: 'small',
+        //   action: 'on-sendProvider'
+        // },
+        // {
+        //   text: '发送货通知单',
+        //   type: 'primary',
+        //   size: 'small',
+        //   action: 'on-sendMenu'
+        // },
         {
           text: '保存',
           type: 'primary',
@@ -189,34 +164,19 @@ export default {
           size: 'small',
           action: 'on-submit'
         }
-      ],
-      btnOption: [
-        {
-          name: 'btn-add',
-          label: '添加行',
-          size: 'small',
-          action: 'item-add',
-          align: 'btn-left'
-        }
       ]
     };
-  },
-  watch: {
-    'crudObj.taxCode'(newVal) {
-      this.crudObj.taxRate = newVal;
-    }
   },
   async created() {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
     this.tabActive = this.tabOption.option.column[0];
-    this.tableData();
+    this.formOption.option.detail = true;
     this.getDicData();
-    this.materielListOption.option.header = false;
+    this.tableData();
   },
   methods: {
-    // 获取数据字典下拉列表
     async getDicData(data) {
       dataDicAPI('orderType').then((res) => {
         this.formOption.option.column = this.formOption.option.column.map((item) => {
@@ -239,25 +199,6 @@ export default {
           }
           return item;
         });
-      });
-      // 税码
-      dataDicAPI('taxRateNo').then((res) => {
-        this.materielListOption.option.column = this.materielListOption.option.column.map(
-          (item) => {
-            if (item.prop === 'taxCode') {
-              return {
-                ...item,
-                dicData: res.data.map((item) => {
-                  return {
-                    label: `${item.label}`,
-                    value: `${item.value}`
-                  };
-                })
-              };
-            }
-            return item;
-          }
-        );
       });
     },
     // 获取头数据和行数据findDeliveryPlanList
@@ -295,6 +236,31 @@ export default {
       });
       sessionStorage.setItem('orderItemArr', JSON.stringify(orderItemArr));
     },
+
+    // 保存表头和表单
+    async handleSave() {
+      if (this.materielListOption.data.length === 0) {
+        alert('请添加一条数据！');
+        return false;
+      }
+      this.tabActive = this.tabOption.option.column[2];
+      this.handleTabClick(this.tabActive);
+      const action = 'updateOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
+      await createOrder(action, params);
+      this.$message({
+        type: 'success',
+        message: '保存成功!'
+      });
+      this.$router.push({ path: '/list' });
+    },
+
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
@@ -313,9 +279,6 @@ export default {
         });
       }
     },
-    itemAdd() {
-      this.$refs.crud.rowAdd();
-    },
     // 删除行数据
     handleDeleteRow(row, index) {
       this.$confirm('确定将选择数据删除?', {
@@ -330,6 +293,21 @@ export default {
         this.materielListOption.data.splice(index, 1);
       });
     },
+    // 生成excel模板
+    generateExcelTemp() {
+      // todo
+    },
+    // 下载excel模板
+    downloadExcelTemp() {
+      window.open(
+        `https://cs.51qqt.com/qqt-srm/servlet/downloadServlet?filePath=${this.downloadMessage}`
+      );
+    },
+    // 导入excel
+    async beforeUploadExcel(file) {
+      console.log('file.raw :', file);
+    },
+
     // 保存新增的数据
     rowSave(row, done, loading) {
       if (this.crudObj.deliveryDate < new Date().getTime()) {
@@ -362,6 +340,26 @@ export default {
       });
       done();
     },
+    // 发送供方
+    // async handleSendProvider() {
+    //   this.tabActive = this.tabOption.option.column[2];
+    //   this.handleTabClick(this.tabActive);
+    //   const action = 'sendOrder';
+    //   let params = {
+    //     elsAccount: this.elsAccount,
+    //     elsSubAccount: this.elsSubAccount,
+    //     ...this.formOption.obj,
+    //     orderItemVOList: this.materielListOption.data,
+    //     deliveryPlanVOList: this.planListOption.data
+    //   };
+    //   // console.log('params: ' + JSON.stringify(params.orderItemVOList));
+    //   await createOrder(action, params);
+    //   this.$message({
+    //     type: 'success',
+    //     message: '发送成功!'
+    //   });
+    //   this.$router.push({ path: '/list' });
+    // },
     rowSavePlan(row, done, loading) {
       // 保存新增的数据
       if (this.crudPlanData === undefined) {
@@ -401,69 +399,11 @@ export default {
     handleCancel() {
       this.$router.push({ path: '/list' });
     },
-    // 保存表头和表单
-    async handleSave() {
-      this.materielListOption.data.map((item) => {
-        if (!item.deliveryDate) {
-          alert('请填写交货日期！');
-        }
-      });
+    async handleRelease() {
       if (this.materielListOption.data.length === 0) {
         alert('请添加一条数据！');
         return false;
-      } else if (!this.formOption.obj.purchasePerson) {
-        alert('请选择采购方负责人!');
-        return false;
-      } else if (!this.formOption.obj.orderType) {
-        alert('请选择订单类型!');
-        return false;
-      } else if (!this.formOption.obj.purchaseType) {
-        alert('请选择采购类别!');
-        return false;
-      } else if (!this.formOption.obj.purchaseGroup) {
-        alert('请选择采购组!');
-        return false;
       }
-      this.tabActive = this.tabOption.option.column[2];
-      this.handleTabClick(this.tabActive);
-      const action = 'updateOrder';
-      let params = {
-        elsAccount: this.elsAccount,
-        elsSubAccount: this.elsSubAccount,
-        ...this.formOption.obj,
-        orderItemVOList: this.materielListOption.data,
-        deliveryPlanVOList: this.planListOption.data
-      };
-      await createOrder(action, params);
-      this.$message({
-        type: 'success',
-        message: '保存成功!'
-      });
-      this.$router.push({ path: '/list' });
-    },
-    // 提交审批
-    async handleSubmit() {
-      if (this.materielListOption.data.length === 0) {
-        alert('请添加一条数据！');
-        return false;
-      } else if (!this.formOption.obj.purchasePerson) {
-        alert('请选择采购方负责人!');
-        return false;
-      } else if (!this.formOption.obj.purchaseType) {
-        alert('请选择采购类别!');
-        return false;
-      } else if (!this.formOption.obj.orderType) {
-        alert('请选择订单类型!');
-        return false;
-      } else if (!this.formOption.obj.purchaseGroup) {
-        alert('请选择采购组!');
-        return false;
-      }
-      this.materielListOption.data.map((item) => {
-        if (!item.deliveryDate) {
-          alert('请填写交货日期！');
-        }
-      });
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
       const action = 'updateOrder';
@@ -493,30 +433,6 @@ export default {
       });
       this.$router.push({ path: '/list' });
     },
-    // 生成excel模板
-    generateExcelTemp() {
-      // todo
-    },
-    // 下载excel模板
-    downloadExcelTemp() {
-      window.open(
-        `https://cs.51qqt.com/qqt-srm/servlet/downloadServlet?filePath=${this.downloadMessage}`
-      );
-    },
-    // 导入excel
-    async beforeUploadExcel(file) {
-      console.log('file.raw :', file);
-    },
-    uploadAfter(res, done, loading) {
-      console.log('after upload', res);
-      done();
-    },
-    uploadBefore(file, done, loading) {
-      console.log('before upload', file);
-      // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
-      const newFile = new File([file], '1234', { type: file.type });
-      done(newFile);
-    },
     onSaveForm(form) {
       // todo
     },
@@ -529,23 +445,6 @@ export default {
         this.crudObj.materialDesc = selectColumns[0].materialDesc;
         this.crudObj.materialSpecifications = selectColumns[0].materialSpecifications;
         this.crudObj.baseUnit = selectColumns[0].baseUnit;
-      }
-    },
-    purchaseDialogOpen() {
-      this.dialogPurchaseVisible = true;
-    },
-    purchaseDialogSave(selectColumns) {
-      if (selectColumns.length !== 0) {
-        this.formOption.obj.purchasePerson =
-          selectColumns[0].elsSubAccount + '_' + selectColumns[0].name;
-      }
-    },
-    purchaseGroupDialogOpen() {
-      this.dialogPurchaseGroupVisible = true;
-    },
-    purchaseGroupDialogSave(selectColumns) {
-      if (selectColumns.length !== 0) {
-        this.formOption.obj.purchaseGroup = selectColumns[0].orgCategoryDesc;
       }
     }
   }

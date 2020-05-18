@@ -499,7 +499,7 @@ export default {
           canDeliveryDate: this.currentDetailItem.canDeliveryDate,
           quoteMethod: this.currentDetailItem.quoteMethod,
           itemStatus: '1',
-          taxRate: '',
+          taxRate: this.currentDetailItem.taxRate,
           priceIncludingTax: '',
           quota: '',
           ladderPriceJson: this.currentDetailItem.ladderPriceJson || null,

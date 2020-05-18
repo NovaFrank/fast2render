@@ -68,13 +68,14 @@ export default {
       dicMethod: 'get',
       type: 'select',
       label: '税码',
-      prop: 'taxCode'
+      prop: 'taxCode',
+      rules: [{ required: true, message: '请选择税码', trigger: 'blur' }]
     },
     {
       label: '税率',
       prop: 'taxRate',
-      disabled: true,
-      rules: [{ trigger: 'blur', validator: validateTaxRate }]
+      disabled: true
+      // rules: [{ trigger: 'blur', validator: validateTaxRate }]
     },
     {
       type: 'tree',

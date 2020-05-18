@@ -464,7 +464,14 @@ export default {
     },
     // 明细行信息保存
     onSaveItemForm(form) {
-      console.log(form);
+      if (
+        this.dialogTitle === '添加询价明细' &&
+        this.inquiryListOption.data.filter((item) => item.materialNumber === form.materialNumber)
+          .length > 0
+      ) {
+        this.$message.error('物料编号不可重复');
+        return;
+      }
       const materialIndex = this.materialList.findIndex(
         (item) => item.materialNumber === form.materialNumber
       );

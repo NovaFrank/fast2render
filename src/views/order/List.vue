@@ -99,6 +99,7 @@
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
+
         <router-link
           v-if="row.orderStatus === '3' && row.sendStatus === '1'"
           :to="`detail/${row.orderNumber}`"
@@ -120,7 +121,7 @@
             row.orderStatus === '0' &&
               row.sendStatus === '0' &&
               row.auditStatus === '1' &&
-              row.sourceType === ''
+              row.sourceType === null
           "
           :to="`edits/${row.orderNumber}`"
         >
@@ -131,7 +132,7 @@
             row.orderStatus === '3' &&
               row.sendStatus === '2' &&
               row.auditStatus === '1' &&
-              row.sourceType === ''
+              row.sourceType === null
           "
           :to="`edits/${row.orderNumber}`"
         >
@@ -143,7 +144,7 @@
 
         <!--view 可修改行数据  -->
         <router-link
-          v-if="row.orderStatus === '2' && row.sendStatus === '0' && row.sourceType === ''"
+          v-if="row.orderStatus === '2' && row.sendStatus === '0' && row.sourceType === null"
           :to="`view/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>

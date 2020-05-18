@@ -1,7 +1,6 @@
 import { validateNumber } from '@/util/validate';
 
 const validateQuantity = (rule, value, callback) => {
-  console.log('value', validateNumber(value));
   if (!validateNumber(value)) {
     callback(new Error('请输入大于0的小数或整数'));
   } else {

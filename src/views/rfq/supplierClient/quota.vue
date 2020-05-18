@@ -222,7 +222,7 @@ export default {
     handleRadioChange(value, scope) {
       if (value === 'N') {
         this.inquiryListOption.data[scope.row.$index].priceIncludingTax = '';
-        this.inquiryListOption.data[scope.row.$index].taxRate = '';
+        // this.inquiryListOption.data[scope.row.$index].taxRate = '';
         this.inquiryListOption.data[scope.row.$index].priceExcludingTax = '';
         this.inquiryListOption.data[scope.row.$index].cellEdit = false; // $cellEdit = false;
         // if (scope.row.quoteMethod === '0') {
@@ -254,12 +254,15 @@ export default {
     handleSend() {
       let result = true;
       this.inquiryListOption.data.forEach((item) => {
-        console.log(item.noQuoted, item.inquiryListOption, item);
-        if (item.quoteMethod === '0' && validatenull(item.priceIncludingTax)) {
+        if (
+          item.noQuoted !== 'N' &&
+          item.quoteMethod === '0' &&
+          validatenull(item.priceIncludingTax)
+        ) {
           // 常规报价
           result = false;
         }
-        if (item.quoteMethod === '1') {
+        if (item.noQuoted !== 'N' && item.quoteMethod === '1') {
           JSON.parse(item.ladderPriceJson).forEach((ladder) => {
             if (validatenull(ladder.priceIncludingTax)) {
               result = false;

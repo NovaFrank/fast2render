@@ -26,7 +26,7 @@
               ? '全部'
               : scope.row.orderStatus === '2'
               ? '供方变更'
-              : scope.row.orderStatus === '4'
+              : scope.row.orderStatus === '4' || scope.row.orderStatus === '1'
               ? '供方已确认'
               : ''
           }}
@@ -199,7 +199,7 @@ export default {
         params = {
           ...params,
           orderStatus:
-            this.tabActive === 'All' ? '' : this.tabActive === 'ProviderChanged' ? '2' : '4'
+            this.tabActive === 'All' ? '' : this.tabActive === 'ProviderChanged' ? '2' : '1' || '4'
         };
       } else if (['Create', 'Pending', 'Approval', 'Reject'].includes(this.tabActive)) {
         params = {

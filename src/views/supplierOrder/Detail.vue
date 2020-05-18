@@ -63,16 +63,19 @@
       @save="purchaseDialogSave"
     ></selectDialog3>
     <el-dialog title="退回原因" :visible.sync="dialogRejecctVisible" width="30%">
-      <textarea
-        v-model="rejectObj"
-        cols="30"
-        rows="10"
-        maxlength="50"
-        class="reject-textarea"
-      ></textarea>
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+        <el-form-item label="" prop="name">
+          <textarea
+            v-model="ruleForm.rejectObj"
+            cols="30"
+            rows="10"
+            class="reject-textarea"
+          ></textarea>
+        </el-form-item>
+      </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogRejecctVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveRejectReason">确 定</el-button>
+        <el-button type="primary" @click="saveRejectReason('ruleForm')">确 定</el-button>
       </span>
     </el-dialog>
   </basic-container>
@@ -98,24 +101,11 @@ export default {
     selectDialog3
   },
   name: 'Detail',
-  props: {
-    isEdit: {
-      type: Boolean,
-      default: false
-    },
-    isInApproval: {
-      type: Boolean,
-      default: false
-    }
-  },
+  props: {},
   data() {
     return {
       elsAccount: '',
       elsSubAccount: '',
-      inputParamJson: {
-        // 业务类型转换传入的值
-        itemList: []
-      },
       tabOption: tabOption,
       tabActive: {},
       fileOption: fileOption,
@@ -144,7 +134,15 @@ export default {
       planListOption: planListOption,
       crudObj: {},
       crudOption: {},
-      rejectObj: '',
+      ruleForm: {
+        rejectObj: ''
+      },
+      rules: {
+        rejectObj: [
+          { required: true, message: '请输入退回原因', trigger: 'blur' },
+          { min: 1, max: 50, message: '长度在 50个字符以内', trigger: 'blur' }
+        ]
+      },
       headerButtons: [
         {
           text: '确认',
@@ -168,7 +166,6 @@ export default {
     this.tabActive = this.tabOption.option.column[0];
     this.tableData();
     this.getDicData();
-
     this.formOption.option.detail = true;
   },
   methods: {
@@ -258,22 +255,29 @@ export default {
           this.$router.push({ path: '/supplier/orderList' });
         });
     },
-    async saveRejectReason() {
-      this.formOption.obj.rejectReason = this.rejectObj;
-      const action = 'backToOrder';
-      let params = {
-        elsAccount: this.elsAccount,
-        ...this.formOption.obj,
-        orderItemReceiveVOList: this.materielListOption.data,
-        deliveryPlanReceiveVOList: this.planListOption.data
-      };
-      await createOrder(action, params);
+    saveRejectReason(formName) {
+      this.$refs[formName].validate(async (valid) => {
+        if (valid) {
+          this.formOption.obj.rejectReason = this.ruleForm.rejectObj;
+          const action = 'backToOrder';
+          let params = {
+            elsAccount: this.elsAccount,
+            ...this.formOption.obj,
+            orderItemReceiveVOList: this.materielListOption.data,
+            deliveryPlanReceiveVOList: this.planListOption.data
+          };
+          await createOrder(action, params);
 
-      this.$message({
-        type: 'success',
-        message: '退回成功!'
+          this.$message({
+            type: 'success',
+            message: '退回成功!'
+          });
+          this.$router.push({ path: '/supplier/orderList' });
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
       });
-      this.$router.push({ path: '/supplier/orderList' });
     },
     // 退回订单
     async handleRelease() {

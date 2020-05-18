@@ -21,9 +21,9 @@
           {{
             scope.row.orderStatus === ''
               ? '全部'
-              : scope.row.orderStatus === '0' || '3'
+              : scope.row.orderStatus === '0' || scope.row.orderStatus === '3'
               ? '未确认'
-              : scope.row.orderStatus === '1' || '4'
+              : scope.row.orderStatus === '1' || scope.row.orderStatus === '4'
               ? '已确认'
               : '已退回'
           }}

@@ -7,11 +7,18 @@
       :option="tableOption.option"
       :page.sync="tableOption.page"
       v-model="tableOption.obj"
-      @row-click="handleRowClick"
       @current-row-change="handleCurrentRowChange"
       @size-change="sizeChange"
       @current-change="currentChange"
     >
+      <template slot="enquiryNumber" slot-scope="scope">
+        <el-button
+          @click.stop="handleRowClick(scope.row)"
+          class="el-button el-button--text el-button--small"
+        >
+          {{ scope.row.enquiryNumber }}
+        </el-button>
+      </template>
       <template slot-scope="scope" slot="itemStatus">
         <!-- // new itemStatus 0
             // quoting itemStatus 1
@@ -90,7 +97,7 @@ export default {
     handleEditRow(scope) {
       this.$router.push({ path: '/new', query: { enquiryNumber: scope.row.enquiryNumber } });
     },
-    handleRowClick(row, column, event) {
+    handleRowClick(row) {
       this.$router.push({ path: `/client/quota/${row.enquiryNumber}` });
     },
     handleTabChange(value) {

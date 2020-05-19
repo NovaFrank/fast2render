@@ -23,6 +23,7 @@ export default {
     },
     column: [
       {
+        slot: true,
         label: '询价单号',
         prop: 'enquiryNumber'
       },

@@ -31,11 +31,18 @@
       :option="tableOption.option"
       :page.sync="tableOption.page"
       v-model="tableOption.obj"
-      @row-click="handleRowClick"
       @current-row-change="handleCurrentRowChange"
       @size-change="sizeChange"
       @current-change="currentChange"
     >
+      <template slot="enquiryNumber" slot-scope="scope">
+        <el-button
+          @click.stop="handleRowClick(scope.row)"
+          class="el-button el-button--text el-button--small"
+        >
+          {{ scope.row.enquiryNumber }}
+        </el-button>
+      </template>
       <template
         v-if="['new', 'quoting', 'close'].includes(tabActive)"
         slot-scope="scope"
@@ -141,7 +148,7 @@ export default {
     handleEditRow(scope) {
       this.$router.push({ path: '/new', query: { enquiryNumber: scope.row.enquiryNumber } });
     },
-    handleRowClick(row, column, event) {
+    handleRowClick(row) {
       if (this.tabActive === 'new' || row.itemStatus === '0') {
         this.$router.push({ path: '/new', query: { enquiryNumber: row.enquiryNumber } });
       } else {

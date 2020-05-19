@@ -73,7 +73,6 @@
         :id="formOption.obj.orderNumber"
         :elsAccount="elsAccount"
         :businessElsAccount="formOption.obj.elsAccount"
-        :version="annexComponentVersion"
         businessModule="order"
       ></fast2-attachment-list>
     </span>
@@ -130,14 +129,7 @@ export default {
     selectDialog4
   },
   name: 'Detail',
-  props: {
-    annexComponentVersion: {
-      type: String,
-      default: () => {
-        return 'attahcment-fiels_4_2';
-      }
-    }
-  },
+  props: {},
   data() {
     return {
       elsAccount: '',

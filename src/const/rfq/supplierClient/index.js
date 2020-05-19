@@ -61,7 +61,7 @@ export default {
       },
       {
         type: 'datetime',
-        format: 'yyyy-MM-dd',
+        format: 'yyyy-MM-dd HH:mm:ss',
         valueFormat: 'timestamp',
         label: '报价截止时间',
         prop: 'quoteEndTime'

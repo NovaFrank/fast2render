@@ -7,13 +7,13 @@ const validateDateTime = (rule, value, callback) => {
     callback();
   }
 };
-const validateTaxRate = (rule, value, callback) => {
-  if (!validateNumber(value)) {
-    callback(new Error('请输入大于0的小数或整数'));
-  } else {
-    callback();
-  }
-};
+// const validateTaxRate = (rule, value, callback) => {
+//   if (!validateNumber(value)) {
+//     callback(new Error('请输入大于0的小数或整数'));
+//   } else {
+//     callback();
+//   }
+// };
 
 const validateQuantity = (rule, value, callback) => {
   if (!validateNumber(value)) {

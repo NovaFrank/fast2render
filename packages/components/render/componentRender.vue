@@ -11,16 +11,16 @@
       >
         <div :key="item.slug">
           <slot name="form-header"></slot>
-          <avue-form :option="item.data" :data="providerData" v-model="formData" :ref="item.slug"
-            ><slot name="form-slot"></slot>
+          <avue-form :option="item.data" :data="providerData" v-model="formData" :ref="item.slug">
+            <slot name="form-slot"></slot>
           </avue-form>
           <slot name="form-footer"></slot>
         </div>
       </template>
       <template v-else-if="!item.hide && item.type === BLOCK_TYPE.LIST">
         <div :key="item.slug">
-          <fast2-theme-provider :option="item.data" theme="block" ref="themebox"
-            ><template v-slot="component">
+          <fast2-theme-provider :option="item.data" theme="block" ref="themebox">
+            <template v-slot="component">
               <slot name="crud-header">
                 <h4>
                   <el-button size="mini" @click="listRowAdd">新增行</el-button>
@@ -34,10 +34,12 @@
                 :data="providerData.tableData"
                 v-model="tableData"
                 ref="table"
-                ><slot name="crud-slot"></slot>
+              >
+                <slot name="crud-slot"></slot>
               </avue-crud>
-              <slot name="crud-footer"></slot> </template
-          ></fast2-theme-provider>
+              <slot name="crud-footer"></slot>
+            </template>
+          </fast2-theme-provider>
         </div>
       </template>
       <template v-else-if="!item.hide && item.type === BLOCK_TYPE.DYNAMIC">
@@ -52,9 +54,7 @@
       <template v-else>
         <div :key="item.slug">
           <h5>无法解析数据：</h5>
-          <code>
-            {{ item }}
-          </code>
+          <code>{{ item }}</code>
         </div>
       </template>
     </template>
@@ -159,6 +159,8 @@ export default {
         result = component;
       } else if (type === 'attachment') {
         result = type;
+      } else if (type === 'business-rule-config') {
+        return type;
       }
       this.mycomponent = KEY_COMPONENT_NAME + result;
       return this.mycomponent;

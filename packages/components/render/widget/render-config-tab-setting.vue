@@ -124,7 +124,7 @@ export default {
     this.initCheckColumnList();
   },
   methods: {
-    changeShowList(checked, item) {
+    changeShowList() {
       // debugger;
     },
     updateTemplateConfig() {
@@ -134,7 +134,9 @@ export default {
       });
     },
     changeShowColumList(column, prop) {
-      if (!column || !column.length) return false;
+      if (!column || !column.length) {
+        return false;
+      }
       let newColumn = [];
       column.map((item) => {
         let list = this.templateConfig.column[prop];

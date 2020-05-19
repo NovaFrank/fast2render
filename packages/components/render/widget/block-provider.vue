@@ -6,6 +6,7 @@
 <script>
 import { getStore } from '../../../lib/store';
 import { mergeColumn, vaildData, loadJson, loadDic } from '../../../lib/utils';
+import { handleColumn } from '../../../lib/blockHander';
 export default {
   name: 'BlockProvider',
   inheritAttrs: false,
@@ -64,7 +65,7 @@ export default {
       this.onLoad(this.version);
     } else {
       this.finaloption = vaildData(this.option, { column: [] });
-      this.finaloption.column = this.handleColumn(this.finaloption.column);
+      this.finaloption.column = handleColumn(this.finaloption.column);
     }
   },
   methods: {
@@ -102,42 +103,9 @@ export default {
       });
       let option = options[0] || {};
       option = vaildData(option, { data: { column: [] } });
-      let column = mergeColumn(option.data.column, finaloption.column);
+      let column = mergeColumn(finaloption.column, option.data.column);
       this.finaloption = JSON.parse(JSON.stringify(finaloption));
-      this.finaloption.column = this.handleColumn(column);
-    },
-    handleColumn(column) {
-      let newcolumn = column.map((item) => {
-        return this.fixColumn(item);
-      });
-      return newcolumn;
-    },
-    replaceLocalDic(config) {
-      if (!config.dicUrl.includes('layout/dics')) {
-        return config;
-      }
-      let slug = config.dicUrl.split('layout/dics/value/')[1];
-      if (slug && this.dics && this.dics[slug]) {
-        delete config.dicUrl;
-        config.dicData = this.dics[slug];
-        console.log('使用本地词典', config.dicData);
-      }
-      return config;
-    },
-    fixColumn(config) {
-      if (!config || !config.dicUrl) {
-        return config;
-      }
-      // 如果是关联子选择框，去掉自动拉取
-      if (config.dicUrl.includes('{{key}}')) {
-        config.dicFlag = false;
-        return config;
-      }
-      config = this.replaceLocalDic(config);
-      if (config.span) {
-        config.span = config.span * 1;
-      }
-      return config;
+      this.finaloption.column = handleColumn(column);
     }
   }
 };

@@ -1,5 +1,5 @@
 import { getStore } from '../lib/store';
-import { vaildData, loadJson, loadDic } from '../lib/utils';
+import { vaildData, loadJson, loadDic, getObjType, sortArrys } from '../lib/utils';
 import _ from 'lodash';
 
 let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
@@ -54,6 +54,7 @@ export const handleColumn = (column) => {
   let newColumn = column.map((item) => {
     return fixColumn(item);
   });
+  newColumn = sortArrys(newColumn, 'order');
   return newColumn;
 };
 
@@ -110,7 +111,7 @@ export const fixRemoteDic = (config) => {
     label: config.dicLabel,
     value: config.dicValue
   };
-  if (config.dicQueryStr && config.dicMethod === "post") {
+  if (config.dicQueryStr && config.dicMethod === 'post') {
     try {
       let query = JSON.parse(config.dicQueryStr);
       config.dicQuery = query;
@@ -122,6 +123,10 @@ export const fixRemoteDic = (config) => {
 };
 
 export const fixColumn = (config) => {
+  let type = getObjType(config.order);
+  if (type !== 'number') {
+    config.order = 1;
+  }
   if (!config || !config.dicUrl) {
     return config;
   }

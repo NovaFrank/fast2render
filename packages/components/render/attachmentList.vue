@@ -342,7 +342,7 @@ export default {
       const _this = this;
       let action = _this.uploadRow.attachmentName
         ? 'update'
-        : _this.uploadRow.businessItemId
+        : _this.uploadRow.uuid
         ? 'update'
         : 'create';
       let checkProp = 'businessItemId';
@@ -364,14 +364,15 @@ export default {
       delete uploadRow.createDate;
       uploadApi.attachmentServer(action, uploadRow).then((res) => {
         if (res.data.statusCode === '200') {
+          const elsAttachment = res.data.data.elsAttachmentVOList[0];
           uploadRow = {
             ...uploadRow,
             ...res.data.data,
-            elsAccount: res.data.data.elsAccount,
-            elsSubAccount: res.data.data.elsSubAccount,
-            attachmentType: res.data.data.attachmentType,
-            createUser: res.data.data.createUser,
-            createDate: formatDate(new Date(res.data.data.lastUpdateDate), 'yyyy-MM-dd hh:mm:ss')
+            elsAccount: elsAttachment.elsAccount,
+            elsSubAccount: elsAttachment.elsSubAccount,
+            attachmentType: elsAttachment.attachmentType,
+            createUser: elsAttachment.createUser,
+            createDate: formatDate(new Date(elsAttachment.lastUpdateDate), 'yyyy-MM-dd hh:mm:ss')
           };
           this.fileList = this.fileList.map((item) => {
             return item[checkProp] === uploadRow[checkProp] ? uploadRow : item;

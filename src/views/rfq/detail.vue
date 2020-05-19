@@ -394,7 +394,7 @@ export default {
         const action = 'submit';
         let params = {
           elsAccount: this.detailObj.elsAccount,
-          toElsAccount: this.detailObj.toElsAccount,
+          // toElsAccount: this.detailObj.toElsAccount,
           businessType: 'bargainEnquiryAudit',
           businessId: this.detailObj.enquiryNumber,
           params: '{"key1":"123"}'

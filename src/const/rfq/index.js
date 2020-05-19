@@ -32,8 +32,8 @@ export default {
       //   prop: 'status'
       // },
       {
-        label: 'ELS账号',
-        prop: 'elsAccount'
+        label: '供应商ELS账号',
+        prop: 'toElsAccount'
       },
       // {
       //   label: '公司名称',

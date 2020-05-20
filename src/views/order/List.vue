@@ -50,14 +50,15 @@
         </span>
       </template>
       <template
-        v-else-if="['ProviderPending'].includes(tabActive)"
+        v-else-if="['ProviderPending', 'changeProviderPending'].includes(tabActive)"
         slot-scope="scope"
         slot="status"
       >
         <span>
-          {{ scope.row.sendStatus === '1' ? '已发送' : '' }}
+          {{ scope.row.sendStatus === '1' ? '已发送' : '3' }}
         </span>
       </template>
+
       <!-- orderStatus: "0":"对方未确认","1":"对方已确认","2":"对方已退回","3":"变更对方未确认","4":"变更对方确认","5":"对方变更退回" -->
       <!-- sendStatus: "0":"未发送","1":"已发送", "2":"变更未发送","3":"变更已发送" -->
       <!-- auditStatus: 0, "审批通过", 1, "未审批", 2, "审批中", 3, "审批拒绝" -->
@@ -240,10 +241,10 @@ export default {
               ? '3'
               : '1'
         };
-      } else if (['ProviderPending'].includes(this.tabActive)) {
+      } else if (['ProviderPending', 'changeProviderPending'].includes(this.tabActive)) {
         params = {
           ...params,
-          sendStatus: this.tabActive === 'ProviderPending' ? '1' : ''
+          sendStatus: this.tabActive === 'ProviderPending' ? '1' : '3'
         };
       }
       const resp = await getOrderList(action, params);

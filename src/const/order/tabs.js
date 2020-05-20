@@ -6,12 +6,12 @@ export default {
         prop: 'detail'
       },
       {
-        label: '附件',
-        prop: 'files'
-      },
-      {
         label: '交货计划',
         prop: 'plan'
+      },
+      {
+        label: '附件',
+        prop: 'files'
       }
     ]
   }

@@ -68,14 +68,14 @@
       >
       </avue-crud>
     </span>
-    <span v-if="tabActive.prop === 'files'">
-      <fast2-attachment-list
-        :id="formOption.obj.orderNumber"
-        :elsAccount="elsAccount"
-        :businessElsAccount="formOption.obj.elsAccount"
-        businessModule="order"
-      ></fast2-attachment-list>
-    </span>
+    <fast2-attachment-list
+      ref="attachment"
+      :id="formOption.obj.orderNumber"
+      :elsAccount="elsAccount"
+      :businessElsAccount="elsAccount"
+      businessModule="order"
+      v-show="tabActive.prop === 'files' && formOption.obj.orderNumber"
+    ></fast2-attachment-list>
     <selectDialog
       ref="materialDialog"
       :dialogVisible.sync="dialogVisible"
@@ -254,6 +254,8 @@ export default {
     },
     // 获取头数据和行数据findDeliveryPlanList
     async tableData(data) {
+      this.formOption.obj = {};
+      this.materielListOption.data = [];
       const action = 'findOrderHeadVO';
       const action2 = 'findOrderItemList';
       const action3 = 'findDeliveryPlanList';
@@ -467,7 +469,7 @@ export default {
         deliveryPlanVOList: this.planListOption.data
       };
       await createOrder(action, params);
-
+      this.$refs.attachment.sendFiles();
       const action2 = 'submit';
       let params2 = {
         elsAccount: this.elsAccount,

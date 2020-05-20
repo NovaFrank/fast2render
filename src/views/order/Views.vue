@@ -35,28 +35,22 @@
         </template>
       </avue-crud>
     </span>
-    <span v-if="tabActive.prop === 'plan'">
-      <avue-crud
-        :data="planListOption.data"
-        :option="planListOption.option"
-        v-model="planListOption.planObj"
-        :page.sync="planListOption.page"
-        @row-save="rowSavePlan"
-        @row-del="rowDelPlan"
-        @row-update="rowUpdatePlan"
-      >
-      </avue-crud>
-    </span>
-    <span v-if="tabActive.prop === 'files'">
-      <!-- <avue-crud :data="fileOption.data" :option="fileOption.option" v-model="filesForm">
-      </avue-crud> -->
-      <fast2-attachment-list
-        :id="formOption.obj.orderNumber"
-        :elsAccount="elsAccount"
-        :businessElsAccount="formOption.obj.elsAccount"
-        businessModule="order"
-      ></fast2-attachment-list>
-    </span>
+    <fast2-attachment-list
+      ref="attachment"
+      :id="formOption.obj.orderNumber"
+      :elsAccount="elsAccount"
+      :businessElsAccount="elsAccount"
+      businessModule="order"
+      v-show="tabActive.prop === 'files' && formOption.obj.orderNumber"
+    ></fast2-attachment-list>
+    <fast2-attachment-list
+      ref="attachment"
+      :id="formOption.obj.orderNumber"
+      :elsAccount="elsAccount"
+      :businessElsAccount="elsAccount"
+      businessModule="order"
+      v-show="tabActive.prop === 'files' && formOption.obj.orderNumber"
+    ></fast2-attachment-list>
     <selectDialog
       ref="materialDialog"
       :dialogVisible.sync="dialogVisible"
@@ -407,7 +401,7 @@ export default {
         deliveryPlanVOList: this.planListOption.data
       };
       await createOrder(action, params);
-
+      this.$refs.attachment.sendFiles();
       const action2 = 'submit';
       let params2 = {
         elsAccount: this.elsAccount,

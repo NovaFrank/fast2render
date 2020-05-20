@@ -83,7 +83,7 @@
             : scope.row.taxRate
         }}
       </template>
-      <template slot="priceIncludingTax" slot-scope="scope">
+      <!-- <template slot="priceIncludingTax" slot-scope="scope">
         <div>
           <span
             v-if="
@@ -104,6 +104,54 @@
             "
           ></avue-crud>
         </div>
+      </template> -->
+      <template slot-scope="scope" slot="priceIncludingTax">
+        <span v-if="scope.row.quoteMethod === '0'">
+          <span
+            v-if="
+              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
+                detailObj.quoteEndTime > new Date().getTime()
+            "
+          >
+            **
+          </span>
+          <span v-else>{{ scope.row.priceIncludingTax }}</span>
+        </span>
+        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
+          <span
+            v-if="
+              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
+                detailObj.quoteEndTime > new Date().getTime()
+            "
+          >
+            **
+          </span>
+          <span v-else>{{ getPriceIndex(scope.row, 'priceIncludingTax') }}</span>
+        </p>
+      </template>
+      <template slot-scope="scope" slot="priceExcludingTax">
+        <span v-if="scope.row.quoteMethod === '0'">
+          <span
+            v-if="
+              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
+                detailObj.quoteEndTime > new Date().getTime()
+            "
+          >
+            **
+          </span>
+          <span v-else>{{ scope.row.priceExcludingTax }}</span>
+        </span>
+        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
+          <span
+            v-if="
+              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
+                detailObj.quoteEndTime > new Date().getTime()
+            "
+          >
+            **
+          </span>
+          <span v-else>{{ getPriceIndex(scope.row, 'priceIncludingTax') }}</span>
+        </p>
       </template>
       <template slot-scope="scope" slot="option">
         <el-row v-if="detailObj.quoteEndTime < new Date().getTime()" :gutter="24">
@@ -239,6 +287,15 @@ export default {
     }
   },
   methods: {
+    getPriceIndex(row, column) {
+      const quantity = row.quantity;
+      const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
+        return Number(item.ladderQuantity);
+      });
+      quantityList.push(quantity);
+      const index = quantityList.findIndex((item) => item === Number(quantity));
+      return JSON.parse(row.ladderPriceJson)[index - 1][column];
+    },
     cellStyle() {
       return {
         borderRight: 'none !important'

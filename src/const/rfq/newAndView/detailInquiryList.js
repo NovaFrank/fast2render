@@ -72,11 +72,21 @@ export default {
         label: '税率',
         prop: 'taxRate'
       },
+      // {
+      //   width: 300,
+      //   slot: true,
+      //   label: '报价',
+      //   prop: 'priceIncludingTax'
+      // },
       {
-        width: 300,
         slot: true,
-        label: '报价',
+        label: '含税价',
         prop: 'priceIncludingTax'
+      },
+      {
+        slot: true,
+        label: '不含税价',
+        prop: 'priceExcludingTax'
       },
       {
         type: 'date',

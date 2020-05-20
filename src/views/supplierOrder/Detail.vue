@@ -4,6 +4,7 @@
       titleText="未确认订单预览"
       showButton
       :buttons="headerButtons"
+      @on-cancel="handleCancel"
       @on-submit="handleRelease"
       @on-save="handleSave"
     ></form-header>
@@ -150,6 +151,11 @@ export default {
       },
       headerButtons: [
         {
+          text: '返回',
+          size: 'small',
+          action: 'on-cancel'
+        },
+        {
           text: '确认',
           type: 'primary',
           size: 'small',
@@ -228,7 +234,7 @@ export default {
       const resp2 = await getOrderList(action2, params2);
       const resp3 = await getOrderList(action3, params3);
       this.formOption.obj = resp.data.data;
-      console.log(this.formOption.obj.toElsAccount);
+      console.log('toElsAccount:' + this.formOption.obj.toElsAccount);
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;
       this.formOption.obj.salePerson = '1001';

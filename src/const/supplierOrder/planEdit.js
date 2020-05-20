@@ -6,11 +6,11 @@ const validateDateTime = (rule, value, callback) => {
   }
 };
 let sessionRequestQuan = sessionStorage.getItem('requestQuantity');
-// let replyRequest = JSON.parse(sessionRequestQuan);
+let replyRequest = Number(JSON.parse(sessionRequestQuan));
 console.log(sessionRequestQuan);
 const validateNumber = (rule, value, callback) => {
   console.log(value);
-  if (value && value > sessionRequestQuan) {
+  if (value && value > replyRequest) {
     callback(new Error('计划交货数量不可大于需求数量'));
   } else {
     callback();

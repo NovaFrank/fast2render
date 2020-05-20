@@ -208,7 +208,7 @@ export default {
         { power: true, text: '提交审批', type: 'primary', size: '', action: 'on-submit-approval' },
         { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
         { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-        { power: true, text: '开启', type: 'primary', size: '', action: 'on-open' },
+        // { power: true, text: '开启', type: 'primary', size: '', action: 'on-open' },
         { power: true, text: '发布新供应商', type: 'primary', size: '', action: 'on-new-supplier' }
       ],
       historyVisible: false,

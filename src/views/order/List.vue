@@ -95,6 +95,12 @@
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
+          v-if="row.orderStatus === '4' && row.sendStatus === '3'"
+          :to="`detail/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
           v-if="row.orderStatus === '2' && row.sendStatus === '1'"
           :to="`detail/${row.orderNumber}`"
         >

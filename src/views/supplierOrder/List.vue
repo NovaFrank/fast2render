@@ -13,7 +13,17 @@
       ref="crud"
     >
       <template
-        v-if="['All', 'UnApproval', 'Approval', 'Reject'].includes(tabActive)"
+        v-if="
+          [
+            'All',
+            'UnApproval',
+            'UnChangeApproval',
+            'Approval',
+            'ApprovalChange',
+            'Reject',
+            'RejectChange'
+          ].includes(tabActive)
+        "
         slot-scope="scope"
         slot="status"
       >
@@ -21,11 +31,17 @@
           {{
             scope.row.orderStatus === ''
               ? '全部'
-              : scope.row.orderStatus === '0' || scope.row.orderStatus === '3'
+              : scope.row.orderStatus === '0'
               ? '未确认'
-              : scope.row.orderStatus === '1' || scope.row.orderStatus === '4'
+              : scope.row.orderStatus === '1'
               ? '已确认'
-              : '已退回'
+              : scope.row.orderStatus === '2'
+              ? '已退回'
+              : scope.row.orderStatus === '3'
+              ? '变更未确认'
+              : scope.row.orderStatus === '4'
+              ? '变更确认'
+              : '变更退回'
           }}
         </span>
       </template>
@@ -94,17 +110,33 @@ export default {
         elsAccount: this.elsAccount,
         ...data
       };
-      if (['All', 'UnApproval', 'Approval', 'Reject'].includes(this.tabActive)) {
+      if (
+        [
+          'All',
+          'UnApproval',
+          'UnChangeApproval',
+          'Approval',
+          'ApprovalChange',
+          'Reject',
+          'RejectChange'
+        ].includes(this.tabActive)
+      ) {
         params = {
           ...params,
           orderStatus:
             this.tabActive === 'All'
               ? ''
               : this.tabActive === 'UnApproval'
-              ? '0' || '3'
+              ? '0'
+              : this.tabActive === 'UnChangeApproval'
+              ? '3'
               : this.tabActive === 'Approval'
-              ? '1' || '4'
-              : '2' || '5'
+              ? '1'
+              : this.tabActive === 'ApprovalChange'
+              ? '4'
+              : this.tabActive === 'Reject'
+              ? '2'
+              : '5'
         };
       }
       const resp = await getOrderList(action, params);

@@ -167,7 +167,6 @@ export default {
   watch: {},
   methods: {
     getPriceIndex(row, column) {
-      console.log(row);
       const quantity = row.quantity;
       const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
         return Number(item.ladderQuantity);

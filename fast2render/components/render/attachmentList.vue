@@ -162,6 +162,7 @@ export default {
     };
   },
   created() {
+    if (validateNull(this.id)) return;
     this.option.delBtn = this.delBtn;
     this.getList();
     if (!this.attachmentTemplate.length) {
@@ -182,7 +183,23 @@ export default {
     id(newValue) {
       this.showUpdate = !validateNull(newValue);
       this.businessId = newValue;
-      if (!validateNull(this.businessId)) this.getList();
+      if (!validateNull(this.businessId)) {
+        this.option.delBtn = this.delBtn;
+        this.getList();
+        if (!this.attachmentTemplate.length) {
+          this.getList();
+        } else {
+          let dic = this.$getDicItem('attachmentType');
+          this.readOption.column.unshift({
+            label: '文件类型',
+            prop: 'attachmentType',
+            type: 'select',
+            order: 0,
+            dicData: dic
+          });
+          this.initList();
+        }
+      }
     }
   },
   methods: {

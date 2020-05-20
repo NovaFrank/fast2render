@@ -186,6 +186,8 @@ export default {
     },
     // 获取头数据和行数据findDeliveryPlanList
     async tableData(data) {
+      this.formOption.obj = {};
+      this.materielListOption.data = [];
       const action = 'findOrderHeadVO';
       const action2 = 'findOrderItemList';
       const action3 = 'findDeliveryPlanList';

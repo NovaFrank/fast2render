@@ -180,6 +180,8 @@ export default {
 
     // 获取头数据和行数据
     async tableData(data) {
+      this.formOption.obj = {};
+      this.materielListOption.data = [];
       const action = 'findOrderHeadReceiveVO';
       const action2 = 'findOrderItemReceiveList';
       const action3 = 'findDeliveryPlanReceiveList';

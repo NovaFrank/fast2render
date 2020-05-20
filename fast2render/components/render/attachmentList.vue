@@ -17,6 +17,8 @@
                   :http-request="uploadFile"
                   action="/"
                 >
+                  <!-- action="http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet"
+                  @on-success="handleSuccess" -->
                   <el-link
                     size="small"
                     slot="trigger"
@@ -29,10 +31,9 @@
                     /
                     <el-link
                       v-if="scope.row.attachmentUrl"
-                      download
-                      target="_blank"
-                      :href="`${dome}${scope.row.attachmentUrl}`"
+                      :href="`${dome}/opt/nfsshare/${scope.row.attachmentUrl}`"
                     >
+                      <!-- @click.stop="handleDownload(scope.row)" -->
                       下载
                     </el-link>
                   </template>
@@ -43,7 +44,7 @@
                   v-if="scope.row.attachmentUrl"
                   download
                   target="_blank"
-                  :href="`${dome}${scope.row.attachmentUrl}`"
+                  :href="`${dome}/opt/nfsshare/${scope.row.attachmentUrl}`"
                 >
                   下载
                 </el-link>
@@ -58,7 +59,7 @@
 
 <script>
 import uploadApi from '../../lib/api/upload';
-import { formatDate, renderSize } from '../../lib/utils';
+import { formatDate } from '../../lib/utils'; // , renderSize
 import { validateNull } from '../../lib/validate';
 
 export default {
@@ -156,7 +157,8 @@ export default {
       dome: 'http://cs.51qqt.com',
       showUpdate: true,
       uploadRow: null,
-      fileList: []
+      fileList: [],
+      businessId: ''
     };
   },
   created() {
@@ -179,9 +181,21 @@ export default {
   watch: {
     id(newValue) {
       this.showUpdate = !validateNull(newValue);
+      this.businessId = newValue;
+      if (!validateNull(this.businessId)) this.getList();
     }
   },
   methods: {
+    sendFiles() {
+      const params = {
+        businessItemIds: this.fileList.map((item) => item.uuid).toString()
+      };
+      uploadApi.sendFiles(params).then((res) => {
+        if (res.data.statusCode !== '200') {
+          this.$message.error(res.data.message);
+        }
+      });
+    },
     doAction(action, data) {
       this.$emit(action, data);
       // this.$message.success(action)
@@ -236,7 +250,7 @@ export default {
       let params = {
         businessElsAccount: this.businessElsAccount,
         businessModule: this.businessModule,
-        businessId: this.id
+        businessId: this.businessId
       };
       uploadApi.attachmentServer(action, params).then((res) => {
         if (res.data.pageData && res.data.pageData.rows) {
@@ -271,7 +285,7 @@ export default {
       }).then(() => {
         let action = 'delete';
         if (row.uuid) {
-          uploadApi.attachmentServer(action, { uuid: this.uploadRow.uuid }).then((res) => {
+          uploadApi.attachmentServer(action, { uuid: row.uuid }).then((res) => {
             if (res.data.statusCode !== '200') {
               this.$message.error(res.data.message);
               return;
@@ -311,32 +325,108 @@ export default {
     setUploadRow(row) {
       this.uploadRow = row;
     },
+    handleDownload(row) {
+      // window.open(
+      //   `${this.dome}/ELSServer_SRM/rest/servlet/downloadServlet?filePath=${attachmentUrl}`
+      // );
+      // var xmlResquest = new XMLHttpRequest();
+      // xmlResquest.open('GET', `/servlet/downloadServlet?filePath=${row.attachmentUrl}`, true);
+      // let userAccount = getAccount();
+      // xmlResquest.setRequestHeader('Content-type', 'application/json');
+      // xmlResquest.setRequestHeader(
+      //   'account',
+      //   `${userAccount.elsAccount}_${userAccount.elsSubAccount}`
+      // );
+      // xmlResquest.setRequestHeader('token', userAccount.token);
+      // xmlResquest.responseType = 'blob';
+      // xmlResquest.onload = function(oEvent) {
+      //   var content = xmlResquest.response;
+      //   var elink = document.createElement('a');
+      //   elink.download = row.attachmentName;
+      //   elink.style.display = 'none';
+      //   var blob = new Blob([content]);
+      //   elink.href = URL.createObjectURL(blob);
+      //   document.body.appendChild(elink);
+      //   elink.click();
+      //   document.body.removeChild(elink);
+      // };
+      // xmlResquest.send();
+      // uploadApi.downloadServlet(row.attachmentUrl).then((res) => {
+      //   console.log('res', res.data);
+      //   let blob = new Blob([res.data], { type: 'text/plain;charset=utf-8' });
+      //   let downloadElement = document.createElement('a');
+      //   let href = window.URL.createObjectURL(blob);
+      //   downloadElement.href = href;
+      //   downloadElement.download = row.attachmentName;
+      //   document.body.appendChild(downloadElement);
+      //   downloadElement.click();
+      //   document.body.removeChild(downloadElement);
+      // });
+    },
+    download(blobUrl, fileName) {
+      const a = document.createElement('a');
+      a.download = fileName;
+      a.href = blobUrl;
+      a.click();
+      document.body.removeChild(a);
+    },
+    handleSuccess(response, file, fileList) {
+      console.log(response, file, fileList);
+    },
     async uploadFile(myfile) {
       console.log('开始上传');
-      let fileSize = renderSize(myfile.file.size);
-      this.getBase64(myfile.file)
-        .then((resBase64) => {
-          let fileBase64 = resBase64.split(',')[1]; // 直接拿到base64信息
-          let params = {
-            fileName: myfile.file.name,
-            fileType: myfile.file.name.split('.')[1],
-            fileData: fileBase64
-          };
-          return uploadApi.uploadFile(params);
-        })
+      const formdata = new FormData();
+      formdata.append('file', myfile.file);
+      uploadApi
+        .uploadServlet(formdata)
         .then((res) => {
+          console.log('上传结束', res);
           if (res.data.statusCode === '200') {
-            let data = res.data.data;
-            data.fileSize = fileSize;
-            this.$emit('upload-file', data);
-            this.updateFileList(data);
+            let data = res.data.data[0];
+            const file = {
+              fileSize: data.size,
+              fileName: data.name,
+              fileType: data.type,
+              filePath: data.url
+            };
+            this.$emit('upload-file', file);
+            this.updateFileList(file);
           } else {
-            this.$message({
-              message: res.data.message,
-              type: 'error'
-            });
+            this.$message.error('上传失败');
           }
+        })
+        .catch(() => {
+          this.$message.error('上传失败');
         });
+
+      // ------ 原有方式 ------
+      // let fileSize = renderSize(myfile.file.size);
+      // this.getBase64(myfile.file)
+      //   .then((resBase64) => {
+      //     let fileBase64 = resBase64.split(',')[1]; // 直接拿到base64信息
+      //     let params = {
+      //       file: myfile,
+      //       fileName: myfile.file.name,
+      //       fileType: myfile.file.name.split('.')[1],
+      //       fileData: fileBase64
+      //     };
+      //     console.log('params', params);
+      //     return uploadApi.uploadFile(params); // uploadFile
+      //   })
+      //   .then((res) => {
+      //     if (res.data.statusCode === '200') {
+      //       let data = res.data.data;
+      //       data.fileSize = fileSize;
+      //       this.$emit('upload-file', data);
+      //       this.updateFileList(data);
+      //     } else {
+      //       this.$message({
+      //         message: res.data.message,
+      //         type: 'error'
+      //       });
+      //     }
+      //   });
+      // ------ 原有方式 ------
     },
     updateFileList(file) {
       const _this = this;
@@ -349,14 +439,14 @@ export default {
       let itemRow = {
         ...this.uploadRow,
         elsAccount: this.elsAccount,
-        // attachmentType: file.fileType,
+        attachmentType: file.fileType,
         attachmentSize: file.fileSize,
         attachmentName: file.fileName,
         attachmentDesc: file.fileName,
         attachmentUrl: file.filePath,
         businessModule: this.businessModule,
         businessElsAccount: this.businessElsAccount,
-        businessId: this.id
+        businessId: this.businessId
       };
       let uploadRow = {
         ...this.uploadRow,
@@ -370,7 +460,7 @@ export default {
           itemRow = {
             ...itemRow,
             ...elsAttachment,
-            // attachmentType: file.fileType,
+            attachmentType: file.fileType,
             elsAccount: res.data.data.elsAccount,
             elsSubAccount: res.data.data.elsSubAccount,
             createUser: elsAttachment.createUser,

@@ -33,7 +33,7 @@
       :businessElsAccount="detailObj.elsAccount"
       businessModule="enquiry"
       :readonly="true"
-      v-if="tabActive === 'files'"
+      v-show="tabActive === 'files'"
     ></fast2-attachment-list>
     <!-- <avue-crud
       v-if="tabActive === 'files'"
@@ -52,7 +52,7 @@
       </template>
     </avue-crud> -->
     <avue-crud
-      v-if="tabActive === 'detail'"
+      v-show="tabActive === 'detail'"
       :data="inquiryListOption.data"
       :option="inquiryListOption.option"
       :page.sync="inquiryListOption.page"

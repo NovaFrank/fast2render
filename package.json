@@ -16,7 +16,7 @@
     "echarts": "^4.6.0",
     "element-ui": "^2.13.0",
     "exec-mathexpress": "^1.0.15",
-    "fast2render": "^0.3.20",
+    "fast2render": "^0.4.1",
     "js-md5": "^0.7.3",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",

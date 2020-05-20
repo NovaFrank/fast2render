@@ -26,14 +26,15 @@
     ></avue-form> -->
     <!-- 表单文件 -->
     <fast2-attachment-list
+      ref="attachment"
       :id="form.enquiryNumber"
       :elsAccount="elsAccount"
       :businessElsAccount="elsAccount"
       businessModule="enquiry"
-      v-if="tabActive === 'files' && form.enquiryNumber"
+      v-show="tabActive === 'files' && form.enquiryNumber"
     ></fast2-attachment-list>
     <avue-crud
-      v-if="tabActive === 'detail'"
+      v-show="tabActive === 'detail'"
       :data="inquiryListOption.data"
       :option="inquiryListOption.option"
       :page.sync="inquiryListOption.page"
@@ -384,6 +385,7 @@ export default {
               this.$message.success('发布成功');
               this.$router.push({ path: '/list' });
             });
+            this.$refs.attachment.sendFiles();
           }
         });
       });

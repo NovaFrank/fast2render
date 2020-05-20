@@ -45,7 +45,7 @@
       ref="attachment"
       :id="formOption.obj.orderNumber"
       :elsAccount="elsAccount"
-      :businessElsAccount="elsAccount"
+      :businessElsAccount="formOption.obj.toElsAccount"
       businessModule="order"
       v-show="tabActive.prop === 'files' && formOption.obj.orderNumber"
     ></fast2-attachment-list>

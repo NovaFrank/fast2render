@@ -6,9 +6,11 @@ const validateDateTime = (rule, value, callback) => {
   }
 };
 let sessionRequestQuan = sessionStorage.getItem('requestQuantity');
-let replyRequest = JSON.parse(sessionRequestQuan);
+// let replyRequest = JSON.parse(sessionRequestQuan);
+console.log(sessionRequestQuan);
 const validateNumber = (rule, value, callback) => {
-  if (value && value > replyRequest) {
+  console.log(value);
+  if (value && value > sessionRequestQuan) {
     callback(new Error('计划交货数量不可大于需求数量'));
   } else {
     callback();
@@ -79,6 +81,7 @@ export default {
       {
         label: '计划交货数量',
         labelWidth: 120,
+        type: 'number',
         prop: 'replyDeliveryQuantity',
         rules: [{ trigger: 'change', validator: validateNumber }]
       }

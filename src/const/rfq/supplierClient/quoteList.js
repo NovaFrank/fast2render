@@ -2,6 +2,7 @@ export default {
   data: [],
   option: {
     header: false,
+    align: 'center',
     menu: false,
     emptyBtn: false,
     submitBtn: false,

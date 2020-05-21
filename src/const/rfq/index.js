@@ -7,6 +7,7 @@ export default {
   },
   option: {
     header: false,
+    align: 'center',
     // selection: true,
     addBtn: false,
     refreshBtn: false,
@@ -25,7 +26,8 @@ export default {
       {
         slot: true,
         label: '询价单号',
-        prop: 'enquiryNumber'
+        prop: 'enquiryNumber',
+        width: '140'
       },
       // {
       //   slot: true,

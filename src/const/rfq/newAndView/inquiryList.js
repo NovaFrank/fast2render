@@ -7,6 +7,7 @@ export default {
   },
   option: {
     selection: true,
+    align: 'center',
     menuAlign: 'left',
     addBtn: false,
     refreshBtn: false,

@@ -11,6 +11,7 @@ export default {
     pageSize: 10
   },
   option: {
+    align: 'center',
     refreshBtn: false,
     columnBtn: false,
     searchBtn: false,

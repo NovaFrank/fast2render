@@ -7,6 +7,7 @@ export default {
   },
   option: {
     addBtn: false,
+    align: 'center',
     refreshBtn: false,
     menu: false,
     indexLabel: '#',

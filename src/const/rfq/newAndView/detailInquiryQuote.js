@@ -2,6 +2,7 @@ export default {
   data: [],
   option: {
     size: 'mini',
+    align: 'center',
     header: false,
     menu: false,
     border: false,

@@ -7,6 +7,7 @@ export default {
   },
   option: {
     header: false,
+    align: 'center',
     // menu: false,
     editBtn: false,
     delBtn: false,

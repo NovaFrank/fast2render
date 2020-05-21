@@ -154,8 +154,10 @@
         </p>
       </template>
       <template slot-scope="scope" slot="option">
-        <el-row v-if="detailObj.quoteEndTime < new Date().getTime()" :gutter="24">
-          <!-- scope.row.itemStatus === '2' &&  -->
+        <el-row
+          v-if="scope.row.itemStatus === '2' && detailObj.quoteEndTime < new Date().getTime()"
+          :gutter="24"
+        >
           <el-col :span="12">
             <avue-radio
               v-model="scope.row.itemStatus"

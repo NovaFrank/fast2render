@@ -40,6 +40,8 @@
                     /
                     <el-link
                       v-if="scope.row.attachmentUrl"
+                      download
+                      target="_blank"
                       :href="`${dome}/opt/nfsshare/${scope.row.attachmentUrl}`"
                     >
                       <!-- @click.stop="handleDownload(scope.row)" -->
@@ -118,12 +120,6 @@ export default {
       type: Boolean,
       default: true
     },
-    list: {
-      type: Array,
-      default: () => {
-        return [];
-      }
-    },
     option: {
       type: Object,
       default: () => {
@@ -190,24 +186,17 @@ export default {
   methods: {
     initData() {
       this.showUpdate = !validateNull(this.id);
-      console.log('this.businessId', this.businessId);
-      console.log('validateNull(this.businessId)', validateNull(this.businessId));
       if (!validateNull(this.businessId)) {
         this.option.delBtn = this.delBtn;
         this.getList();
-        if (!this.attachmentTemplate.length) {
-          this.getList();
-        } else {
-          let dic = this.$getDicItem('attachmentType');
-          this.readOption.column.unshift({
-            label: '文件类型',
-            prop: 'attachmentType',
-            type: 'select',
-            order: 0,
-            dicData: dic
-          });
-          this.initList();
-        }
+        // let dic = this.$getDicItem('attachmentType');
+        // this.readOption.column.unshift({
+        //   label: '文件类型',
+        //   prop: 'attachmentType',
+        //   type: 'select',
+        //   order: 0,
+        //   dicData: dic
+        // });
       }
     },
     initWebUpload() {
@@ -239,14 +228,17 @@ export default {
       // });
     },
     sendFiles() {
-      const params = {
-        businessItemIds: this.fileList.map((item) => item.uuid).toString()
-      };
-      uploadApi.sendFiles(params).then((res) => {
-        if (res.data.statusCode !== '200') {
-          this.$message.error(res.data.message);
-        }
-      });
+      const list = this.fileList.filter((item) => item.uuid); // 过滤掉未上传过的行数据
+      if (list.length > 0) {
+        const params = {
+          businessItemIds: list.map((item) => item.uuid).toString()
+        };
+        uploadApi.sendFiles(params).then((res) => {
+          if (res.data.statusCode !== '200') {
+            this.$message.error(res.data.message);
+          }
+        });
+      }
     },
     doAction(action, data) {
       this.$emit(action, data);
@@ -258,8 +250,6 @@ export default {
       this.attachmentTemplate.map((item) => {
         this.listTempRowAdd(item);
       });
-      const list = this.fileList;
-      console.log('list', list);
       //  有id 为读取模式， 没id 为模版预览模式
       if (this.id) {
         this.getList();
@@ -310,7 +300,7 @@ export default {
         }
         // businessItemId 根据该值判断 替换或直接push
         const itemIds = this.fileList.map((item) => item.businessItemId);
-        this.list.forEach((item) => {
+        this.attachmentTemplate.forEach((item) => {
           if (itemIds.includes(item.businessItemId)) {
             const index = this.fileList.findIndex(
               (file) => file.businessItemId === item.businessItemId
@@ -366,7 +356,6 @@ export default {
         attachmentType: type
       };
       this.fileList.push(fileItem);
-      this.list.push(fileItem);
     },
     // removeFile() {
     //   let action = 'delete';

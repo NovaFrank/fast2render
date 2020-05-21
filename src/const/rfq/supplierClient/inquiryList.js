@@ -24,6 +24,10 @@ export default {
         prop: 'materialName'
       },
       {
+        label: '物料描述',
+        prop: 'materialDesc'
+      },
+      {
         label: '规格',
         prop: 'materialSpecifications'
       },

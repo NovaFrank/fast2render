@@ -24,6 +24,10 @@ export default {
         prop: 'materialNumber'
       },
       {
+        label: '物料名称',
+        prop: 'materialName'
+      },
+      {
         label: '物料描述',
         prop: 'materialDesc'
       },

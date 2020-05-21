@@ -15,11 +15,6 @@ export default {
         formslot: true,
         label: '报价',
         prop: 'ladderPriceJson'
-      },
-      {
-        span: 24,
-        label: '备注',
-        prop: 'remark'
       }
     ]
   }

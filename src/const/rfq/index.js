@@ -48,10 +48,10 @@ export default {
         label: '物料名称',
         prop: 'materialName'
       },
-      // {
-      //   label: '物料描述',
-      //   prop: 'materialDesc'
-      // },
+      {
+        label: '物料描述',
+        prop: 'materialDesc'
+      },
       {
         dicUrl: '/layout/dics/value/enquiryType',
         dicMethod: 'get',

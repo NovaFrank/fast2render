@@ -27,11 +27,6 @@ export default {
         label: '不含税价',
         prop: 'priceExcludingTax',
         disabled: true
-      },
-      {
-        span: 24,
-        label: '备注',
-        prop: 'remark'
       }
     ]
   }

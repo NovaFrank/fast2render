@@ -150,7 +150,7 @@
           >
             **
           </span>
-          <span v-else>{{ getPriceIndex(scope.row, 'priceIncludingTax') }}</span>
+          <span v-else>{{ getPriceIndex(scope.row, 'priceExcludingTax') }}</span>
         </p>
       </template>
       <template slot-scope="scope" slot="option">

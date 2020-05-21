@@ -36,6 +36,10 @@ export default {
       {
         label: '供方已确认',
         prop: 'ProviderApproval'
+      },
+      {
+        label: '变更已确认',
+        prop: 'ChangeApproval'
       }
     ]
   }

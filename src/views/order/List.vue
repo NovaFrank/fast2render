@@ -16,7 +16,7 @@
       ref="crud"
     >
       <template
-        v-if="['All', 'ProviderChanged', 'ProviderApproval'].includes(tabActive)"
+        v-if="['All', 'ProviderChanged', 'ProviderApproval', 'ChangeApproval'].includes(tabActive)"
         slot-scope="scope"
         slot="status"
       >
@@ -26,9 +26,9 @@
               ? '全部'
               : scope.row.orderStatus === '2'
               ? '供方变更'
-              : scope.row.orderStatus === '4' || scope.row.orderStatus === '1'
+              : scope.row.orderStatus === '1'
               ? '供方已确认'
-              : ''
+              : '变更已确认'
           }}
         </span>
       </template>
@@ -229,11 +229,19 @@ export default {
         pageSize: this.formOption.page.pageSize,
         ...data
       }; // orderStatus: "0":"对方未确认","1":"对方已确认","2":"对方已退回","3":"变更对方未确认","4":"变更对方确认","5":"对方变更退回"
-      if (['All', 'ProviderChanged', 'ProviderApproval'].includes(this.tabActive)) {
+      if (
+        ['All', 'ProviderChanged', 'ProviderApproval', 'ChangeApproval'].includes(this.tabActive)
+      ) {
         params = {
           ...params,
           orderStatus:
-            this.tabActive === 'All' ? '' : this.tabActive === 'ProviderChanged' ? '2' : '1' || '4'
+            this.tabActive === 'All'
+              ? ''
+              : this.tabActive === 'ProviderChanged'
+              ? '2'
+              : this.tabActive === 'ProviderApproval'
+              ? '1'
+              : '4'
         };
       } else if (['Create', 'Pending', 'Approval', 'Reject'].includes(this.tabActive)) {
         params = {

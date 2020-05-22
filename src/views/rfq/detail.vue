@@ -520,7 +520,7 @@ export default {
             flowId: res.data.data.flowCode,
             businessType: 'bargainEnquiryAudit'
           };
-          setStore({ name: res.data.data.orderNumber, content, type: true });
+          setStore({ name: this.currentEnquiryNumber, content, type: true });
         }
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {

@@ -451,15 +451,30 @@ export default {
         // });
 
         const action = 'submit';
+
+        const param = {
+          enquiryNumber: this.currentEnquiryNumber,
+          elsAccount: this.elsAccount,
+          quoteEndTime: this.detailObj.quoteEndTime,
+          enquiryType: this.detailObj.enquiryType,
+          enquiryDesc: this.detailObj.enquiryDesc,
+          companyCode: this.detailObj.companyCode,
+          enquiryMethod: this.detailObj.enquiryMethod || '',
+          itemList: this.inquiryListOption.data
+        };
         let params = {
           elsAccount: this.detailObj.elsAccount,
           // toElsAccount: this.detailObj.toElsAccount,
           businessType: 'bargainEnquiryAudit',
           businessId: this.detailObj.enquiryNumber,
-          params: '{"key1":"123"}'
+          params: JSON.stringify(param)
         };
         submitAudit(action, params).then((res) => {
-          console.log(res);
+          if (res.data.statusCode === '200') {
+            this.$message.success('提交审批成功');
+            return;
+          }
+          this.$message.error('提交审批失败');
         });
       });
     },

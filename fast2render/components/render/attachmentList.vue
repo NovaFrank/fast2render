@@ -169,7 +169,6 @@ export default {
   },
   created() {},
   mounted() {
-    console.log('mounted', this.id);
     // this.initWebUpload();
     if (!validateNull(this.id)) {
       this.businessId = this.id;
@@ -178,8 +177,10 @@ export default {
   },
   watch: {
     id(newValue) {
-      console.log('newValue', newValue);
       this.businessId = newValue;
+      this.initData();
+    },
+    attachmentTemplate(newValue) {
       this.initData();
     }
   },

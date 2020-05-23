@@ -67,14 +67,16 @@
       </template>
       <template slot-scope="scope" slot="quoteMethod">
         <span v-if="scope.row.quoteMethod === '0'">常规报价</span>
-        <p
-          style="margin: 0"
-          v-else-if="scope.row.quoteMethod === '1'"
-          v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
-          :key="ladder.ladderGrade"
-        >
-          {{ ladder.ladderGrade }}
-        </p>
+        <div v-else-if="scope.row.quoteMethod === '1'">
+          <span>阶梯报价</span>
+          <p
+            style="margin: 0"
+            v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
+            :key="ladder.ladderGrade"
+          >
+            {{ ladder.ladderGrade }}
+          </p>
+        </div>
       </template>
       <template slot="taxRate" slot-scope="scope">
         {{

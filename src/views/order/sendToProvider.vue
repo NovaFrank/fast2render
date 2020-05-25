@@ -245,8 +245,19 @@ export default {
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
+      sessionStorage.setItem('materialRow', JSON.stringify(this.materielListOption.data));
       if (this.tabActive.prop === 'plan') {
-        this.tableData();
+        let sessionCateCode = sessionStorage.getItem('materialRow');
+        this.planListOption.data = JSON.parse(sessionCateCode);
+        this.planListOption.data.forEach((item) => {
+          JSON.parse(sessionCateCode).forEach((i) => {
+            if (i.orderItemNumber === item.orderItemNumber) {
+              item.requestDeliveryDate = i.deliveryDate;
+              item.requestDeliveryQuantity = i.quantity;
+              item.deliveryItemNumber = '1';
+            }
+          });
+        });
       }
     },
     // 删除行数据

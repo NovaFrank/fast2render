@@ -230,24 +230,36 @@ export default {
     },
     sendFiles() {
       const list = this.fileList.filter((item) => item.uuid); // 过滤掉未上传过的行数据
-      if (list.length > 0) {
-        const params = {
-          businessItemIds: list.map((item) => item.uuid).toString()
-        };
-        return new Promise((resolve) => {
-          uploadApi.sendFiles(params).then((res) => {
-            if (res.data.statusCode === '200') {
-              resolve({ result: true, statusCode: res.data.statusCode });
-            } else {
-              resolve({
-                result: false,
-                message: res.data.message,
-                statusCode: res.data.statusCode
-              });
-            }
+      return new Promise((resolve, reject) => {
+        if (list.length > 0) {
+          const params = {
+            businessItemIds: list.map((item) => item.uuid).toString()
+          };
+          uploadApi
+            .sendFiles(params)
+            .then((res) => {
+              if (res.data.statusCode === '200') {
+                resolve({ result: true, statusCode: res.data.statusCode });
+              } else {
+                resolve({
+                  result: false,
+                  message: res.data.message,
+                  statusCode: res.data.statusCode
+                });
+              }
+            })
+            .catch((res) => {
+              reject(res);
+            });
+        } else {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          reject({
+            result: false,
+            message: '请上传附件',
+            statusCode: '-100'
           });
-        });
-      }
+        }
+      });
     },
     doAction(action, data) {
       this.$emit(action, data);

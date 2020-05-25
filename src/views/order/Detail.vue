@@ -266,6 +266,7 @@ export default {
       if (this.tabActive.prop === 'plan') {
         this.tableData();
       }
+      this.tableData();
     },
     // 删除行数据
     handleDeleteRow(row, index) {

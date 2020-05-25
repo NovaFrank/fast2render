@@ -426,7 +426,7 @@ export default {
         alert('请选择采购组!');
         return false;
       }
-      this.tabActive = this.tabOption.option.column[2];
+      this.tabActive = this.tabOption.option.column[1];
       this.handleTabClick(this.tabActive);
       const action = 'updateOrder';
       let params = {
@@ -474,7 +474,7 @@ export default {
       //   }
       //   return false;
       // });
-      this.tabActive = this.tabOption.option.column[2];
+      this.tabActive = this.tabOption.option.column[1];
       this.handleTabClick(this.tabActive);
       const action = 'updateOrder';
       let params = {

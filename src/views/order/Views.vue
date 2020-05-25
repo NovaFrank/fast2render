@@ -40,6 +40,7 @@
       :id="formOption.obj.orderNumber"
       :elsAccount="elsAccount"
       :businessElsAccount="elsAccount"
+      :readonly="true"
       businessModule="order"
       v-show="tabActive.prop === 'files' && formOption.obj.orderNumber"
     ></fast2-attachment-list>
@@ -403,7 +404,7 @@ export default {
         deliveryPlanVOList: this.planListOption.data
       };
       await createOrder(action, params);
-      this.$refs.attachment.sendFiles();
+      // this.$refs.attachment.sendFiles();
       const action2 = 'submit';
       let params2 = {
         elsAccount: this.elsAccount,

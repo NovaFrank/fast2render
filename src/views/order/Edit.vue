@@ -397,11 +397,19 @@ export default {
     },
     // 保存表头和表单
     async handleSave() {
-      this.materielListOption.data.map((item) => {
+      this.materielListOption.data.forEach((item) => {
         if (!item.deliveryDate) {
           alert('请填写交货日期！');
+          throw new Error('请填写交货日期！');
         }
       });
+      // this.materielListOption.data.map((item) => {
+      //   if (!item.deliveryDate) {
+      //     alert('请填写交货日期！');
+      //     return false;
+      //   }
+      //   return false;
+      // });
       if (this.materielListOption.data.length === 0) {
         alert('请添加一条数据！');
         return false;
@@ -453,11 +461,19 @@ export default {
         alert('请选择采购组!');
         return false;
       }
-      this.materielListOption.data.map((item) => {
+      this.materielListOption.data.forEach((item) => {
         if (!item.deliveryDate) {
           alert('请填写交货日期！');
+          throw new Error('kd');
         }
       });
+      // this.materielListOption.data.map((item) => {
+      //   if (!item.deliveryDate) {
+      //     alert('请填写交货日期！');
+      //     return false;
+      //   }
+      //   return false;
+      // });
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
       const action = 'updateOrder';
@@ -469,7 +485,7 @@ export default {
         deliveryPlanVOList: this.planListOption.data
       };
       await createOrder(action, params);
-      this.$refs.attachment.sendFiles();
+      // this.$refs.attachment.sendFiles();
       const action2 = 'submit';
       let params2 = {
         elsAccount: this.elsAccount,

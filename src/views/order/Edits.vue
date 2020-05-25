@@ -498,7 +498,7 @@ export default {
       };
       // console.log('params: ' + JSON.stringify(params2));
       await submitAudit(action2, params2);
-      this.$refs.attachment.sendFiles();
+      // this.$refs.attachment.sendFiles();
       // console.log('params: ' + JSON.stringify(resp));
       this.$message({
         type: 'success',

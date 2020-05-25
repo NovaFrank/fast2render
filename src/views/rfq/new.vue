@@ -353,40 +353,45 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$refs.form.validate((valid) => {
-          if (valid) {
-            if (this.inquiryListOption.data.length === 0) {
-              this.$message.error('请添加询价明细');
-              return;
-            }
-            let params = {
-              enquiryNumber: this.currentEnquiryNumber,
-              elsAccount: this.elsAccount,
-              // beginDate: this.form.beginDate,
-              quoteEndTime: this.form.quoteEndTime,
-              enquiryType: this.form.enquiryType,
-              enquiryDesc: this.form.enquiryDesc,
-              companyCode: this.form.companyCode,
-              // responsible: this.form.responsible,
-              enquiryMethod: this.form.enquiryMethod,
-              itemList: this.inquiryListOption.data
-            };
-            if (this.currentEnquiryNumber) {
-              params = {
-                ...params,
-                enquiryNumber: this.currentEnquiryNumber
-              };
-            }
-            purchaseEnquiryAction('publishEnquiry', params).then((res) => {
-              if (res.data.statusCode !== '200') {
-                this.$message.error(res.data.message);
+        this.$refs.attachment.sendFiles().then((res) => {
+          if (!res.result) {
+            this.$message.error(res.message || '附件发送失败');
+            return;
+          }
+          this.$refs.form.validate((valid) => {
+            if (valid) {
+              if (this.inquiryListOption.data.length === 0) {
+                this.$message.error('请添加询价明细');
                 return;
               }
-              this.$message.success('发布成功');
-              this.$router.push({ path: '/list' });
-            });
-            this.$refs.attachment.sendFiles();
-          }
+              let params = {
+                enquiryNumber: this.currentEnquiryNumber,
+                elsAccount: this.elsAccount,
+                // beginDate: this.form.beginDate,
+                quoteEndTime: this.form.quoteEndTime,
+                enquiryType: this.form.enquiryType,
+                enquiryDesc: this.form.enquiryDesc,
+                companyCode: this.form.companyCode,
+                // responsible: this.form.responsible,
+                enquiryMethod: this.form.enquiryMethod,
+                itemList: this.inquiryListOption.data
+              };
+              if (this.currentEnquiryNumber) {
+                params = {
+                  ...params,
+                  enquiryNumber: this.currentEnquiryNumber
+                };
+              }
+              purchaseEnquiryAction('publishEnquiry', params).then((res) => {
+                if (res.data.statusCode !== '200') {
+                  this.$message.error(res.data.message);
+                  return;
+                }
+                this.$message.success('发布成功');
+                this.$router.push({ path: '/list' });
+              });
+            }
+          });
         });
       });
     },

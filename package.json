@@ -1,6 +1,6 @@
 {
   "name": "fast2render",
-  "version": "0.3.18",
+  "version": "0.4.4",
   "private": false,
   "main": "lib/index.umd.min.js",
   "scripts": {

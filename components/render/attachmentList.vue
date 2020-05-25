@@ -234,10 +234,18 @@ export default {
         const params = {
           businessItemIds: list.map((item) => item.uuid).toString()
         };
-        uploadApi.sendFiles(params).then((res) => {
-          if (res.data.statusCode !== '200') {
-            this.$message.error(res.data.message);
-          }
+        return new Promise((resolve) => {
+          uploadApi.sendFiles(params).then((res) => {
+            if (res.data.statusCode === '200') {
+              resolve({ result: true, statusCode: res.data.statusCode });
+            } else {
+              resolve({
+                result: false,
+                message: res.data.message,
+                statusCode: res.data.statusCode
+              });
+            }
+          });
         });
       }
     },

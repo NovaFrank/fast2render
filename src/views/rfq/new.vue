@@ -413,6 +413,14 @@ export default {
               this.$message.error('请添加询价明细');
               return;
             }
+            let validate = this.inquiryListOption.data.filter(
+              (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+            );
+            if (validate.length > 0) {
+              this.$message.error('请完善报价方式或税码/税率');
+              return;
+            }
+            console.log('validate', validate.length);
             const params = {
               enquiryNumber: this.currentEnquiryNumber,
               elsAccount: this.elsAccount,

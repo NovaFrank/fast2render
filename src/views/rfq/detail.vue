@@ -440,8 +440,13 @@ export default {
       this.suppliersDialogVisable = true;
     },
     handleSubmitApproval() {
+      let status = false;
       let result = false;
       this.inquiryListOption.data.forEach((item) => {
+        if (item.itemStatus !== '5' && item.itemStatus !== '4' && item.itemStatus !== '1') {
+          status = true;
+          return;
+        }
         if (item.itemStatus === '4') {
           let quote = 0;
           this.inquiryListOption.data
@@ -454,6 +459,10 @@ export default {
           if (Number(quote) !== 100) result = true;
         }
       });
+      if (status) {
+        this.$message.error('已报价状态的单据不能提交审批');
+        return;
+      }
       if (result) {
         this.$message.error('物料配额必须等于100');
         return;

@@ -442,15 +442,17 @@ export default {
     handleSubmitApproval() {
       let result = false;
       this.inquiryListOption.data.forEach((item) => {
-        let quote = 0;
-        this.inquiryListOption.data
-          .filter(
-            (itemF) => itemF.materialNumber === item.materialNumber && item.itemStatus === '4'
-          )
-          .forEach((itemQuota) => {
-            quote += Number(itemQuota.quota);
-          });
-        if (Number(quote) !== 100) result = true;
+        if (item.itemStatus === '4') {
+          let quote = 0;
+          this.inquiryListOption.data
+            .filter(
+              (itemF) => itemF.materialNumber === item.materialNumber && item.itemStatus === '4'
+            )
+            .forEach((itemQuota) => {
+              quote += Number(itemQuota.quota);
+            });
+          if (Number(quote) !== 100) result = true;
+        }
       });
       if (result) {
         this.$message.error('物料配额必须等于100');

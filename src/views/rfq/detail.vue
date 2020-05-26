@@ -18,6 +18,7 @@
       <template slot="quoteEndTime">
         <el-date-picker
           v-model="quoteEndTimeChange"
+          :disabled="this.detailObj.auditStatus === '0' || this.detailObj.auditStatus === '2'"
           type="datetime"
           placeholder="选择日期时间"
           value-format="timestamp"
@@ -537,6 +538,11 @@ export default {
         this.detailObj = res.data.data;
         if (this.detailObj.auditStatus === '0' || this.detailObj.auditStatus === '2') {
           this.inquiryListOption.option.header = false;
+
+          this.headerButtons = [
+            { power: true, text: '返回', type: '', size: '', action: 'on-back' },
+            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
+          ];
         }
 
         if (res.data.data.flowCode) {

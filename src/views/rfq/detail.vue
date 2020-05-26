@@ -440,8 +440,8 @@ export default {
       this.suppliersDialogVisable = true;
     },
     handleSubmitApproval() {
-      let status = false;
-      let result = false;
+      let status = false; // 已报价，但包含未进行接受/拒绝操作的行信息，单据不可提交审批
+      let result = false; // 相同物料 已报价 分配的配额必须相加为100
       this.inquiryListOption.data.forEach((item) => {
         if (item.itemStatus !== '5' && item.itemStatus !== '4' && item.itemStatus !== '1') {
           status = true;

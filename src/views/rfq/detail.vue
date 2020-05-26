@@ -444,7 +444,9 @@ export default {
       this.inquiryListOption.data.forEach((item) => {
         let quote = 0;
         this.inquiryListOption.data
-          .filter((itemF) => itemF.materialNumber === item.materialNumber)
+          .filter(
+            (itemF) => itemF.materialNumber === item.materialNumber && item.itemStatus === '4'
+          )
           .forEach((itemQuota) => {
             quote += Number(itemQuota.quota);
           });

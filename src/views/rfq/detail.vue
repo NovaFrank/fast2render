@@ -157,7 +157,12 @@
       </template>
       <template slot-scope="scope" slot="option">
         <el-row
-          v-if="scope.row.itemStatus === '2' && detailObj.quoteEndTime < new Date().getTime()"
+          v-if="
+            detailObj.auditStatus !== '0' &&
+              detailObj.auditStatus !== '2' &&
+              scope.row.itemStatus === '2' &&
+              detailObj.quoteEndTime < new Date().getTime()
+          "
           :gutter="24"
         >
           <el-col :span="12">
@@ -435,25 +440,26 @@ export default {
       this.suppliersDialogVisable = true;
     },
     handleSubmitApproval() {
+      let result = false;
+      this.inquiryListOption.data.forEach((item) => {
+        let quote = 0;
+        this.inquiryListOption.data
+          .filter((itemF) => itemF.materialNumber === item.materialNumber)
+          .forEach((itemQuota) => {
+            quote += Number(itemQuota.quota);
+          });
+        if (Number(quote) !== 100) result = true;
+      });
+      if (result) {
+        this.$message.error('物料配额必须等于100');
+        return;
+      }
       this.$confirm('是否提交审批？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // const params = {
-        //   enquiryNumber: this.currentEnquiryNumber,
-        //   itemList: this.inquiryListOption.data
-        // };
-        // purchaseEnquiryAction('acceptOrRefuse', params).then((res) => {
-        //   if (res.data.statusCode !== '200') {
-        //     this.$message.error(res.data.message);
-        //     return;
-        //   }
-        //   this.$message.success('提交成功');
-        // });
-
         const action = 'submit';
-
         const param = {
           enquiryNumber: this.currentEnquiryNumber,
           elsAccount: this.elsAccount,
@@ -516,6 +522,9 @@ export default {
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
+        if (this.detailObj.auditStatus === '0' || this.detailObj.auditStatus === '2') {
+          this.inquiryListOption.option.header = false;
+        }
 
         if (res.data.data.flowCode) {
           let content = {
@@ -530,7 +539,9 @@ export default {
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
           return {
             id: item.uuid,
-            $cellEdit: item.itemStatus === '4',
+            $cellEdit:
+              item.itemStatus === '4' &&
+              (this.detailObj.auditStatus !== '0' || this.detailObj.auditStatus === '2'),
             ...item
           };
         });

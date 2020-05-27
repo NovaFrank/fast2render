@@ -545,9 +545,18 @@ export default {
 
           this.headerButtons = [
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
-            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
-            { power: true, text: '比价', type: 'primary', size: '', action: 'on-bid-price' }
+            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
           ];
+        }
+
+        if (this.detailObj.quoteEndTime < new Date().getTime()) {
+          this.headerButtons.push({
+            power: true,
+            text: '比价',
+            type: 'primary',
+            size: '',
+            action: 'on-bid-price'
+          });
         }
 
         if (res.data.data.flowCode) {

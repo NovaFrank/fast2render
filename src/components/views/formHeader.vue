@@ -12,6 +12,7 @@
         {{ button.text }}
       </el-button>
       <el-popover
+        v-show="showHistoryButton"
         placement="bottom"
         width="180"
         trigger="click"
@@ -53,6 +54,10 @@ export default {
   components: {},
   created: function() {},
   props: {
+    showHistoryButton: {
+      type: Boolean,
+      default: true
+    },
     titleText: String,
     showButton: {
       type: Boolean,

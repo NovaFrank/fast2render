@@ -6,10 +6,9 @@ export default {
     pageSize: 10
   },
   option: {
-    addBtn: false,
     align: 'center',
-    refreshBtn: false,
     menu: false,
+    header: false,
     indexLabel: '#',
     border: true,
     highlightCurrentRow: true,

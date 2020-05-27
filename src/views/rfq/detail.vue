@@ -13,6 +13,7 @@
       @on-submit-approval="handleSubmitApproval"
       @on-update-end="handleUpdateQuoteEndTime"
       @show-time-history="handleShowTimeHistory"
+      @on-bid-price="handleBidPrice"
     ></form-header>
     <avue-form ref="form" v-model="detailObj" :option="formOption">
       <template slot="quoteEndTime">
@@ -267,7 +268,8 @@ export default {
         { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
         { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
         // { power: true, text: '开启', type: 'primary', size: '', action: 'on-open' },
-        { power: true, text: '发布新供应商', type: 'primary', size: '', action: 'on-new-supplier' }
+        { power: true, text: '发布新供应商', type: 'primary', size: '', action: 'on-new-supplier' },
+        { power: true, text: '比价', type: 'primary', size: '', action: 'on-bid-price' }
       ],
       historyVisible: false,
       historyList: [],
@@ -346,6 +348,9 @@ export default {
     },
     handleBack() {
       this.$router.push({ path: '/list' });
+    },
+    handleBidPrice() {
+      this.$router.push({ path: `/price/${this.currentEnquiryNumber}` });
     },
     handleClose() {
       this.$confirm('是否关闭？', '提示', {
@@ -446,7 +451,6 @@ export default {
       this.inquiryListOption.data.forEach((item) => {
         if (item.itemStatus === '4') {
           status = false; // 必须有接受的报价才能够提交审批
-          return;
         }
         if (item.itemStatus === '4') {
           let quote = 0;
@@ -541,7 +545,8 @@ export default {
 
           this.headerButtons = [
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
-            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
+            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
+            { power: true, text: '比价', type: 'primary', size: '', action: 'on-bid-price' }
           ];
         }
 

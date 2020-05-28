@@ -10,6 +10,8 @@ export default {
     menu: false,
     indexLabel: '#',
     addBtn: false,
+    refreshBtn: false,
+    columnBtn: false,
     border: true,
     highlightCurrentRow: true,
     index: true,

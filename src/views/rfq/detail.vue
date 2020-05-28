@@ -647,7 +647,7 @@ export default {
         });
       });
       // 供应商列表 supplierMasterListAction
-      supplierMasterListAction({ elsAccount: this.elsAccount }).then((res) => {
+      supplierMasterListAction({ elsAccount: this.elsAccount, pageSize: 10000 }).then((res) => {
         this.supplierList = res.data.pageData.rows;
         this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
           return {

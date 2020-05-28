@@ -2,7 +2,7 @@
   <el-dialog :title="title" :visible.sync="visable">
     <avue-form :option="formOption" v-model="form" ref="form">
       <template slot="suppliers">
-        <el-transfer v-model="form.selectedSupplier" :data="data"></el-transfer>
+        <el-transfer filterable v-model="form.selectedSupplier" :data="data"></el-transfer>
       </template>
       <template slot="menuForm">
         <el-button size="small" @click="closeDialog">取消</el-button>

@@ -8,8 +8,8 @@ export default {
   option: {
     align: 'center',
     menu: false,
-    header: false,
     indexLabel: '#',
+    addBtn: false,
     border: true,
     highlightCurrentRow: true,
     index: true,

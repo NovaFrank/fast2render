@@ -150,17 +150,22 @@ export default {
       };
       // new itemStatus 0
       // quoting itemStatus 1
-      // price itemStatus 4/5
-      // close itemStatus 6
-      if (['new', 'quoting', 'close'].includes(this.tabActive)) {
+      // price itemStatus 4
+      // close itemStatusList 6/5
+      if (['new', 'quoting'].includes(this.tabActive)) {
         params = {
           ...params,
-          itemStatus: this.tabActive === 'new' ? '0' : this.tabActive === 'quoting' ? '1' : '6'
+          itemStatus: this.tabActive === 'new' ? '0' : '1'
         };
       } else if (this.tabActive === 'price') {
         params = {
           ...params,
-          itemStatusList: ['4', '5']
+          itemStatus: '4'
+        };
+      } else if (this.tabActive === 'close') {
+        params = {
+          ...params,
+          itemStatusList: ['5', '6']
         };
       }
       postAction('findPageList', params).then((res) => {

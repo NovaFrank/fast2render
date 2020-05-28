@@ -270,8 +270,7 @@ export default {
         { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
         { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
         // { power: true, text: '开启', type: 'primary', size: '', action: 'on-open' },
-        { power: true, text: '发布新供应商', type: 'primary', size: '', action: 'on-new-supplier' },
-        { power: true, text: '比价', type: 'primary', size: '', action: 'on-bid-price' }
+        { power: true, text: '发布新供应商', type: 'primary', size: '', action: 'on-new-supplier' }
       ],
       historyVisible: false,
       historyList: [],

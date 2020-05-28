@@ -383,7 +383,6 @@ export default {
                   companyCode: this.form.companyCode,
                   // responsible: this.form.responsible,
                   enquiryMethod: this.form.enquiryMethod,
-                  purchaseRequestNumber: this.form.purchaseRequestNumber,
                   itemList: this.inquiryListOption.data
                 };
                 if (this.currentEnquiryNumber) {
@@ -439,7 +438,6 @@ export default {
               companyCode: this.form.companyCode,
               // responsible: this.form.responsible,
               enquiryMethod: this.form.enquiryMethod,
-              purchaseRequestNumber: this.form.purchaseRequestNumber,
               itemList: this.inquiryListOption.data
             };
             purchaseEnquiryAction('save', params).then((res) => {
@@ -506,6 +504,7 @@ export default {
       );
       const currentMaterial = this.materialList[materialIndex];
       let item = {
+        ...form,
         materialNumber: currentMaterial.materialNumber,
         materialName: currentMaterial.materialName,
         materialDesc: currentMaterial.materialDesc,

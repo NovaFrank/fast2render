@@ -1,6 +1,7 @@
 <template>
   <basic-container>
     <form-header
+      v-if="!isAudit"
       titleText="预览"
       showButton
       :buttons="headerButtons"
@@ -241,6 +242,7 @@ export default {
   },
   data() {
     return {
+      isAudit: false,
       elsAccount: '',
       elsSubAccount: '',
       dic: [
@@ -286,6 +288,7 @@ export default {
     };
   },
   created() {
+    this.isAudit = this.$route.query.isAudit || false;
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
@@ -562,7 +565,8 @@ export default {
         if (res.data.data.flowCode) {
           let content = {
             flowId: res.data.data.flowCode,
-            businessType: 'bargainEnquiryAudit'
+            businessType: 'bargainEnquiryAudit',
+            auditStatus: res.data.data.auditStatus
           };
           setStore({ name: this.currentEnquiryNumber, content, type: true });
         }

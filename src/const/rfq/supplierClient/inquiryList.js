@@ -65,6 +65,11 @@ export default {
       },
       {
         slot: true,
+        label: '阶梯信息',
+        prop: 'quoteMethodInfo'
+      },
+      {
+        slot: true,
         label: '含税价',
         prop: 'priceIncludingTax'
       },

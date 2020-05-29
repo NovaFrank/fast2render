@@ -43,8 +43,9 @@
       <template slot-scope="scope" slot="quoteMethod">
         <span v-if="scope.row.quoteMethod === '0'">常规报价</span>
         <span v-else-if="scope.row.quoteMethod === '1'">阶梯报价</span>
-        <!-- <div v-else-if="scope.row.quoteMethod === '1'">
-          <span>阶梯报价</span>
+      </template>
+      <template slot-scope="scope" slot="quoteMethodInfo">
+        <span v-if="scope.row.quoteMethod === '1'">
           <p
             style="margin: 0"
             v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
@@ -52,7 +53,7 @@
           >
             {{ ladder.ladderGrade }}
           </p>
-        </div> -->
+        </span>
       </template>
       <template slot-scope="scope" slot="quote">
         <avue-radio

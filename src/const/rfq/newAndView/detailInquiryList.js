@@ -53,10 +53,11 @@ export default {
         label: '报价方式',
         prop: 'quoteMethod'
       },
-      // {
-      //   label: 'ELS账号',
-      //   prop: 'elsAccount'
-      // },
+      {
+        slot: true,
+        label: '阶梯信息',
+        prop: 'quoteMethodInfo'
+      },
       {
         label: '供应商',
         prop: 'toElsAccount'

@@ -82,6 +82,17 @@
           </p>
         </div> -->
       </template>
+      <template slot-scope="scope" slot="quoteMethodInfo">
+        <span v-if="scope.row.quoteMethod === '1'">
+          <p
+            style="margin: 0"
+            v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
+            :key="ladder.ladderGrade"
+          >
+            {{ ladder.ladderGrade }}
+          </p>
+        </span>
+      </template>
       <template slot="taxRate" slot-scope="scope">
         {{
           scope.row.itemStatus === '2' && detailObj.quoteEndTime > new Date().getTime()

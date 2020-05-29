@@ -67,6 +67,11 @@ export default {
         slot: true,
         label: '报价方式',
         prop: 'quoteMethod'
+      },
+      {
+        slot: true,
+        label: '阶梯信息',
+        prop: 'quoteMethodInfo'
       }
     ]
   }

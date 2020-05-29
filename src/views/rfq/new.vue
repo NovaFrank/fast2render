@@ -265,7 +265,7 @@ export default {
           return item;
         });
       });
-      // 币别
+      // 税率
       dataDicAPI('taxRate').then((res) => {
         this.dialogOption.column = this.dialogOption.column.map((item) => {
           if (item.prop === 'taxCode') {

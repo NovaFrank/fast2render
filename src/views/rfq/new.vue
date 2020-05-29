@@ -46,7 +46,8 @@
     >
       <template slot-scope="scope" slot="quoteMethod">
         <span v-if="scope.row.quoteMethod === '0'">常规报价</span>
-        <div v-else-if="scope.row.quoteMethod === '1'">
+        <span v-else-if="scope.row.quoteMethod === '1'">阶梯报价</span>
+        <!-- <div v-else-if="scope.row.quoteMethod === '1'">
           <span>阶梯报价</span>
           <p
             style="margin: 0"
@@ -55,7 +56,7 @@
           >
             {{ ladder.ladderGrade }}
           </p>
-        </div>
+        </div> -->
       </template>
       <template slot="menuLeft" v-if="!form.purchaseRequestNumber">
         <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>

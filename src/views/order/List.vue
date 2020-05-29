@@ -151,13 +151,23 @@
 
         <!--view 可修改行数据  -->
         <router-link
-          v-if="row.orderStatus === '2' && row.sendStatus === '0' && row.sourceType === null"
+          v-if="
+            row.orderStatus === '2' &&
+              row.sendStatus === '0' &&
+              row.auditStatus === '1' &&
+              row.sourceType === null
+          "
           :to="`view/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
         </router-link>
         <router-link
-          v-if="row.orderStatus === '2' && row.sendStatus === '0' && row.sourceType === 'request'"
+          v-if="
+            row.orderStatus === '2' &&
+              row.sendStatus === '0' &&
+              row.auditStatus === '1' &&
+              row.sourceType === 'request'
+          "
           :to="`views/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
@@ -165,6 +175,12 @@
         <!--sendtoprovider-->
         <router-link
           v-if="row.orderStatus === '0' && row.sendStatus === '0' && row.auditStatus === '0'"
+          :to="`sendToProvider/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '2' && row.sendStatus === '0' && row.auditStatus === '0'"
           :to="`sendToProvider/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>

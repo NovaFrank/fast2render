@@ -16,7 +16,15 @@
       ref="crud"
     >
       <template
-        v-if="['All', 'ProviderChanged', 'ProviderApproval', 'ChangeApproval'].includes(tabActive)"
+        v-if="
+          [
+            'All',
+            'ProviderChanged',
+            'ProviderChanged2',
+            'ProviderApproval',
+            'ChangeApproval'
+          ].includes(tabActive)
+        "
         slot-scope="scope"
         slot="status"
       >
@@ -26,6 +34,8 @@
               ? '全部'
               : scope.row.orderStatus === '2'
               ? '供方变更'
+              : scope.row.orderStatus === '5'
+              ? '变更退回'
               : scope.row.orderStatus === '1'
               ? '供方已确认'
               : '变更已确认'
@@ -163,6 +173,17 @@
         </router-link>
         <router-link
           v-if="
+            row.orderStatus === '5' &&
+              row.sendStatus === '0' &&
+              row.auditStatus === '1' &&
+              row.sourceType === null
+          "
+          :to="`view/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="
             row.orderStatus === '2' &&
               row.sendStatus === '0' &&
               row.auditStatus === '1' &&
@@ -187,6 +208,12 @@
         </router-link>
         <router-link
           v-if="row.orderStatus === '3' && row.sendStatus === '2' && row.auditStatus === '0'"
+          :to="`sendToProvider/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '5' && row.sendStatus === '0' && row.auditStatus === '0'"
           :to="`sendToProvider/${row.orderNumber}`"
         >
           <el-tag>{{ row.orderNumber }}</el-tag>
@@ -246,7 +273,13 @@ export default {
         ...data
       }; // orderStatus: "0":"对方未确认","1":"对方已确认","2":"对方已退回","3":"变更对方未确认","4":"变更对方确认","5":"对方变更退回"
       if (
-        ['All', 'ProviderChanged', 'ProviderApproval', 'ChangeApproval'].includes(this.tabActive)
+        [
+          'All',
+          'ProviderChanged',
+          'ProviderChanged2',
+          'ProviderApproval',
+          'ChangeApproval'
+        ].includes(this.tabActive)
       ) {
         params = {
           ...params,
@@ -255,6 +288,8 @@ export default {
               ? ''
               : this.tabActive === 'ProviderChanged'
               ? '2'
+              : this.tabActive === 'ProviderChanged2'
+              ? '5'
               : this.tabActive === 'ProviderApproval'
               ? '1'
               : '4'

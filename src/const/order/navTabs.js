@@ -34,6 +34,10 @@ export default {
         prop: 'ProviderChanged'
       },
       {
+        label: '变更已退回',
+        prop: 'ProviderChanged2'
+      },
+      {
         label: '供方已确认',
         prop: 'ProviderApproval'
       },

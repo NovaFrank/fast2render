@@ -294,6 +294,7 @@ export default {
             return;
           }
           this.$message.success('发送成功');
+          this.$router.back();
         });
       });
     },

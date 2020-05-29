@@ -18,10 +18,6 @@ export default {
     column: [
       { label: '物料编号', prop: 'materialNumber' },
       { label: '物料名称', prop: 'materialName' },
-      // {
-      //   label: '物料描述',
-      //   prop: 'materialDesc'
-      // },
       { label: '单位', prop: 'baseUnit' },
       { label: '需求数量', prop: 'quantity' },
       { label: '对比项', prop: 'option' }

@@ -356,7 +356,13 @@ export default {
     initColumn() {
       this.inquiryListOption = inquiryListOption;
       // 添加供应商列
-      if (this.inquiryListOption.option.column.length > 5) return;
+      this.inquiryListOption.option.column = [
+        { label: '物料编号', prop: 'materialNumber' },
+        { label: '物料名称', prop: 'materialName' },
+        { label: '单位', prop: 'baseUnit' },
+        { label: '需求数量', prop: 'quantity' },
+        { label: '对比项', prop: 'option' }
+      ];
       this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(
         this.supplierColumn
       );
@@ -462,6 +468,7 @@ export default {
         submitAudit(action, params).then((res) => {
           if (res.data.statusCode === '200') {
             this.$message.success('提交审批成功');
+            this.$router.back();
             return;
           }
           this.$message.error('提交审批失败');

@@ -34,6 +34,7 @@
                 <div v-if="row[column.prop] === `${row.materialNumber}_${column.prop}`">
                   <el-col :span="12">
                     <avue-radio
+                      :disabled="detailObj.auditStatus === '2'"
                       v-model="row[`itemStatus_${row.materialNumber}_${column.prop}`]"
                       :dic="dic"
                       @change="
@@ -43,7 +44,11 @@
                   </el-col>
                   <el-col :span="12">
                     <el-input
-                      :disabled="row[`itemStatus_${row.materialNumber}_${column.prop}`] === '5'"
+                      v-show="row[`itemStatus_${row.materialNumber}_${column.prop}`] === '4'"
+                      :disabled="
+                        row[`itemStatus_${row.materialNumber}_${column.prop}`] === '5' ||
+                          detailObj.auditStatus === '2'
+                      "
                       v-model="row[`quota_${row.materialNumber}_${column.prop}`]"
                       placeholder="配额"
                       @input="

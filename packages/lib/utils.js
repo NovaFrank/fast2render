@@ -1,6 +1,7 @@
 import { validateNull } from './validate';
 import _ from 'lodash';
 import { setStore, getStore } from './store';
+import Formula from '@hapi/formula';
 
 /**
  * 验证表单
@@ -217,6 +218,44 @@ export const vaildData = (val, dafult) => {
   return !validateNull(val) ? val : dafult;
 };
 
+export const getFormulaValue = (formulaItem, obj = {}) => {
+  const reference = function(name) {
+    return (context) => context[name];
+  };
+  const functions = {
+    x: (value) => value.toFixed(2)
+  };
+  if (!formulaItem || !formulaItem.formulaElementJson || !formulaItem.formulaContent) {
+    obj.formulaVauleResult = false;
+    return obj;
+  }
+  let content = formulaItem.formulaContent.split('=')[0];
+  let result = formulaItem.formulaContent.split('=')[1] || 'r';
+  let type = getObjType(formulaItem.formulaElementJson);
+
+  let list =
+    type === 'array' ? formulaItem.formulaElementJson : JSON.parse(formulaItem.formulaElementJson);
+  let calcObj = {};
+  let resultField = 'price';
+
+  list.map((item) => {
+    calcObj[item.elementId] = obj[item.fieldName];
+    if (item.elementId === result) {
+      resultField = item.fieldName;
+    }
+  });
+
+  const formula = new Formula.Parser(content, {
+    reference,
+    functions
+  });
+  let real = formula.evaluate(calcObj);
+  obj[resultField] = real;
+  obj.formulaVauleResult = true;
+  console.log(real, '最终计算结果');
+  return obj;
+};
+
 export const sortArrys = (list, prop) => {
   list.sort(function(a, b) {
     if (a[prop] > b[prop]) {
@@ -313,6 +352,9 @@ export function isJSON(str) {
 
 export const getDicItem = (action) => {
   let dicLib = getStore({ name: 'commondic' });
+  if (dicLib && getObjType(dicLib) !== 'object') {
+    dicLib = JSON.parse(dicLib);
+  }
   if (dicLib) {
     let dic = dicLib[action];
     if (dic) {
@@ -324,10 +366,51 @@ export const getDicItem = (action) => {
   return [];
 };
 
+export const getTableItem = (action) => {
+  let dicLib = getStore({ name: 'allTableColumn' });
+  if (dicLib && getObjType(dicLib) !== 'object') {
+    dicLib = JSON.parse(dicLib);
+  }
+  if (dicLib) {
+    let dic = dicLib[action];
+    if (dic) {
+      return dic;
+    }
+  } else {
+    loadAllTable();
+  }
+  return [];
+};
+
+export const getTemplateItem = async (type) => {
+  let template = getStore({ name: type });
+  if (template && getObjType(template) !== 'object') {
+    template = JSON.parse(template);
+  }
+  if (template) {
+    return template;
+  } else {
+    template = await loadTemplate(type);
+    return template;
+  }
+};
+
 export const loadDic = () => {
   let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
   let url = `${filePath}dic/index.json`;
   loadJson(url, 'commondic');
+};
+
+export const loadAllTable = () => {
+  let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
+  let url = `${filePath}allTableColumn.json`;
+  loadJson(url, 'allTableColumn');
+};
+
+export const loadTemplate = (type) => {
+  let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/template/';
+  let url = `${filePath}${type}.json`;
+  loadJson(url, type);
 };
 
 export const loadJson = (url, name) => {

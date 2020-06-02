@@ -30,7 +30,7 @@ export const checkDic = () => {
   }
 };
 export const mergeOption = (list, option, type) => {
-  if (!list) {
+  if (getObjType(list) !== 'array') {
     return;
   }
   let finalOption = vaildData(option, { column: [] });

@@ -27,6 +27,16 @@ export default {
             defaultValue: item.defaultValue,
             span: 24
           };
+          if (item.type === 'select' && item.settingValue) {
+            let dic = item.settingValue;
+            if (item.dicUrl && item.dicUrl.length) {
+              dic = item.dicUrl;
+            }
+            if (item.multiple) {
+              formItem.multiple = true;
+            }
+            formItem.dicData = this.$getDicItem(dic);
+          }
           option.column.push(formItem);
         });
       }

@@ -169,7 +169,6 @@ export default {
   },
   created() {},
   mounted() {
-    console.log('mounted', this.id);
     // this.initWebUpload();
     if (!validateNull(this.id)) {
       this.businessId = this.id;
@@ -178,8 +177,10 @@ export default {
   },
   watch: {
     id(newValue) {
-      console.log('newValue', newValue);
       this.businessId = newValue;
+      this.initData();
+    },
+    attachmentTemplate() {
       this.initData();
     }
   },
@@ -229,16 +230,36 @@ export default {
     },
     sendFiles() {
       const list = this.fileList.filter((item) => item.uuid); // 过滤掉未上传过的行数据
-      if (list.length > 0) {
-        const params = {
-          businessItemIds: list.map((item) => item.uuid).toString()
-        };
-        uploadApi.sendFiles(params).then((res) => {
-          if (res.data.statusCode !== '200') {
-            this.$message.error(res.data.message);
-          }
-        });
-      }
+      return new Promise((resolve, reject) => {
+        if (list.length > 0) {
+          const params = {
+            businessItemIds: list.map((item) => item.uuid).toString()
+          };
+          uploadApi
+            .sendFiles(params)
+            .then((res) => {
+              if (res.data.statusCode === '200') {
+                resolve({ result: true, statusCode: res.data.statusCode });
+              } else {
+                resolve({
+                  result: false,
+                  message: res.data.message,
+                  statusCode: res.data.statusCode
+                });
+              }
+            })
+            .catch((res) => {
+              reject(res);
+            });
+        } else {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          reject({
+            result: false,
+            message: '请上传附件',
+            statusCode: '-100'
+          });
+        }
+      });
     },
     doAction(action, data) {
       this.$emit(action, data);
@@ -366,7 +387,7 @@ export default {
     setUploadRow(row) {
       this.uploadRow = row;
     },
-    handleDownload(row) {},
+    handleDownload(row) { console.log(row)},
     download(blobUrl, fileName) {
       const a = document.createElement('a');
       a.download = fileName;

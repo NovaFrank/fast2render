@@ -12,6 +12,7 @@ export default {
   align: 'center',
   menuAlign: 'left',
   menuWidth: '140',
+  menuType: 'text',
   addBtn: true,
   size: 'mini',
   refreshBtn: false,

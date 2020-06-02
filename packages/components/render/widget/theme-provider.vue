@@ -1,13 +1,10 @@
 <template>
   <div>
-    <div v-if="spanMethodData.prop && finalOption">
-      <slot :option="finalOption" :data="myData" :spanMethod="spanMethod"></slot>
+    <div v-if="spanMethodData.prop">
+      <slot :option="finalOption" :data="myData" :spanMethod="spanMethod" :reload="reload"></slot>
     </div>
-    <div v-else-if="finalOption">
-      <slot :option="finalOption" :data="myData"></slot>
-    </div>
-    <div v-else>
-      刷新组件中。。。。。。
+    <div>
+      <slot :option="finalOption" :data="myData" :reload="reload"></slot>
     </div>
   </div>
 </template>
@@ -16,7 +13,8 @@ import BigListTemplate from '../../../lib/crud-biglist';
 import SmallListTemplate from '../../../lib/crud-small';
 import BigFormTemplate from '../../../lib/form-big';
 import SmallFormTemplate from '../../../lib/form-small';
-import { mySpanMethod } from '../../../lib/utils.js';
+import { mySpanMethod, zipLayout } from '../../../lib/utils.js';
+import { getStore, setStore } from '../../../lib/store.js';
 import { loadBlockConfig, handleColumn } from '../../../lib/blockHander.js';
 
 import _ from 'lodash';
@@ -35,6 +33,16 @@ export default {
     version: {
       type: String,
       default: null // 远程获取 表格字段数据配置- 后续扩充 from 类型
+    },
+    hasRowPermission: {
+      type: Boolean,
+      default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
+    },
+    rowPermission: {
+      type: Object,
+      default: function() {
+        return {};
+      }
     },
     spanMethodData: {
       type: Object,
@@ -61,7 +69,8 @@ export default {
   },
   data() {
     return {
-      finalOption: null,
+      finalOption: {},
+      reload: false,
       optionHash: ''
     };
   },
@@ -75,9 +84,13 @@ export default {
     },
     // 单点监测 ，避免多次触发
     hash: {
-      handler() {
-        this.finalOption = null;
-        this.handlerChange();
+      handler(val) {
+        this.finalOption = getStore(val);
+        if (!this.finalOption) {
+          this.handlerChange();
+        } else {
+          this.reload = true;
+        }
         console.log('参数变化');
       },
       immediate: true // 刷新加载 立马触发一次handler
@@ -85,8 +98,10 @@ export default {
   },
   computed: {
     hash: function() {
-      let { version, theme, type, optionHash } = this;
-      let obj = version + theme + type + optionHash;
+      let { version, theme, type, optionHash, rowPermission } = this;
+      let fullText = zipLayout(JSON.stringify({ version, theme, type, optionHash, rowPermission }));
+      let str = fullText.substring(fullText.length - 32);
+      let obj = (version || 'local') + '-' + str;
       return obj;
     },
     myData: function() {
@@ -101,11 +116,36 @@ export default {
     handlerChange() {
       this.version ? this.mergeRemoteOption() : this.mergeLocalOption();
     },
+    setFinalOption(option) {
+      if (this.hasRowPermission) {
+        this.finalOption = this.filterColumWithRule(option, this.rowPermission);
+      } else {
+        this.finalOption = option;
+      }
+      setStore({ name: this.hash, content: this.finalOption });
+      this.reload = true;
+      console.log('输出配置', option);
+    },
+    filterColumWithRule(option, rowPermission) {
+      let newColumn = [];
+      option.column.map((item) => {
+        if (rowPermission[item.prop]) {
+          if (rowPermission[item.prop].display) {
+            item.readonly = !rowPermission[item.prop].readonly;
+            newColumn.push(item);
+          }
+        } else {
+          newColumn.push(item);
+        }
+      });
+      option.column = newColumn;
+      return option;
+    },
     // 只有本地配置的处理方法
     mergeLocalOption() {
       let localOption = this.getIntiOption();
       localOption.column = this.handlerColumn(localOption.column);
-      this.finalOption = localOption;
+      this.setFinalOption(localOption);
       this.$forceUpdate();
     },
     // 使用远程配置的处理方法
@@ -113,8 +153,7 @@ export default {
       let localOption = this.getIntiOption();
       let remoteOption = loadBlockConfig(this.version, localOption, this.type);
       if (remoteOption) {
-        this.finalOption = remoteOption;
-
+        this.setFinalOption(remoteOption);
         this.$forceUpdate();
       } else {
         setTimeout(() => {

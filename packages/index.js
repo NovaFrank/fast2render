@@ -21,7 +21,9 @@ import util, {
   getDicItem,
   getTableItem,
   getTemplateItem,
-  getFormulaValue
+  getFormulaValue,
+  getFormulaItem,
+  getFormulaList
 } from './lib/utils';
 import auth from './lib/auth';
 import SelectDialog from './components/render/selectDialog/selectDialog';
@@ -47,6 +49,8 @@ export default {
     Vue.prototype.$getTableItem = getTableItem;
     Vue.prototype.$getTemplateItem = getTemplateItem;
     Vue.prototype.$getFormulaValue = getFormulaValue;
+    Vue.prototype.$getFormulaItem = getFormulaItem;
+    Vue.prototype.$getFormulaList = getFormulaList;
     Vue.prototype.$util = util;
     Vue.prototype.$auth = auth;
     Vue.component(ButtonGroupRender.name, ButtonGroupRender);

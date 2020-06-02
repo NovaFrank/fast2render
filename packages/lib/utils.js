@@ -366,6 +366,22 @@ export const getDicItem = (action) => {
   return [];
 };
 
+export const getFormulaItem = (action) => {
+  let lib = getStore({ name: 'commonFormula' });
+  if (lib && getObjType(lib) !== 'object') {
+    lib = JSON.parse(lib);
+  }
+  if (lib) {
+    let item = lib[action];
+    if (item) {
+      return item;
+    }
+  } else {
+    loadFormula();
+  }
+  return [];
+};
+
 export const getTableItem = (action) => {
   let dicLib = getStore({ name: 'allTableColumn' });
   if (dicLib && getObjType(dicLib) !== 'object') {
@@ -394,6 +410,11 @@ export const getTemplateItem = async (type) => {
     return template;
   }
 };
+export const loadFormula = () => {
+  let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
+  let url = `${filePath}formula/index.json`;
+  loadJson(url, 'commonFormula');
+};
 
 export const loadDic = () => {
   let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
@@ -411,6 +432,12 @@ export const loadTemplate = (type) => {
   let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/template/';
   let url = `${filePath}${type}.json`;
   loadJson(url, type);
+};
+
+export const initJson = () => {
+  loadAllTable();
+  loadDic();
+  loadFormula();
 };
 
 export const loadJson = (url, name) => {

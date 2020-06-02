@@ -180,7 +180,8 @@ export default {
       this.businessId = newValue;
       this.initData();
     },
-    attachmentTemplate() {
+    attachmentTemplate(newValue) {
+      console.log(newValue);
       this.initData();
     }
   },
@@ -387,7 +388,9 @@ export default {
     setUploadRow(row) {
       this.uploadRow = row;
     },
-    handleDownload(row) { console.log(row)},
+    handleDownload(row) {
+      console.log(row);
+    },
     download(blobUrl, fileName) {
       const a = document.createElement('a');
       a.download = fileName;

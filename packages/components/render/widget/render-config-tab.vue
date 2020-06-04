@@ -33,7 +33,7 @@
  */
 
 export default {
-  name: 'ConfigTab',
+  name: 'ConfigTabRender',
   props: {
     list: {
       type: Array,

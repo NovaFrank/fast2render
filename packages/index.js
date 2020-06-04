@@ -10,7 +10,8 @@ import PageProvider from './components/render/widget/page-provider';
 import ThemeProvider from './components/render/widget/theme-provider';
 import ConfigTabRender from './components/render/widget/render-config-tab';
 import CostConfigTabRender from './components/render/widget/render-cost-config-tab';
-import ConfigTabSettingRender from './components/render/widget/render-config-tab-setting';
+import ConfigTabSetting from './components/render/widget/setting-config-tab';
+import CostConfigTabSetting from './components/render/widget/setting-cost-config-tab';
 import TemplateProvider from './components/render/widget/template-provider';
 import PageHeader from './components/render/widget/page-header';
 import PageListHeader from './components/render/widget/page-list-header';
@@ -23,7 +24,10 @@ import util, {
   getTemplateItem,
   getFormulaValue,
   getFormulaItem,
-  getFormulaList
+  getFormulaList,
+  getBlockItem,
+  getBlockFieldItem,
+  getTableList
 } from './lib/utils';
 import auth from './lib/auth';
 import SelectDialog from './components/render/selectDialog/selectDialog';
@@ -43,14 +47,18 @@ export default {
     Vue.component('Fast2' + ThemeProvider.name, ThemeProvider);
     Vue.component('Fast2' + ConfigTabRender.name, ConfigTabRender);
     Vue.component('Fast2' + CostConfigTabRender.name, CostConfigTabRender);
-    Vue.component('Fast2' + ConfigTabSettingRender.name, ConfigTabSettingRender);
+    Vue.component('Fast2' + ConfigTabSetting.name, ConfigTabSetting);
+    Vue.component('Fast2' + CostConfigTabSetting.name, CostConfigTabSetting);
     Vue.prototype.$loadDic = loadDic;
     Vue.prototype.$getDicItem = getDicItem;
     Vue.prototype.$getTableItem = getTableItem;
+    Vue.prototype.$getTableList = getTableList;
     Vue.prototype.$getTemplateItem = getTemplateItem;
     Vue.prototype.$getFormulaValue = getFormulaValue;
     Vue.prototype.$getFormulaItem = getFormulaItem;
     Vue.prototype.$getFormulaList = getFormulaList;
+    Vue.prototype.$getBlockItem = getBlockItem;
+    Vue.prototype.$getBlockFieldItem = getBlockFieldItem;
     Vue.prototype.$util = util;
     Vue.prototype.$auth = auth;
     Vue.component(ButtonGroupRender.name, ButtonGroupRender);

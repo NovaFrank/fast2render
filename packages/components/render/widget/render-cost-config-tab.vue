@@ -33,7 +33,7 @@
  */
 
 export default {
-  name: 'CostConfigTab',
+  name: 'CostConfigTabRender',
   props: {
     list: {
       type: Array,

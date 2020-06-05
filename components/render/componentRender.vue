@@ -11,7 +11,12 @@
       >
         <div :key="item.slug">
           <slot name="form-header"></slot>
-          <avue-form :option="item.data" :data="providerData" v-model="formData" :ref="item.slug">
+          <avue-form
+            :option="item.data"
+            :data="providerData.fieldData"
+            v-model="formData"
+            :ref="item.slug"
+          >
             <slot name="form-slot"></slot>
           </avue-form>
           <slot name="form-footer"></slot>
@@ -69,6 +74,7 @@
  * block 内含一组组件
  */
 import itemAttachment from './cards/item-attachment';
+import { getObjType } from '../../lib/utils';
 const BLOCK_TYPE = {
   LIST: 'crud',
   FORM: 'form',
@@ -101,7 +107,8 @@ export default {
       type: Object,
       default: () => {
         return {
-          tableData: []
+          tableData: [],
+          fieldData: {}
         };
       }
     }
@@ -119,6 +126,15 @@ export default {
       handler: function(newVal) {
         this.$emit('change-form', newVal);
         this.$root.$emit('change-form', newVal);
+        if (!this.providerData.fromData) {
+          this.providerData.fromData = newVal;
+        } else if (getObjType(newVal) === 'object') {
+          // 结构已有参数
+          this.providerData.fromData = {
+            ...this.providerData.fromData,
+            ...newVal
+          };
+        }
       },
       deep: true
     }

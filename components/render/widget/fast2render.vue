@@ -43,7 +43,7 @@
           <el-col v-else :key="index" :md="column.span || 12" class="widget-item" :xs="24">
             <render-item
               :item="column"
-              :providerData="data"
+              :providerData="providerData"
               :label="column.label"
               :prop="column.prop"
               v-bind="$attrs"
@@ -72,7 +72,7 @@ export default {
     RenderTab,
     RenderConfigTab
   },
-  props: ['option', 'data', 'mode', 'config'],
+  props: ['option', 'data', 'providerData', 'mode', 'config'],
   data() {
     return {
       selectWidget: this.select,

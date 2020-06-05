@@ -33,7 +33,7 @@
  */
 import { test } from '../demo/template.js';
 export default {
-  name: 'ConfigTabRender',
+  name: 'CostConfigTabRender',
   props: {
     list: {
       type: Array,

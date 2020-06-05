@@ -16,6 +16,7 @@
         <span>{{ currentEnquiryNumber || '待生成' }}</span>
       </template>
     </avue-form>
+    <!-- 标准询价 -->
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <!-- <avue-form
       v-if="tabActive === 'files'"
@@ -45,8 +46,9 @@
       @selection-change="handleMaterialSelectChange"
     >
       <template slot-scope="scope" slot="quoteMethod">
-        <span v-if="scope.row.quoteMethod === '0'">常规报价</span>
-        <span v-else-if="scope.row.quoteMethod === '1'">阶梯报价</span>
+        <span v-for="method in quoteMethodData" :key="method.value">
+          <span v-if="scope.row.quoteMethod === method.value">{{ method.label }}</span>
+        </span>
       </template>
       <template slot-scope="scope" slot="quoteMethodInfo">
         <span v-if="scope.row.quoteMethod === '1'">
@@ -97,20 +99,6 @@
       @close-field-dialog="closeFieldDialog"
       @show-supplier-select="handleShowSupplierSelect"
     ></field-dialog>
-    <!-- 供应商列表 -->
-    <!-- <SelectDialogTable
-      ref="suppliersDialog"
-      :dialogVisible.sync="suppliersDialogVisable"
-      :title="'供应商'"
-      :column="suppliersDialogOptionColumn"
-      :data="suppliersDialogData"
-      :page="suppliersDialogPage"
-      :queryParam="suppliersDialogQueryParam"
-      :pageParam="suppliersDialogPageParam"
-      :multiple="true"
-      @save="suppliersDialogSave"
-      @handleList="suppliersHandleList"
-    ></SelectDialogTable> -->
     <select-supplier-dialog
       ref="suppliersDialog"
       :dialogVisible.sync="suppliersDialogVisable"
@@ -154,6 +142,7 @@ export default {
   },
   data() {
     return {
+      data: {},
       elsAccount: '',
       elsSubAccount: '',
       headerButtons: [
@@ -237,7 +226,7 @@ export default {
           action: 'on-delete'
         });
       }
-      this.inquiryListOption.data = [];
+      // this.inquiryListOption.data = [];
       this.$forceUpdate();
     }
   },
@@ -253,18 +242,6 @@ export default {
       });
     },
     handleAddShow(title, row) {
-      // 币别
-      dataDicAPI('currency').then((res) => {
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'currency') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
       // 税率
       dataDicAPI('taxRate').then((res) => {
         this.dialogOption.column = this.dialogOption.column.map((item) => {
@@ -355,58 +332,99 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$refs.attachment
-          .sendFiles()
-          .then((res) => {
-            if (!res.result) {
-              this.$message.error(res.message || '附件发送失败');
+        this.$refs.form.validate((valid) => {
+          if (valid) {
+            if (this.inquiryListOption.data.length === 0) {
+              this.$message.error('请添加询价明细');
               return;
             }
-            this.$refs.form.validate((valid) => {
-              if (valid) {
-                if (this.inquiryListOption.data.length === 0) {
-                  this.$message.error('请添加询价明细');
-                  return;
-                }
-                let validate = this.inquiryListOption.data.filter(
-                  (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
-                );
-                if (validate.length > 0) {
-                  this.$message.error('请完善报价方式或税码/税率');
-                  return;
-                }
-                let params = {
-                  enquiryNumber: this.currentEnquiryNumber,
-                  elsAccount: this.elsAccount,
-                  // beginDate: this.form.beginDate,
-                  quoteEndTime: this.form.quoteEndTime,
-                  enquiryType: this.form.enquiryType,
-                  enquiryDesc: this.form.enquiryDesc,
-                  companyCode: this.form.companyCode,
-                  // responsible: this.form.responsible,
-                  enquiryMethod: this.form.enquiryMethod,
-                  itemList: this.inquiryListOption.data
-                };
-                if (this.currentEnquiryNumber) {
-                  params = {
-                    ...params,
-                    enquiryNumber: this.currentEnquiryNumber
-                  };
-                }
-                purchaseEnquiryAction('publishEnquiry', params).then((res) => {
-                  if (res.data.statusCode !== '200') {
-                    this.$message.error(res.data.message);
-                    return;
-                  }
-                  this.$message.success('发布成功');
-                  this.$router.push({ path: '/list' });
-                });
+            let validate = this.inquiryListOption.data.filter(
+              (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+            );
+            if (validate.length > 0) {
+              this.$message.error('请完善报价方式或税码/税率');
+              return;
+            }
+            let params = {
+              enquiryNumber: this.currentEnquiryNumber,
+              elsAccount: this.elsAccount,
+              // beginDate: this.form.beginDate,
+              quoteEndTime: this.form.quoteEndTime,
+              enquiryType: this.form.enquiryType,
+              enquiryDesc: this.form.enquiryDesc,
+              companyCode: this.form.companyCode,
+              // responsible: this.form.responsible,
+              enquiryMethod: this.form.enquiryMethod,
+              itemList: this.inquiryListOption.data
+            };
+            if (this.currentEnquiryNumber) {
+              params = {
+                ...params,
+                enquiryNumber: this.currentEnquiryNumber
+              };
+            }
+            purchaseEnquiryAction('publishEnquiry', params).then((res) => {
+              if (res.data.statusCode !== '200') {
+                this.$message.error(res.data.message);
+                return;
               }
+              this.$message.success('发布成功');
+              this.$router.push({ path: '/list' });
             });
-          })
-          .catch((res) => {
-            this.$message.error(res.message || '发布失败，请检查附件');
-          });
+          }
+        });
+        // this.$refs.attachment
+        //   .sendFiles()
+        //   .then((res) => {
+        //     if (!res.result) {
+        //       this.$message.error(res.message || '附件发送失败');
+        //       return;
+        //     }
+        //     this.$refs.form.validate((valid) => {
+        //       if (valid) {
+        //         if (this.inquiryListOption.data.length === 0) {
+        //           this.$message.error('请添加询价明细');
+        //           return;
+        //         }
+        //         let validate = this.inquiryListOption.data.filter(
+        //           (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+        //         );
+        //         if (validate.length > 0) {
+        //           this.$message.error('请完善报价方式或税码/税率');
+        //           return;
+        //         }
+        //         let params = {
+        //           enquiryNumber: this.currentEnquiryNumber,
+        //           elsAccount: this.elsAccount,
+        //           // beginDate: this.form.beginDate,
+        //           quoteEndTime: this.form.quoteEndTime,
+        //           enquiryType: this.form.enquiryType,
+        //           enquiryDesc: this.form.enquiryDesc,
+        //           companyCode: this.form.companyCode,
+        //           // responsible: this.form.responsible,
+        //           enquiryMethod: this.form.enquiryMethod,
+        //           itemList: this.inquiryListOption.data
+        //         };
+        //         if (this.currentEnquiryNumber) {
+        //           params = {
+        //             ...params,
+        //             enquiryNumber: this.currentEnquiryNumber
+        //           };
+        //         }
+        //         purchaseEnquiryAction('publishEnquiry', params).then((res) => {
+        //           if (res.data.statusCode !== '200') {
+        //             this.$message.error(res.data.message);
+        //             return;
+        //           }
+        //           this.$message.success('发布成功');
+        //           this.$router.push({ path: '/list' });
+        //         });
+        //       }
+        //     });
+        //   })
+        //   .catch((res) => {
+        //     this.$message.error(res.message || '发布失败，请检查附件');
+        //   });
       });
     },
     // 表单保存
@@ -429,7 +447,6 @@ export default {
               this.$message.error('请完善报价方式或税码/税率');
               return;
             }
-            console.log('validate', validate.length);
             const params = {
               enquiryNumber: this.currentEnquiryNumber,
               elsAccount: this.elsAccount,
@@ -590,21 +607,6 @@ export default {
       this.currentDetailItem = {};
       this.currentSelectionDetailItems = [];
     },
-    suppliersHandleList() {
-      // let listParams = deepClone(this.materialsDialogQueryParam);
-      // Object.assign(listParams, this.materialsDialogPageParam);
-      // getMaterialsData(listParams).then((res) => {
-      //   const data = res.data;
-      //   setTimeout(() => {
-      //     this.materialsDialogData = data.items;
-      //     this.materialsDialogPage = {
-      //       total: data.paginator.total,
-      //       pageSize: data.paginator.pageSize,
-      //       currentPage: data.paginator.currentPage
-      //     };
-      //   }, 1000);
-      // });
-    },
     tableData(data) {
       // 组织列表（公司）
       orgList().then((res) => {
@@ -619,18 +621,6 @@ export default {
                   label: item.orgId // `${item.orgId}_${item.orgDesc}`
                 };
               })
-            };
-          }
-          return item;
-        });
-      });
-      // 询价类型 数据字典（临时），最好写option dicUrl
-      dataDicAPI('enquiryType').then((res) => {
-        this.formOption.column = this.formOption.column.map((item) => {
-          if (item.prop === 'enquiryType') {
-            return {
-              ...item,
-              dicData: res.data
             };
           }
           return item;
@@ -668,15 +658,7 @@ export default {
       });
       // 报价方式 数据字典
       dataDicAPI('quoteMethod').then((res) => {
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'quoteMethod') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
+        this.quoteMethodData = res.data;
       });
       // 供应商列表 supplierMasterListAction
       supplierMasterListAction({ elsAccount: this.elsAccount, pageSize: 10000 }).then((res) => {

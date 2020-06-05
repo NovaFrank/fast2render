@@ -69,18 +69,9 @@
         <el-button size="small" @click.stop="handleShowSupplierSelect()">新供应商</el-button>
       </template>
       <template slot-scope="scope" slot="quoteMethod">
-        <span v-if="scope.row.quoteMethod === '0'">常规报价</span>
-        <span v-else-if="scope.row.quoteMethod === '1'">阶梯报价</span>
-        <!-- <div v-else-if="scope.row.quoteMethod === '1'">
-          <span>阶梯报价</span>
-          <p
-            style="margin: 0"
-            v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
-            :key="ladder.ladderGrade"
-          >
-            {{ ladder.ladderGrade }}
-          </p>
-        </div> -->
+        <span v-for="method in quoteMethodData" :key="method.value">
+          <span v-if="scope.row.quoteMethod === method.value">{{ method.label }}</span>
+        </span>
       </template>
       <template slot-scope="scope" slot="quoteMethodInfo">
         <span v-if="scope.row.quoteMethod === '1'">
@@ -100,28 +91,6 @@
             : scope.row.taxRate
         }}
       </template>
-      <!-- <template slot="priceIncludingTax" slot-scope="scope">
-        <div>
-          <span
-            v-if="
-              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
-                detailObj.quoteEndTime > new Date().getTime()
-            "
-          >
-            **
-          </span>
-          <avue-crud
-            :cell-style="cellStyle"
-            :header-cell-class-name="cHeaderStyle"
-            :data="JSON.parse(scope.row.ladderPriceJson)"
-            :option="quoteListOption.option"
-            v-else-if="
-              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
-                detailObj.quoteEndTime < new Date().getTime()
-            "
-          ></avue-crud>
-        </div>
-      </template> -->
       <template slot-scope="scope" slot="priceIncludingTax">
         <span v-if="scope.row.quoteMethod === '0'">
           <span
@@ -634,6 +603,7 @@ export default {
           canDeliveryDate: this.currentDetailItem.canDeliveryDate,
           quoteMethod: this.currentDetailItem.quoteMethod,
           itemStatus: '1',
+          taxCode: this.currentDetailItem.taxCode,
           taxRate: this.currentDetailItem.taxRate,
           priceIncludingTax: '',
           quota: '',

@@ -7,8 +7,12 @@
     :before-close="closeDialog"
   >
     <avue-form ref="form" :option="quoteFormOption.option" v-model="form" class="new-field">
-      <template slot="priceIncludingTax">
-        <el-input placeholder="请输入 含税价" v-model="form.priceIncludingTax"></el-input>
+      <!-- 成本询价 -->
+      <template slot="costConstituteJson">
+        <fast2-cost-config-tab-render
+          :list="template"
+          :providerData="providerData"
+        ></fast2-cost-config-tab-render>
       </template>
       <template slot="menuForm">
         <el-button @click="closeDialog">取消</el-button>
@@ -19,14 +23,15 @@
 </template>
 
 <script>
-import quoteFormOption from '@/const/rfq/supplierClient/quoteForm0';
+import quoteFormOption from '@/const/rfq/supplierClient/costQuoteForm';
 import ladderOption from '@/const/rfq/supplierClient/quoteList';
+// import { unzipLayout, zipLayout } from './../../../fast2render/lib/utils.js';
 
 const execMathExpress = require('exec-mathexpress');
 
-// 销售方常规报价
+// 销售方阶梯报价
 export default {
-  name: 'quote-dialog',
+  name: 'quote-ladder-dialog',
   components: {},
   created: function() {},
   props: {
@@ -40,43 +45,58 @@ export default {
     field: {
       type: Object,
       default: () => {
-        return {};
+        return {
+          costConstituteJson: []
+        };
       }
     }
   },
   data() {
     return {
+      templateName: '',
       quoteFormOption: quoteFormOption,
       ladderOption: ladderOption,
+      template: [],
+      providerData: {},
       form: {
-        remark: ''
+        costConstituteJson: []
       }
     };
   },
   watch: {
     field(newVal) {
       this.form = newVal;
-    },
-    'form.priceIncludingTax'(newVal) {
-      const result = execMathExpress('v1 / ( v2 + v3 )', {
-        v1: newVal,
-        v2: 1,
-        v3: this.form.taxRate
+
+      const costJson = JSON.parse(newVal.costConstituteJson);
+      const templateData = costJson.templateJson;
+      this.templateName = costJson.templateName;
+      console.log(templateData);
+      this.template = templateData;
+      let data = {};
+      templateData.forEach((element) => {
+        data[element.prop] = element.propData;
       });
-      this.form.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
+      this.providerData = data;
     }
   },
   methods: {
     closeDialog() {
       this.$emit('close-field-dialog');
     },
-    handleDeleteSupplier(row, index) {
-      this.form.suppliers.splice(index, 1);
-    },
     handleSubmit() {
+      this.form.costConstituteJson = this.template.map((item) => {
+        return {
+          ...item,
+          propData: this.providerData[item.prop]
+        };
+      });
+      const obj = {
+        templateName: this.templateName,
+        templateJson: this.form.costConstituteJson
+      };
       const params = {
         ...this.form,
-        remark: this.form.remark
+        costConstituteJson: JSON.stringify(obj)
       };
       this.$emit('on-save-form', params);
     }

@@ -64,8 +64,6 @@ export default {
       rules: [{ trigger: 'change', validator: validateDateTime }]
     },
     {
-      dicUrl: '/layout/dics/value/taxCode',
-      dicMethod: 'get',
       type: 'select',
       label: '税码',
       prop: 'taxCode',
@@ -78,16 +76,18 @@ export default {
       // rules: [{ trigger: 'blur', validator: validateTaxRate }]
     },
     {
+      dicUrl: '/layout/dics/value/currency',
+      dicMethod: 'get',
       type: 'tree',
       label: '币别',
       prop: 'currency'
     },
     {
-      dicUrl: '/layout/dics/value/enquiryMethod',
+      dicUrl: '/layout/dics/value/quoteMethod',
       dicMethod: 'get',
       type: 'select',
       label: '报价方式',
-      prop: 'quoteMethod', // 0、1
+      prop: 'quoteMethod',
       rules: [{ required: true, message: '请选择报价方式', trigger: 'change' }]
     },
     {

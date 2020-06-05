@@ -181,6 +181,7 @@ export default {
       this.initData();
     },
     attachmentTemplate(newValue) {
+      console.log(newValue);
       this.initData();
     }
   },
@@ -387,7 +388,9 @@ export default {
     setUploadRow(row) {
       this.uploadRow = row;
     },
-    handleDownload(row) {},
+    handleDownload(row) {
+      console.log(row);
+    },
     download(blobUrl, fileName) {
       const a = document.createElement('a');
       a.download = fileName;

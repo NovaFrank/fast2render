@@ -7,8 +7,16 @@
     :before-close="closeDialog"
   >
     <avue-form ref="form" :option="quoteFormOption.option" v-model="form" class="new-field">
-      <template slot="priceIncludingTax">
-        <el-input placeholder="请输入 含税价" v-model="form.priceIncludingTax"></el-input>
+      <template slot="ladderPriceJson">
+        <avue-crud :data="ladderOption.data" :option="ladderOption.option">
+          <template slot-scope="scope" slot="priceIncludingTax">
+            <el-input
+              placeholder="请输入 含税价"
+              v-model="scope.row.priceIncludingTax"
+              @blur="(event) => handleInputPrice(event, scope)"
+            ></el-input>
+          </template>
+        </avue-crud>
       </template>
       <template slot="menuForm">
         <el-button @click="closeDialog">取消</el-button>
@@ -19,14 +27,14 @@
 </template>
 
 <script>
-import quoteFormOption from '@/const/rfq/supplierClient/quoteForm';
+import quoteFormOption from '@/const/rfq/supplierClient/ladderQuoteForm';
 import ladderOption from '@/const/rfq/supplierClient/quoteList';
 
 const execMathExpress = require('exec-mathexpress');
 
-// 销售方常规报价
+// 销售方阶梯报价
 export default {
-  name: 'quote-dialog',
+  name: 'quote-ladder-dialog',
   components: {},
   created: function() {},
   props: {
@@ -40,7 +48,9 @@ export default {
     field: {
       type: Object,
       default: () => {
-        return {};
+        return {
+          ladderPriceJson: []
+        };
       }
     }
   },
@@ -49,6 +59,7 @@ export default {
       quoteFormOption: quoteFormOption,
       ladderOption: ladderOption,
       form: {
+        ladderPriceJson: [],
         remark: ''
       }
     };
@@ -56,14 +67,17 @@ export default {
   watch: {
     field(newVal) {
       this.form = newVal;
-    },
-    'form.priceIncludingTax'(newVal) {
-      const result = execMathExpress('v1 / ( v2 + v3 )', {
-        v1: newVal,
-        v2: 1,
-        v3: this.form.taxRate
-      });
-      this.form.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
+      this.ladderOption.data =
+        JSON.parse(newVal.ladderPriceJson).map((item) => {
+          return {
+            ladderQuantity: item.ladderQuantity,
+            ladderGrade: item.ladderGrade,
+            priceIncludingTax: item.priceIncludingTax || '',
+            taxRate: item.taxRate || newVal.taxRate,
+            priceExcludingTax: item.priceExcludingTax || '',
+            $cellEdit: true
+          };
+        }) || [];
     }
   },
   methods: {
@@ -73,9 +87,19 @@ export default {
     handleDeleteSupplier(row, index) {
       this.form.suppliers.splice(index, 1);
     },
+    handleInputPrice(event, scope) {
+      const currentItem = this.ladderOption.data[scope.row.$index];
+      const result = execMathExpress('v1 / ( v2 + v3 )', {
+        v1: event.target.value,
+        v2: 1,
+        v3: currentItem.taxRate
+      });
+      currentItem.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
+    },
     handleSubmit() {
       const params = {
         ...this.form,
+        ladderPriceJson: JSON.stringify(this.ladderOption.data),
         remark: this.form.remark
       };
       this.$emit('on-save-form', params);

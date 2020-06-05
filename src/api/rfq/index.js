@@ -47,3 +47,14 @@ export const submitAudit = (action, params) => {
     }
   });
 };
+
+// 成本模板 POST /ElsTemplateConfigService/findPageList
+export const costTemplateList = (params) => {
+  return request({
+    url: `${prefix}/ElsTemplateConfigService/findPageList`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};

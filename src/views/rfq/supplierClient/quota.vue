@@ -41,8 +41,9 @@
         </p>
       </template>
       <template slot-scope="scope" slot="quoteMethod">
-        <span v-if="scope.row.quoteMethod === '0'">常规报价</span>
-        <span v-else-if="scope.row.quoteMethod === '1'">阶梯报价</span>
+        <span v-for="method in quoteMethodData" :key="method.value">
+          <span v-if="scope.row.quoteMethod === method.value">{{ method.label }}</span>
+        </span>
       </template>
       <template slot-scope="scope" slot="quoteMethodInfo">
         <span v-if="scope.row.quoteMethod === '1'">
@@ -92,6 +93,15 @@
       @on-save-form="onSaveLadderForm"
       @close-field-dialog="closeFieldDialog"
     ></quote-ladder-dialog>
+    <!-- 成本报价 -->
+    <cost-quote-dialog
+      :dialogTitle="dialogTitle"
+      :field="costDialogForm"
+      :fieldDialogVisible="costQuoteVisible"
+      :dialogWidth="dialogWidth"
+      @on-save-form="onSaveCostForm"
+      @close-field-dialog="closeFieldDialog"
+    ></cost-quote-dialog>
     <!-- 报价历史记录 -->
     <history
       :dialogVisible="historyVisible"
@@ -103,8 +113,9 @@
 
 <script>
 import FormHeader from '@/components/views/formHeader';
-import quoteLadderDialog from '@/components/views/quoteDialog'; // 阶梯报价
-import quoteDialog from '@/components/views/quoteDialog0'; // 常规报价
+import costQuoteDialog from '@/components/views/costQuoteDialog'; // 成本报价
+import quoteLadderDialog from '@/components/views/ladderQuoteDialog'; // 阶梯报价
+import quoteDialog from '@/components/views/quoteDialog'; // 常规报价
 import formOption from '@/const/rfq/supplierClient/detail';
 import tabOption from '@/const/rfq/newAndView/tabs';
 import filesOption from '@/const/rfq/newAndView/fileList';
@@ -113,18 +124,14 @@ import { getAction, postAction, queryQuote } from '@/api/rfq/supplierClient';
 import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
 import history from './../history';
 import { validatenull } from '@/util/validate';
-import {
-  dataDicAPI
-  // materialListAction,
-  // supplierMasterListAction,
-  // accountListAction
-} from '@/api/rfq/common';
+import { dataDicAPI } from '@/api/rfq/common';
 
 export default {
   components: {
     FormHeader,
     quoteDialog,
     quoteLadderDialog,
+    costQuoteDialog,
     history
   },
   data() {
@@ -147,8 +154,10 @@ export default {
       detailObj: {},
       filesForm: {},
       fieldDialogForm: {},
-      ladderQuoteVisible: false,
+      costDialogForm: {},
       quoteVisible: false,
+      ladderQuoteVisible: false,
+      costQuoteVisible: false,
       historyVisible: false,
       historyList: [],
       quoteMethodData: [],
@@ -180,6 +189,7 @@ export default {
       return JSON.parse(row.ladderPriceJson)[index - 1][column];
     },
     closeFieldDialog() {
+      this.costQuoteVisible = false;
       this.ladderQuoteVisible = false;
       this.quoteVisible = false;
     },
@@ -212,7 +222,7 @@ export default {
           taxRate: scope.row.taxRate,
           remark: scope.row.remark || ''
         };
-      } else {
+      } else if (scope.row.quoteMethod === '1') {
         this.fieldDialogForm = {
           index: scope.index,
           taxRate: scope.row.taxRate,
@@ -220,21 +230,21 @@ export default {
           remark: scope.row.remark || ''
         };
         this.ladderQuoteVisible = true;
+      } else if (scope.row.quoteMethod === '2') {
+        this.costDialogForm = {
+          index: scope.index,
+          costConstituteJson: scope.row.costConstituteJson || null
+        };
+        this.costQuoteVisible = true;
       }
     },
     handleRadioChange(value, scope) {
       if (value === 'N') {
         this.inquiryListOption.data[scope.row.$index].priceIncludingTax = '';
-        // this.inquiryListOption.data[scope.row.$index].taxRate = '';
         this.inquiryListOption.data[scope.row.$index].priceExcludingTax = '';
-        this.inquiryListOption.data[scope.row.$index].cellEdit = false; // $cellEdit = false;
-        // if (scope.row.quoteMethod === '0') {
-        //   this.inquiryListOption.data[scope.row.$index].$cellEdit = false;
-        // }
+        this.inquiryListOption.data[scope.row.$index].cellEdit = false;
       } else {
-        this.inquiryListOption.data[scope.row.$index].cellEdit = true; // $cellEdit = true;
-        // if (scope.row.quoteMethod === '0') {
-        //   this.inquiryListOption.data[scope.row.$index].$cellEdit = true;
+        this.inquiryListOption.data[scope.row.$index].cellEdit = true;
         // }
       }
     },
@@ -356,6 +366,16 @@ export default {
       );
       this.$set(this.inquiryListOption.data[form.index], 'remark', form.remark);
     },
+    // 行信息 - 成本报价保存
+    onSaveCostForm(form) {
+      console.log(form);
+      this.costQuoteVisible = false;
+      this.$set(
+        this.inquiryListOption.data[form.index],
+        'costConstituteJson',
+        form.costConstituteJson || null
+      );
+    },
     sizeChange(val) {
       this.inquiryListOption.page.pageSize = val;
       this.tableData({
@@ -368,40 +388,6 @@ export default {
       dataDicAPI('quoteMethod').then((res) => {
         this.quoteMethodData = res.data;
       });
-      // 询价类型 数据字典（临时），最好写option dicUrl
-      dataDicAPI('enquiryType').then((res) => {
-        this.formOption.column = this.formOption.column.map((item) => {
-          if (item.prop === 'enquiryType') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
-      // 报价方式 数据字典
-      dataDicAPI('quoteMethod').then((res) => {
-        this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
-          if (item.prop === 'quoteMethod') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
-    },
-    uploadAfter(res, done, loading) {
-      console.log('after upload', res);
-      done();
-    },
-    uploadBefore(file, done, loading) {
-      console.log('before upload', file);
-      // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
-      const newFile = new File([file], '1234', { type: file.type });
-      done(newFile);
     }
   }
 };

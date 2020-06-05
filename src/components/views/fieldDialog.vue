@@ -7,19 +7,37 @@
     :before-close="closeDialog"
   >
     <avue-form ref="form" :option="dialogOption" v-model="form" class="new-field">
-      <template v-if="form.quoteMethod === '1'" slot="ladderPriceJson">
+      <template slot="ladderPriceJson">
         <div>
-          <avue-form
-            @submit="submitLadderForm"
-            :option="ladderFormOption.option"
-            v-model="ladderFormOption.form"
-          ></avue-form>
-          <avue-crud
-            :data="ladderOption.data"
-            :option="ladderOption.option"
-            @row-del="delLadderUpdate"
-          >
-          </avue-crud>
+          <div v-if="form.quoteMethod === '1'">
+            <avue-form
+              @submit="submitLadderForm"
+              :option="ladderFormOption.option"
+              v-model="ladderFormOption.form"
+            ></avue-form>
+            <avue-crud
+              :data="ladderOption.data"
+              :option="ladderOption.option"
+              @row-del="delLadderUpdate"
+            >
+            </avue-crud>
+          </div>
+          <!-- 成本询价 -->
+          <div v-else-if="form.quoteMethod === '2'">
+            <el-select v-model="currentTemplate" filterable clearable placeholder="请选择 成本模板">
+              <el-option
+                v-for="item in templateList"
+                :key="item.templateName"
+                :label="item.templateName"
+                :value="item.templateName"
+              >
+              </el-option>
+            </el-select>
+            <fast2-cost-config-tab-render
+              :list="template"
+              :providerData="data"
+            ></fast2-cost-config-tab-render>
+          </div>
         </div>
       </template>
       <template slot="suppliers">
@@ -46,12 +64,16 @@
 import ladderFormOption from '@/const/rfq/newAndView/ladderForm';
 import ladderOption from '@/const/rfq/newAndView/ladder';
 import supplierList from '@/const/rfq/newAndView/supplierList';
+import { costTemplateList } from '@/api/rfq/index';
+import { getUserInfo } from '@/util/utils.js';
 
 // 采购方添加询价明细
 export default {
   name: 'field-dialog',
   components: {},
-  created: function() {},
+  created() {
+    this.costTemplateList();
+  },
   props: {
     dialogWidth: String,
     dialogTitle: String,
@@ -75,6 +97,9 @@ export default {
   },
   data() {
     return {
+      currentTemplate: '',
+      templateList: [],
+      template: [],
       supplierList: supplierList,
       ladderOption: ladderOption,
       ladderFormOption: ladderFormOption,
@@ -85,16 +110,35 @@ export default {
     };
   },
   watch: {
+    currentTemplate(newVal) {
+      // if (newVal) {
+      //   const index = this.templateList.findIndex((item) => item.templateName === newVal);
+      //   this.template = JSON.parse(this.templateList[index].configJson);
+      // }
+    },
     field(newVal) {
       this.form = newVal;
-      this.ladderOption.data = JSON.parse(newVal.ladderPriceJson) || [];
+      this.ladderOption.data = newVal.ladderPriceJson ? JSON.parse(newVal.ladderPriceJson) : [];
+      this.$getTemplateItem('cost-base-price-template').then((res) => {
+        this.template = res.column[0].data;
+      });
     },
     'form.taxCode'(newVal) {
-      console.log(newVal);
-      this.form.taxRate = newVal.split('_')[0];
+      this.form.taxRate = newVal ? newVal.split('_')[0] : '';
     }
   },
   methods: {
+    costTemplateList() {
+      const userInfo = getUserInfo();
+      costTemplateList({
+        elsAccount: userInfo.elsAccount,
+        pageSize: 1000,
+        businessModule: 'cost'
+      }).then((res) => {
+        console.log(res);
+        this.templateList = res.data.pageData.rows;
+      });
+    },
     closeDialog() {
       this.$emit('close-field-dialog');
     },
@@ -119,6 +163,14 @@ export default {
           return;
         }
         this.form.ladderPriceJson = this.ladderOption.data;
+      } else if (this.form.quoteMethod === '2') {
+        const obj = {
+          templateName: this.currentTemplate,
+          templateJson: this.template
+        };
+        console.log(obj);
+        const costConstituteJson = JSON.stringify(obj);
+        this.form.costConstituteJson = costConstituteJson;
       }
       this.$refs.form.validate((valid) => {
         if (valid) {

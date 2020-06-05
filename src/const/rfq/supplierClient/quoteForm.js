@@ -11,10 +11,22 @@ export default {
     fit: true,
     column: [
       {
-        span: 24,
         formslot: true,
-        label: '报价',
-        prop: 'ladderPriceJson'
+        span: 8,
+        label: '含税价',
+        prop: 'priceIncludingTax'
+      },
+      {
+        span: 8,
+        label: '税率',
+        prop: 'taxRate',
+        disabled: true
+      },
+      {
+        span: 8,
+        label: '不含税价',
+        prop: 'priceExcludingTax',
+        disabled: true
       }
     ]
   }

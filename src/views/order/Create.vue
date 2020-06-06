@@ -407,7 +407,41 @@ export default {
     },
     // 提交审批
     async handleSubmit() {
-      alert('请先保存！');
+      if (this.materielListOption.data.length === 0) {
+        alert('请添加一条数据!');
+        return false;
+      } else if (this.formOption.obj.orderType === '') {
+        alert('请选择订单类型!');
+        return false;
+      } else if (this.formOption.obj.purchasePerson === '') {
+        alert('请选择采购方负责人!');
+        return false;
+      } else if (this.formOption.obj.purchaseType === '') {
+        alert('请选择采购类别!');
+        return false;
+      } else if (this.formOption.obj.purchaseGroup === '') {
+        alert('请选择采购组!');
+        return false;
+      }
+      this.tabActive = this.tabOption.option.column[1];
+      this.handleTabClick(this.tabActive);
+      const action = 'createOrder';
+      let params = {
+        elsAccount: this.elsAccount,
+        elsSubAccount: this.elsSubAccount,
+        ...this.formOption.obj,
+        orderItemVOList: this.materielListOption.data,
+        deliveryPlanVOList: this.planListOption.data
+      };
+      // console.log('params: ' + JSON.stringify(params));
+      const res = await createOrder(action, params);
+      this.$message({
+        type: 'success',
+        message: '订单保存成功!'
+      });
+      const orderNo = res.data.data.orderNumber;
+      this.$router.push({ name: 'edits', params: { orderNumber: orderNo } });
+      // this.$router.push({ path: '/list' });
     },
 
     // 保存 跳转到list

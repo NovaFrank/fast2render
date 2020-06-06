@@ -15,6 +15,16 @@
       @current-change="currentChange"
       ref="crud"
     >
+      <template slot-scope="{ row }" slot="menu">
+        <button
+          v-if="row.sendStatus === '0' && row.auditStatus === '1'"
+          @click="deleteRow(row)"
+          type="button"
+          class="el-button el-button--text el-button--small"
+        >
+          <i class="el-icon-delete"></i><span>删 除</span>
+        </button>
+      </template>
       <template
         v-if="
           [
@@ -234,7 +244,7 @@
 import tabOption from '@/const/order/navTabs';
 import formOption from '@/const/order/orderFormOption';
 import { getUserInfo } from '@/util/utils.js';
-import { getOrderList } from '@/api/order.js';
+import { getOrderList, createOrder } from '@/api/order.js';
 export default {
   watch: {
     tabActive() {
@@ -315,6 +325,27 @@ export default {
       const resp = await getOrderList(action, params);
       this.formOption.data = resp.data.pageData.rows;
       this.formOption.page.total = resp.data.pageData.total;
+    },
+    async deleteRow(row) {
+      this.$confirm('确定将选择的订单删除?', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const action = 'delete';
+        let params = {
+          elsAccount: this.elsAccount,
+          toElsAccount: row.toElsAccount,
+          orderNumber: row.orderNumber,
+          uuid: row.uuid
+        };
+        await createOrder(action, params);
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        });
+        this.tableData();
+      });
     },
     itemAdd() {
       this.$router.push({ path: '/create' });

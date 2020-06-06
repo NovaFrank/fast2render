@@ -7,7 +7,7 @@ export default {
   },
   option: {
     header: false,
-    menu: false,
+    menu: true,
     border: true,
     stripe: true,
     index: true,
@@ -15,6 +15,7 @@ export default {
     page: false,
     addBtn: false,
     editBtn: false,
+    delBtn: false,
     highlightCurrentRow: true,
     align: 'center',
     menuAlign: 'center',

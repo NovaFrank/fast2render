@@ -100,3 +100,12 @@ export const submitAudit = (action, params) => {
     }
   });
 };
+
+// 上传附件
+export const uploadServlet = (formdata) => {
+  return axios({
+    url: `${baseUrl}/servlet/UploadServlet`,
+    method: 'post',
+    data: formdata
+  });
+};

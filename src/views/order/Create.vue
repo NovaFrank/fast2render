@@ -53,6 +53,17 @@
       >
         <template slot="menuLeft">
           <button-group :option="btnOption" @item-add="itemAdd"></button-group>
+          <el-upload
+            id="webpicker"
+            :show-file-list="false"
+            class="upload-box"
+            ref="uploadBox"
+            :http-request="uploadFile"
+            action="/"
+          >
+            <el-button size="small">导入行数据</el-button>
+          </el-upload>
+          <el-button size="small" @click="downloadExcelTemp()">下载模版</el-button>
         </template>
         <template slot="materialNumberForm">
           <el-input v-model="crudObj.materialNumber" :readonly="true">
@@ -137,7 +148,7 @@ import selectDialog2 from '@/common/selectDialog2';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
 import { getUserInfo } from '@/util/utils.js';
-import { createOrder, dataDicAPI } from '@/api/order.js';
+import { createOrder, dataDicAPI, uploadServlet } from '@/api/order.js';
 import { format, chain, bignumber } from 'mathjs';
 export default {
   components: {
@@ -164,6 +175,7 @@ export default {
       purchaseGroupOption: purchaseGroupOption,
       filesForm: {},
       materielListOption: materielListOption,
+      taxCodeArr: {},
       params: {
         addList: [],
         updateList: [],
@@ -268,7 +280,9 @@ export default {
             if (item.prop === 'taxCode') {
               return {
                 ...item,
-                dicData: res.data.map((item) => {
+                dicData: res.data.map((item, index) => {
+                  // arr3[key] = { purchase: item.suppliers[index2][key], sale: '', diff: '' };
+                  this.taxCodeArr[item.label] = item.value;
                   return {
                     label: `${item.label}`,
                     value: `${item.value}`
@@ -558,6 +572,64 @@ export default {
     },
     handleDeliveryDate(val) {
       this.deliveryDateChange = val;
+    },
+    // 下载excel模板
+    downloadExcelTemp() {
+      window.open(`https://cs.51qqt.com/ELSServer_SRM/temple/order_item.xls`);
+    },
+    async uploadFile(myfile) {
+      if (!this.formOption.obj.toElsAccount) {
+        alert('请选择供应商！');
+        return false;
+      }
+      const formdata = new FormData();
+      console.log('111' + JSON.stringify(this.taxCodeArr));
+      formdata.append('file', myfile.file);
+      await uploadServlet(formdata)
+        .then(async (res) => {
+          console.log('上传结束', res);
+          if (res.data.statusCode === '200') {
+            let data = res.data.data[0];
+            const file = {
+              fileSize: data.size,
+              fileName: data.name,
+              fileType: data.type,
+              filePath: data.url
+            };
+            this.$emit('upload-file', file);
+            // this.updateFileList(file);
+            const action = 'importExcel';
+            console.log(data.url);
+            let params = {
+              elsAccount: this.elsAccount,
+              urlStr: data.url,
+              taxMap: this.taxCodeArr
+            };
+            // console.log('params: ' + JSON.stringify(params));
+            let newRow = await createOrder(action, params);
+            // console.log('newRow:' + JSON.stringify(newRow));
+
+            if (this.materielListOption.data.length <= 0) {
+              this.materielListOption.data.push(newRow.data.data[0]);
+              this.params.addList.push(newRow.data.data[0]);
+              console.log('newRow:' + this.materielListOption.data[0]);
+              this.materielListOption.data[0].orderItemNumber = '1';
+              this.materielListOption.data[0].deliveryItemNumber = '1';
+            } else {
+              this.materielListOption.data.push(newRow.data.data[0]);
+              this.materielListOption.data[this.params.addList.length].orderItemNumber = (
+                this.params.addList.length + 1
+              ).toString();
+              this.materielListOption.data[0].deliveryItemNumber = '1';
+              this.params.addList.push(newRow.data.data[0]);
+            }
+          } else {
+            this.$message.error('上传失败');
+          }
+        })
+        .catch(() => {
+          this.$message.error('上传失败');
+        });
     }
   }
 };
@@ -587,5 +659,11 @@ export default {
 .scope-btn {
   color: #409eff;
   cursor: pointer;
+}
+#webpicker {
+  display: inline-block;
+}
+.btns-right {
+  display: inline;
 }
 </style>

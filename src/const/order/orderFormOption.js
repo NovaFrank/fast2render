@@ -19,36 +19,42 @@ export default {
     highlightCurrentRow: true,
     align: 'center',
     menuAlign: 'center',
-    menuWidth: '80',
+    menuWidth: '130',
     column: [
       {
         label: '订单号',
         prop: 'orderNumber',
         width: 200,
-        slot: true
+        slot: true,
+        editDisplay: false
       },
       {
         label: '供应商ELS账号',
-        prop: 'toElsAccount'
+        prop: 'toElsAccount',
+        editDisplay: false
       },
       {
         label: '公司名称',
-        prop: 'toElsAccountName'
+        prop: 'toElsAccountName',
+        editDisplay: false
       },
       {
         label: '创建日期',
         prop: 'createDate',
         type: 'date',
         format: 'yyyy-MM-dd',
-        valueFormat: 'yyyy-MM-dd'
+        valueFormat: 'yyyy-MM-dd',
+        editDisplay: false
       },
       {
         label: '订单类型',
-        prop: 'orderType'
+        prop: 'orderType',
+        editDisplay: false
       },
       {
         label: '采购负责人',
-        prop: 'purchasePerson'
+        prop: 'purchasePerson',
+        formslot: true
       },
       {
         label: '订单状态',
@@ -56,6 +62,7 @@ export default {
         span: 6,
         type: 'select',
         disabled: true,
+        editDisplay: false,
         dicData: [
           {
             label: '对方变更退回',
@@ -89,6 +96,7 @@ export default {
         span: 6,
         type: 'select',
         disabled: true,
+        editDisplay: false,
         dicData: [
           {
             label: '变更已发送',
@@ -114,6 +122,7 @@ export default {
         span: 6,
         type: 'select',
         disabled: true,
+        editDisplay: false,
         dicData: [
           {
             label: '超量交收',
@@ -143,6 +152,7 @@ export default {
         span: 6,
         type: 'select',
         disabled: true,
+        editDisplay: false,
         dicData: [
           {
             label: '审批驳回',

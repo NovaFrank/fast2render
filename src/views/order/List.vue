@@ -10,12 +10,21 @@
       :option="formOption.option"
       v-model="crudObj"
       :page.sync="formOption.page"
+      @row-update="rowUpdate"
       @on-load="tableData"
       @size-change="sizeChange"
       @current-change="currentChange"
       ref="crud"
     >
-      <template slot-scope="{ row }" slot="menu">
+      <template slot-scope="{ row, index }" slot="menu">
+        <button
+          v-if="row.sendStatus === '0' && row.auditStatus === '1'"
+          @click.stop="changePurchasePerson(row, index)"
+          type="button"
+          class="el-button el-button--text el-button--small"
+        >
+          <i class="el-icon-connection"></i><span>移 管</span>
+        </button>
         <button
           v-if="row.sendStatus === '0' && row.auditStatus === '1'"
           @click="deleteRow(row)"
@@ -24,6 +33,15 @@
         >
           <i class="el-icon-delete"></i><span>删 除</span>
         </button>
+      </template>
+      <template slot-scope="{}" slot="purchasePersonForm">
+        <el-input v-model="listOption.purchasePerson">
+          <i
+            slot="suffix"
+            class=" el-input_icon el-icon-search pointer"
+            @click="purchaseDialogOpen"
+          ></i>
+        </el-input>
       </template>
       <template
         v-if="
@@ -237,6 +255,15 @@
         </router-link>
       </template>
     </avue-crud>
+    <selectDialog3
+      ref="purchaseDialog"
+      :dialogVisible.sync="dialogPurchaseVisible"
+      :title="'选择采购方负责人'"
+      :column="purchaseOption.option.column"
+      :elsAccount="elsAccount"
+      actionPath="findPageList"
+      @save="purchaseDialogSave"
+    ></selectDialog3>
   </basic-container>
 </template>
 
@@ -245,6 +272,8 @@ import tabOption from '@/const/order/navTabs';
 import formOption from '@/const/order/orderFormOption';
 import { getUserInfo } from '@/util/utils.js';
 import { getOrderList, createOrder } from '@/api/order.js';
+import purchaseOption from '@/const/order/purchaseList';
+import selectDialog3 from '@/common/selectDialog3';
 export default {
   watch: {
     tabActive() {
@@ -252,14 +281,19 @@ export default {
     }
   },
   components: {
-    //
+    selectDialog3
   },
   data() {
     return {
       tabOption: tabOption,
       tabActive: 'all',
       crudObj: {},
-      formOption: formOption
+      formOption: formOption,
+      dialogPurchaseVisible: false,
+      purchaseOption: purchaseOption,
+      listOption: {
+        purchasePerson: ''
+      }
     };
   },
   created() {
@@ -350,6 +384,46 @@ export default {
     itemAdd() {
       this.$router.push({ path: '/create' });
     },
+    // 移管
+    changePurchasePerson(row, index) {
+      this.$refs.crud.rowEdit(row, index);
+    },
+    purchaseDialogOpen() {
+      this.dialogPurchaseVisible = true;
+    },
+    purchaseDialogSave(selectColumns) {
+      if (selectColumns.length !== 0) {
+        this.listOption.purchasePerson =
+          selectColumns[0].elsSubAccount + '_' + selectColumns[0].name;
+      }
+    },
+
+    async rowUpdate(row, index, done, loading) {
+      loading();
+      this.$confirm('确定将此数据移管吗?', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const action = 'updatePerson';
+        let params = {
+          elsAccount: this.elsAccount,
+          toElsAccount: row.toElsAccount,
+          orderNumber: row.orderNumber,
+          purchasePerson: this.listOption.purchasePerson
+        };
+        // console.log('params: ' + JSON.stringify(params));
+        await createOrder(action, params);
+        this.$message({
+          type: 'success',
+          message: '移管成功!'
+        });
+        this.tableData();
+      });
+
+      done();
+    },
+
     // 分页
     currentChange(val) {
       this.formOption.page.currentPage = val;

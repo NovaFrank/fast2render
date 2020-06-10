@@ -62,7 +62,9 @@
             </template>
           </avue-crud>
         </el-tab-pane>
-        <el-tab-pane label="成本比价" name="costChart">成本比价</el-tab-pane>
+        <el-tab-pane label="成本比价" name="costChart">
+          <cost-bids :materialData="materialData" :costPriceData="costPriceData"></cost-bids>
+        </el-tab-pane>
         <el-tab-pane label="历史价格" name="historyChart">
           <div>
             <div class="date-picker">
@@ -97,7 +99,7 @@
       </el-tabs>
       <el-row v-show="chartTabActive === 'historyChart'">
         <el-col :span="4">
-          <el-tabs tab-position="left" style="height: 200px;">
+          <el-tabs @tab-click="handleClickYMaterial" tab-position="left" style="height: 200px;">
             <el-tab-pane
               v-for="material in materialData"
               :label="material.materialName"
@@ -123,6 +125,7 @@ import { historyAction } from '@/api/rfq/priceBids';
 import { compare } from '@/util/utils.js';
 import FormHeader from '@/components/views/formHeader';
 import { formatDate } from '@/util/date';
+import costBids from './priceCostBids';
 
 let echarts = require('echarts/lib/echarts');
 require('echarts/lib/component/title');
@@ -131,9 +134,10 @@ require('echarts/lib/chart/bar');
 require('echarts/lib/chart/line');
 
 export default {
-  components: { FormHeader },
+  components: { FormHeader, costBids },
   data() {
     return {
+      costPriceData: [],
       quotaInput: '',
       dic: [
         {
@@ -152,16 +156,6 @@ export default {
       priceObjOption: priceObjOption,
       inquiryListOption: inquiryListOption,
       historyChartOption: historyChartOption,
-      priceObj: {
-        no: 'RQ0170810001',
-        inquiryTime: '2017-07-08 － 2017-08-20',
-        center: 'HN－海宁',
-        currency: 'RMB',
-        strategy: '定向',
-        dealPrice: '3600',
-        dealTime: '2017-5-20',
-        dealSupplier: '曼达数码'
-      },
       chartTabActive: 'bidChart',
       chartDom: {},
       tabOption: {
@@ -193,7 +187,7 @@ export default {
   created() {
     this.enquiryNumber = this.$route.params.enquiryNumber;
     this.initDetail();
-    this.chartTabActive = this.$route.query.type || 'bidChart';
+    this.chartTabActive = this.$route.query.type || 'costChart'; // bidChart
   },
   mounted() {
     this.initChart();
@@ -204,6 +198,13 @@ export default {
     }
   },
   methods: {
+    handleClickYMaterial(value) {
+      this.currentMaterial = this.materialData.filter(
+        (item) => item.materialName === value.label
+      )[0];
+      this.handleTabHistoryTitle();
+      this.historyChartData();
+    },
     handleRadioChange(value, row, materialNumber, toElsAccount) {
       const index = this.crudData.findIndex(
         (item) => item.materialNumber === materialNumber && item.toElsAccount === toElsAccount
@@ -380,6 +381,7 @@ export default {
       });
       queryDetailAction('findItemDetails', this.enquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
+        this.costPriceData = res.data.pageData.rows.filter((item) => item.quoteMethod === '2');
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
           return {
             id: item.uuid,

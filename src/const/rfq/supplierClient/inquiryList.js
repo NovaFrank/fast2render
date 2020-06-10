@@ -70,6 +70,11 @@ export default {
       },
       {
         slot: true,
+        label: '成本模板',
+        prop: 'costTemplate'
+      },
+      {
+        slot: true,
         label: '含税价',
         prop: 'priceIncludingTax'
       },

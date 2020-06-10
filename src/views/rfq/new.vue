@@ -61,6 +61,11 @@
           </p>
         </span>
       </template>
+      <template slot-scope="scope" slot="costTemplate">
+        <span v-if="scope.row.quoteMethod === '2'">
+          {{ JSON.parse(scope.row.costConstituteJson).templateName }}
+        </span>
+      </template>
       <template slot="menuLeft" v-if="!form.purchaseRequestNumber">
         <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>
       </template>
@@ -114,7 +119,7 @@
 import FormHeader from '@/components/views/formHeader';
 import fieldDialog from '@/components/views/fieldDialog';
 // import SelectDialogTable from '@/components/views/SelectDialogTable';
-import fieldDialogOption from '@/const/rfq/newAndView/formDialog';
+import fieldDialogOption from '@/const/rfq/newAndView/formDialog'; // 询价明细弹窗option
 import formOption from '@/const/rfq/newAndView/form';
 import tabOption from '@/const/rfq/newAndView/tabs';
 import inquiryListOption from '@/const/rfq/newAndView/inquiryList';
@@ -332,99 +337,58 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$refs.form.validate((valid) => {
-          if (valid) {
-            if (this.inquiryListOption.data.length === 0) {
-              this.$message.error('请添加询价明细');
+        this.$refs.attachment
+          .sendFiles()
+          .then((res) => {
+            if (!res.result) {
+              this.$message.error(res.message || '附件发送失败');
               return;
             }
-            let validate = this.inquiryListOption.data.filter(
-              (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
-            );
-            if (validate.length > 0) {
-              this.$message.error('请完善报价方式或税码/税率');
-              return;
-            }
-            let params = {
-              enquiryNumber: this.currentEnquiryNumber,
-              elsAccount: this.elsAccount,
-              // beginDate: this.form.beginDate,
-              quoteEndTime: this.form.quoteEndTime,
-              enquiryType: this.form.enquiryType,
-              enquiryDesc: this.form.enquiryDesc,
-              companyCode: this.form.companyCode,
-              // responsible: this.form.responsible,
-              enquiryMethod: this.form.enquiryMethod,
-              itemList: this.inquiryListOption.data
-            };
-            if (this.currentEnquiryNumber) {
-              params = {
-                ...params,
-                enquiryNumber: this.currentEnquiryNumber
-              };
-            }
-            purchaseEnquiryAction('publishEnquiry', params).then((res) => {
-              if (res.data.statusCode !== '200') {
-                this.$message.error(res.data.message);
-                return;
+            this.$refs.form.validate((valid) => {
+              if (valid) {
+                if (this.inquiryListOption.data.length === 0) {
+                  this.$message.error('请添加询价明细');
+                  return;
+                }
+                let validate = this.inquiryListOption.data.filter(
+                  (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+                );
+                if (validate.length > 0) {
+                  this.$message.error('请完善报价方式或税码/税率');
+                  return;
+                }
+                let params = {
+                  enquiryNumber: this.currentEnquiryNumber,
+                  elsAccount: this.elsAccount,
+                  // beginDate: this.form.beginDate,
+                  quoteEndTime: this.form.quoteEndTime,
+                  enquiryType: this.form.enquiryType,
+                  enquiryDesc: this.form.enquiryDesc,
+                  companyCode: this.form.companyCode,
+                  // responsible: this.form.responsible,
+                  enquiryMethod: this.form.enquiryMethod,
+                  itemList: this.inquiryListOption.data
+                };
+                if (this.currentEnquiryNumber) {
+                  params = {
+                    ...params,
+                    enquiryNumber: this.currentEnquiryNumber
+                  };
+                }
+                purchaseEnquiryAction('publishEnquiry', params).then((res) => {
+                  if (res.data.statusCode !== '200') {
+                    this.$message.error(res.data.message);
+                    return;
+                  }
+                  this.$message.success('发布成功');
+                  this.$router.push({ path: '/list' });
+                });
               }
-              this.$message.success('发布成功');
-              this.$router.push({ path: '/list' });
             });
-          }
-        });
-        // this.$refs.attachment
-        //   .sendFiles()
-        //   .then((res) => {
-        //     if (!res.result) {
-        //       this.$message.error(res.message || '附件发送失败');
-        //       return;
-        //     }
-        //     this.$refs.form.validate((valid) => {
-        //       if (valid) {
-        //         if (this.inquiryListOption.data.length === 0) {
-        //           this.$message.error('请添加询价明细');
-        //           return;
-        //         }
-        //         let validate = this.inquiryListOption.data.filter(
-        //           (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
-        //         );
-        //         if (validate.length > 0) {
-        //           this.$message.error('请完善报价方式或税码/税率');
-        //           return;
-        //         }
-        //         let params = {
-        //           enquiryNumber: this.currentEnquiryNumber,
-        //           elsAccount: this.elsAccount,
-        //           // beginDate: this.form.beginDate,
-        //           quoteEndTime: this.form.quoteEndTime,
-        //           enquiryType: this.form.enquiryType,
-        //           enquiryDesc: this.form.enquiryDesc,
-        //           companyCode: this.form.companyCode,
-        //           // responsible: this.form.responsible,
-        //           enquiryMethod: this.form.enquiryMethod,
-        //           itemList: this.inquiryListOption.data
-        //         };
-        //         if (this.currentEnquiryNumber) {
-        //           params = {
-        //             ...params,
-        //             enquiryNumber: this.currentEnquiryNumber
-        //           };
-        //         }
-        //         purchaseEnquiryAction('publishEnquiry', params).then((res) => {
-        //           if (res.data.statusCode !== '200') {
-        //             this.$message.error(res.data.message);
-        //             return;
-        //           }
-        //           this.$message.success('发布成功');
-        //           this.$router.push({ path: '/list' });
-        //         });
-        //       }
-        //     });
-        //   })
-        //   .catch((res) => {
-        //     this.$message.error(res.message || '发布失败，请检查附件');
-        //   });
+          })
+          .catch((res) => {
+            this.$message.error(res.message || '发布失败，请检查附件');
+          });
       });
     },
     // 表单保存

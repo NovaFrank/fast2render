@@ -72,6 +72,11 @@ export default {
         slot: true,
         label: '阶梯信息',
         prop: 'quoteMethodInfo'
+      },
+      {
+        slot: true,
+        label: '成本模板',
+        prop: 'costTemplate'
       }
     ]
   }

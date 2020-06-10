@@ -24,7 +24,13 @@
           </div>
           <!-- 成本询价 -->
           <div v-else-if="form.quoteMethod === '2'">
-            <el-select v-model="currentTemplate" filterable clearable placeholder="请选择 成本模板">
+            <el-select
+              v-model="currentTemplate"
+              @change="handleTemplateChange"
+              filterable
+              clearable
+              placeholder="请选择 成本模板"
+            >
               <el-option
                 v-for="item in templateList"
                 :key="item.templateName"
@@ -33,10 +39,13 @@
               >
               </el-option>
             </el-select>
-            <fast2-cost-config-tab-render
+            <!-- :tabView="false" -->
+            <fast2-config-tab-render
+              :tabPermission="tabPermission"
+              :readOnly="true"
               :list="template"
               :providerData="data"
-            ></fast2-cost-config-tab-render>
+            ></fast2-config-tab-render>
           </div>
         </div>
       </template>
@@ -72,6 +81,9 @@ export default {
   name: 'field-dialog',
   components: {},
   created() {
+    this.$getBlockItem('cost-base-price-template').then((res) => {
+      this.template = res.column[0].data;
+    });
     this.costTemplateList();
   },
   props: {
@@ -100,6 +112,7 @@ export default {
       currentTemplate: '',
       templateList: [],
       template: [],
+      tabPermission: [],
       supplierList: supplierList,
       ladderOption: ladderOption,
       ladderFormOption: ladderFormOption,
@@ -110,32 +123,42 @@ export default {
     };
   },
   watch: {
-    currentTemplate(newVal) {
-      // if (newVal) {
-      //   const index = this.templateList.findIndex((item) => item.templateName === newVal);
-      //   this.template = JSON.parse(this.templateList[index].configJson);
-      // }
-    },
+    // currentTemplate(newVal) {
+    //   if (newVal) {
+    //     const index = this.templateList.findIndex((item) => item.templateName === newVal);
+    //     this.tabPermission = JSON.parse(this.templateList[index].configJson);
+    //   }
+    // },
     field(newVal) {
       this.form = newVal;
+      console.log('this.form', this.form);
       this.ladderOption.data = newVal.ladderPriceJson ? JSON.parse(newVal.ladderPriceJson) : [];
-      this.$getTemplateItem('cost-base-price-template').then((res) => {
-        this.template = res.column[0].data;
-      });
+      if (this.form.quoteMethod === '2' && this.dialogTitle === '修改询价明细') {
+        const costJson = JSON.parse(newVal.costConstituteJson);
+        this.currentTemplate = costJson.templateName;
+        // this.template = costJson.templateJson;
+        this.tabPermission = costJson.permissionJson;
+      }
     },
     'form.taxCode'(newVal) {
       this.form.taxRate = newVal ? newVal.split('_')[0] : '';
     }
   },
   methods: {
+    handleTemplateChange(value) {
+      const index = this.templateList.findIndex((item) => item.templateName === value);
+      if (index === -1) this.tabPermission = {};
+      else this.tabPermission = JSON.parse(this.templateList[index].configJson);
+      console.log(this.tabPermission);
+    },
     costTemplateList() {
       const userInfo = getUserInfo();
       costTemplateList({
         elsAccount: userInfo.elsAccount,
         pageSize: 1000,
-        businessModule: 'cost'
+        businessModule: 'cost',
+        currentVersionFlag: 'Y'
       }).then((res) => {
-        console.log(res);
         this.templateList = res.data.pageData.rows;
       });
     },
@@ -166,9 +189,9 @@ export default {
       } else if (this.form.quoteMethod === '2') {
         const obj = {
           templateName: this.currentTemplate,
-          templateJson: this.template
+          templateJson: this.template,
+          permissionJson: this.tabPermission
         };
-        console.log(obj);
         const costConstituteJson = JSON.stringify(obj);
         this.form.costConstituteJson = costConstituteJson;
       }

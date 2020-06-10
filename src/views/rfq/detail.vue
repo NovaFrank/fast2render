@@ -38,22 +38,6 @@
       :readonly="true"
       v-show="tabActive === 'files'"
     ></fast2-attachment-list>
-    <!-- <avue-crud
-      v-if="tabActive === 'files'"
-      :data="filesOption.data"
-      :option="filesOption.option"
-      :page.sync="filesOption.page"
-      @size-change="sizeChange"
-      @current-change="currentChange"
-    >
-      <template slot-scope="scope" slot="menu">
-        <el-row :gutter="24">
-          <el-col :span="6">
-            <a :href="scope.url">下载</a>
-          </el-col>
-        </el-row>
-      </template>
-    </avue-crud> -->
     <avue-crud
       v-show="tabActive === 'detail'"
       :data="inquiryListOption.data"
@@ -83,6 +67,16 @@
             {{ ladder.ladderGrade }}
           </p>
         </span>
+      </template>
+      <!-- 成本模板 -->
+      <template slot-scope="scope" slot="costTemplate">
+        <a
+          class="el-button el-button--text el-button--small"
+          @click.stop="handleShowCostTemplate(scope)"
+          v-if="scope.row.quoteMethod === '2'"
+        >
+          {{ JSON.parse(scope.row.costConstituteJson).templateName }}
+        </a>
       </template>
       <template slot="taxRate" slot-scope="scope">
         {{
@@ -190,6 +184,15 @@
       @close-field-dialog="closeFieldDialog"
       @on-save-form="handleOpenSubmit"
     ></open-dialog>
+    <cost-template-dialog
+      dialogTitle="成本报价"
+      dialogWidth="70%"
+      :tabPermission="tabPermission"
+      :template="template"
+      :data="providerData"
+      :fieldDialogVisible.sync="costDialogVisible"
+      @close-field-dialog="closeFieldDialog"
+    ></cost-template-dialog>
   </basic-container>
 </template>
 
@@ -210,6 +213,7 @@ import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
 import selectSupplierDialog from '@/components/views/selectSupplierDialog';
 import quoteListOption from '@/const/rfq/newAndView/detailInquiryQuote';
 
+import costTemplateDialog from '@/components/views/costTemplateDialog';
 import openDialog from '@/components/views/openDialog';
 import openFormOption from '@/const/rfq/newAndView/openForm';
 import { setStore } from '@/util/store.js';
@@ -219,7 +223,8 @@ export default {
     FormHeader,
     history,
     selectSupplierDialog,
-    openDialog
+    openDialog,
+    costTemplateDialog
   },
   data() {
     return {
@@ -257,6 +262,7 @@ export default {
       historyList: [],
       quoteMethodData: [],
       openDialogVisible: false,
+      costDialogVisible: false,
       openFormOption: openFormOption,
       suppliersDialogVisable: false,
       suppliersDialogOptionColumn: supplierSelectDialog.option.column,
@@ -301,6 +307,7 @@ export default {
     },
     closeFieldDialog() {
       this.openDialogVisible = false;
+      this.costDialogVisible = false;
     },
     currentChange(val) {
       this.inquiryListOption.page.currentPage = val;
@@ -420,6 +427,25 @@ export default {
     },
     handleTabChange(value) {
       this.tabActive = value.prop;
+    },
+    handleShowCostTemplate(scope) {
+      if (
+        this.detailObj.auditStatus !== '0' &&
+        this.detailObj.auditStatus !== '2' &&
+        scope.row.itemStatus === '2' &&
+        this.detailObj.quoteEndTime < new Date().getTime()
+      ) {
+        const costJson = JSON.parse(scope.row.costConstituteJson);
+        this.template = costJson.templateJson;
+        this.tabPermission = costJson.permissionJson;
+        this.providerData = {};
+        this.template.forEach((element) => {
+          this.providerData[element.prop] = element.propData;
+        });
+        this.costDialogVisible = true;
+      } else {
+        console.log('....');
+      }
     },
     handleShowSupplierSelect() {
       if (validatenull(this.currentDetailItem)) {

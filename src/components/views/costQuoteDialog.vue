@@ -10,8 +10,9 @@
       <!-- 成本询价 -->
       <template slot="costConstituteJson">
         <fast2-cost-config-tab-render
-          :list="template"
-          :providerData="providerData"
+          :tabPermission="form.tabPermission"
+          :list="form.template"
+          :providerData="form.providerData"
         ></fast2-cost-config-tab-render>
       </template>
       <template slot="menuForm">
@@ -25,9 +26,6 @@
 <script>
 import quoteFormOption from '@/const/rfq/supplierClient/costQuoteForm';
 import ladderOption from '@/const/rfq/supplierClient/quoteList';
-// import { unzipLayout, zipLayout } from './../../../fast2render/lib/utils.js';
-
-const execMathExpress = require('exec-mathexpress');
 
 // 销售方阶梯报价
 export default {
@@ -35,6 +33,8 @@ export default {
   components: {},
   created: function() {},
   props: {
+    // template: Array,
+    // providerData: Object,
     dialogWidth: String,
     dialogTitle: String,
     fieldDialogType: String,
@@ -56,8 +56,8 @@ export default {
       templateName: '',
       quoteFormOption: quoteFormOption,
       ladderOption: ladderOption,
-      template: [],
-      providerData: {},
+      // template: [],
+      // providerData: {},
       form: {
         costConstituteJson: []
       }
@@ -66,17 +66,18 @@ export default {
   watch: {
     field(newVal) {
       this.form = newVal;
+      console.log('this.form', this.form);
 
-      const costJson = JSON.parse(newVal.costConstituteJson);
-      const templateData = costJson.templateJson;
-      this.templateName = costJson.templateName;
-      console.log(templateData);
-      this.template = templateData;
-      let data = {};
-      templateData.forEach((element) => {
-        data[element.prop] = element.propData;
-      });
-      this.providerData = data;
+      // const costJson = JSON.parse(newVal.costConstituteJson);
+      // const templateData = costJson.templateJson;
+      // this.templateName = costJson.templateName;
+      // let data = {};
+      // templateData.forEach((element) => {
+      //   data[element.prop] = element.propData;
+      // });
+      // this.providerData = data;
+      // console.log(this.providerData);
+      // this.template = templateData;
     }
   },
   methods: {
@@ -84,15 +85,16 @@ export default {
       this.$emit('close-field-dialog');
     },
     handleSubmit() {
-      this.form.costConstituteJson = this.template.map((item) => {
+      this.form.costConstituteJson = this.form.template.map((item) => {
         return {
           ...item,
-          propData: this.providerData[item.prop]
+          propData: this.form.providerData[item.prop]
         };
       });
       const obj = {
-        templateName: this.templateName,
-        templateJson: this.form.costConstituteJson
+        templateName: this.form.templateName,
+        templateJson: this.form.costConstituteJson,
+        permissionJson: this.form.tabPermission
       };
       const params = {
         ...this.form,

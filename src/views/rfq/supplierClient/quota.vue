@@ -56,6 +56,15 @@
           </p>
         </span>
       </template>
+      <template slot-scope="scope" slot="costTemplate">
+        <a
+          class="el-button el-button--text el-button--small"
+          @click.stop="handleShowCostTemplate(scope)"
+          v-if="scope.row.quoteMethod === '2'"
+        >
+          {{ JSON.parse(scope.row.costConstituteJson).templateName }}
+        </a>
+      </template>
       <template slot-scope="scope" slot="quote">
         <avue-radio
           v-model="scope.row.noQuoted"
@@ -108,6 +117,16 @@
       :data="historyList"
       :quoteMethodData="quoteMethodData"
     ></history>
+    <!-- 成本报价模板 -->
+    <cost-template-dialog
+      dialogTitle="成本报价"
+      dialogWidth="70%"
+      :tabPermission="tabPermission"
+      :template="template"
+      :data="providerData"
+      :fieldDialogVisible.sync="costDialogVisible"
+      @close-field-dialog="closeFieldDialog"
+    ></cost-template-dialog>
   </basic-container>
 </template>
 
@@ -120,6 +139,7 @@ import formOption from '@/const/rfq/supplierClient/detail';
 import tabOption from '@/const/rfq/newAndView/tabs';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
+import costTemplateDialog from '@/components/views/costTemplateDialog';
 import { getAction, postAction, queryQuote } from '@/api/rfq/supplierClient';
 import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
 import history from './../history';
@@ -132,7 +152,8 @@ export default {
     quoteDialog,
     quoteLadderDialog,
     costQuoteDialog,
-    history
+    history,
+    costTemplateDialog
   },
   data() {
     return {
@@ -159,6 +180,7 @@ export default {
       ladderQuoteVisible: false,
       costQuoteVisible: false,
       historyVisible: false,
+      costDialogVisible: false,
       historyList: [],
       quoteMethodData: [],
       dialogTitle: '',
@@ -192,6 +214,7 @@ export default {
       this.costQuoteVisible = false;
       this.ladderQuoteVisible = false;
       this.quoteVisible = false;
+      this.costDialogVisible = false;
     },
     currentChange(val) {
       this.inquiryListOption.page.currentPage = val;
@@ -212,6 +235,16 @@ export default {
       });
       this.historyVisible = true;
     },
+    handleShowCostTemplate(scope) {
+      const costJson = JSON.parse(scope.row.costConstituteJson);
+      this.template = costJson.templateJson;
+      this.tabPermission = costJson.permissionJson;
+      this.providerData = {};
+      this.template.forEach((element) => {
+        this.providerData[element.prop] = element.propData;
+      });
+      this.costDialogVisible = true;
+    },
     // 显示报价弹窗
     handleQuoteRow(scope) {
       this.dialogTitle = `${scope.row.materialNumber}(${scope.row.materialName})物料报价弹框`;
@@ -231,9 +264,22 @@ export default {
         };
         this.ladderQuoteVisible = true;
       } else if (scope.row.quoteMethod === '2') {
+        const costJson = JSON.parse(scope.row.costConstituteJson);
+        const template = costJson.templateJson;
+        const tabPermission = costJson.permissionJson;
+        const templateName = costJson.templateName;
+        let providerData = {};
+        template.forEach((element) => {
+          providerData[element.prop] = element.propData;
+        });
+
         this.costDialogForm = {
           index: scope.index,
-          costConstituteJson: scope.row.costConstituteJson || null
+          costConstituteJson: scope.row.costConstituteJson || null,
+          templateName,
+          tabPermission,
+          template,
+          providerData
         };
         this.costQuoteVisible = true;
       }

@@ -5,7 +5,7 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" append-to-body>
       <div>
         <el-checkbox-group v-model="templateConfig.tab" @change="changeShowList(item)">
-          <template v-for="item in list">
+          <template v-for="item in newList">
             <el-checkbox
               :key="item.prop"
               :name="item.prop"
@@ -29,35 +29,31 @@
             :label="subTabItem.label"
             :name="subTabItem.prop"
             :key="subTabItem.prop"
-            ><slot :name="subTabItem.prop">
-              <fast2-block-provider :option="subTabItem.option" :version="subTabItem.version">
-                <template v-slot="component">
-                  <div>
-                    {{ component.list }}
-                    <template v-for="item in component.list">
-                      <div :key="item.id" v-if="item.data && item.data.column">
-                        <el-checkbox-group v-model="templateConfig.column[subTabItem.prop]">
-                          <template v-for="subFielditem in item.data.column">
-                            <span :key="subFielditem.prop">
-                              <el-checkbox
-                                :name="subFielditem.prop"
-                                :label="subFielditem.label"
-                                :checked="
-                                  templateConfig.column[subTabItem.prop].includes(
-                                    subFielditem.label
-                                  )
-                                "
-                                @change="changeShowColumList(item.data.column, subTabItem.prop)"
-                                >{{ subFielditem.label }}
-                              </el-checkbox></span
-                            >
-                          </template>
-                        </el-checkbox-group>
-                      </div>
-                    </template>
-                  </div></template
-                ></fast2-block-provider
-              ></slot
+          >
+            <fast2-block-provider :option="subTabItem.option" :version="subTabItem.version">
+              <template v-slot="component">
+                <div>
+                  <template v-for="item in component.list">
+                    <div :key="item.id" v-if="item.data && item.data.column">
+                      <el-checkbox-group v-model="templateConfig.column[subTabItem.prop]">
+                        <template v-for="subFielditem in item.data.column">
+                          <span :key="subFielditem.prop">
+                            <el-checkbox
+                              :name="subFielditem.prop"
+                              :label="subFielditem.label"
+                              :checked="
+                                templateConfig.column[subTabItem.prop].includes(subFielditem.label)
+                              "
+                              @change="changeShowColumList(item.data.column, subTabItem.prop)"
+                              >{{ subFielditem.label }}
+                            </el-checkbox></span
+                          >
+                        </template>
+                      </el-checkbox-group>
+                    </div>
+                  </template>
+                </div></template
+              ></fast2-block-provider
             >
           </el-tab-pane></template
         ></el-tabs
@@ -73,7 +69,7 @@
  * 进入屏蔽其他操作状态，单纯进行布局， 保存 及 发布 ， 可维护类型为 表格 表单 详情， 组合， 可 维护 模版 页面  模块
  * block 内含一组组件
  */
-
+import { test } from '../demo/template.js';
 export default {
   name: 'CostConfigTabSetting',
   props: {
@@ -84,6 +80,10 @@ export default {
       }
     },
     config: {},
+    debugger: {
+      type: String,
+      default: 'false'
+    },
     providerData: {
       type: Object,
       default: () => {
@@ -102,6 +102,7 @@ export default {
         tab: [],
         column: {}
       },
+      newList: [],
       template: {},
       dialogVisible: false,
       dialogTitle: '选择启用模块',
@@ -112,7 +113,7 @@ export default {
   },
   computed: {
     tabData() {
-      this.list.map((item) => {
+      this.newList.map((item) => {
         if (!this.providerData[item.prop]) {
           this.providerData[item.prop] = {
             tableData: []
@@ -123,8 +124,15 @@ export default {
     }
   },
   mounted() {
-    console.log('启动tab组件');
-    this.active = this.list[0].prop;
+    console.log('启动tab配置组件');
+    if (this.debugger === 'true') {
+      this.newList = test;
+    } else {
+      this.newList = this.list;
+    }
+    if (this.list[0]) {
+      this.active = this.list[0].prop;
+    }
     this.initCheckColumnList();
   },
   methods: {
@@ -162,13 +170,13 @@ export default {
       this.updateTemplateConfig();
     },
     initCheckColumnList() {
-      this.list.map((item) => {
+      this.newList.map((item) => {
         this.templateConfig.column[item.prop] = [];
       });
     },
     handleTemplateBlock() {
       this.showlist = [];
-      this.list.map((item) => {
+      this.newList.map((item) => {
         let list = this.templateConfig.tab;
         let isShow = list && item.label && list.includes(item.label);
         item.option = { column: [] };

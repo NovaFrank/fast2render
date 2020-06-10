@@ -59,6 +59,11 @@ export default {
         prop: 'quoteMethodInfo'
       },
       {
+        slot: true,
+        label: '成本模板',
+        prop: 'costTemplate'
+      },
+      {
         label: '供应商',
         prop: 'toElsAccount'
       },

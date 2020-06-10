@@ -78,7 +78,7 @@ export default {
     {
       dicUrl: '/layout/dics/value/currency',
       dicMethod: 'get',
-      type: 'tree',
+      type: 'select',
       label: '币别',
       prop: 'currency'
     },

@@ -66,12 +66,11 @@ export default {
       crudData: []
     };
   },
-  created() {
-    this.initDetail();
-  },
+  created() {},
   mounted() {},
   watch: {
     costPriceData(newValue) {
+      this.currentMaterial = this.costPriceData[0];
       const costJson = JSON.parse(newValue[0].costConstituteJson);
       this.template = costJson.templateJson;
       this.tabPermission = costJson.permissionJson;
@@ -85,7 +84,22 @@ export default {
     }
   },
   methods: {
-    initDetail() {},
+    // 初始循环当前供应商报价数据providerData
+    initProviderData(supplier) {
+      const prop = supplier.toElsAccount;
+      const index = this.costPriceData.findIndex(
+        (item) =>
+          item.toElsAccount === prop && item.materialNumber === this.currentMaterial.materialNumber
+      );
+      const materialData = this.costPriceData[index];
+      const costJson = JSON.parse(materialData.costConstituteJson);
+      const template = costJson.templateJson;
+      this.providerData = {};
+      template.forEach((element) => {
+        this.providerData[element.prop] = element.propData;
+      });
+      return prop;
+    },
     // 初始汇总比
     initColumn() {
       // 获取最多供应商项
@@ -114,17 +128,29 @@ export default {
       this.template.forEach((item) => {
         let i = {};
         const tempProp = item.prop;
-        this.suppliers.forEach((supplier) => {
-          const prop = supplier.toElsAccount;
-          let price = 0;
-          this.$getFormulaValue(
-            this.$getFormulaItem('const-cailiao'), // tempProp
-            this.providerData[tempProp].tableData
-          ).forEach((item) => {
-            if (item.price) price += Number(item.price);
+        if (
+          this.providerData[tempProp].tableData &&
+          this.providerData[tempProp].tableData.length > 0
+        ) {
+          this.suppliers.forEach((supplier) => {
+            const prop = this.initProviderData(supplier);
+            let price = 0;
+            this.providerData[tempProp].tableData.forEach((t) => {
+              const formula = this.$getFormulaItem(tempProp);
+              price += this.$getFormulaValue(formula, t).price;
+              console.log(tempProp, formula, price);
+            });
+            i[prop] = price;
           });
-          i[prop] = price;
-        });
+        } else if (this.providerData[tempProp].formData) {
+          let price = 0;
+          this.suppliers.forEach((supplier) => {
+            const prop = this.initProviderData(supplier);
+            const formula = this.$getFormulaItem(tempProp);
+            price += this.$getFormulaValue(formula, this.providerData[tempProp].formData).price;
+            i[prop] = price;
+          });
+        }
         this.sumData.push({
           ...i,
           key: item.label
@@ -160,31 +186,37 @@ export default {
       this.template.forEach((item) => {
         let i = {};
         const tempProp = item.prop;
-        const columns = this.tabPermission[tempProp];
-        if (columns.tableJson) {
-          columns.tableJson.forEach((t) => {
-            this.suppliers.forEach((supplier) => {
-              const prop = supplier.toElsAccount;
-              // let price = 0;
-              // this.$getFormulaValue(
-              //   this.$getFormulaItem('const-cailiao'), // tempProp
-              //   this.providerData[tempProp].tableData
-              // ).forEach((item) => {
-              //   if (item.price) price += Number(item.price);
-              // });
-              // i[prop] = price;
-              i[prop] = this.providerData[tempProp].tableData[0][t.prop];
-            });
-            console.log(item);
-            this.sumDetailData.push({
-              ...i,
-              prop: tempProp,
-              id: `${tempProp}_${t.prop}`,
-              field: t.prop, // t.label
-              key: item.label
+        if (
+          this.providerData[tempProp].tableData &&
+          this.providerData[tempProp].tableData.length > 0
+        ) {
+          this.suppliers.forEach((supplier) => {
+            const prop = this.initProviderData(supplier);
+            this.providerData[tempProp].tableData.forEach((t) => {
+              const formula = this.$getFormulaItem(tempProp);
+              i[prop] = this.$getFormulaValue(formula, t).price;
+              this.sumDetailData.push({
+                ...i,
+                prop: tempProp,
+                id: `${tempProp}_${t.$index}`,
+                field: t.name, // t.label
+                key: item.label
+              });
             });
           });
-        } else if (columns.fieldJson) {
+        } else if (this.providerData[tempProp].formData) {
+          this.suppliers.forEach((supplier) => {
+            const prop = this.initProviderData(supplier);
+            const formula = this.$getFormulaItem(tempProp);
+            i[prop] = this.$getFormulaValue(formula, this.providerData[tempProp].formData).price;
+          });
+          this.sumDetailData.push({
+            ...i,
+            prop: tempProp,
+            id: `${tempProp}`,
+            field: this.providerData[tempProp].formData.type,
+            key: item.label
+          });
         }
       });
     },

@@ -225,7 +225,6 @@ export const getFormulaValue = (formulaItem, obj = {}) => {
   const functions = {
     x: (value) => value.toFixed(2)
   };
-  console.log(!formulaItem || !formulaItem.formulaElementJson || !formulaItem.content);
   if (!formulaItem || !formulaItem.formulaElementJson || !formulaItem.content) {
     obj.formulaVauleResult = false;
     return obj;
@@ -240,7 +239,7 @@ export const getFormulaValue = (formulaItem, obj = {}) => {
   let resultField = 'price';
 
   list.map((item) => {
-    calcObj[item.elementId] = obj[item.fieldName];
+    calcObj[item.elementId] = obj[item.fieldName] * 1;
     if (item.elementId === result) {
       resultField = item.fieldName;
     }
@@ -253,7 +252,6 @@ export const getFormulaValue = (formulaItem, obj = {}) => {
   let real = formula.evaluate(calcObj);
   obj[resultField] = real;
   obj.formulaVauleResult = true;
-  console.log(real, '最终计算结果');
   return obj;
 };
 

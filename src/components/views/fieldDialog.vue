@@ -81,7 +81,7 @@ export default {
   name: 'field-dialog',
   components: {},
   created() {
-    this.$getBlockItem('cost-base-price-template').then((res) => {
+    this.$getTemplateItem('cost-base-price-template').then((res) => {
       this.template = res.column[0].data;
     });
     this.costTemplateList();

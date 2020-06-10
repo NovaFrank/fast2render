@@ -1,9 +1,15 @@
 <template>
   <div class="tabBox">
-    <template v-if="newList && newList.length">
-      <el-tabs v-model="active" @tab-click="changeTab">
+    <template v-if="newList && newList.length && tabView">
+      <el-tabs v-model="active">
         <template v-for="subItem in newList">
-          <el-tab-pane :label="subItem.label" :name="subItem.prop" :key="subItem.prop">
+          <el-tab-pane
+            :label="subItem.label"
+            v-if="newPermission && newPermission[subItem.prop]"
+            :name="subItem.prop"
+            :key="subItem.prop"
+          >
+            {{ subItem.prop }}
             <fast2-block-provider
               :option="subItem.option"
               :version="subItem.option ? null : subItem.version"
@@ -14,12 +20,42 @@
                     :providerData="tabData[subItem.prop]"
                     :list="component.list"
                     :ref="subItem.prop"
+                    :readOnly="readOnly"
+                    :permission="newPermission[subItem.prop]"
                     :dataSource="subItem.prop"
                     v-on="$listeners"
                   >
                   </fast2-component-render></div></template
             ></fast2-block-provider> </el-tab-pane></template
       ></el-tabs>
+    </template>
+    <template v-if="newList && newList.length && !tabView">
+      <template v-for="subItem in newList">
+        <div
+          class="tab-block"
+          :key="subItem.prop"
+          v-if="newPermission && newPermission[subItem.prop]"
+        >
+          <h4 class="block-title">{{ subItem.label }}</h4>
+          <fast2-block-provider
+            :option="subItem.option"
+            :version="subItem.option ? null : subItem.version"
+          >
+            <template v-slot="component">
+              <div>
+                <fast2-component-render
+                  :providerData="tabData[subItem.prop]"
+                  :list="component.list"
+                  :ref="subItem.prop"
+                  :readOnly="readOnly"
+                  :permission="newPermission[subItem.prop]"
+                  :dataSource="subItem.prop"
+                  v-on="$listeners"
+                >
+                </fast2-component-render></div></template
+          ></fast2-block-provider>
+        </div>
+      </template>
     </template>
   </div>
 </template>
@@ -31,7 +67,9 @@
  * 进入屏蔽其他操作状态，单纯进行布局， 保存 及 发布 ， 可维护类型为 表格 表单 详情， 组合， 可 维护 模版 页面  模块
  * block 内含一组组件
  */
-import { test } from '../demo/template.js';
+// import { test } from '../demo/template.js';
+import { zhunru } from '../demo/template2.js';
+import permisssion from '../demo/tableJson3';
 export default {
   name: 'CostConfigTabRender',
   props: {
@@ -44,6 +82,20 @@ export default {
     debugger: {
       type: String,
       default: 'false'
+    },
+    readOnly: {
+      type: Boolean,
+      default: false
+    },
+    tabView: {
+      type: Boolean,
+      default: true
+    },
+    tabPermission: {
+      type: Object,
+      default: () => {
+        return {};
+      }
     },
     providerData: {
       type: Object,
@@ -60,8 +112,30 @@ export default {
       tableData: {},
       formData: {},
       active: '',
-      newList: []
+      newList: [],
+      newPermission: {}
     };
+  },
+  watch: {
+    list: {
+      handler(val) {
+        this.newList = val;
+        if (this.newList[0]) {
+          this.active = this.newList[0].prop;
+        }
+        // this.$emit('design-update', this.editData);
+      },
+      deep: true,
+      immediate: true
+    },
+    tabPermission: {
+      handler(val) {
+        this.newPermission = val;
+        // this.$emit('design-update', this.editData);
+      },
+      deep: true,
+      immediate: true
+    }
   },
   computed: {
     tabData() {
@@ -78,18 +152,27 @@ export default {
   mounted() {
     console.log('启动tab组件');
     if (this.debugger === 'true') {
-      this.newList = test;
-    } else {
-      this.newList = this.list;
+      this.newList = zhunru;
     }
-    if (this.list && this.list[0] && this.list[0].prop) {
-      this.active = this.list[0].prop;
+    if (this.debugger === 'true') {
+      this.newPermission = permisssion;
+    }
+    if (this.newList[0]) {
+      this.active = this.newList[0].prop;
     }
   }
 };
 </script>
 <style scoped>
+.avue-form__menu {
+  display: none;
+}
+</style>
+<style scoped>
 .tabBox {
   background-color: #fff;
+}
+.tabBox .avue-form__menu {
+  display: none;
 }
 </style>

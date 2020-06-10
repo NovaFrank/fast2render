@@ -3,7 +3,8 @@
     <template v-for="item in list">
       <template
         v-if="
-          !item.hide &&
+          item &&
+            !item.hide &&
             (item.type === BLOCK_TYPE.DETAIL ||
               item.type === BLOCK_TYPE.FORM ||
               item.type === BLOCK_TYPE.FIELD)
@@ -11,27 +12,46 @@
       >
         <div :key="item.slug">
           <slot name="form-header"></slot>
-          <avue-form
+          <fast2-theme-provider
             :option="item.data"
-            :data="providerData.fieldData"
-            v-model="formData"
-            :ref="item.slug"
+            :readOnly="readOnly"
+            :hasRowPermission="hasFieldPermission"
+            :rowPermission="getRowPromession(permission.fieldJson)"
+            theme="block"
+            ref="themebox"
           >
-            <slot name="form-slot"></slot>
-          </avue-form>
+            <template v-slot="component">
+              <avue-form
+                v-if="component.reload"
+                :option="component.option"
+                v-model="providerData.formData"
+                :ref="item.slug"
+              >
+                <slot name="form-slot"></slot>
+              </avue-form>
+            </template>
+          </fast2-theme-provider>
           <slot name="form-footer"></slot>
         </div>
       </template>
-      <template v-else-if="!item.hide && item.type === BLOCK_TYPE.LIST">
+      <template v-else-if="item && !item.hide && item.type === BLOCK_TYPE.LIST">
         <div :key="item.slug">
-          <fast2-theme-provider :option="item.data" theme="block" ref="themebox">
+          <fast2-theme-provider
+            :option="item.data"
+            :readOnly="readOnly"
+            :hasRowPermission="hasRowPermission"
+            :rowPermission="getRowPromession(permission.tableJson)"
+            theme="block"
+            ref="themebox"
+          >
             <template v-slot="component">
               <slot name="crud-header">
-                <h4>
+                <h4 v-if="!readOnly">
                   <el-button size="mini" @click="listRowAdd">新增行</el-button>
                 </h4>
               </slot>
               <avue-crud
+                v-if="inited"
                 :option="component.option"
                 @row-save="listRowSave"
                 @row-del="listRowDel"
@@ -47,10 +67,11 @@
           </fast2-theme-provider>
         </div>
       </template>
-      <template v-else-if="!item.hide && item.type === BLOCK_TYPE.DYNAMIC">
+      <template v-else-if="item && !item.hide && item.type === BLOCK_TYPE.DYNAMIC">
         <div :key="item.slug">
           <component
             :is="getComponent(item.type, item.component)"
+            :readOnly="readOnly"
             :list="item.data && item.data.tableData ? item.data.tableData : item.data"
             :providerData="providerData"
           ></component>
@@ -75,6 +96,7 @@
  */
 import itemAttachment from './cards/item-attachment';
 import { getObjType } from '../../lib/utils';
+import { validateNull } from '../../lib/validate';
 const BLOCK_TYPE = {
   LIST: 'crud',
   FORM: 'form',
@@ -103,12 +125,25 @@ export default {
       type: String,
       default: null
     },
+    readOnly: {
+      type: Boolean,
+      default: false
+    },
+    permission: {
+      type: Object,
+      default: () => {
+        return {
+          tableJson: [],
+          fieldJson: []
+        };
+      }
+    },
     providerData: {
       type: Object,
       default: () => {
         return {
           tableData: [],
-          fieldData: {}
+          formData: {}
         };
       }
     }
@@ -118,28 +153,47 @@ export default {
       BLOCK_TYPE,
       tableObj: {},
       tableData: [],
-      formData: {}
+      formData: {},
+      inited: false
     };
   },
-  watch: {
-    formData: {
-      handler: function(newVal) {
-        this.$emit('change-form', newVal);
-        this.$root.$emit('change-form', newVal);
-        if (!this.providerData.fromData) {
-          this.providerData.fromData = newVal;
-        } else if (getObjType(newVal) === 'object') {
-          // 结构已有参数
-          this.providerData.fromData = {
-            ...this.providerData.fromData,
-            ...newVal
-          };
-        }
-      },
-      deep: true
+  computed: {
+    hasRowPermission() {
+      if (validateNull(this.permission)) {
+        return false;
+      }
+      return !validateNull(this.permission.tableJson);
+    },
+    hasFieldPermission() {
+      if (validateNull(this.permission)) {
+        return false;
+      }
+      return !validateNull(this.permission.fieldJson);
     }
   },
+  watch: {
+    readOnly: function() {
+      this.initList();
+    }
+  },
+  created() {},
+  mounted() {
+    this.initList();
+  },
   methods: {
+    initList() {
+      this.list = this.list.map((item) => {
+        item.data.labelPosition = 'top';
+        item.data.submitBtn = false;
+        if (this.readOnly) {
+          item.data.detail = true;
+        } else {
+          item.data.menuBtn = false;
+        }
+        return item;
+      });
+      this.inited = true;
+    },
     listRowUpdate(row, index, done, loading) {
       // 行修改
       this.$set(this.providerData.tableData, index, row);
@@ -167,6 +221,18 @@ export default {
         };
       }
       this.$root.$emit('change-table', data);
+    },
+    getRowPromession(data) {
+      let newData = {};
+      if (getObjType(data) === 'array') {
+        data.map((item) => {
+          newData[item.prop] = item;
+        });
+      } else if (getObjType(data) === 'object') {
+        newData = data;
+      }
+      console.log('end data', newData);
+      return newData;
     },
     getComponent(type, component) {
       let KEY_COMPONENT_NAME = 'item-';

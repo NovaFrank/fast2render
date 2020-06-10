@@ -14,6 +14,7 @@ import PageHeader from './components/render/widget/page-header';
 import PageListHeader from './components/render/widget/page-list-header';
 import PageDetailHeader from './components/render/widget/page-detail-header';
 import BusinessRuleConfig from './components/render/widget/render-rule-config';
+import AttachmentList from './components/render/attachmentList';
 
 import util, {
   loadDic,
@@ -48,6 +49,8 @@ export default {
     Vue.component(PageHeader.name, PageHeader);
     Vue.component(PageListHeader.name, PageListHeader);
     Vue.component(PageDetailHeader.name, PageDetailHeader);
+    Vue.component('Fast2' + AttachmentList.name, AttachmentList);
+    Vue.component(AttachmentList.name, AttachmentList);
     Vue.prototype.$loadDic = loadDic;
     Vue.prototype.$getDicItem = getDicItem;
     Vue.prototype.$getTableItem = getTableItem;

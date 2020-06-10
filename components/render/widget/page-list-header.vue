@@ -26,20 +26,7 @@ export default {
     buttons: {
       type: Array,
       default: () => {
-        return [
-          {
-            name: 'btn-add',
-            label: '新增',
-            icon: 'el-icon-plus',
-            size: 'small',
-            disabled: false,
-            round: false,
-            type: 'primary',
-            action: 'addItem',
-            align: 'btn-right',
-            class: ''
-          }
-        ];
+        return [];
       }
     }
   },

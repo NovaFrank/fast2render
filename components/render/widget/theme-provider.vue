@@ -1,7 +1,13 @@
 <template>
   <div>
     <div v-if="spanMethodData.prop">
-      <slot :option="finalOption" :data="myData" :spanMethod="spanMethod" :reload="reload"></slot>
+      <slot
+        :inited="inited"
+        :option="finalOption"
+        :data="myData"
+        :spanMethod="spanMethod"
+        :reload="reload"
+      ></slot>
     </div>
     <div>
       <slot :option="finalOption" :data="myData" :reload="reload"></slot>
@@ -33,6 +39,10 @@ export default {
     version: {
       type: String,
       default: null // 远程获取 表格字段数据配置- 后续扩充 from 类型
+    },
+    readOnly: {
+      type: Boolean,
+      default: false // 是否只读模式
     },
     hasRowPermission: {
       type: Boolean,
@@ -70,7 +80,7 @@ export default {
   data() {
     return {
       finalOption: {},
-      reload: false,
+      reload: false, // 是否重新加载完成
       optionHash: ''
     };
   },
@@ -85,6 +95,7 @@ export default {
     // 单点监测 ，避免多次触发
     hash: {
       handler(val) {
+        this.inited = false;
         this.finalOption = getStore(val);
         if (!this.finalOption) {
           this.handlerChange();
@@ -117,6 +128,13 @@ export default {
       this.version ? this.mergeRemoteOption() : this.mergeLocalOption();
     },
     setFinalOption(option) {
+      // 最后统一规则
+      option.detail = this.readOnly;
+      if (this.type !== 'crud' && this.hasRowPermission) {
+        // option.menuBtn = !this.readOnly;
+        //  option.menu = !this.readOnly;
+      }
+
       if (this.hasRowPermission) {
         this.finalOption = this.filterColumWithRule(option, this.rowPermission);
       } else {
@@ -130,12 +148,14 @@ export default {
       let newColumn = [];
       option.column.map((item) => {
         if (rowPermission[item.prop]) {
-          if (rowPermission[item.prop].display) {
-            item.readonly = !rowPermission[item.prop].readonly;
+          let isDisplay = rowPermission[item.prop].display === 'true';
+          console.log(rowPermission[item.prop], isDisplay);
+          if (isDisplay) {
+            item.readonly = rowPermission[item.prop].readonly;
             newColumn.push(item);
           }
         } else {
-          newColumn.push(item);
+          // newColumn.push(item);
         }
       });
       option.column = newColumn;

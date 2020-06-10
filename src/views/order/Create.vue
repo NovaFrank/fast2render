@@ -148,7 +148,7 @@ import selectDialog2 from '@/common/selectDialog2';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
 import { getUserInfo } from '@/util/utils.js';
-import { createOrder, dataDicAPI, uploadServlet } from '@/api/order.js';
+import { createOrder, dataDicAPI, uploadServlet, submitAudit } from '@/api/order.js';
 import { format, chain, bignumber } from 'mathjs';
 export default {
   components: {
@@ -449,13 +449,22 @@ export default {
       };
       // console.log('params: ' + JSON.stringify(params));
       const res = await createOrder(action, params);
+      const orderNo = res.data.data.orderNumber;
+      const action2 = 'submit';
+      let params2 = {
+        elsAccount: this.elsAccount,
+        toElsAccount: this.formOption.obj.toElsAccount,
+        businessType: 'orderAudit',
+        businessId: orderNo,
+        params: '{"key1":"123"}'
+      };
+      await submitAudit(action2, params2);
       this.$message({
         type: 'success',
-        message: '订单保存成功!'
+        message: '已提交审批!'
       });
-      const orderNo = res.data.data.orderNumber;
-      this.$router.push({ name: 'edits', params: { orderNumber: orderNo } });
-      // this.$router.push({ path: '/list' });
+      this.$router.push({ path: '/list' });
+      // this.$router.push({ name: 'edits', params: { orderNumber: orderNo } });
     },
 
     // 保存 跳转到list

@@ -1,6 +1,7 @@
 <template>
   <basic-container>
     <form-header
+      v-if="!isAudit"
       titleText="预览"
       showButton
       :buttons="headerButtons"
@@ -86,6 +87,7 @@ export default {
   props: {},
   data() {
     return {
+      isAudit: false,
       elsAccount: '',
       elsSubAccount: '',
       inputParamJson: {
@@ -142,6 +144,7 @@ export default {
     };
   },
   async created() {
+    this.isAudit = this.$route.query.isAudit || false;
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;

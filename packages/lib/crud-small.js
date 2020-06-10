@@ -8,7 +8,7 @@ export default {
   indexLabel: '序号',
   labelPosition: 'top',
   page: false,
-  align: 'center',
+  align: 'left',
   menuAlign: 'left',
   menuWidth: '180',
   menuType: 'text',

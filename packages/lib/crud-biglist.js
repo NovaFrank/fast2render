@@ -9,7 +9,7 @@ export default {
   index: true,
   indexLabel: '序号',
   page: true,
-  align: 'center',
+  align: 'left',
   menuAlign: 'left',
   menuWidth: '140',
   menuType: 'text',

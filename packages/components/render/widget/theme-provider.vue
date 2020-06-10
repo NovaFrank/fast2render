@@ -1,7 +1,13 @@
 <template>
   <div>
     <div v-if="spanMethodData.prop">
-      <slot :option="finalOption" :data="myData" :spanMethod="spanMethod" :reload="reload"></slot>
+      <slot
+        :inited="inited"
+        :option="finalOption"
+        :data="myData"
+        :spanMethod="spanMethod"
+        :reload="reload"
+      ></slot>
     </div>
     <div>
       <slot :option="finalOption" :data="myData" :reload="reload"></slot>
@@ -16,6 +22,7 @@ import SmallFormTemplate from '../../../lib/form-small';
 import { mySpanMethod, zipLayout } from '../../../lib/utils.js';
 import { getStore, setStore } from '../../../lib/store.js';
 import { loadBlockConfig, handleColumn } from '../../../lib/blockHander.js';
+import { validateNull } from '../../../lib/validate';
 
 import _ from 'lodash';
 
@@ -33,6 +40,10 @@ export default {
     version: {
       type: String,
       default: null // 远程获取 表格字段数据配置- 后续扩充 from 类型
+    },
+    readOnly: {
+      type: Boolean,
+      default: false // 是否只读模式
     },
     hasRowPermission: {
       type: Boolean,
@@ -70,7 +81,7 @@ export default {
   data() {
     return {
       finalOption: {},
-      reload: false,
+      reload: false, // 是否重新加载完成
       optionHash: ''
     };
   },
@@ -85,6 +96,7 @@ export default {
     // 单点监测 ，避免多次触发
     hash: {
       handler(val) {
+        this.inited = false;
         this.finalOption = getStore(val);
         if (!this.finalOption) {
           this.handlerChange();
@@ -117,6 +129,13 @@ export default {
       this.version ? this.mergeRemoteOption() : this.mergeLocalOption();
     },
     setFinalOption(option) {
+      // 最后统一规则
+      option.detail = this.readOnly;
+      if (this.type !== 'crud' && this.hasRowPermission) {
+        // option.menuBtn = !this.readOnly;
+        //  option.menu = !this.readOnly;
+      }
+
       if (this.hasRowPermission) {
         this.finalOption = this.filterColumWithRule(option, this.rowPermission);
       } else {
@@ -128,13 +147,26 @@ export default {
     },
     filterColumWithRule(option, rowPermission) {
       let newColumn = [];
+      if (!option || !option.column) {
+        console.log('请使用正确的 option 参数');
+        return false;
+      }
+      if (validateNull(rowPermission)) {
+        console.log('请使用配置生成的权限配置');
+        return false;
+      }
       option.column.map((item) => {
         if (rowPermission[item.prop]) {
-          if (rowPermission[item.prop].display) {
-            item.readonly = !rowPermission[item.prop].readonly;
+          let isDisplay = Boolean(rowPermission[item.prop].display === 'true');
+          if (isDisplay) {
+            item.readonly = Boolean(
+              rowPermission[item.prop].readonly === true ||
+                rowPermission[item.prop].readonly === 'true'
+            );
             newColumn.push(item);
           }
-        } else {
+        } else if (item.rules.length) {
+          // 如果有规则定义 推送到列表 不可隐藏
           newColumn.push(item);
         }
       });
@@ -180,9 +212,9 @@ export default {
         JSON.stringify(Object.assign(isBig ? BigListTemplate : SmallListTemplate, option))
       );
       // set option header
-      if (!option.addBtn && !option.header) {
-        option.header = false;
-      }
+      // if (!option.addBtn && !option.header) {
+      //   option.header = false;
+      // }
 
       // set search menu span
       const column = option.column || [];
@@ -197,9 +229,11 @@ export default {
       return newOption;
     },
     handlerOptionForm(option, isBig) {
-      let newOption = JSON.parse(
-        JSON.stringify(Object.assign(isBig ? BigFormTemplate : SmallFormTemplate, option))
-      );
+      // 全部获取身拷贝
+      let handlerOption = JSON.parse(JSON.stringify(option));
+      let newBigForm = JSON.parse(JSON.stringify(BigFormTemplate));
+      let newSmallForm = JSON.parse(JSON.stringify(SmallFormTemplate));
+      let newOption = Object.assign(isBig ? newBigForm : newSmallForm, handlerOption);
       return newOption;
     },
     loadOption(slug) {

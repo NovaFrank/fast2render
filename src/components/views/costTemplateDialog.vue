@@ -51,16 +51,27 @@ export default {
     template(newValue) {
       console.log(newValue);
       this.sumData = newValue.map((item) => {
-        let price = 0;
-        this.$getFormulaValue(
-          this.$getFormulaItem('const-cailiao'),
-          this.data[item.prop].tableData
-        ).forEach((item) => {
-          if (item.price) price += Number(item.price);
-        });
+        if (item.propData.tableData && item.propData.tableData.length > 0) {
+          let price = 0;
+          item.propData.tableData.forEach((t) => {
+            const formula = this.$getFormulaItem(item.prop);
+            price += this.$getFormulaValue(formula, t).price;
+          });
+          return {
+            key: item.label,
+            value: price
+          };
+        } else if (item.propData.formData) {
+          const formula = this.$getFormulaItem(item.prop);
+          let price = this.$getFormulaValue(formula, item.propData.formData).price;
+          return {
+            key: item.label,
+            value: price
+          };
+        }
         return {
           key: item.label,
-          value: price
+          value: 0
         };
       });
     }

@@ -146,11 +146,17 @@ export default {
       this.$confirm('确定删除？', '提示').then(() => {});
     },
     handleEditRow(scope) {
-      this.$router.push({ path: '/new', query: { enquiryNumber: scope.row.enquiryNumber } });
+      this.$router.push({
+        path: `/new/${scope.row.enquiryNumber}`,
+        query: { enquiryNumber: scope.row.enquiryNumber }
+      });
     },
     handleRowClick(row) {
       if (this.tabActive === 'new' || row.itemStatus === '0') {
-        this.$router.push({ path: '/new', query: { enquiryNumber: row.enquiryNumber } });
+        this.$router.push({
+          path: `/new/${row.enquiryNumber}`,
+          query: { enquiryNumber: row.enquiryNumber }
+        });
       } else {
         this.$router.push({ path: `/detail/${row.enquiryNumber}` });
       }

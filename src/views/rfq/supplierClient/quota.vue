@@ -33,11 +33,17 @@
         <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
           {{ getPriceIndex(scope.row, 'priceIncludingTax') }}
         </p>
+        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
+          {{ getCostPriceIndex(scope.row, 'priceIncludingTax') }}
+        </p>
       </template>
       <template slot-scope="scope" slot="priceExcludingTax">
         <span v-if="scope.row.quoteMethod === '0'">{{ scope.row.priceExcludingTax }}</span>
         <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
           {{ getPriceIndex(scope.row, 'priceExcludingTax') }}
+        </p>
+        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
+          {{ getCostPriceIndex(scope.row, 'priceExcludingTax') }}
         </p>
       </template>
       <template slot-scope="scope" slot="quoteMethod">
@@ -57,13 +63,13 @@
         </span>
       </template>
       <template slot-scope="scope" slot="costTemplate">
-        <a
+        <el-link
           class="el-button el-button--text el-button--small"
           @click.stop="handleShowCostTemplate(scope)"
           v-if="scope.row.quoteMethod === '2'"
         >
           {{ JSON.parse(scope.row.costConstituteJson).templateName }}
-        </a>
+        </el-link>
       </template>
       <template slot-scope="scope" slot="quote">
         <avue-radio
@@ -146,6 +152,8 @@ import history from './../history';
 import { validatenull } from '@/util/validate';
 import { dataDicAPI } from '@/api/rfq/common';
 
+const execMathExpress = require('exec-mathexpress');
+
 export default {
   components: {
     FormHeader,
@@ -209,6 +217,31 @@ export default {
       quantityList.push(quantity);
       const index = quantityList.findIndex((item) => item === Number(quantity));
       return JSON.parse(row.ladderPriceJson)[index - 1][column];
+    },
+    getCostPriceIndex(row, column) {
+      const costJson = JSON.parse(row.costConstituteJson);
+      const template = costJson.templateJson;
+      let price = 0;
+      template.forEach((item) => {
+        if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
+          item.propData.tableData.forEach((t) => {
+            const formula = this.$getFormulaItem(item.prop);
+            price += this.$getFormulaValue(formula, t).price;
+          });
+        } else if (item.propData && item.propData.formData) {
+          const formula = this.$getFormulaItem(item.prop);
+          price += this.$getFormulaValue(formula, item.propData.formData).price;
+        }
+      });
+      if (column === 'priceExcludingTax') {
+        const result = execMathExpress('v1 / ( v2 + v3 )', {
+          v1: price || 0,
+          v2: 1,
+          v3: row.taxRate
+        });
+        price = Math.floor((result.num / result.den) * 100) / 100;
+      }
+      return price || 0;
     },
     closeFieldDialog() {
       this.costQuoteVisible = false;

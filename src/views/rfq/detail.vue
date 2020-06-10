@@ -70,13 +70,13 @@
       </template>
       <!-- 成本模板 -->
       <template slot-scope="scope" slot="costTemplate">
-        <a
+        <el-link
           class="el-button el-button--text el-button--small"
           @click.stop="handleShowCostTemplate(scope)"
           v-if="scope.row.quoteMethod === '2'"
         >
           {{ JSON.parse(scope.row.costConstituteJson).templateName }}
-        </a>
+        </el-link>
       </template>
       <template slot="taxRate" slot-scope="scope">
         {{
@@ -85,6 +85,7 @@
             : scope.row.taxRate
         }}
       </template>
+      <!-- 含税 -->
       <template slot-scope="scope" slot="priceIncludingTax">
         <span v-if="scope.row.quoteMethod === '0'">
           <span
@@ -108,7 +109,11 @@
           </span>
           <span v-else>{{ getPriceIndex(scope.row, 'priceIncludingTax') }}</span>
         </p>
+        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
+          {{ getCostPriceIndex(scope.row, 'priceIncludingTax') }}
+        </p>
       </template>
+      <!-- 不含税 -->
       <template slot-scope="scope" slot="priceExcludingTax">
         <span v-if="scope.row.quoteMethod === '0'">
           <span
@@ -132,13 +137,17 @@
           </span>
           <span v-else>{{ getPriceIndex(scope.row, 'priceExcludingTax') }}</span>
         </p>
+        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
+          {{ getCostPriceIndex(scope.row, 'priceExcludingTax') }}
+        </p>
       </template>
+      <!-- 接受/拒绝/重报价 -->
       <template slot-scope="scope" slot="option">
         <el-row
           v-if="
             detailObj.auditStatus !== '0' &&
               detailObj.auditStatus !== '2' &&
-              scope.row.itemStatus === '2' &&
+              scope.row.itemStatus !== '1' &&
               detailObj.quoteEndTime < new Date().getTime()
           "
           :gutter="24"
@@ -147,11 +156,13 @@
             <avue-radio
               v-model="scope.row.itemStatus"
               :dic="dic"
+              :disabled="detailObj.auditStatus === '0' || detailObj.auditStatus === '2'"
               @change="(value) => handleRadioChange(value, scope)"
             ></avue-radio>
           </el-col>
           <el-col :span="12">
             <el-button
+              v-if="detailObj.auditStatus !== '0' && detailObj.auditStatus !== '2'"
               class="el-button el-button--text el-button--small"
               @click.stop="handleAgainQuote(scope.row)"
             >
@@ -217,6 +228,8 @@ import costTemplateDialog from '@/components/views/costTemplateDialog';
 import openDialog from '@/components/views/openDialog';
 import openFormOption from '@/const/rfq/newAndView/openForm';
 import { setStore } from '@/util/store.js';
+
+const execMathExpress = require('exec-mathexpress');
 
 export default {
   components: {
@@ -285,6 +298,15 @@ export default {
   watch: {
     detailObj(newVal) {
       this.quoteEndTimeChange = newVal.quoteEndTime;
+      if (
+        !validatenull(this.quoteEndTimeChange) &&
+        this.quoteEndTimeChange < new Date().getTime()
+      ) {
+        const index = this.headerButtons.findIndex((item) => item.text === '发布新供应商');
+        if (index !== -1) {
+          this.headerButtons.splice(index, 1);
+        }
+      }
     }
   },
   methods: {
@@ -296,6 +318,31 @@ export default {
       quantityList.push(quantity);
       const index = quantityList.findIndex((item) => item === Number(quantity));
       return JSON.parse(row.ladderPriceJson)[index - 1][column];
+    },
+    getCostPriceIndex(row, column) {
+      const costJson = JSON.parse(row.costConstituteJson);
+      const template = costJson.templateJson;
+      let price = 0;
+      template.forEach((item) => {
+        if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
+          item.propData.tableData.forEach((t) => {
+            const formula = this.$getFormulaItem(item.prop);
+            price += this.$getFormulaValue(formula, t).price;
+          });
+        } else if (item.propData && item.propData.formData) {
+          const formula = this.$getFormulaItem(item.prop);
+          price += this.$getFormulaValue(formula, item.propData.formData).price;
+        }
+      });
+      if (column === 'priceExcludingTax') {
+        const result = execMathExpress('v1 / ( v2 + v3 )', {
+          v1: price || 0,
+          v2: 1,
+          v3: row.taxRate
+        });
+        price = Math.floor((result.num / result.den) * 100) / 100;
+      }
+      return price || 0;
     },
     cellStyle() {
       return {
@@ -373,6 +420,11 @@ export default {
       };
     },
     handleNewSupplier() {
+      if (new Date().getTime() > this.detailObj.quoteEndTime) {
+        this.$message.error('报价已截止');
+        this.$router.go(0);
+        return;
+      }
       this.$confirm('是否发布新供应商？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -507,6 +559,7 @@ export default {
         submitAudit(action, params).then((res) => {
           if (res.data.statusCode === '200') {
             this.$message.success('提交审批成功');
+            this.$router.go(0);
             return;
           }
           this.$message.error('提交审批失败');
@@ -533,6 +586,7 @@ export default {
             return;
           }
           this.$message.success('更新截止时间成功');
+          this.$router.go(0);
         });
       });
     },
@@ -584,7 +638,8 @@ export default {
             id: item.uuid,
             $cellEdit:
               item.itemStatus === '4' &&
-              (this.detailObj.auditStatus !== '0' || this.detailObj.auditStatus === '2'),
+              this.detailObj.auditStatus !== '0' &&
+              this.detailObj.auditStatus !== '2',
             ...item
           };
         });

@@ -192,8 +192,8 @@ export default {
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
     this.tableData(); // 加载当前页面需要的数据
-    if (!validatenull(this.$route.query.enquiryNumber)) {
-      this.currentEnquiryNumber = this.$route.query.enquiryNumber;
+    if (!validatenull(this.$route.params.enquiryNumber)) {
+      this.currentEnquiryNumber = this.$route.params.enquiryNumber;
       this.initDetail();
     } else {
       this.currentEnquiryNumber = '';
@@ -432,7 +432,8 @@ export default {
               const enquiryNumber = res.data.data.enquiryNumber;
               this.currentEnquiryNumber = enquiryNumber;
               this.$forceUpdate();
-              this.$router.push({ path: '/new', query: { enquiryNumber } });
+              this.form.enquiryNumber = enquiryNumber;
+              this.$router.push({ path: `/new/${enquiryNumber}`, query: { enquiryNumber } });
             });
           }
         });

@@ -10,8 +10,12 @@ export default {
         prop: 'new'
       },
       {
-        label: '报价中',
-        prop: 'quoting'
+        label: '已报价',
+        prop: 'quoted'
+      },
+      {
+        label: '重报价',
+        prop: 'requote'
       },
       {
         label: '定价',

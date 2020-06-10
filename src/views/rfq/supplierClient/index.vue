@@ -20,21 +20,28 @@
         </el-button>
       </template>
       <template slot-scope="scope" slot="itemStatus">
-        <!-- // new itemStatus 0
-            // quoting itemStatus 1
-            // price itemStatus 4/5
-            // close itemStatus 6 -->
+        <!-- 
+      // new itemStatus 0
+      // quoted itemStatus 1
+      // price itemStatus 4
+      // close itemStatusList 6/5
+
+      // 未报价   itemStatus:1
+      // 已报价   itemStatus:2
+      // 重报价   itemStatus:3
+      // 定价      itemStatus:4
+      // 关闭      itemStatusList:[5,6] -->
         <span>
           {{
-            scope.row.itemStatus === '0'
-              ? '未发布'
-              : scope.row.itemStatus === '1'
-              ? '报价中'
+            scope.row.itemStatus === '1'
+              ? '未报价'
               : scope.row.itemStatus === '2'
               ? '已报价'
-              : ['4', '5'].includes(scope.row.itemStatus)
+              : scope.row.itemStatus === '3'
+              ? '重定价'
+              : scope.row.itemStatus === '4'
               ? '定价'
-              : scope.row.itemStatus === '6'
+              : ['6', '5'].includes(scope.row.itemStatus)
               ? '已关闭'
               : ''
           }}
@@ -149,13 +156,29 @@ export default {
         elsAccount: this.elsAccount
       };
       // new itemStatus 0
-      // quoting itemStatus 1
+      // quoted itemStatus 1
       // price itemStatus 4
       // close itemStatusList 6/5
-      if (['new', 'quoting'].includes(this.tabActive)) {
+
+      // 未报价   itemStatus:1
+      // 已报价   itemStatus:2
+      // 重报价   itemStatus:3
+      // 定价      itemStatus:4
+      // 关闭      itemStatusList:[5,6]
+      if (this.tabActive === 'new') {
         params = {
           ...params,
-          itemStatus: this.tabActive === 'new' ? '0' : '1'
+          itemStatus: '1'
+        };
+      } else if (this.tabActive === 'quoted') {
+        params = {
+          ...params,
+          itemStatus: '2'
+        };
+      } else if (this.tabActive === 'requote') {
+        params = {
+          ...params,
+          itemStatus: '3'
         };
       } else if (this.tabActive === 'price') {
         params = {

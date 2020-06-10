@@ -24,7 +24,7 @@ export default {
     columnBtn: false,
     column: [
       {
-        label: '订单项号',
+        label: '订单行号',
         prop: 'orderItemNumber'
       },
       {

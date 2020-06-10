@@ -44,7 +44,7 @@ export default {
         prop: 'materialDesc'
       },
       {
-        label: '订单项号',
+        label: '订单行号',
         prop: 'orderItemNumber',
         addDisplay: false,
         editDisplay: false

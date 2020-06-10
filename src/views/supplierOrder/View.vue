@@ -40,6 +40,7 @@
     </span>
     <fast2-attachment-list
       ref="attachment"
+      :readonly="fileReadOnly"
       :id="formOption.obj.orderNumber"
       :elsAccount="elsAccount"
       :businessElsAccount="formOption.obj.toElsAccount"
@@ -99,6 +100,7 @@ export default {
   },
   data() {
     return {
+      fileReadOnly: true,
       elsAccount: '',
       elsSubAccount: '',
       inputParamJson: {

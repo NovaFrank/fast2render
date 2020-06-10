@@ -44,6 +44,7 @@
     </span>
     <fast2-attachment-list
       ref="attachment"
+      :readonly="fileReadOnly"
       :id="formOption.obj.orderNumber"
       :elsAccount="elsAccount"
       :businessElsAccount="formOption.obj.toElsAccount"
@@ -110,6 +111,7 @@ export default {
   props: {},
   data() {
     return {
+      fileReadOnly: true,
       elsAccount: '',
       elsSubAccount: '',
       tabOption: tabOption,
@@ -234,8 +236,13 @@ export default {
       const resp2 = await getOrderList(action2, params2);
       const resp3 = await getOrderList(action3, params3);
       this.formOption.obj = resp.data.data;
-      console.log('toElsAccount:' + this.formOption.obj.toElsAccount);
       this.materielListOption.data = resp2.data.data;
+      this.planListOption.data = resp3.data.data;
+      resp3.data.data.map((item) => {
+        item.replyDeliveryDate = item.requestDeliveryDate;
+        item.replyDeliveryQuantity = item.requestDeliveryQuantity;
+        return item;
+      });
       this.planListOption.data = resp3.data.data;
       this.formOption.obj.salePerson = '1001';
     },

@@ -7,7 +7,6 @@ const validateDateTime = (rule, value, callback) => {
 };
 let sessionRequestQuan = sessionStorage.getItem('requestQuantity');
 let replyRequest = Number(JSON.parse(sessionRequestQuan));
-console.log(sessionRequestQuan);
 const validateNumber = (rule, value, callback) => {
   console.log(value);
   if (value && value > replyRequest) {
@@ -42,7 +41,7 @@ export default {
     columnBtn: false,
     column: [
       {
-        label: '订单项号',
+        label: '订单行号',
         labelWidth: 120,
         prop: 'orderItemNumber',
         disabled: true

@@ -10,3 +10,8 @@ export const login = (params) =>
       ...params
     }
   });
+
+const commonApi = {
+  login
+};
+export default commonApi;

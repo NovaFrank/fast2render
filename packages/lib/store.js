@@ -1,4 +1,5 @@
 import { validateNull } from './validate';
+import { isJSON } from './utils';
 /**
  * 存储localStorage
  */
@@ -31,11 +32,15 @@ export const getStore = (params) => {
   if (validateNull(obj)) {
     return;
   }
-  obj = JSON.parse(obj);
-  if (debug) {
+  let newObj = isJSON(obj);
+  if (debug && newObj) {
+    return newObj;
+  } else if (debug) {
     return obj;
+  } else if (!newObj) {
+    return false;
   }
-
+  obj = newObj;
   if (timer) {
     let current = new Date().getTime();
     let datatime = obj.datetime;

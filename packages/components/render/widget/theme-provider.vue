@@ -156,20 +156,28 @@ export default {
         return false;
       }
       option.column.map((item) => {
-        if (rowPermission[item.prop]) {
-          let isDisplay = Boolean(rowPermission[item.prop].display === 'true');
+        const prop = item.prop;
+        const permissionItem = rowPermission[prop];
+
+        if (permissionItem) {
+          let isDisplay = permissionItem.display === true || permissionItem.display === 'true';
+
           if (isDisplay) {
-            item.readonly = Boolean(
-              rowPermission[item.prop].readonly === true ||
-                rowPermission[item.prop].readonly === 'true'
-            );
+            item.readonly = permissionItem.readonly;
+            item.disabled = item.readonly;
             newColumn.push(item);
           }
-        } else if (item.rules.length) {
-          // 如果有规则定义 推送到列表 不可隐藏
-          newColumn.push(item);
+        } else {
+          let isLocalDefine = this.option.column.find((subitem) => {
+            return subitem.prop === prop;
+          });
+
+          if (isLocalDefine) {
+            newColumn.push(item);
+          }
         }
       });
+
       option.column = newColumn;
       return option;
     },

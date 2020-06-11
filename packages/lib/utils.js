@@ -16,6 +16,9 @@ export const vaildForm = (form) => {
   return flag;
 };
 
+/**
+ * 序列化请求数据
+ */
 export const serialize = (data) => {
   let list = [];
   Object.keys(data).forEach((ele) => {
@@ -24,6 +27,9 @@ export const serialize = (data) => {
   return list.join('&');
 };
 
+/**
+ *获取对象类型
+ */
 export const getObjType = (obj) => {
   var toString = Object.prototype.toString;
   var map = {
@@ -46,6 +52,11 @@ export const getObjType = (obj) => {
   return map[toString.call(obj)];
 };
 
+/**
+ *
+ * @param {*} data  要处理的数据
+ * @param {*} expect 默认数据，数据类型不一致将返回默认数据
+ */
 export const formatObject = (data, expect) => {
   let type = getObjType(data);
   let expectType = getObjType(expect);
@@ -208,6 +219,40 @@ export const detailDataType = (value, type) => {
 };
 
 /**
+ *
+ * @param {*} Formulas 要执行的公式， 可多个
+ * @param {*} obj 要被计算的对象
+ */
+export const doCalc = (Formulas, obj) => {
+  if (getObjType(Formulas) === 'string') {
+    let Formula = getFormulaItem(Formulas);
+    let newObj = getFormulaValue(Formula, obj);
+    return newObj;
+  } else if (getObjType(Formulas) === 'array') {
+    let newObj = JSON.parse(JSON.stringify(obj));
+    Formulas.map((item) => {
+      newObj = doCalc(item, newObj);
+    });
+    return newObj;
+  }
+};
+
+/**
+ *
+ * @param {*} Formulas 要执行的公式， 可为数组 [‘formula1’, ‘formula2’] 或者为 字符串 ‘formula1’
+ * @param {*} list 要被计算的列表
+ */
+export const doListCalc = (Formulas, list) => {
+  if (getObjType(list) === 'array') {
+    let newList = list.map((item) => {
+      return doCalc(Formulas, item);
+    });
+    return newList;
+  }
+  return list;
+};
+
+/**
  * 根据字段数组排序
  */
 
@@ -218,6 +263,11 @@ export const vaildData = (val, dafult) => {
   return !validateNull(val) ? val : dafult;
 };
 
+/**
+ *
+ * @param {*} formulaItem   计算公式
+ * @param {*} obj   要处理的数据对象
+ */
 export const getFormulaValue = (formulaItem, obj = {}) => {
   const reference = function(name) {
     return (context) => context[name];
@@ -256,6 +306,11 @@ export const getFormulaValue = (formulaItem, obj = {}) => {
   return obj;
 };
 
+/**
+ *
+ * @param {*} list 用来排序的数组
+ * @param {*} prop 排序对比属性
+ */
 export const sortArrys = (list, prop) => {
   list.sort(function(a, b) {
     if (a[prop] > b[prop]) {
@@ -270,7 +325,7 @@ export const sortArrys = (list, prop) => {
 };
 
 /**
- * @param stringOfObj 查找对象的路径 从子级开始， 以点区隔
+ * @param stringOfObj 查找对象的路径 从子级开始， 以点区隔  this.arr[0].item
  * @param obj 被查找的对象
  */
 export const checkObjExist = (stringOfObj, obj) => {
@@ -293,6 +348,11 @@ export const checkObjExist = (stringOfObj, obj) => {
   return !!value;
 };
 
+/**
+ *
+ * @param {*} str 获取子级数据
+ * @param {*} obj 要获取的对象
+ */
 const getItemChildrenProp = (str, obj) => {
   if (validateNull(str)) {
     return null;
@@ -308,10 +368,18 @@ const getItemChildrenProp = (str, obj) => {
   }
 };
 
+/**
+ *
+ * @param {*} jsonObj 把对象转换为 base64
+ */
 export const zipLayout = (jsonObj) => {
   return btoa(unescape(encodeURIComponent(JSON.stringify(jsonObj))));
 };
 
+/**
+ *
+ * @param {*} jsonObjStr  把 base64 转换为对象
+ */
 export const unzipLayout = (jsonObjStr) => {
   let _atob = '';
   try {
@@ -319,11 +387,16 @@ export const unzipLayout = (jsonObjStr) => {
   } catch (e) {
     _atob = jsonObjStr;
   }
-  const projectObj = JSON.parse(_atob);
+  const projectObj = isJSON(_atob);
   console.log(projectObj, '解压缩数据');
   return projectObj;
 };
 
+/**
+ *
+ * @param {*} str  带数组定义字符串  list[0]
+ * @param {*} obj  要取值的对象
+ */
 export const getItemFormArrayStr = (str, obj) => {
   if (validateNull(obj)) {
     return null;
@@ -337,6 +410,10 @@ export const getItemFormArrayStr = (str, obj) => {
   return newObj[index];
 };
 
+/**
+ *
+ * @param {*} str  判断是否json 数据
+ */
 export function isJSON(str) {
   if (getObjType(str) !== 'string') {
     return false;
@@ -350,38 +427,44 @@ export function isJSON(str) {
   }
 }
 
-export const getDicItem = (action) => {
-  let dicLib = getStore({ name: 'commondic' });
-  if (dicLib && getObjType(dicLib) !== 'object') {
-    dicLib = JSON.parse(dicLib);
+export const getParseJson = (str) => {
+  let isJson = isJSON(str);
+  if (isJson) {
+    return JSON.parse(str);
   }
-  if (dicLib) {
-    let dic = dicLib[action];
-    if (dic) {
-      return dic;
-    }
-  } else {
-    loadDic();
-  }
-  return [];
+  return null;
 };
 
-export const getFormulaItem = (action) => {
-  let lib = getStore({ name: 'commonFormula' });
-  if (lib && getObjType(lib) !== 'object') {
-    lib = JSON.parse(lib);
+/**
+ *
+ * @param {*} action  获取字典条目
+ */
+export const getDicItem = async (action, dic = 'commondic') => {
+  let item = getItemFormMap(action, dic);
+  if (!item) {
+    await loadFormula();
+    item = getItemFormMap(action, dic);
   }
-  if (lib) {
-    let item = lib[action];
-    if (item) {
-      return item;
-    }
-  } else {
-    loadFormula();
-  }
-  return [];
+  return item;
 };
 
+/**
+ *
+ * @param {*} action 公式名称
+ * TODO 如果未找到 尝试刷新公式列表
+ */
+export const getFormulaItem = async (action, dic = 'commonFormula') => {
+  let item = getItemFormMap(action, dic);
+  if (!item) {
+    await loadFormula();
+    item = getItemFormMap(action, dic);
+  }
+  return item;
+};
+
+/**
+ * 初始化所有公式
+ */
 export const getFormulaList = async () => {
   let lib = getStore({ name: 'commonFormula' });
   if (lib && getObjType(lib) !== 'object') {
@@ -389,7 +472,6 @@ export const getFormulaList = async () => {
   } else {
     loadFormula();
   }
-
   let list = [];
   Object.keys(lib).map((item) => {
     let newItem = {
@@ -400,29 +482,49 @@ export const getFormulaList = async () => {
   });
   return list;
 };
-export const getTableItem = (action) => {
-  let lib = getStore({ name: 'allTableColumn' });
-  if (lib && getObjType(lib) !== 'object') {
-    lib = JSON.parse(lib);
+
+/**
+ *
+ * @param {*} action  获取数据库导出字段用来进行字段配置
+ */
+export const getTableItem = async (action) => {
+  let item = getItemFormMap(action, 'allTableColumn');
+  if (!item) {
+    await loadAllTable();
+    item = getItemFormMap(action, 'allTableColumn');
   }
+  return item;
+};
+
+const getItemFormMap = (action, storeName) => {
+  let lib = getStore({ name: storeName });
+  console.log('获取的库', lib);
   if (lib) {
     let item = lib[action];
+    console.log('获取的对象', item);
     if (item) {
       return item;
     }
-  } else {
-    loadAllTable();
   }
-  return [];
+  return null;
+};
+/**
+ * 获取所有数据库字段
+ */
+export const getTableList = async () => {
+  let lib = parseTableList();
+  let list = [];
+  if (!lib) {
+    lib = loadAllTable();
+    list = parseTableList();
+  }
+  return list;
 };
 
-export const getTableList = () => {
+const parseTableList = () => {
   let lib = getStore({ name: 'allTableColumn' });
-  if (lib && getObjType(lib) !== 'object') {
-    lib = JSON.parse(lib);
-  }
+  let list = [];
   if (lib) {
-    let list = [];
     Object.keys(lib).map((item) => {
       let newItem = {
         name: item,
@@ -431,30 +533,29 @@ export const getTableList = () => {
       list.push(newItem);
     });
     return list;
-  } else {
-    loadAllTable();
   }
-  return [];
 };
-
+/**
+ *
+ * @param {*} type 获取指定模版定义
+ */
 export const getTemplateItem = async (type) => {
-  let template = getStore({ name: type });
-  if (template && getObjType(template) !== 'object') {
-    template = JSON.parse(template);
-  }
-  if (template) {
-    return template;
+  let item = getParseJson(getStore({ name: type }));
+  if (item) {
+    return item;
   } else {
-    template = await loadTemplate(type);
-    return template;
+    item = await loadTemplate(type);
+    console.log(item);
+    return item;
   }
 };
 
+/**
+ *
+ * @param {*} type 获取指定组件定义
+ */
 export const getBlockItem = async (type) => {
   let item = getStore({ name: type });
-  if (item && getObjType(item) !== 'object' && getObjType(item) !== 'array') {
-    item = JSON.parse(item);
-  }
   if (item) {
     return item;
   } else {
@@ -477,34 +578,57 @@ export const getBlockFieldItem = async (type) => {
   }
 };
 
-export const loadFormula = () => {
+/**
+ * 加载公式
+ */
+
+export const loadFormula = async () => {
   let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
   let url = `${filePath}formula/index.json`;
-  loadJson(url, 'commonFormula');
+  let item = await loadJson(url, 'commonFormula');
+  return item;
 };
 
-export const loadDic = () => {
+/**
+ * 加载词典
+ */
+export const loadDic = async () => {
   let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
   let url = `${filePath}dic/index.json`;
-  loadJson(url, 'commondic');
+  let item = await loadJson(url, 'commondic');
+  return item;
 };
 
-export const loadAllTable = () => {
+/**
+ * 加载字段
+ */
+export const loadAllTable = async () => {
   let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
   let url = `${filePath}allTableColumn.json`;
-  loadJson(url, 'allTableColumn');
+  let item = await loadJson(url, 'allTableColumn');
+  return item;
 };
 
-export const loadTemplate = (type) => {
+/**
+ *
+ * @param {*} type  加载指定模版
+ */
+export const loadTemplate = async (type) => {
   let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/template/';
   let url = `${filePath}${type}.json`;
-  loadJson(url, type);
+  let item = await loadJson(url, type);
+  return item;
 };
 
-export const loadBlock = (type) => {
+/**
+ *
+ * @param {*} type  加载组件
+ */
+
+export const loadBlock = async (type) => {
   let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/block/';
   let url = `${filePath}${type}.json`;
-  let block = loadJson(url, type);
+  let block = await loadJson(url, type);
   return block;
 };
 
@@ -515,24 +639,23 @@ export const initJson = () => {
 };
 
 export const loadJson = (url, name) => {
-  const xhr = new XMLHttpRequest();
-  xhr.open('get', url, true);
-  xhr.responseType = 'json';
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      console.log('获取文件', url);
-      setStore({ name, content: xhr.response });
-    } else {
-      console.log('获取文件失败', xhr.status, xhr.statusText);
-      this.$message.error('获取文件失败', xhr.statusText);
-    }
-  };
-
-  xhr.onerror = function() {
-    console.log('获取文件失败', xhr.status, xhr.statusText);
-    this.$message.error('获取文件失败', xhr.statusText);
-  };
-  xhr.send();
+  return new Promise(function(resolve, reject) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('get', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        console.log('获取文件', url);
+        setStore({ name, content: xhr.response });
+        resolve(xhr.response);
+      } else {
+        console.log('获取文件失败', xhr.status, xhr.statusText);
+        this.$message.error('获取文件失败', xhr.statusText);
+        reject(new Error('服务器错误，获取文件失败'));
+      }
+    };
+    xhr.send();
+  });
 };
 
 export const makeBlockOutputJson = (page) => {
@@ -671,7 +794,12 @@ const util = {
   unzipLayout,
   makeBlockOutputJson,
   mySpanMethod,
-  renderSize
+  renderSize,
+  getTemplateItem,
+  getDicItem,
+  getFormulaItem,
+  getBlockItem,
+  doCalc
 };
 
 export default util;

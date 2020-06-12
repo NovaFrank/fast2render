@@ -4,6 +4,7 @@
       titleText="新建询价单"
       showButton
       :buttons="headerButtons"
+      @on-test="handleTest"
       @on-back="handleBack"
       @on-cancel="handleCancel"
       @on-close="handleClose"
@@ -112,6 +113,11 @@
       :crudObj="currentDetailItem"
       @on-save="suppliersDialogSaveTransfer"
     ></select-supplier-dialog>
+    <relation-dialog
+      :dialogVisible.sync="relationDialogVisable"
+      :leftData="selectedSupplier"
+      :rightData="relation"
+    ></relation-dialog>
   </basic-container>
 </template>
 
@@ -125,6 +131,7 @@ import tabOption from '@/const/rfq/newAndView/tabs';
 import inquiryListOption from '@/const/rfq/newAndView/inquiryList';
 import filesOption from '@/const/rfq/newAndView/files';
 import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
+import relationDialog from './relationship/dialog';
 import selectSupplierDialog from '@/components/views/selectSupplierDialog';
 import { getUserInfo } from '@/util/utils.js';
 
@@ -137,16 +144,20 @@ import {
 } from '@/api/rfq/common';
 import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
 import { validatenull } from '@/util/validate';
+import { testSuppliers } from '@/api/rfq/index';
 
 export default {
   components: {
     FormHeader,
     fieldDialog,
     // SelectDialogTable,
-    selectSupplierDialog
+    selectSupplierDialog,
+    relationDialog
   },
   data() {
     return {
+      relation: {},
+      selectedSupplier: [],
       data: {},
       elsAccount: '',
       elsSubAccount: '',
@@ -184,6 +195,7 @@ export default {
       currentDetailItem: {}, // 当前选中物料行
       currentSelectionDetailItems: [],
       currentDetailItemSelected: [], // 当前选中物料行已有供应商 toElsAccount,
+      relationDialogVisable: false,
       currentEnquiryNumber: ''
     };
   },
@@ -219,6 +231,7 @@ export default {
         this.headerButtons = [
           // { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
           { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
+          { power: true, text: '生成监测', type: 'primary', size: '', action: 'on-test' },
           { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
           { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
           { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
@@ -230,6 +243,7 @@ export default {
           // { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
           // { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
           { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
+          { power: true, text: '生成监测', type: 'primary', size: '', action: 'on-test' },
           { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
           { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
           { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' }
@@ -563,6 +577,11 @@ export default {
         }
       });
     },
+    showRelationDialog(selectedSupplier, relation) {
+      this.selectedSupplier = selectedSupplier;
+      this.relation = relation;
+      this.relationDialogVisable = true;
+    },
     suppliersDialogSaveTransfer(selectedSupplier) {
       // this.currentSelectionDetailItems;
       if (this.currentSelectionDetailItems.length > 0) {
@@ -690,6 +709,34 @@ export default {
       // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
       const newFile = new File([file], '1234', { type: file.type });
       done(newFile);
+    },
+    handleTest() {
+      let selectSuppliers = [];
+      this.inquiryListOption.data.forEach((item) => {
+        if (item.toElsAccountList) {
+          item.toElsAccountList.split(',').forEach((i) => {
+            selectSuppliers.push(i.split('_')[1]);
+          });
+        }
+      });
+      if (selectSuppliers.length > 0) {
+        testSuppliers(selectSuppliers)
+          .then((res) => {
+            if (res.data.statusCode === '200') {
+              this.showRelationDialog(
+                selectSuppliers,
+                res.data.data.data['companyRelationshipVOS']
+              );
+            } else {
+              this.$message.error('查询失败' || res.data.message);
+            }
+          })
+          .catch((res) => {
+            this.$message.error('查询失败');
+          });
+      } else {
+        this.$message.error('请选择供应商');
+      }
     }
   }
 };

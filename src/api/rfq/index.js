@@ -58,3 +58,12 @@ export const costTemplateList = (params) => {
     }
   });
 };
+
+// 风险监测
+export const testSuppliers = (params) => {
+  return request({
+    url: `${prefix}/inquiry/PurchaseEnquiryService/findEnterpriseRelations`,
+    method: 'post',
+    data: params
+  });
+};

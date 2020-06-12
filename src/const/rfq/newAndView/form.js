@@ -24,22 +24,6 @@ export default {
       span: 6,
       prop: 'enquiryDesc'
     },
-    // {
-    //   type: 'date',
-    //   format: 'yyyy-MM-dd',
-    //   valueFormat: 'timestamp',
-    //   label: '询价日期',
-    //   span: 6,
-    //   prop: 'createDate',
-    //   rules: [
-    //     {
-    //       required: true,
-    //       message: '请选择询价日期',
-    //       trigger: 'blur'
-    //     }
-    //   ]
-    // },
-    // 公司代码 - 默认
     {
       type: 'tree',
       label: '公司代码',

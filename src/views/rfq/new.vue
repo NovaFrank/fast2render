@@ -191,6 +191,19 @@ export default {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
+    this.$getBlockItem('rfq-header').then((res) => {
+      this.formOption.column = res[0].data.column.map((item) => {
+        if (item.prop === 'enquiryNumber') item.formslot = true;
+        if (item.prop === 'companyCode') item.type = 'tree';
+        if (item.prop === 'quoteEndTime') {
+          item.type = 'datetime';
+          item.format = 'yyyy-MM-dd HH:mm:ss';
+          item.valueFormat = 'timestamp';
+        }
+        if (item.prop === 'enquiryType') item.type = 'select';
+        return item;
+      });
+    });
     this.tableData(); // 加载当前页面需要的数据
     if (!validatenull(this.$route.params.enquiryNumber)) {
       this.currentEnquiryNumber = this.$route.params.enquiryNumber;

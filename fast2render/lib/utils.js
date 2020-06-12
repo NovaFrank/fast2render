@@ -451,9 +451,6 @@ export const getTemplateItem = async (type) => {
 
 export const getBlockItem = async (type) => {
   let item = getStore({ name: type });
-  if (item && getObjType(item) !== 'object' && getObjType(item) !== 'array') {
-    item = JSON.parse(item);
-  }
   if (item) {
     return item;
   } else {
@@ -500,10 +497,10 @@ export const loadTemplate = (type) => {
   loadJson(url, type);
 };
 
-export const loadBlock = (type) => {
+export const loadBlock = async (type) => {
   let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/block/';
   let url = `${filePath}${type}.json`;
-  let block = loadJson(url, type);
+  let block = await loadJson(url, type);
   return block;
 };
 
@@ -514,24 +511,23 @@ export const initJson = () => {
 };
 
 export const loadJson = (url, name) => {
-  const xhr = new XMLHttpRequest();
-  xhr.open('get', url, true);
-  xhr.responseType = 'json';
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      console.log('获取文件', url);
-      setStore({ name, content: xhr.response });
-    } else {
-      console.log('获取文件失败', xhr.status, xhr.statusText);
-      this.$message.error('获取文件失败', xhr.statusText);
-    }
-  };
-
-  xhr.onerror = function() {
-    console.log('获取文件失败', xhr.status, xhr.statusText);
-    this.$message.error('获取文件失败', xhr.statusText);
-  };
-  xhr.send();
+  return new Promise(function(resolve, reject) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('get', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        console.log('获取文件', url);
+        setStore({ name, content: xhr.response });
+        resolve(xhr.response);
+      } else {
+        console.log('获取文件失败', xhr.status, xhr.statusText);
+        this.$message.error('获取文件失败', xhr.statusText);
+        reject(new Error('服务器错误，获取文件失败'));
+      }
+    };
+    xhr.send();
+  });
 };
 
 export const makeBlockOutputJson = (page) => {

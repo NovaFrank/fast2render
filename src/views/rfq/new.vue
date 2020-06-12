@@ -15,23 +15,6 @@
       <template slot="enquiryNumber">
         <span>{{ currentEnquiryNumber || '待生成' }}</span>
       </template>
-      <template slot="enquiryType">
-        <el-select
-          v-model="form.enquiryType"
-          @change="handleEnquiryTypeChange"
-          filterable
-          clearable
-          placeholder="请选择 成本模板"
-        >
-          <el-option
-            v-for="item in requestTypeDict"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
-        </el-select>
-      </template>
     </avue-form>
     <!-- 标准询价 -->
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
@@ -155,8 +138,6 @@ import {
 import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
 import { validatenull } from '@/util/validate';
 
-import { ElsTemplateConfigService } from '@/api/templateConfig.js';
-
 export default {
   components: {
     FormHeader,
@@ -219,11 +200,7 @@ export default {
           item.format = 'yyyy-MM-dd HH:mm:ss';
           item.valueFormat = 'timestamp';
         }
-        if (item.prop === 'enquiryType') {
-          item.type = 'select';
-          item.dicUrl = '';
-          item.formslot = true;
-        }
+        if (item.prop === 'enquiryType') item.type = 'select';
         return item;
       });
     });
@@ -476,17 +453,15 @@ export default {
       });
     },
     handleShowSupplierSelect() {
+      console.log(
+        'this.currentSelectionDetailItems.length',
+        this.currentSelectionDetailItems.length
+      );
       if (!validatenull(this.currentDetailItem) || this.currentSelectionDetailItems.length > 0) {
         this.suppliersDialogVisable = true;
         return;
       }
       this.$message.warning('请选择询价明细');
-    },
-    handleEnquiryTypeChange(value) {
-      this.inquiryListOption = inquiryListOption;
-      const current = this.configurations[value].tableColumns;
-      this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
-      this.dialogOption.column = this.dialogOption.column.concat(current);
     },
     handleTabChange(value) {
       this.tabActive = value.prop;
@@ -589,6 +564,7 @@ export default {
       });
     },
     suppliersDialogSaveTransfer(selectedSupplier) {
+      // this.currentSelectionDetailItems;
       if (this.currentSelectionDetailItems.length > 0) {
         this.currentSelectionDetailItems.forEach((item) => {
           const index = item.$index;
@@ -610,54 +586,6 @@ export default {
       this.currentSelectionDetailItems = [];
     },
     tableData(data) {
-      ElsTemplateConfigService.find({
-        elsAccount: this.elsAccount,
-        businessModule: 'enquiry',
-        currentVersionFlag: 'Y'
-      })
-        .then((res) => {
-          this.requestTypeDict = [];
-          const configurations = [];
-
-          if (res.data && res.data.statusCode === '200' && res.data.pageData) {
-            const rows = res.data.pageData.rows || [];
-            const userStation = this.elsAccountStation;
-
-            for (const item of rows) {
-              const json = JSON.parse(item.configJson);
-              const table = json.table;
-
-              const tableJson = json.tableJson || {};
-              const tablePermission = tableJson[userStation] || {};
-
-              this.requestTypeDict.push({
-                value: item.templateNumber,
-                label: item.templateName
-              });
-
-              configurations[item.templateNumber] = {
-                name: item.templateName,
-                tableColumns: table,
-                tablePermission: tablePermission
-              };
-            }
-            console.log(this.requestTypeDict);
-            this.formOption.column = this.formOption.column.map((item) => {
-              if (item.prop === 'enquiryType') {
-                item.type = 'select';
-                item.dicData = this.requestTypeDict;
-              }
-              return item;
-            });
-
-            this.configurations = configurations;
-          } else {
-            this.$message.error('查找配置数据失败, ' + res.data.message || '');
-          }
-        })
-        .catch((err) => {
-          this.$message.error('查找配置数据失败, ' + err.message || '');
-        });
       // 组织列表（公司）
       orgList().then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {

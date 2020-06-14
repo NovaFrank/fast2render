@@ -31,14 +31,6 @@ export default {
       prop: 'materialNumber',
       rules: [{ required: true, message: '请选择物料编号', trigger: 'blur' }]
     },
-    // {
-    //   label: '物料名称',
-    //   prop: 'materialName'
-    // },
-    // {
-    //   label: '物料描述',
-    //   prop: 'materialDesc'
-    // },
     {
       type: 'date',
       format: 'yyyy-MM-dd',
@@ -73,7 +65,6 @@ export default {
       label: '税率',
       prop: 'taxRate',
       disabled: true
-      // rules: [{ trigger: 'blur', validator: validateTaxRate }]
     },
     {
       dicUrl: '/layout/dics/value/currency',
@@ -96,14 +87,6 @@ export default {
       label: '',
       prop: 'ladderPriceJson'
     }
-    // {
-    //   type: 'tree',
-    //   span: 24,
-    //   label: '供应商',
-    //   prop: 'toElsAccountList',
-    //   multiple: true
-    //   // formslot: true
-    // },
   ],
   menuBtn: true,
   emptyBtn: false,

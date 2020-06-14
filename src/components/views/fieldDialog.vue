@@ -6,11 +6,12 @@
     :visible.sync="fieldDialogVisible"
     :before-close="closeDialog"
   >
-    <avue-form ref="form" :option="dialogOption" v-model="form" class="new-field">
+    <avue-form ref="formField" :option="dialogOption" v-model="form" class="new-field">
       <template slot="ladderPriceJson">
         <div>
           <div v-if="form.quoteMethod === '1'">
             <avue-form
+              ref="ladderForm"
               @submit="submitLadderForm"
               :option="ladderFormOption.option"
               v-model="ladderFormOption.form"
@@ -129,6 +130,11 @@ export default {
     //     this.tabPermission = JSON.parse(this.templateList[index].configJson);
     //   }
     // },
+    // fieldDialogVisible(newVal) {
+    //   this.$nextTick(() => {
+    //     if (this.$refs.formField) this.$refs.formField.resetFields(); // 等弹窗里的form表单的dom渲染完在执行this.$refs.staffForm.resetFields()，去除验证
+    //   });
+    // },
     field(newVal) {
       this.form = newVal;
       console.log('this.form', this.form);
@@ -149,7 +155,6 @@ export default {
       const index = this.templateList.findIndex((item) => item.templateName === value);
       if (index === -1) this.tabPermission = {};
       else this.tabPermission = JSON.parse(this.templateList[index].configJson);
-      console.log(this.tabPermission);
     },
     costTemplateList() {
       const userInfo = getUserInfo();
@@ -195,7 +200,7 @@ export default {
         const costConstituteJson = JSON.stringify(obj);
         this.form.costConstituteJson = costConstituteJson;
       }
-      this.$refs.form.validate((valid) => {
+      this.$refs.formField.validate((valid) => {
         if (valid) {
           this.$emit('on-save-form', this.form);
         }

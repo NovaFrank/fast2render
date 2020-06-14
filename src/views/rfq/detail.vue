@@ -20,12 +20,30 @@
       <template slot="quoteEndTime">
         <el-date-picker
           v-model="quoteEndTimeChange"
-          :disabled="this.detailObj.auditStatus === '0' || this.detailObj.auditStatus === '2'"
+          :disabled="detailObj.auditStatus === '0' || detailObj.auditStatus === '2'"
           type="datetime"
           placeholder="选择日期时间"
           value-format="timestamp"
           @change="handleQuoteEndTime"
         ></el-date-picker>
+      </template>
+      <template slot="enquiryType">
+        <el-select
+          v-model="detailObj.enquiryType"
+          @change="handleEnquiryTypeChange"
+          filterable
+          clearable
+          disabled
+          placeholder="请选择 成本模板"
+        >
+          <el-option
+            v-for="item in requestTypeDict"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
       </template>
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
@@ -110,7 +128,15 @@
           <span v-else>{{ getPriceIndex(scope.row, 'priceIncludingTax') }}</span>
         </p>
         <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
-          {{ getCostPriceIndex(scope.row, 'priceIncludingTax') }}
+          <span
+            v-if="
+              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
+                detailObj.quoteEndTime > new Date().getTime()
+            "
+          >
+            **
+          </span>
+          <span v-else>{{ getCostPriceIndex(scope.row, 'priceIncludingTax') }}</span>
         </p>
       </template>
       <!-- 不含税 -->
@@ -138,7 +164,15 @@
           <span v-else>{{ getPriceIndex(scope.row, 'priceExcludingTax') }}</span>
         </p>
         <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
-          {{ getCostPriceIndex(scope.row, 'priceExcludingTax') }}
+          <span
+            v-if="
+              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
+                detailObj.quoteEndTime > new Date().getTime()
+            "
+          >
+            **
+          </span>
+          <span v-else>{{ getCostPriceIndex(scope.row, 'priceExcludingTax') }}</span>
         </p>
       </template>
       <!-- 接受/拒绝/重报价 -->
@@ -228,6 +262,7 @@ import costTemplateDialog from '@/components/views/costTemplateDialog';
 import openDialog from '@/components/views/openDialog';
 import openFormOption from '@/const/rfq/newAndView/openForm';
 import { setStore } from '@/util/store.js';
+import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 
 const execMathExpress = require('exec-mathexpress');
 
@@ -283,7 +318,9 @@ export default {
       currentDetailItemSelected: [], // 当前选中物料行已有供应商 toElsAccount,
       timeHistory: [],
       quoteEndTimeChange: null,
-      currentEnquiryNumber: ''
+      currentEnquiryNumber: '',
+      requestTypeDict: [],
+      configurations: {}
     };
   },
   created() {
@@ -308,12 +345,14 @@ export default {
           item.format = 'yyyy-MM-dd';
           item.valueFormat = 'timestamp';
         }
-        if (item.prop === 'enquiryType') item.type = 'select';
+        if (item.prop === 'enquiryType') {
+          item.type = 'select';
+          item.formslot = true;
+        }
         return item;
       });
     });
     this.tableData();
-    this.initDetail();
   },
   watch: {
     detailObj(newVal) {
@@ -327,9 +366,113 @@ export default {
           this.headerButtons.splice(index, 1);
         }
       }
+      if (!validatenull(newVal.enquiryType)) {
+        this.handleEnquiryTypeChange(newVal.enquiryType);
+      }
     }
   },
   methods: {
+    async tableData(data) {
+      const res = await ElsTemplateConfigService.find({
+        elsAccount: this.elsAccount,
+        businessModule: 'enquiry',
+        currentVersionFlag: 'Y'
+      });
+      if (res.data && res.data.statusCode === '200' && res.data.pageData) {
+        let configurations = [];
+        const rows = res.data.pageData.rows || [];
+        for (const item of rows) {
+          const json = JSON.parse(item.configJson);
+          const table = json.table;
+          this.requestTypeDict.push({
+            value: item.templateNumber,
+            label: item.templateName
+          });
+          configurations[item.templateNumber] = {
+            name: item.templateName,
+            tableColumns: table
+          };
+        }
+        this.configurations = configurations;
+      }
+      // 报价方式 数据字典
+      dataDicAPI('quoteMethod').then((res) => {
+        this.quoteMethodData = res.data;
+      });
+      // dataDicAPI('enquiryType').then((res) => {
+      //   this.formOption.column = this.formOption.column.map((item) => {
+      //     if (item.prop === 'enquiryType') {
+      //       return {
+      //         ...item,
+      //         dicData: res.data
+      //       };
+      //     }
+      //     return item;
+      //   });
+      // });
+      // 供应商列表 supplierMasterListAction
+      supplierMasterListAction({ elsAccount: this.elsAccount, pageSize: 10000 }).then((res) => {
+        this.supplierList = res.data.pageData.rows;
+        this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
+          return {
+            label: item.toElsAccount,
+            key: item.toElsAccount
+          };
+        });
+      });
+      this.initDetail();
+    },
+    handleEnquiryTypeChange(value) {
+      this.inquiryListOption.option.column = [
+        { label: '物料编号', prop: 'materialNumber' },
+        { label: '物料名称', prop: 'materialName' },
+        { label: '物料描述', prop: 'materialDesc' },
+        { label: '规格', prop: 'materialSpecifications' },
+        {
+          label: '单位',
+          prop: 'baseUnit',
+          span: 4
+        },
+        { label: '需求数量', prop: 'quantity' },
+        { slot: true, label: '报价方式', prop: 'quoteMethod' },
+        { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
+        { slot: true, label: '成本模板', prop: 'costTemplate' },
+        { label: '供应商', prop: 'toElsAccount' },
+        {
+          type: 'select',
+          label: '状态',
+          prop: 'itemStatus',
+          dicData: [
+            { label: '已报价', value: '2' },
+            { label: '报价中', value: '1' },
+            { label: '已接受', value: '4' },
+            { label: '已拒绝', value: '5' },
+            { label: '重报价', value: '3' }
+          ]
+        },
+        { slot: true, label: '税率', prop: 'taxRate' },
+        { slot: true, label: '含税价', prop: 'priceIncludingTax' },
+        { slot: true, label: '不含税价', prop: 'priceExcludingTax' },
+        {
+          type: 'date',
+          format: 'yyyy-MM-dd',
+          valueFormat: 'timestamp',
+          label: '交货日期',
+          prop: 'deliveryDate'
+        },
+        { slot: true, label: '操作', prop: 'option' },
+        { label: '配额', prop: 'quota', cell: true }
+      ];
+      const current = this.configurations[value].tableColumns.map((item) => {
+        let result = {};
+        result.prop = item.prop;
+        result.label = item.label;
+        result.display = item.purchaseShow;
+        result.span = item.span;
+        return result;
+      });
+      this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+    },
     getPriceIndex(row, column) {
       const quantity = row.quantity;
       const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
@@ -715,33 +858,6 @@ export default {
       this.inquiryListOption.data = this.inquiryListOption.data
         .concat(itemList)
         .sort(compare('materialNumber'));
-    },
-    tableData(data) {
-      // 报价方式 数据字典
-      dataDicAPI('quoteMethod').then((res) => {
-        this.quoteMethodData = res.data;
-      });
-      dataDicAPI('enquiryType').then((res) => {
-        this.formOption.column = this.formOption.column.map((item) => {
-          if (item.prop === 'enquiryType') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
-      // 供应商列表 supplierMasterListAction
-      supplierMasterListAction({ elsAccount: this.elsAccount, pageSize: 10000 }).then((res) => {
-        this.supplierList = res.data.pageData.rows;
-        this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
-          return {
-            label: item.toElsAccount,
-            key: item.toElsAccount
-          };
-        });
-      });
     },
     uploadAfter(res, done, loading) {
       console.log('after upload', res);

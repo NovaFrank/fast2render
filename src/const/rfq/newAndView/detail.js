@@ -22,7 +22,7 @@ export default {
     {
       type: 'select',
       // dicData: DIC.TABLE_CONFIG_DEFAULT,
-      dicUrl: '/layout/dics/value/enquiryType',
+      // dicUrl: '/layout/dics/value/enquiryType',
       dicMethod: 'get',
       label: '询价类型',
       span: 6,

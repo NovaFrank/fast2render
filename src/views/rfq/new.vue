@@ -16,16 +16,26 @@
       <template slot="enquiryNumber">
         <span>{{ currentEnquiryNumber || '待生成' }}</span>
       </template>
+      <template slot="enquiryType">
+        <el-select
+          v-model="form.enquiryType"
+          @change="handleEnquiryTypeChange"
+          filterable
+          clearable
+          placeholder="请选择 成本模板"
+        >
+          <el-option
+            v-for="item in requestTypeDict"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+      </template>
     </avue-form>
     <!-- 标准询价 -->
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
-    <!-- <avue-form
-      v-if="tabActive === 'files'"
-      :option="filesOption.option"
-      v-model="filesForm"
-      :upload-before="uploadBefore"
-      :upload-after="uploadAfter"
-    ></avue-form> -->
     <!-- 表单文件 -->
     <fast2-attachment-list
       ref="attachment"
@@ -146,6 +156,8 @@ import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
 import { validatenull } from '@/util/validate';
 import { testSuppliers } from '@/api/rfq/index';
 
+import { ElsTemplateConfigService } from '@/api/templateConfig.js';
+
 export default {
   components: {
     FormHeader,
@@ -196,7 +208,9 @@ export default {
       currentSelectionDetailItems: [],
       currentDetailItemSelected: [], // 当前选中物料行已有供应商 toElsAccount,
       relationDialogVisable: false,
-      currentEnquiryNumber: ''
+      currentEnquiryNumber: '',
+      requestTypeDict: [],
+      configurations: {}
     };
   },
   created() {
@@ -212,7 +226,10 @@ export default {
           item.format = 'yyyy-MM-dd HH:mm:ss';
           item.valueFormat = 'timestamp';
         }
-        if (item.prop === 'enquiryType') item.type = 'select';
+        if (item.prop === 'enquiryType') {
+          item.type = 'select';
+          item.formslot = true;
+        }
         return item;
       });
     });
@@ -258,22 +275,193 @@ export default {
           action: 'on-delete'
         });
       }
+      if (newVal.enquiryType) {
+        console.log(newVal.enquiryType);
+        this.handleEnquiryTypeChange(newVal.enquiryType);
+      }
       // this.inquiryListOption.data = [];
       this.$forceUpdate();
     }
   },
   methods: {
-    closeFieldDialog() {
-      this.fieldDialogVisible = false;
-    },
-    currentChange(val) {
-      this.inquiryListOption.page.currentPage = val;
-      this.tableData({
-        currentPage: val,
-        pageSize: this.inquiryListOption.page.pageSize
+    handleEnquiryTypeChange(value) {
+      this.inquiryListOption.option.column = [
+        { label: '物料编号', prop: 'materialNumber' },
+        { label: '物料名称', prop: 'materialName' },
+        { label: '物料描述', prop: 'materialDesc' },
+        { label: '规格', prop: 'materialSpecifications' },
+        { label: '单位', prop: 'baseUnit', span: 4 },
+        { label: '需求数量', prop: 'quantity' },
+        { label: '供应商', prop: 'toElsAccountList' },
+        {
+          type: 'date',
+          format: 'yyyy-MM-dd',
+          valueFormat: 'timestamp',
+          label: '要求交期',
+          prop: 'deliveryDate'
+        },
+        {
+          type: 'date',
+          format: 'yyyy-MM-dd',
+          valueFormat: 'timestamp',
+          label: '交货日期',
+          prop: 'canDeliveryDate'
+        },
+        { slot: true, label: '报价方式', prop: 'quoteMethod' },
+        { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
+        { slot: true, label: '成本模板', prop: 'costTemplate' }
+      ];
+      const current = this.configurations[value].tableColumns.map((item) => {
+        let result = {};
+        result.prop = item.prop;
+        result.label = item.label;
+        result.display = item.purchaseShow;
+        result.span = item.span;
+        result.type = item.type;
+        result.dicData = item.dicData;
+        result.dicUrl = item.dicUrl;
+        result.dicMethod = item.dicMethod;
+        return result;
       });
+      this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+      this.dialogOption.column = this.dialogOption.column.concat(current);
     },
     handleAddShow(title, row) {
+      this.fieldDialogForm = title === '添加' ? {} : row;
+      this.dialogTitle = `${title}询价明细`;
+      this.fieldDialogVisible = true;
+      this.$nextTick(() => {
+        if (this.$refs.formField) this.$refs.formField.resetFields(); // 等弹窗里的form表单的dom渲染完在执行this.$refs.staffForm.resetFields()，去除验证
+      });
+    },
+    tableData(data) {
+      ElsTemplateConfigService.find({
+        elsAccount: this.elsAccount,
+        businessModule: 'enquiry',
+        currentVersionFlag: 'Y'
+      })
+        .then((res) => {
+          this.requestTypeDict = [];
+          const configurations = [];
+
+          if (res.data && res.data.statusCode === '200' && res.data.pageData) {
+            const rows = res.data.pageData.rows || [];
+            for (const item of rows) {
+              const json = JSON.parse(item.configJson);
+              const table = json.table;
+              this.requestTypeDict.push({
+                value: item.templateNumber,
+                label: item.templateName
+              });
+              configurations[item.templateNumber] = {
+                name: item.templateName,
+                tableColumns: table
+              };
+            }
+            this.configurations = configurations;
+          } else {
+            this.requestTypeDict = [];
+            this.$message.error('查找采购申请配置数据失败, ' + res.data.message || '');
+          }
+        })
+        .catch((err) => {
+          this.requestTypeDict = [];
+          this.$message.error('查找采购申请配置数据失败, ' + err.message || '');
+        });
+      // 组织列表（公司）
+      orgList().then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'companyCode') {
+            return {
+              ...item,
+              dicData: res.data.pageData.rows.map((item) => {
+                return {
+                  ...item,
+                  value: item.orgId,
+                  label: item.orgId // `${item.orgId}_${item.orgDesc}`
+                };
+              })
+            };
+          }
+          return item;
+        });
+      });
+      // 公开方式 数据字典
+      // dataDicAPI('enquiryMethod').then((res) => {
+      //   this.formOption.column = this.formOption.column.map((item) => {
+      //     if (item.prop === 'enquiryMethod') {
+      //       return {
+      //         ...item,
+      //         dicData: res.data
+      //       };
+      //     }
+      //     return item;
+      //   });
+      // });
+      // 负责人 accountListAction
+      accountListAction({ elsAccount: this.elsAccount }).then((res) => {
+        this.accountList = res.data.pageData.rows;
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'responsible') {
+            return {
+              dicData: this.accountList.map((item) => {
+                return {
+                  label: `${item.elsAccount}_${item.name}`,
+                  value: `${item.elsAccount}_${item.name}`
+                };
+              }),
+              ...item
+            };
+          }
+          return item;
+        });
+      });
+      // 报价方式 数据字典
+      dataDicAPI('quoteMethod').then((res) => {
+        this.quoteMethodData = res.data;
+      });
+      // 供应商列表 supplierMasterListAction
+      supplierMasterListAction({ elsAccount: this.elsAccount, pageSize: 10000 }).then((res) => {
+        this.supplierList = res.data.pageData.rows;
+        this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
+          return {
+            label: `${item.toElsAccount}_${item.supplierName}`,
+            key: `${item.toElsAccount}_${item.supplierName}`
+          };
+        });
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
+          if (item.prop === 'toElsAccountList') {
+            return {
+              dicData: this.supplierList.map((item) => {
+                return {
+                  label: `${item.toElsAccount}_${item.supplierName}`,
+                  value: `${item.toElsAccount}_${item.supplierName}`
+                };
+              }),
+              ...item
+            };
+          }
+          return item;
+        });
+      });
+      // 物料列表
+      materialListAction({ elsAccount: this.elsAccount }).then((res) => {
+        this.materialList = res.data.pageData.rows;
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
+          if (item.prop === 'materialNumber') {
+            return {
+              dicData: this.materialList.map((item) => {
+                return {
+                  label: item.materialNumber,
+                  value: item.materialNumber
+                };
+              }),
+              ...item
+            };
+          }
+          return item;
+        });
+      });
       // 税率
       dataDicAPI('taxRate').then((res) => {
         this.dialogOption.column = this.dialogOption.column.map((item) => {
@@ -291,9 +479,16 @@ export default {
           return item;
         });
       });
-      this.fieldDialogForm = title === '添加' ? {} : row;
-      this.dialogTitle = `${title}询价明细`;
-      this.fieldDialogVisible = true;
+    },
+    closeFieldDialog() {
+      this.fieldDialogVisible = false;
+    },
+    currentChange(val) {
+      this.inquiryListOption.page.currentPage = val;
+      this.tableData({
+        currentPage: val,
+        pageSize: this.inquiryListOption.page.pageSize
+      });
     },
     handleClose() {
       this.$confirm('是否关闭？', '提示', {
@@ -603,112 +798,6 @@ export default {
       );
       this.currentDetailItem = {};
       this.currentSelectionDetailItems = [];
-    },
-    tableData(data) {
-      // 组织列表（公司）
-      orgList().then((res) => {
-        this.formOption.column = this.formOption.column.map((item) => {
-          if (item.prop === 'companyCode') {
-            return {
-              ...item,
-              dicData: res.data.pageData.rows.map((item) => {
-                return {
-                  ...item,
-                  value: item.orgId,
-                  label: item.orgId // `${item.orgId}_${item.orgDesc}`
-                };
-              })
-            };
-          }
-          return item;
-        });
-      });
-      // 公开方式 数据字典
-      dataDicAPI('enquiryMethod').then((res) => {
-        this.formOption.column = this.formOption.column.map((item) => {
-          if (item.prop === 'enquiryMethod') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
-      // 负责人 accountListAction
-      accountListAction({ elsAccount: this.elsAccount }).then((res) => {
-        this.accountList = res.data.pageData.rows;
-        this.formOption.column = this.formOption.column.map((item) => {
-          if (item.prop === 'responsible') {
-            return {
-              dicData: this.accountList.map((item) => {
-                return {
-                  label: `${item.elsAccount}_${item.name}`,
-                  value: `${item.elsAccount}_${item.name}`
-                };
-              }),
-              ...item
-            };
-          }
-          return item;
-        });
-      });
-      // 报价方式 数据字典
-      dataDicAPI('quoteMethod').then((res) => {
-        this.quoteMethodData = res.data;
-      });
-      // 供应商列表 supplierMasterListAction
-      supplierMasterListAction({ elsAccount: this.elsAccount, pageSize: 10000 }).then((res) => {
-        this.supplierList = res.data.pageData.rows;
-        this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
-          return {
-            label: `${item.toElsAccount}_${item.supplierName}`,
-            key: `${item.toElsAccount}_${item.supplierName}`
-          };
-        });
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'toElsAccountList') {
-            return {
-              dicData: this.supplierList.map((item) => {
-                return {
-                  label: `${item.toElsAccount}_${item.supplierName}`,
-                  value: `${item.toElsAccount}_${item.supplierName}`
-                };
-              }),
-              ...item
-            };
-          }
-          return item;
-        });
-      });
-      // 物料列表
-      materialListAction({ elsAccount: this.elsAccount }).then((res) => {
-        this.materialList = res.data.pageData.rows;
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'materialNumber') {
-            return {
-              dicData: this.materialList.map((item) => {
-                return {
-                  label: item.materialNumber,
-                  value: item.materialNumber
-                };
-              }),
-              ...item
-            };
-          }
-          return item;
-        });
-      });
-    },
-    uploadAfter(res, done, loading) {
-      console.log('after upload', res);
-      done();
-    },
-    uploadBefore(file, done, loading) {
-      console.log('before upload', file);
-      // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
-      const newFile = new File([file], '1234', { type: file.type });
-      done(newFile);
     },
     handleTest() {
       let selectSuppliers = [];

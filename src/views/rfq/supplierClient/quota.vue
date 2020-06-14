@@ -9,7 +9,26 @@
       @on-save="handleSave"
       @on-send="handleSend"
     ></form-header>
-    <avue-form ref="form" v-model="detailObj" :option="formOption"></avue-form>
+    <avue-form ref="form" v-model="detailObj" :option="formOption">
+      <template slot="enquiryType">
+        <el-select
+          v-model="detailObj.enquiryType"
+          @change="handleEnquiryTypeChange"
+          filterable
+          clearable
+          disabled
+          placeholder="请选择 成本模板"
+        >
+          <el-option
+            v-for="item in requestTypeDict"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+      </template>
+    </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <fast2-attachment-list
       :id="detailObj.enquiryNumber"
@@ -151,6 +170,7 @@ import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
 import history from './../history';
 import { validatenull } from '@/util/validate';
 import { dataDicAPI } from '@/api/rfq/common';
+import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 
 const execMathExpress = require('exec-mathexpress');
 
@@ -199,7 +219,9 @@ export default {
         { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
         { power: true, text: '发送', type: 'primary', size: '', action: 'on-send' }
       ],
-      currentEnquiryNumber: ''
+      currentEnquiryNumber: '',
+      requestTypeDict: [],
+      configurations: {}
     };
   },
   created() {
@@ -218,15 +240,91 @@ export default {
           item.format = 'yyyy-MM-dd';
           item.valueFormat = 'timestamp';
         }
-        if (item.prop === 'enquiryType') item.type = 'select';
+        if (item.prop === 'enquiryType') {
+          item.type = 'select';
+          item.formslot = true;
+        }
         return item;
       });
     });
     this.tableData();
-    this.initDetail();
   },
-  watch: {},
+  watch: {
+    detailObj(newVal) {
+      if (!validatenull(newVal.enquiryType)) {
+        this.handleEnquiryTypeChange(newVal.enquiryType);
+      }
+    }
+  },
   methods: {
+    handleEnquiryTypeChange(value) {
+      this.inquiryListOption.option.column = [
+        { label: '物料编号', prop: 'materialNumber' },
+        { label: '物料名称', prop: 'materialName' },
+        { label: '物料描述', prop: 'materialDesc' },
+        { label: '规格', prop: 'materialSpecifications' },
+        { label: '单位', prop: 'baseUnit', span: 4 },
+        { label: '需求数量', prop: 'quantity' },
+        { label: '供应商', prop: 'toElsAccountList' },
+        {
+          type: 'date',
+          format: 'yyyy-MM-dd',
+          valueFormat: 'timestamp',
+          label: '要求交期',
+          prop: 'deliveryDate'
+        },
+        {
+          type: 'date',
+          format: 'yyyy-MM-dd',
+          valueFormat: 'timestamp',
+          label: '交货日期',
+          prop: 'canDeliveryDate'
+        },
+        { slot: true, label: '报价方式', prop: 'quoteMethod' },
+        { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
+        { slot: true, label: '成本模板', prop: 'costTemplate' }
+      ];
+      console.log(this.configurations, value);
+      const current = this.configurations[value].tableColumns.map((item) => {
+        let result = {};
+        result.prop = item.prop;
+        result.label = item.label;
+        result.display = item.saleShow;
+        result.span = item.span;
+        return result;
+      });
+      this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+    },
+    async tableData(data) {
+      // 报价方式 数据字典
+      dataDicAPI('quoteMethod').then((res) => {
+        this.quoteMethodData = res.data;
+      });
+      const res = await ElsTemplateConfigService.find({
+        elsAccount: this.elsAccount || '307000',
+        businessModule: 'enquiry',
+        currentVersionFlag: 'Y'
+      });
+      if (res.data && res.data.statusCode === '200' && res.data.pageData) {
+        let configurations = [];
+        const rows = res.data.pageData.rows || [];
+        for (const item of rows) {
+          const json = JSON.parse(item.configJson);
+          const table = json.table;
+          this.requestTypeDict.push({
+            value: item.templateNumber,
+            label: item.templateName
+          });
+          configurations[item.templateNumber] = {
+            name: item.templateName,
+            tableColumns: table
+          };
+        }
+        this.configurations = configurations;
+        console.log(this.configurations);
+      }
+      this.initDetail();
+    },
     getPriceIndex(row, column) {
       const quantity = row.quantity;
       const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
@@ -478,12 +576,6 @@ export default {
       this.tableData({
         currentPage: 1,
         pageSize: val
-      });
-    },
-    tableData(data) {
-      // 报价方式 数据字典
-      dataDicAPI('quoteMethod').then((res) => {
-        this.quoteMethodData = res.data;
       });
     }
   }

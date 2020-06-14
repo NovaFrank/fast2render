@@ -328,11 +328,18 @@ export default {
         { slot: true, label: '成本模板', prop: 'costTemplate' }
       ];
       this.inquiryListOption.option.column = baseColumn;
+
       this.dialogOption.column = [
         {
           type: 'tree',
           label: '物料编号',
           prop: 'materialNumber',
+          dicData: this.materialList.map((item) => {
+            return {
+              label: item.materialNumber,
+              value: item.materialNumber
+            };
+          }),
           rules: [{ required: true, message: '请选择物料编号', trigger: 'blur' }]
         },
         {

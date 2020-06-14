@@ -55,6 +55,7 @@ export default {
           let price = 0;
           item.propData.tableData.forEach((t) => {
             const formula = this.$getFormulaItem(item.prop);
+            console.log(formula, item.prop, t);
             price += this.$getFormulaValue(formula, t).price;
           });
           return {

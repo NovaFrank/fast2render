@@ -144,10 +144,7 @@ import {
 } from '@/api/rfq/common';
 import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
 import { validatenull } from '@/util/validate';
-<<<<<<< HEAD
 import { testSuppliers } from '@/api/rfq/index';
-=======
->>>>>>> bf123f8c5065d1dd651ecc86ee35558b56d63e76
 
 export default {
   components: {

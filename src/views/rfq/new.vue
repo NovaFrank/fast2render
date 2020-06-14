@@ -360,6 +360,8 @@ export default {
           rules: [{ trigger: 'change', validator: validateDateTime }]
         },
         {
+          dicUrl: '/layout/dics/value/taxRate',
+          dicMethod: 'get',
           type: 'select',
           label: '税码',
           prop: 'taxCode',

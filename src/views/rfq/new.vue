@@ -285,7 +285,7 @@ export default {
   },
   methods: {
     handleEnquiryTypeChange(value) {
-      this.inquiryListOption.option.column = [
+      const baseColumn = [
         { label: '物料编号', prop: 'materialNumber' },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
@@ -311,6 +311,8 @@ export default {
         { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
         { slot: true, label: '成本模板', prop: 'costTemplate' }
       ];
+      this.inquiryListOption.option.column = baseColumn;
+      this.dialogOption.column = baseColumn;
       const current = this.configurations[value].tableColumns.map((item) => {
         let result = {};
         result.prop = item.prop;

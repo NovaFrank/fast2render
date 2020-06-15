@@ -294,12 +294,12 @@ export default {
         return result;
       });
       this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
-      // this.inquiryListOption.option.column.push({
-      //   slot: true,
-      //   label: '是否报价',
-      //   type: 'switch',
-      //   prop: 'quote'
-      // });
+      this.inquiryListOption.option.column.push({
+        slot: true,
+        label: '是否报价',
+        type: 'switch',
+        prop: 'quote'
+      });
     },
     async tableData(data) {
       // 报价方式 数据字典
@@ -327,7 +327,6 @@ export default {
           };
         }
         this.configurations = configurations;
-        console.log(this.configurations);
       }
       this.initDetail();
     },
@@ -355,14 +354,14 @@ export default {
           price += this.$getFormulaValue(formula, item.propData.formData).price;
         }
       });
-      if (column === 'priceExcludingTax') {
-        const result = execMathExpress('v1 / ( v2 + v3 )', {
-          v1: price || 0,
-          v2: 1,
-          v3: row.taxRate
-        });
-        price = Math.floor((result.num / result.den) * 100) / 100;
-      }
+      // if (column === 'priceExcludingTax') {
+      //   const result = execMathExpress('v1 / ( v2 + v3 )', {
+      //     v1: price || 0,
+      //     v2: 1,
+      //     v3: row.taxRate
+      //   });
+      //   price = Math.floor((result.num / result.den) * 100) / 100;
+      // }
       return price || 0;
     },
     closeFieldDialog() {

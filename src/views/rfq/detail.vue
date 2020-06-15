@@ -505,28 +505,31 @@ export default {
         return '**';
       }
       const costJson = JSON.parse(row.costConstituteJson);
-      const template = costJson.templateJson;
-      let price = 0;
-      template.forEach((item) => {
-        if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
-          item.propData.tableData.forEach((t) => {
+      if (costJson) {
+        const template = costJson.templateJson;
+        let price = 0;
+        template.forEach((item) => {
+          if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
+            item.propData.tableData.forEach((t) => {
+              const formula = this.$getFormulaItem(item.prop);
+              price += this.$getFormulaValue(formula, t).price;
+            });
+          } else if (item.propData && item.propData.formData) {
             const formula = this.$getFormulaItem(item.prop);
-            price += this.$getFormulaValue(formula, t).price;
-          });
-        } else if (item.propData && item.propData.formData) {
-          const formula = this.$getFormulaItem(item.prop);
-          price += this.$getFormulaValue(formula, item.propData.formData).price;
-        }
-      });
-      if (column === 'priceExcludingTax') {
-        const result = execMathExpress('v1 / ( v2 + v3 )', {
-          v1: price || 0,
-          v2: 1,
-          v3: row.taxRate
+            price += this.$getFormulaValue(formula, item.propData.formData).price;
+          }
         });
-        price = Math.floor((result.num / result.den) * 100) / 100;
+        if (column === 'priceExcludingTax') {
+          const result = execMathExpress('v1 / ( v2 + v3 )', {
+            v1: price || 0,
+            v2: 1,
+            v3: row.taxRate
+          });
+          price = Math.floor((result.num / result.den) * 100) / 100;
+        }
+        return price || 0;
       }
-      return price || 0;
+      return 0;
     },
     cellStyle() {
       return {

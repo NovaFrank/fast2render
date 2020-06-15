@@ -41,6 +41,7 @@
     ></fast2-attachment-list>
     <!-- 供应商附件 -->
     <fast2-attachment-list
+      ref="attachment"
       :id="detailObj.enquiryNumber"
       :elsAccount="detailObj.elsAccount"
       :businessElsAccount="detailObj.toElsAccount"
@@ -527,20 +528,27 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        const params = {
-          quoteEndTime: this.detailObj.quoteEndTime,
-          enquiryNumber: this.currentEnquiryNumber,
-          toElsAccount: this.detailObj.toElsAccount,
-          saleItemList: this.inquiryListOption.data
-        };
-        postAction('quote', params).then((res) => {
-          if (res.data.statusCode !== '200') {
-            this.$message.error(res.data.message);
-            return;
-          }
-          this.$message.success('发送成功');
-          this.$router.back();
-        });
+        this.$refs.attachment
+          .sendFiles()
+          .then((res) => {
+            const params = {
+              quoteEndTime: this.detailObj.quoteEndTime,
+              enquiryNumber: this.currentEnquiryNumber,
+              toElsAccount: this.detailObj.toElsAccount,
+              saleItemList: this.inquiryListOption.data
+            };
+            postAction('quote', params).then((res) => {
+              if (res.data.statusCode !== '200') {
+                this.$message.error(res.data.message);
+                return;
+              }
+              this.$message.success('发送成功');
+              this.$router.back();
+            });
+          })
+          .catch((res) => {
+            this.$message.error(res.message || '发布失败，请检查附件');
+          });
       });
     },
     handleTabChange(value) {

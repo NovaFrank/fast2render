@@ -60,7 +60,7 @@
     <fast2-attachment-list
       :id="detailObj.enquiryNumber"
       :elsAccount="detailObj.toElsAccount"
-      :businessElsAccount="detailObj.toElsAccount"
+      :businessElsAccount="detailObj.elsAccount"
       businessModule="enquiry"
       :readonly="true"
       v-show="tabActive === 'filesSupplier'"

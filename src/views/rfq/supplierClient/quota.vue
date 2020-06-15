@@ -354,14 +354,14 @@ export default {
           price += this.$getFormulaValue(formula, item.propData.formData).price;
         }
       });
-      // if (column === 'priceExcludingTax') {
-      //   const result = execMathExpress('v1 / ( v2 + v3 )', {
-      //     v1: price || 0,
-      //     v2: 1,
-      //     v3: row.taxRate
-      //   });
-      //   price = Math.floor((result.num / result.den) * 100) / 100;
-      // }
+      if (column === 'priceExcludingTax') {
+        const result = execMathExpress('v1 / ( v2 + v3 )', {
+          v1: price || 0,
+          v2: 1,
+          v3: row.taxRate
+        });
+        price = Math.floor((result.num / result.den) * 100) / 100;
+      }
       return price || 0;
     },
     closeFieldDialog() {

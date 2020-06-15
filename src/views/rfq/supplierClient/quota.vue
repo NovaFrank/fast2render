@@ -264,8 +264,6 @@ export default {
         { label: '物料描述', prop: 'materialDesc' },
         { label: '规格', prop: 'materialSpecifications' },
         { label: '单位', prop: 'baseUnit', span: 4 },
-        { label: '需求数量', prop: 'quantity' },
-        { label: '供应商', prop: 'toElsAccountList' },
         {
           type: 'date',
           format: 'yyyy-MM-dd',
@@ -273,18 +271,20 @@ export default {
           label: '要求交期',
           prop: 'deliveryDate'
         },
+        { label: '需求数量', prop: 'quantity' },
         {
           type: 'date',
           format: 'yyyy-MM-dd',
           valueFormat: 'timestamp',
           label: '交货日期',
-          prop: 'canDeliveryDate'
+          prop: 'deliveryDate'
         },
-        { slot: true, label: '报价方式', prop: 'quoteMethod' },
         { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
-        { slot: true, label: '成本模板', prop: 'costTemplate' }
+        { slot: true, label: '成本模板', prop: 'costTemplate' },
+        { slot: true, label: '含税价', prop: 'priceIncludingTax' },
+        { label: '税率', prop: 'taxRate' },
+        { slot: true, label: '不含税价', prop: 'priceExcludingTax' }
       ];
-      console.log(this.configurations, value);
       const current = this.configurations[value].tableColumns.map((item) => {
         let result = {};
         result.prop = item.prop;
@@ -294,6 +294,12 @@ export default {
         return result;
       });
       this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+      // this.inquiryListOption.option.column.push({
+      //   slot: true,
+      //   label: '是否报价',
+      //   type: 'switch',
+      //   prop: 'quote'
+      // });
     },
     async tableData(data) {
       // 报价方式 数据字典
@@ -477,6 +483,31 @@ export default {
             }
           });
         }
+        // if (item.noQuoted !== 'N' && item.quoteMethod === '2') {
+        //   const costJson = JSON.parse(item.costConstituteJson);
+        //   const template = costJson.templateJson;
+        //   const tabPermission = costJson.permissionJson;
+        //   template.forEach((item) => {
+        //     console.log(
+        //       item.prop,
+        //       !validatenull(tabPermission[item.prop]),
+        //       item.propData.tableData,
+        //       item.propData.tableData.length === 0,
+        //       item.propData.formData,
+        //       validatenull(item.propData.formData),
+        //       !validatenull(tabPermission[item.prop]) &&
+        //         item.propData.tableData.length === 0 &&
+        //         validatenull(item.propData.formData)
+        //     );
+        //     if (
+        //       tabPermission[item.prop] &&
+        //       item.propData.tableData.length === 0 &&
+        //       validatenull(item.propData.formData)
+        //     ) {
+        //       result = false;
+        //     }
+        //   });
+        // }
       });
       if (!result) {
         this.$message.error('请完善报价信息');
@@ -520,10 +551,6 @@ export default {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
       });
-      // new itemStatus 0
-      // quoting itemStatus 1
-      // price itemStatus 4/5
-      // close itemStatus 6
       getAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {

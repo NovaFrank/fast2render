@@ -98,7 +98,7 @@ export const getAccount = () => {
 
 export const getLocalToken = (supplier) => {
   const params = {
-    elsAccount: supplier ? '307012' : '307000',
+    elsAccount: supplier ? '307005' : '307000',
     elsSubAccount: '1001',
     elsSubAccountPassword: md5('123')
   };

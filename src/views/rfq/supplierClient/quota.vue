@@ -38,6 +38,7 @@
       businessModule="enquiry"
       :readonly="true"
       v-show="tabActive === 'files'"
+      :passClient="false"
       :client="true"
       :clientTab="false"
     ></fast2-attachment-list>
@@ -50,6 +51,7 @@
       businessModule="enquiry"
       :readonly="detailObj.quoteEndTime < new Date().getTime()"
       v-show="tabActive === 'filesSupplier'"
+      :passClient="false"
       :client="true"
       :clientTab="true"
     ></fast2-attachment-list>

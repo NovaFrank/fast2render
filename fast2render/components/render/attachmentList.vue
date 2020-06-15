@@ -76,14 +76,22 @@ import { validateNull } from '../../lib/validate';
 export default {
   name: 'AttachmentList',
   props: {
+    // 是否屏蔽下载供应商附件
     downloadClient: {
       type: Boolean,
       default: true
     },
+    // 跳过 是否判断供应商以及供应商tab
+    passClient: {
+      type: Boolean,
+      default: true
+    },
+    // 是否为供应商端
     client: {
       type: Boolean,
       default: true
     },
+    // 是否为供应商tab
     clientTab: {
       type: Boolean,
       default: true
@@ -330,22 +338,26 @@ export default {
       };
       uploadApi.attachmentServer(action, params).then((res) => {
         if (res.data.pageData && res.data.pageData.rows) {
-          if (this.client && this.clientTab) {
-            this.fileList = res.data.pageData.rows.filter(
-              (item) => item.elsAccount === this.elsAccount
-            );
-          } else if (this.client && !this.clientTab) {
-            this.fileList = res.data.pageData.rows.filter(
-              (item) => item.elsAccount !== this.elsAccount
-            );
-          } else if (!this.client && !this.clientTab) {
-            this.fileList = res.data.pageData.rows.filter(
-              (item) => item.elsAccount === this.businessElsAccount
-            );
-          } else if (!this.client && this.clientTab) {
-            this.fileList = res.data.pageData.rows.filter(
-              (item) => item.elsAccount !== this.businessElsAccount
-            );
+          if (this.passClient) {
+            this.fileList = res.data.pageData.rows;
+          } else {
+            if (this.client && this.clientTab) {
+              this.fileList = res.data.pageData.rows.filter(
+                (item) => item.elsAccount === this.elsAccount
+              );
+            } else if (this.client && !this.clientTab) {
+              this.fileList = res.data.pageData.rows.filter(
+                (item) => item.elsAccount !== this.elsAccount
+              );
+            } else if (!this.client && !this.clientTab) {
+              this.fileList = res.data.pageData.rows.filter(
+                (item) => item.elsAccount === this.businessElsAccount
+              );
+            } else if (!this.client && this.clientTab) {
+              this.fileList = res.data.pageData.rows.filter(
+                (item) => item.elsAccount !== this.businessElsAccount
+              );
+            }
           }
         }
         // businessItemId 根据该值判断 替换或直接push

@@ -44,6 +44,7 @@
       :businessElsAccount="elsAccount"
       businessModule="enquiry"
       v-show="tabActive === 'files' && form.enquiryNumber"
+      :passClient="false"
       :client="false"
       :clientTab="false"
     ></fast2-attachment-list>

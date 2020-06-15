@@ -9,7 +9,7 @@
         <div v-if="component.option && component.option.column && component.option.column.length">
           <avue-crud :data="fileList" :option="component.option" @row-del="handleDelete">
             <template v-slot:fileAction="scope">
-              <div v-if="!readonly">
+              <div v-if="!readonly && downloadClient">
                 <el-upload
                   id="webpicker"
                   :show-file-list="false"
@@ -50,7 +50,7 @@
                   </template>
                 </el-upload>
               </div>
-              <div v-else>
+              <div v-else-if="downloadClient">
                 <el-link
                   v-if="scope.row.attachmentUrl"
                   download
@@ -76,6 +76,18 @@ import { validateNull } from '../../lib/validate';
 export default {
   name: 'AttachmentList',
   props: {
+    downloadClient: {
+      type: Boolean,
+      default: true
+    },
+    client: {
+      type: Boolean,
+      default: true
+    },
+    clientTab: {
+      type: Boolean,
+      default: true
+    },
     version: {
       type: String,
       default: () => {
@@ -318,7 +330,23 @@ export default {
       };
       uploadApi.attachmentServer(action, params).then((res) => {
         if (res.data.pageData && res.data.pageData.rows) {
-          this.fileList = res.data.pageData.rows;
+          if (this.client && this.clientTab) {
+            this.fileList = res.data.pageData.rows.filter(
+              (item) => item.elsAccount === this.elsAccount
+            );
+          } else if (this.client && !this.clientTab) {
+            this.fileList = res.data.pageData.rows.filter(
+              (item) => item.elsAccount !== this.elsAccount
+            );
+          } else if (!this.client && !this.clientTab) {
+            this.fileList = res.data.pageData.rows.filter(
+              (item) => item.elsAccount === this.businessElsAccount
+            );
+          } else if (!this.client && this.clientTab) {
+            this.fileList = res.data.pageData.rows.filter(
+              (item) => item.elsAccount !== this.businessElsAccount
+            );
+          }
         }
         // businessItemId 根据该值判断 替换或直接push
         const itemIds = this.fileList.map((item) => item.businessItemId);

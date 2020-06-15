@@ -49,14 +49,13 @@ export default {
   },
   watch: {
     template(newValue) {
-      console.log(newValue);
       this.sumData = newValue.map((item) => {
         if (item.propData.tableData && item.propData.tableData.length > 0) {
           let price = 0;
           item.propData.tableData.forEach((t) => {
             const formula = this.$getFormulaItem(item.prop);
-            console.log(formula, item.prop, t);
-            price += this.$getFormulaValue(formula, t).price;
+            const p = this.$getFormulaValue(formula, t).price;
+            price += p;
           });
           return {
             key: item.label,

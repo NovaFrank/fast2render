@@ -483,6 +483,14 @@ export default {
       return JSON.parse(row.ladderPriceJson)[index - 1][column];
     },
     getCostPriceIndex(row, column) {
+      if (
+        !(
+          (row.itemStatus === '2' || row.itemStatus === '4') &&
+          this.detailObj.quoteEndTime > new Date().getTime()
+        )
+      ) {
+        return '**';
+      }
       const costJson = JSON.parse(row.costConstituteJson);
       const template = costJson.templateJson;
       let price = 0;

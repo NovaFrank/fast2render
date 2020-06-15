@@ -30,13 +30,23 @@
       </template>
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
+    <!-- 采购方附件 -->
     <fast2-attachment-list
       :id="detailObj.enquiryNumber"
-      :elsAccount="elsAccount"
+      :elsAccount="detailObj.elsAccount"
       :businessElsAccount="detailObj.toElsAccount"
       businessModule="enquiry"
       :readonly="true"
       v-show="tabActive === 'files'"
+    ></fast2-attachment-list>
+    <!-- 供应商附件 -->
+    <fast2-attachment-list
+      :id="detailObj.enquiryNumber"
+      :elsAccount="detailObj.elsAccount"
+      :businessElsAccount="detailObj.toElsAccount"
+      businessModule="enquiry"
+      :readonly="detailObj.quoteEndTime < new Date().getTime()"
+      v-show="tabActive === 'filesSupplier'"
     ></fast2-attachment-list>
     <avue-crud
       v-show="tabActive === 'detail'"
@@ -161,7 +171,7 @@ import costQuoteDialog from '@/components/views/costQuoteDialog'; // 成本报�
 import quoteLadderDialog from '@/components/views/ladderQuoteDialog'; // 阶梯报价
 import quoteDialog from '@/components/views/quoteDialog'; // 常规报价
 import formOption from '@/const/rfq/supplierClient/detail';
-import tabOption from '@/const/rfq/newAndView/tabs';
+import tabOption from '@/const/rfq/newAndView/detailTabs';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
 import costTemplateDialog from '@/components/views/costTemplateDialog';

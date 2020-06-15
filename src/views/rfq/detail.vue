@@ -47,7 +47,7 @@
       </template>
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
-    <!-- 附件 -->
+    <!-- 采购方附件 -->
     <fast2-attachment-list
       :id="detailObj.enquiryNumber"
       :elsAccount="elsAccount"
@@ -55,6 +55,15 @@
       businessModule="enquiry"
       :readonly="true"
       v-show="tabActive === 'files'"
+    ></fast2-attachment-list>
+    <!-- 供应商附件 -->
+    <fast2-attachment-list
+      :id="detailObj.enquiryNumber"
+      :elsAccount="detailObj.toElsAccount"
+      :businessElsAccount="detailObj.toElsAccount"
+      businessModule="enquiry"
+      :readonly="true"
+      v-show="tabActive === 'filesSupplier'"
     ></fast2-attachment-list>
     <avue-crud
       v-show="tabActive === 'detail'"
@@ -93,7 +102,11 @@
           @click.stop="handleShowCostTemplate(scope)"
           v-if="scope.row.quoteMethod === '2'"
         >
-          {{ JSON.parse(scope.row.costConstituteJson).templateName }}
+          {{
+            JSON.parse(scope.row.costConstituteJson)
+              ? JSON.parse(scope.row.costConstituteJson).templateName
+              : ''
+          }}
         </el-link>
       </template>
       <template slot="taxRate" slot-scope="scope">
@@ -245,7 +258,7 @@
 import { mySpanMethod } from '@/util/utils';
 import FormHeader from '@/components/views/formHeader';
 import formOption from '@/const/rfq/newAndView/detail';
-import tabOption from '@/const/rfq/newAndView/tabs';
+import tabOption from '@/const/rfq/newAndView/detailTabs';
 import inquiryListOption from '@/const/rfq/newAndView/detailInquiryList';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
@@ -860,6 +873,7 @@ export default {
           priceIncludingTax: '',
           quota: '',
           ladderPriceJson: this.currentDetailItem.ladderPriceJson || null,
+          costConstituteJson: this.currentDetailItem.costConstituteJson || null,
           $cellEdit: false
         };
       });

@@ -361,6 +361,7 @@ export default {
     },
     listRowAdd() {
       let fileItem = {
+        elsAccount: this.elsAccount,
         businessItemId: this.id + '_00' + (this.fileList.length + 1)
       };
       this.fileList.push(fileItem);
@@ -469,6 +470,7 @@ export default {
         ? 'update'
         : 'create';
       let checkProp = 'businessItemId';
+      console.log('this.elsAccount', this.elsAccount);
       let itemRow = {
         ...this.uploadRow,
         elsAccount: this.elsAccount,

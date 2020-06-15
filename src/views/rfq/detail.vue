@@ -93,7 +93,11 @@
           @click.stop="handleShowCostTemplate(scope)"
           v-if="scope.row.quoteMethod === '2'"
         >
-          {{ JSON.parse(scope.row.costConstituteJson).templateName }}
+          {{
+            JSON.parse(scope.row.costConstituteJson)
+              ? JSON.parse(scope.row.costConstituteJson).templateName
+              : ''
+          }}
         </el-link>
       </template>
       <template slot="taxRate" slot-scope="scope">
@@ -860,6 +864,7 @@ export default {
           priceIncludingTax: '',
           quota: '',
           ladderPriceJson: this.currentDetailItem.ladderPriceJson || null,
+          costConstituteJson: this.currentDetailItem.costConstituteJson || null,
           $cellEdit: false
         };
       });

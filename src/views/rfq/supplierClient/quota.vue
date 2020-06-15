@@ -38,6 +38,8 @@
       businessModule="enquiry"
       :readonly="true"
       v-show="tabActive === 'files'"
+      :client="true"
+      :clientTab="false"
     ></fast2-attachment-list>
     <!-- 供应商附件 -->
     <fast2-attachment-list
@@ -48,6 +50,8 @@
       businessModule="enquiry"
       :readonly="detailObj.quoteEndTime < new Date().getTime()"
       v-show="tabActive === 'filesSupplier'"
+      :client="true"
+      :clientTab="true"
     ></fast2-attachment-list>
     <avue-crud
       v-show="tabActive === 'detail'"

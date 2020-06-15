@@ -44,6 +44,8 @@
       :businessElsAccount="elsAccount"
       businessModule="enquiry"
       v-show="tabActive === 'files' && form.enquiryNumber"
+      :client="false"
+      :clientTab="false"
     ></fast2-attachment-list>
     <avue-crud
       v-show="tabActive === 'detail'"

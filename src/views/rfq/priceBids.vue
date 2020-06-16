@@ -343,7 +343,6 @@ export default {
           .filter((crud) => item.materialNumber === crud.materialNumber)
           .forEach((item) => {
             sum += Number(item.quota);
-            console.log('sum', sum);
           });
         if (item.option === '配额') {
           return {
@@ -432,7 +431,6 @@ export default {
             .forEach((itemQuota) => {
               quote += Number(itemQuota.quota);
             });
-          console.log('quote', quote);
           if (Number(quote) !== 100) result = true; // 相同物料 已报价 分配的配额必须相加为100
         }
       });

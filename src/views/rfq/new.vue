@@ -295,7 +295,6 @@ export default {
         });
       }
       if (newVal.enquiryType) {
-        console.log(newVal.enquiryType);
         this.handleEnquiryTypeChange(newVal.enquiryType);
       }
       // this.inquiryListOption.data = [];
@@ -418,41 +417,7 @@ export default {
       });
       this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
       this.dialogOption.column = this.dialogOption.column.concat(current);
-      // 物料列表
-      materialListAction({ elsAccount: this.elsAccount }).then((res) => {
-        this.materialList = res.data.pageData.rows;
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'materialNumber') {
-            return {
-              dicData: this.materialList.map((item) => {
-                return {
-                  label: item.materialNumber,
-                  value: item.materialNumber
-                };
-              }),
-              ...item
-            };
-          }
-          return item;
-        });
-      });
-      // 税率
-      dataDicAPI('taxRate').then((res) => {
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'taxCode') {
-            return {
-              ...item,
-              dicData: res.data.map((item) => {
-                return {
-                  label: `${item.value}`,
-                  value: `${item.label}_${item.value}`
-                };
-              })
-            };
-          }
-          return item;
-        });
-      });
+      this.tableData();
     },
     handleAddShow(title, row) {
       this.fieldDialogForm = title === '添加' ? {} : row;
@@ -572,6 +537,41 @@ export default {
           return item;
         });
       });
+      // 物料列表
+      materialListAction({ elsAccount: this.elsAccount }).then((res) => {
+        this.materialList = res.data.pageData.rows;
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
+          if (item.prop === 'materialNumber') {
+            return {
+              dicData: this.materialList.map((item) => {
+                return {
+                  label: item.materialNumber,
+                  value: item.materialNumber
+                };
+              }),
+              ...item
+            };
+          }
+          return item;
+        });
+      });
+      // 税率
+      dataDicAPI('taxRate').then((res) => {
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
+          if (item.prop === 'taxCode') {
+            return {
+              ...item,
+              dicData: res.data.map((item) => {
+                return {
+                  label: `${item.value}`,
+                  value: `${item.label}_${item.value}`
+                };
+              })
+            };
+          }
+          return item;
+        });
+      });
     },
     closeFieldDialog() {
       this.fieldDialogVisible = false;
@@ -642,7 +642,6 @@ export default {
       };
     },
     handleMaterialSelectChange(selection) {
-      console.log(selection);
       this.currentSelectionDetailItems = selection;
     },
     // 发布/提交审批
@@ -755,10 +754,6 @@ export default {
       });
     },
     handleShowSupplierSelect() {
-      console.log(
-        'this.currentSelectionDetailItems.length',
-        this.currentSelectionDetailItems.length
-      );
       if (!validatenull(this.currentDetailItem) || this.currentSelectionDetailItems.length > 0) {
         this.suppliersDialogVisable = true;
         return;

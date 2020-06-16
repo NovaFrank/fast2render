@@ -369,11 +369,11 @@ export default {
           if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
             item.propData.tableData.forEach((t) => {
               const formula = this.$getFormulaItem(item.prop);
-              price += this.$getFormulaValue(formula, t).price;
+              price += Number(this.$getFormulaValue(formula, t).price);
             });
           } else if (item.propData && item.propData.formData) {
             const formula = this.$getFormulaItem(item.prop);
-            price += this.$getFormulaValue(formula, item.propData.formData).price;
+            price += Number(this.$getFormulaValue(formula, item.propData.formData).price);
           }
         });
         if (column === 'priceExcludingTax') {
@@ -620,7 +620,6 @@ export default {
     },
     // 行信息 - 成本报价保存
     onSaveCostForm(form) {
-      console.log(form);
       this.costQuoteVisible = false;
       this.$set(
         this.inquiryListOption.data[form.index],

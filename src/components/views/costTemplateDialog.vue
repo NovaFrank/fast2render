@@ -54,7 +54,7 @@ export default {
           let price = 0;
           item.propData.tableData.forEach((t) => {
             const formula = this.$getFormulaItem(item.prop);
-            const p = this.$getFormulaValue(formula, t).price;
+            const p = Number(this.$getFormulaValue(formula, t).price);
             price += p;
           });
           return {
@@ -63,7 +63,7 @@ export default {
           };
         } else if (item.propData.formData) {
           const formula = this.$getFormulaItem(item.prop);
-          let price = this.$getFormulaValue(formula, item.propData.formData).price;
+          let price = Number(this.$getFormulaValue(formula, item.propData.formData).price);
           return {
             key: item.label,
             value: price

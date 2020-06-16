@@ -137,7 +137,6 @@ export default {
     // },
     field(newVal) {
       this.form = newVal;
-      console.log('this.form', this.form);
       this.ladderOption.data = newVal.ladderPriceJson ? JSON.parse(newVal.ladderPriceJson) : [];
       if (this.form.quoteMethod === '2' && this.dialogTitle === '修改询价明细') {
         const costJson = JSON.parse(newVal.costConstituteJson);

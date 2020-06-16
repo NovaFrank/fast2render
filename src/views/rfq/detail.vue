@@ -117,11 +117,12 @@
         </el-link>
       </template>
       <template slot="taxRate" slot-scope="scope">
-        {{
+        <!-- {{
           scope.row.itemStatus === '2' && detailObj.quoteEndTime > new Date().getTime()
             ? '**'
             : scope.row.taxRate
-        }}
+        }} -->
+        {{ scope.row.taxRate }}
       </template>
       <!-- 含税 -->
       <template slot-scope="scope" slot="priceIncludingTax">
@@ -519,11 +520,11 @@ export default {
           if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
             item.propData.tableData.forEach((t) => {
               const formula = this.$getFormulaItem(item.prop);
-              price += this.$getFormulaValue(formula, t).price;
+              price += Number(this.$getFormulaValue(formula, t).price);
             });
           } else if (item.propData && item.propData.formData) {
             const formula = this.$getFormulaItem(item.prop);
-            price += this.$getFormulaValue(formula, item.propData.formData).price;
+            price += Number(this.$getFormulaValue(formula, item.propData.formData).price);
           }
         });
         if (column === 'priceExcludingTax') {
@@ -667,7 +668,6 @@ export default {
       });
     },
     handleOpenSubmit(form) {
-      console.log(form);
       this.detailObj.quoteEndTime = new Date().getTime();
       this.openDialogVisible = false;
     },
@@ -863,7 +863,15 @@ export default {
       const newSuppliers = selectedSupplier.filter(
         (item) => !this.currentDetailItemSelected.includes(item)
       );
+
       const itemList = newSuppliers.map((item, index) => {
+        let costJson = JSON.parse(this.currentDetailItem.costConstituteJson);
+        let template = costJson.templateJson;
+        template = template.map((element) => {
+          element.propData = {};
+          return element;
+        });
+        costJson.templateJson = template;
         return {
           id: `${index}`,
           materialNumber: this.currentDetailItem.materialNumber,
@@ -883,23 +891,13 @@ export default {
           priceIncludingTax: '',
           quota: '',
           ladderPriceJson: this.currentDetailItem.ladderPriceJson || null,
-          costConstituteJson: this.currentDetailItem.costConstituteJson || null,
+          costConstituteJson: JSON.stringify(costJson) || null,
           $cellEdit: false
         };
       });
       this.inquiryListOption.data = this.inquiryListOption.data
         .concat(itemList)
         .sort(compare('materialNumber'));
-    },
-    uploadAfter(res, done, loading) {
-      console.log('after upload', res);
-      done();
-    },
-    uploadBefore(file, done, loading) {
-      console.log('before upload', file);
-      // 如果你想修改file文件,由于上传的file是只读文件，必须复制新的file才可以修改名字，完后赋值到done函数里,如果不修改的话直接写done()即可
-      const newFile = new File([file], '1234', { type: file.type });
-      done(newFile);
     }
   }
 };

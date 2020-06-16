@@ -78,7 +78,6 @@ export default {
       this.template.forEach((element) => {
         this.providerData[element.prop] = element.propData;
       });
-      console.log(this.template, this.tabPermission, this.providerData);
       this.initColumn();
       this.initDetailColumn();
     }
@@ -137,8 +136,7 @@ export default {
             let price = 0;
             this.providerData[tempProp].tableData.forEach((t) => {
               const formula = this.$getFormulaItem(tempProp);
-              price += this.$getFormulaValue(formula, t).price;
-              console.log(tempProp, formula, price);
+              price += Number(this.$getFormulaValue(formula, t).price);
             });
             i[prop] = price;
           });
@@ -147,7 +145,9 @@ export default {
           this.suppliers.forEach((supplier) => {
             const prop = this.initProviderData(supplier);
             const formula = this.$getFormulaItem(tempProp);
-            price += this.$getFormulaValue(formula, this.providerData[tempProp].formData).price;
+            price += Number(
+              this.$getFormulaValue(formula, this.providerData[tempProp].formData).price
+            );
             i[prop] = price;
           });
         }
@@ -194,7 +194,7 @@ export default {
             const prop = this.initProviderData(supplier);
             this.providerData[tempProp].tableData.forEach((t) => {
               const formula = this.$getFormulaItem(tempProp);
-              i[prop] = this.$getFormulaValue(formula, t).price;
+              i[prop] = Number(this.$getFormulaValue(formula, t).price);
               this.sumDetailData.push({
                 ...i,
                 prop: tempProp,
@@ -208,7 +208,9 @@ export default {
           this.suppliers.forEach((supplier) => {
             const prop = this.initProviderData(supplier);
             const formula = this.$getFormulaItem(tempProp);
-            i[prop] = this.$getFormulaValue(formula, this.providerData[tempProp].formData).price;
+            i[prop] = Number(
+              this.$getFormulaValue(formula, this.providerData[tempProp].formData).price
+            );
           });
           this.sumDetailData.push({
             ...i,

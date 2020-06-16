@@ -11,7 +11,6 @@ export const setStore = (params) => {
     type: type,
     datetime: new Date().getTime()
   };
-  console.log(type, name, '保存类型');
   if (type) window.sessionStorage.setItem(name, JSON.stringify(obj));
   else window.localStorage.setItem(name, JSON.stringify(obj));
 };

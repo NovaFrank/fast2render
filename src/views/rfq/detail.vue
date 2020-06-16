@@ -868,7 +868,7 @@ export default {
         let costJson = JSON.parse(this.currentDetailItem.costConstituteJson);
         let template = costJson.templateJson;
         template = template.map((element) => {
-          element.propData = {};
+          element.propData = { tableData: [], formData: {} };
           return element;
         });
         costJson.templateJson = template;

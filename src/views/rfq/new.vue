@@ -22,7 +22,7 @@
           @change="handleEnquiryTypeChange"
           filterable
           clearable
-          placeholder="请选择 成本模板"
+          placeholder="请选择 询价类型"
         >
           <el-option
             v-for="item in requestTypeDict"

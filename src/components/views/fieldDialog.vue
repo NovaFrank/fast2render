@@ -76,6 +76,7 @@ import ladderOption from '@/const/rfq/newAndView/ladder';
 import supplierList from '@/const/rfq/newAndView/supplierList';
 import { costTemplateList } from '@/api/rfq/index';
 import { getUserInfo } from '@/util/utils.js';
+import { validateNull } from '../../../fast2render/lib/validate';
 
 // 采购方添加询价明细
 export default {
@@ -191,6 +192,10 @@ export default {
         }
         this.form.ladderPriceJson = this.ladderOption.data;
       } else if (this.form.quoteMethod === '2') {
+        if (validateNull(this.currentTemplate)) {
+          this.$message.error('请选择成本模板');
+          return;
+        }
         const obj = {
           templateName: this.currentTemplate,
           templateJson: this.template,

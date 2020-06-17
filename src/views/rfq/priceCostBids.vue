@@ -128,6 +128,7 @@ export default {
         let i = {};
         const tempProp = item.prop;
         if (
+          this.providerData[tempProp] &&
           this.providerData[tempProp].tableData &&
           this.providerData[tempProp].tableData.length > 0
         ) {
@@ -140,7 +141,7 @@ export default {
             });
             i[prop] = price;
           });
-        } else if (this.providerData[tempProp].formData) {
+        } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {
           let price = 0;
           this.suppliers.forEach((supplier) => {
             const prop = this.initProviderData(supplier);
@@ -187,6 +188,7 @@ export default {
         let i = {};
         const tempProp = item.prop;
         if (
+          this.providerData[tempProp] &&
           this.providerData[tempProp].tableData &&
           this.providerData[tempProp].tableData.length > 0
         ) {
@@ -204,7 +206,7 @@ export default {
               });
             });
           });
-        } else if (this.providerData[tempProp].formData) {
+        } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {
           this.suppliers.forEach((supplier) => {
             const prop = this.initProviderData(supplier);
             const formula = this.$getFormulaItem(tempProp);

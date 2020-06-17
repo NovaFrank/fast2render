@@ -127,34 +127,21 @@
       <!-- 含税 -->
       <template slot-scope="scope" slot="priceIncludingTax">
         <span v-if="scope.row.quoteMethod === '0'">
-          <span
-            v-if="
-              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
-                detailObj.quoteEndTime > new Date().getTime()
-            "
-          >
+          <!-- (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
+                detailObj.quoteEndTime > new Date().getTime() -->
+          <span v-if="showXPrice(scope.row)">
             **
           </span>
           <span v-else>{{ scope.row.priceIncludingTax }}</span>
         </span>
         <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
-          <span
-            v-if="
-              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
-                detailObj.quoteEndTime > new Date().getTime()
-            "
-          >
+          <span v-if="showXPrice(scope.row)">
             **
           </span>
           <span v-else>{{ getPriceIndex(scope.row, 'priceIncludingTax') }}</span>
         </p>
         <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
-          <span
-            v-if="
-              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
-                detailObj.quoteEndTime > new Date().getTime()
-            "
-          >
+          <span v-if="showXPrice(scope.row)">
             **
           </span>
           <span v-else>{{ getCostPriceIndex(scope.row, 'priceIncludingTax') }}</span>
@@ -163,34 +150,19 @@
       <!-- 不含税 -->
       <template slot-scope="scope" slot="priceExcludingTax">
         <span v-if="scope.row.quoteMethod === '0'">
-          <span
-            v-if="
-              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
-                detailObj.quoteEndTime > new Date().getTime()
-            "
-          >
+          <span v-if="showXPrice(scope.row)">
             **
           </span>
           <span v-else>{{ scope.row.priceExcludingTax }}</span>
         </span>
         <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
-          <span
-            v-if="
-              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
-                detailObj.quoteEndTime > new Date().getTime()
-            "
-          >
+          <span v-if="showXPrice(scope.row)">
             **
           </span>
           <span v-else>{{ getPriceIndex(scope.row, 'priceExcludingTax') }}</span>
         </p>
         <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
-          <span
-            v-if="
-              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
-                detailObj.quoteEndTime > new Date().getTime()
-            "
-          >
+          <span v-if="showXPrice(scope.row)">
             **
           </span>
           <span v-else>{{ getCostPriceIndex(scope.row, 'priceExcludingTax') }}</span>
@@ -229,6 +201,7 @@
     </avue-crud>
     <!-- 报价历史记录 -->
     <history
+      :detailObj="detailObj"
       :dialogVisible="historyVisible"
       :data="historyList"
       :quoteMethodData="quoteMethodData"
@@ -271,7 +244,7 @@ import inquiryListOption from '@/const/rfq/newAndView/detailInquiryList';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
 import { getUserInfo, compare } from '@/util/utils.js';
-import { purchaseEnquiryAction, queryDetailAction, submitAudit } from '@/api/rfq';
+import { purchaseEnquiryAction, queryDetailAction, submitAudit, openPassWord } from '@/api/rfq';
 import { dataDicAPI, supplierMasterListAction } from '@/api/rfq/common';
 import history from './history';
 import { validatenull } from '@/util/validate';
@@ -318,15 +291,7 @@ export default {
       tabActive: 'detail',
       detailObj: {},
       filesForm: {},
-      headerButtons: [
-        { power: true, text: '返回', type: '', size: '', action: 'on-back' },
-        { power: true, text: '更新时间', type: 'primary', size: '', action: 'on-update-end' },
-        { power: true, text: '提交审批', type: 'primary', size: '', action: 'on-submit-approval' },
-        { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
-        { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-        // { power: true, text: '开启', type: 'primary', size: '', action: 'on-open' },
-        { power: true, text: '发布新供应商', type: 'primary', size: '', action: 'on-new-supplier' }
-      ],
+      headerButtons: [],
       historyVisible: false,
       historyList: [],
       quoteMethodData: [],
@@ -393,6 +358,16 @@ export default {
     }
   },
   methods: {
+    showXPrice(item) {
+      // 显示星星：限时、加密
+      const canSee = this.detailObj.canSeeRule || '0';
+      let result =
+        ((item.itemStatus === '2' || item.itemStatus === '4') &&
+          this.detailObj.quoteEndTime > new Date().getTime() &&
+          canSee === '0') ||
+        (canSee === '1' && this.detailObj.showQuoteInfo !== 'Y');
+      return result;
+    },
     async tableData(data) {
       const res = await ElsTemplateConfigService.find({
         elsAccount: this.elsAccount,
@@ -464,11 +439,12 @@ export default {
           label: '状态',
           prop: 'itemStatus',
           dicData: [
-            { label: '已报价', value: '2' },
             { label: '报价中', value: '1' },
+            { label: '已报价', value: '2' },
+            { label: '重报价', value: '3' },
             { label: '已接受', value: '4' },
             { label: '已拒绝', value: '5' },
-            { label: '重报价', value: '3' }
+            { label: '已关闭', value: '6' }
           ]
         },
         { slot: true, label: '税率', prop: 'taxRate' },
@@ -484,15 +460,17 @@ export default {
         { slot: true, label: '操作', prop: 'option' },
         { label: '配额', prop: 'quota', cell: true }
       ];
-      const current = this.configurations[value].tableColumns.map((item) => {
-        let result = {};
-        result.prop = item.prop;
-        result.label = item.label;
-        result.display = item.purchaseShow;
-        result.span = item.span;
-        return result;
-      });
-      this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+      if (!validatenull(this.configurations)) {
+        const current = this.configurations[value].tableColumns.map((item) => {
+          let result = {};
+          result.prop = item.prop;
+          result.label = item.label;
+          result.display = item.purchaseShow;
+          result.span = item.span;
+          return result;
+        });
+        this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+      }
     },
     getPriceIndex(row, column) {
       const quantity = row.quantity;
@@ -504,12 +482,7 @@ export default {
       return JSON.parse(row.ladderPriceJson)[index - 1][column];
     },
     getCostPriceIndex(row, column) {
-      if (
-        !(
-          (row.itemStatus === '2' || row.itemStatus === '4') &&
-          this.detailObj.quoteEndTime > new Date().getTime()
-        )
-      ) {
+      if (row.itemStatus === '1' || row.itemStatus === '3') {
         return '**';
       }
       const costJson = JSON.parse(row.costConstituteJson);
@@ -655,8 +628,8 @@ export default {
     handleShowHistory() {
       queryDetailAction('queryQuote', this.currentEnquiryNumber).then((res) => {
         this.historyList = res.data.pageData.rows;
+        this.historyVisible = true;
       });
-      this.historyVisible = true;
     },
     // 开启
     handleShowOpen() {
@@ -668,8 +641,18 @@ export default {
       });
     },
     handleOpenSubmit(form) {
-      this.detailObj.quoteEndTime = new Date().getTime();
-      this.openDialogVisible = false;
+      console.log('this.form', form);
+      // this.detailObj.quoteEndTime = new Date().getTime();
+      openPassWord({ enquiryNumber: this.detailObj.enquiryNumber, passWord: form.password }).then(
+        (res) => {
+          if (res.data.statusCode === '200') {
+            this.openDialogVisible = false;
+            this.$router.go(0);
+          } else {
+            this.$message.warning('请输入正确开启密码');
+          }
+        }
+      );
     },
     handleTabChange(value) {
       this.tabActive = value.prop;
@@ -804,6 +787,27 @@ export default {
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
             { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
           ];
+        } else {
+          this.headerButtons = [
+            { power: true, text: '返回', type: '', size: '', action: 'on-back' },
+            { power: true, text: '更新时间', type: 'primary', size: '', action: 'on-update-end' },
+            {
+              power: true,
+              text: '提交审批',
+              type: 'primary',
+              size: '',
+              action: 'on-submit-approval'
+            },
+            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
+            { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+            {
+              power: true,
+              text: '发布新供应商',
+              type: 'primary',
+              size: '',
+              action: 'on-new-supplier'
+            }
+          ];
         }
 
         if (this.detailObj.quoteEndTime < new Date().getTime()) {
@@ -814,6 +818,16 @@ export default {
             size: '',
             action: 'on-bid-price'
           });
+
+          if (this.detailObj.canSeeRule === '1' && this.detailObj.showQuoteInfo !== 'Y') {
+            this.headerButtons.push({
+              power: true,
+              text: '开启',
+              type: 'primary',
+              size: '',
+              action: 'on-open'
+            });
+          }
         }
 
         if (res.data.data.flowCode) {

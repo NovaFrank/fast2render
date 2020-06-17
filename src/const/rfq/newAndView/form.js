@@ -1,5 +1,5 @@
 // 注册信息字段、资质准入字段 dialog
-// import { DIC } from '../../dic';
+import { DIC } from '../../dic';
 
 const validateQuoteEndTime = (rule, value, callback) => {
   if (value && value < new Date().getTime()) {
@@ -46,8 +46,9 @@ export default {
     {
       type: 'select',
       // dicData: DIC.TABLE_CONFIG_DEFAULT,
-      dicUrl: '/layout/dics/value/enquiryType',
-      dicMethod: 'get',
+      // dicUrl: '/layout/dics/value/enquiryType',
+      // dicMethod: 'get',
+      formslot: true,
       label: '询价类型',
       span: 6,
       prop: 'enquiryType',
@@ -58,6 +59,29 @@ export default {
           trigger: 'change'
         }
       ]
+    },
+    {
+      type: 'select',
+      dicData: DIC.CHECK_RULE,
+      label: '查看规则',
+      span: 6,
+      prop: 'canSeeRule',
+      value: '0',
+      rules: [
+        {
+          required: true,
+          message: '请选择查看规则',
+          trigger: 'blur'
+        }
+      ]
+    },
+    {
+      type: 'input',
+      label: '开启密码',
+      span: 6,
+      prop: 'passWord',
+      maxlength: 8,
+      showWordLimit: true
     }
     // Test
     // {

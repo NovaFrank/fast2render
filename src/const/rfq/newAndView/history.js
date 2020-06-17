@@ -39,6 +39,7 @@ export default {
         prop: 'quoteMethod'
       },
       {
+        slot: true,
         label: '含税价',
         prop: 'priceIncludingTax'
       },
@@ -47,6 +48,7 @@ export default {
         prop: 'taxRate'
       },
       {
+        slot: true,
         label: '不含税价',
         prop: 'priceExcludingTax'
       },

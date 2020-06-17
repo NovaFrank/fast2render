@@ -67,3 +67,12 @@ export const testSuppliers = (params) => {
     data: params
   });
 };
+
+// 开启 POST /PurchaseEnquiryService/openPassWord
+export const openPassWord = (params) => {
+  return request({
+    url: `${prefix}/inquiry/PurchaseEnquiryService/openPassWord`,
+    method: 'post',
+    data: params
+  });
+};

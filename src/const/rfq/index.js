@@ -38,10 +38,10 @@ export default {
         label: '供应商ELS账号',
         prop: 'toElsAccount'
       },
-      // {
-      //   label: '公司名称',
-      //   prop: 'companyShortName'
-      // },
+      {
+        label: '公司名称',
+        prop: 'companyShortName'
+      },
       {
         label: '物料编码',
         prop: 'materialNumber'

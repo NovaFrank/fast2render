@@ -1,15 +1,54 @@
 <template>
   <div>
-    <el-dialog title="报价记录" width="70%" :visible.sync="visable">
-      <avue-crud :data.sync="crudData" :option="crudOption.option"> </avue-crud>
+    <el-dialog title="报价记录" width="70%" :visible.sync="dialogVisible">
+      <avue-crud :data.sync="crudData" :option="crudOption.option">
+        <!-- 含税 -->
+        <template slot-scope="scope" slot="priceIncludingTax">
+          <span v-if="scope.row.quoteMethod === '0'">
+            {{
+              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
+              detailObj.quoteEndTime > new Date().getTime()
+                ? '**'
+                : scope.row.priceIncludingTax
+            }}
+          </span>
+          <span v-else-if="scope.row.quoteMethod === '1'">
+            <span>{{ getPriceIndex(scope.row, 'priceIncludingTax') }}</span>
+          </span>
+          <span v-else-if="scope.row.quoteMethod === '2'">
+            {{ getCostPriceIndex(scope.row, 'priceIncludingTax') }}
+          </span>
+        </template>
+        <!-- 不含税 -->
+        <template slot-scope="scope" slot="priceExcludingTax">
+          <span v-if="scope.row.quoteMethod === '0'">
+            {{
+              (scope.row.itemStatus === '2' || scope.row.itemStatus === '4') &&
+              detailObj.quoteEndTime > new Date().getTime()
+                ? '**'
+                : scope.row.priceExcludingTax
+            }}
+          </span>
+          <span v-else-if="scope.row.quoteMethod === '1'">
+            {{ getPriceIndex(scope.row, 'priceExcludingTax') }}
+          </span>
+          <span v-else-if="scope.row.quoteMethod === '2'">
+            {{ getCostPriceIndex(scope.row, 'priceExcludingTax') }}
+          </span>
+        </template>
+      </avue-crud>
     </el-dialog>
   </div>
 </template>
 <script>
 import historyOption from '@/const/rfq/newAndView/history';
+
+const execMathExpress = require('exec-mathexpress');
+
 export default {
   name: 'history',
   props: {
+    detailObj: Object,
     title: { type: String, default: '' }, // dialog标题
     dialogVisible: { type: Boolean, default: false }, // dialog显隐
     // 表格的列配置
@@ -55,7 +94,6 @@ export default {
   },
   data() {
     return {
-      visable: this.dialogVisible,
       selectColumns: [],
       crudObj: {},
       crudData: [],
@@ -95,17 +133,58 @@ export default {
     column: function(newValue) {
       this.crudOption.column = newValue;
     },
-    visable: function(newValue) {
-      this.initData();
-      this.$emit('update:dialogVisible', newValue);
-    },
-    dialogVisible: function(newValue) {
-      this.visable = newValue;
-    },
     crudOption: function(newValue) {}
   },
   methods: {
-    initData() {}
+    getPriceIndex(row, column) {
+      if (
+        (row.itemStatus === '2' || row.itemStatus === '4') &&
+        this.detailObj.quoteEndTime > new Date().getTime()
+      ) {
+        return '**';
+      }
+      const quantity = row.quantity;
+      const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
+        return Number(item.ladderQuantity);
+      });
+      quantityList.push(quantity);
+      const index = quantityList.findIndex((item) => item === Number(quantity));
+      return JSON.parse(row.ladderPriceJson)[index - 1][column];
+    },
+    getCostPriceIndex(row, column) {
+      if (
+        (row.itemStatus === '2' || row.itemStatus === '4') &&
+        this.detailObj.quoteEndTime > new Date().getTime()
+      ) {
+        return '**';
+      }
+      const costJson = JSON.parse(row.costConstituteJson);
+      if (costJson) {
+        const template = costJson.templateJson;
+        let price = 0;
+        template.forEach((item) => {
+          if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
+            item.propData.tableData.forEach((t) => {
+              const formula = this.$getFormulaItem(item.prop);
+              price += Number(this.$getFormulaValue(formula, t).price);
+            });
+          } else if (item.propData && item.propData.formData) {
+            const formula = this.$getFormulaItem(item.prop);
+            price += Number(this.$getFormulaValue(formula, item.propData.formData).price);
+          }
+        });
+        if (column === 'priceExcludingTax') {
+          const result = execMathExpress('v1 / ( v2 + v3 )', {
+            v1: price || 0,
+            v2: 1,
+            v3: row.taxRate
+          });
+          price = Math.floor((result.num / result.den) * 100) / 100;
+        }
+        return price || 0;
+      }
+      return 0;
+    }
   }
 };
 </script>

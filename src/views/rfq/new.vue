@@ -236,22 +236,22 @@ export default {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
-    this.$getBlockItem('rfq-header').then((res) => {
-      this.formOption.column = res[0].data.column.map((item) => {
-        if (item.prop === 'enquiryNumber') item.formslot = true;
-        if (item.prop === 'companyCode') item.type = 'tree';
-        if (item.prop === 'quoteEndTime') {
-          item.type = 'datetime';
-          item.format = 'yyyy-MM-dd HH:mm:ss';
-          item.valueFormat = 'timestamp';
-        }
-        if (item.prop === 'enquiryType') {
-          item.type = 'select';
-          item.formslot = true;
-        }
-        return item;
-      });
-    });
+    // this.$getBlockItem('rfq-header').then((res) => {
+    //   this.formOption.column = res[0].data.column.map((item) => {
+    //     if (item.prop === 'enquiryNumber') item.formslot = true;
+    //     if (item.prop === 'companyCode') item.type = 'tree';
+    //     if (item.prop === 'quoteEndTime') {
+    //       item.type = 'datetime';
+    //       item.format = 'yyyy-MM-dd HH:mm:ss';
+    //       item.valueFormat = 'timestamp';
+    //     }
+    //     if (item.prop === 'enquiryType') {
+    //       item.type = 'select';
+    //       item.formslot = true;
+    //     }
+    //     return item;
+    //   });
+    // });
     this.tableData(); // 加载当前页面需要的数据
     if (!validatenull(this.$route.params.enquiryNumber)) {
       this.currentEnquiryNumber = this.$route.params.enquiryNumber;
@@ -297,8 +297,35 @@ export default {
       if (newVal.enquiryType) {
         this.handleEnquiryTypeChange(newVal.enquiryType);
       }
-      // this.inquiryListOption.data = [];
       this.$forceUpdate();
+    },
+    'form.canSeeRule'(newVal) {
+      if (newVal === '1') {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'passWord') {
+            item.display = true;
+            item.rules = [
+              {
+                required: true,
+                message: '请填写开启密码',
+                trigger: 'blur'
+              }
+            ];
+            return item;
+          }
+          return item;
+        });
+      } else {
+        this.form.passWord = '';
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'passWord') {
+            item.display = false;
+            item.rules = [];
+            return item;
+          }
+          return item;
+        });
+      }
     }
   },
   methods: {
@@ -681,6 +708,8 @@ export default {
                   companyCode: this.form.companyCode,
                   // responsible: this.form.responsible,
                   enquiryMethod: this.form.enquiryMethod,
+                  canSeeRule: this.form.canSeeRule,
+                  passWord: this.form.passWord,
                   itemList: this.inquiryListOption.data
                 };
                 if (this.currentEnquiryNumber) {
@@ -707,13 +736,13 @@ export default {
     },
     // 表单保存
     handleSaveForm() {
-      this.$confirm('是否保存？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$refs.form.validate((valid) => {
-          if (valid) {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.$confirm('是否保存？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
             if (this.inquiryListOption.data.length === 0) {
               this.$message.error('请添加询价明细');
               return;
@@ -735,6 +764,8 @@ export default {
               companyCode: this.form.companyCode,
               // responsible: this.form.responsible,
               enquiryMethod: this.form.enquiryMethod,
+              canSeeRule: this.form.canSeeRule,
+              passWord: this.form.passWord,
               itemList: this.inquiryListOption.data
             };
             purchaseEnquiryAction('save', params).then((res) => {
@@ -749,8 +780,8 @@ export default {
               this.form.enquiryNumber = enquiryNumber;
               this.$router.push({ path: `/new/${enquiryNumber}`, query: { enquiryNumber } });
             });
-          }
-        });
+          });
+        }
       });
     },
     handleShowSupplierSelect() {

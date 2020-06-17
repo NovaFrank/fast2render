@@ -159,6 +159,7 @@
     ></cost-quote-dialog>
     <!-- 报价历史记录 -->
     <history
+      :detailObj="detailObj"
       :dialogVisible="historyVisible"
       :data="historyList"
       :quoteMethodData="quoteMethodData"
@@ -206,7 +207,7 @@ export default {
   },
   data() {
     return {
-      quoteStatus: false,
+      quoteStatus: false, // 是否为 未报价/重报价 状态，true 可保存、发送、附件操作，false 不可进行操作
       dic: [
         {
           label: '否',

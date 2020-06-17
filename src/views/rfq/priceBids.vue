@@ -187,7 +187,7 @@ export default {
   created() {
     this.enquiryNumber = this.$route.params.enquiryNumber;
     this.initDetail();
-    this.chartTabActive = this.$route.query.type || 'costChart'; // bidChart
+    this.chartTabActive = this.$route.query.type || 'bidChart';
   },
   mounted() {
     this.initChart();

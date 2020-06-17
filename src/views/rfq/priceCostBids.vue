@@ -153,6 +153,7 @@ export default {
             );
             i[prop] = price;
           });
+          console.log(item.label, i);
         }
         this.sumData.push({
           ...i,

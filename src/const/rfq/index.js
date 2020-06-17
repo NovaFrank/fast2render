@@ -39,7 +39,7 @@ export default {
         prop: 'toElsAccount'
       },
       {
-        label: '公司名称',
+        label: '供应商名称',
         prop: 'companyShortName'
       },
       {

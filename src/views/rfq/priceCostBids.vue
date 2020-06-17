@@ -135,10 +135,12 @@ export default {
           this.suppliers.forEach((supplier) => {
             const prop = this.initProviderData(supplier);
             let price = 0;
-            this.providerData[tempProp].tableData.forEach((t) => {
-              const formula = this.$getFormulaItem(tempProp);
-              price += Number(this.$getFormulaValue(formula, t).price);
-            });
+            if (this.providerData[tempProp]) {
+              this.providerData[tempProp].tableData.forEach((t) => {
+                const formula = this.$getFormulaItem(tempProp);
+                price += Number(this.$getFormulaValue(formula, t).price);
+              });
+            }
             i[prop] = price;
           });
         } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {

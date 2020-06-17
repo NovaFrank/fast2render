@@ -81,3 +81,9 @@ export default {
   }
 };
 </script>
+
+<style>
+.el-transfer-panel {
+  width: 430px;
+}
+</style>

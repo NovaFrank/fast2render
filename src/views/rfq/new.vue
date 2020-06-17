@@ -545,8 +545,8 @@ export default {
         this.supplierList = res.data.pageData.rows;
         this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
           return {
-            label: `${item.toElsAccount}_${item.supplierName}`,
-            key: `${item.toElsAccount}_${item.supplierName}`
+            label: `${item.toElsAccount}_${item.supplierName}_${item.firstType}`,
+            key: `${item.toElsAccount}_${item.supplierName}_${item.firstType}`
           };
         });
         this.dialogOption.column = this.dialogOption.column.map((item) => {
@@ -554,8 +554,8 @@ export default {
             return {
               dicData: this.supplierList.map((item) => {
                 return {
-                  label: `${item.toElsAccount}_${item.supplierName}`,
-                  value: `${item.toElsAccount}_${item.supplierName}`
+                  label: `${item.toElsAccount}_${item.supplierName}_${item.firstType}`,
+                  value: `${item.toElsAccount}_${item.supplierName}_${item.firstType}`
                 };
               }),
               ...item

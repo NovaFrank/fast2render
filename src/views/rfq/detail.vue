@@ -185,7 +185,8 @@
             detailObj.auditStatus !== '0' &&
               detailObj.auditStatus !== '2' &&
               scope.row.itemStatus !== '1' &&
-              detailObj.quoteEndTime < new Date().getTime()
+              detailObj.quoteEndTime < new Date().getTime() &&
+              !showXPrice(scope.row)
           "
           :gutter="24"
         >
@@ -215,6 +216,7 @@
       :dialogVisible="historyVisible"
       :data="historyList"
       :quoteMethodData="quoteMethodData"
+      @close-field-dialog="closeFieldDialog"
     ></history>
     <!-- 新供应商选择 -->
     <select-supplier-dialog
@@ -549,6 +551,7 @@ export default {
     closeFieldDialog() {
       this.openDialogVisible = false;
       this.costDialogVisible = false;
+      this.historyVisible = false;
     },
     currentChange(val) {
       this.inquiryListOption.page.currentPage = val;
@@ -558,7 +561,7 @@ export default {
       });
     },
     handleAgainQuote(row) {
-      this.$confirm('确定要该供应商物料重报价？', '提示', {
+      this.$confirm('确定要该供应商物料重报价（请更新报价截止时间）？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -687,7 +690,7 @@ export default {
       if (
         scope.row.itemStatus !== '1' &&
         scope.row.itemStatus !== '3' &&
-        this.detailObj.quoteEndTime < new Date().getTime()
+        !this.showXPrice(scope.row)
       ) {
         const costJson = JSON.parse(scope.row.costConstituteJson);
         this.template = costJson.templateJson;

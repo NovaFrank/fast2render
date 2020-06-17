@@ -128,6 +128,7 @@ import { formatDate } from '@/util/date';
 import costBids from './priceCostBids';
 
 let echarts = require('echarts/lib/echarts');
+const execMathExpress = require('exec-mathexpress');
 require('echarts/lib/component/title');
 require('echarts/lib/component/tooltip');
 require('echarts/lib/chart/bar');
@@ -241,6 +242,37 @@ export default {
       const index = quantityList.findIndex((item) => item === Number(quantity));
       return JSON.parse(row.ladderPriceJson)[index - 1][column];
     },
+    getCostPriceIndex(row, column) {
+      if (row.itemStatus === '1' || row.itemStatus === '3') {
+        return '**';
+      }
+      const costJson = JSON.parse(row.costConstituteJson);
+      if (costJson) {
+        const template = costJson.templateJson;
+        let price = 0;
+        template.forEach((item) => {
+          if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
+            item.propData.tableData.forEach((t) => {
+              const formula = this.$getFormulaItem(item.prop);
+              price += Number(this.$getFormulaValue(formula, t).price);
+            });
+          } else if (item.propData && item.propData.formData) {
+            const formula = this.$getFormulaItem(item.prop);
+            price += Number(this.$getFormulaValue(formula, item.propData.formData).price);
+          }
+        });
+        if (column === 'priceExcludingTax') {
+          const result = execMathExpress('v1 / ( v2 + v3 )', {
+            v1: price || 0,
+            v2: 1,
+            v3: row.taxRate
+          });
+          price = Math.floor((result.num / result.den) * 100) / 100;
+        }
+        return price || 0;
+      }
+      return 0;
+    },
     initDetailError(res) {
       if (res.data.statusCode !== '200') {
         this.$message.error(res.data.message);
@@ -314,11 +346,15 @@ export default {
                 d[prop] =
                   current.quoteMethod === '1'
                     ? this.getPriceIndex(current, 'priceIncludingTax')
+                    : current.quoteMethod === '2'
+                    ? this.getCostPriceIndex(current, 'priceIncludingTax')
                     : current.priceIncludingTax;
               } else if (option === '不含税价') {
                 d[prop] =
                   current.quoteMethod === '1'
                     ? this.getPriceIndex(current, 'priceExcludingTax')
+                    : current.quoteMethod === '2'
+                    ? this.getCostPriceIndex(current, 'priceExcludingTax')
                     : current.priceExcludingTax;
               } else if (option === '税率') {
                 if (currentSupplierList.length > 0) d[prop] = current.taxRate;

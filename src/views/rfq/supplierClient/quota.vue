@@ -113,6 +113,10 @@
       </template>
       <template slot-scope="scope" slot="quote">
         <avue-radio
+          v-if="
+            (scope.row.itemStatus === '1' && detailObj.quoteEndTime > new Date().getTime()) ||
+              scope.row.itemStatus === '3'
+          "
           v-model="scope.row.noQuoted"
           :disabled="!['1', '3'].includes(scope.row.itemStatus)"
           :dic="dic"
@@ -121,7 +125,12 @@
       </template>
       <template slot-scope="scope" slot="menu">
         <el-button
-          v-if="scope.row.noQuoted !== 'N' && ['1', '3'].includes(scope.row.itemStatus)"
+          v-if="
+            (scope.row.noQuoted !== 'N' &&
+              scope.row.itemStatus === '1' &&
+              detailObj.quoteEndTime > new Date().getTime()) ||
+              scope.row.itemStatus === '3'
+          "
           @click.stop="handleQuoteRow(scope)"
           class="el-button el-button--text el-button--small"
         >
@@ -163,6 +172,7 @@
       :dialogVisible="historyVisible"
       :data="historyList"
       :quoteMethodData="quoteMethodData"
+      @close-field-dialog="closeFieldDialog"
     ></history>
     <!-- 成本报价模板 -->
     <cost-template-dialog
@@ -395,6 +405,7 @@ export default {
       this.ladderQuoteVisible = false;
       this.quoteVisible = false;
       this.costDialogVisible = false;
+      this.historyVisible = false;
     },
     currentChange(val) {
       this.inquiryListOption.page.currentPage = val;
@@ -593,17 +604,17 @@ export default {
             noQuoted: item.noQuoted || 'Y'
           };
         });
-        if (this.quoteStatus) {
+        if (this.detailObj.quoteEndTime < new Date().getTime() || !this.quoteStatus) {
+          this.headerButtons = [
+            { power: true, text: '返回', type: '', size: '', action: 'on-back' },
+            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
+          ];
+        } else {
           this.headerButtons = [
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
             { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
             { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
             { power: true, text: '发送', type: 'primary', size: '', action: 'on-send' }
-          ];
-        } else {
-          this.headerButtons = [
-            { power: true, text: '返回', type: '', size: '', action: 'on-back' },
-            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
           ];
         }
       });

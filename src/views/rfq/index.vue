@@ -97,7 +97,7 @@ import tabOption from '@/const/rfq/navTabs';
 import tableOption from '@/const/rfq/index';
 import { purchaseEnquiryAction } from '@/api/rfq';
 import { getUserInfo } from '@/util/utils.js';
-import { dataDicAPI } from '@/api/rfq/common';
+import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 
 export default {
   components: {},
@@ -177,18 +177,6 @@ export default {
       });
     },
     tableData(data) {
-      // 询价类型 数据字典（临时），最好写option dicUrl
-      dataDicAPI('enquiryType').then((res) => {
-        this.tableOption.option.column = this.tableOption.option.column.map((item) => {
-          if (item.prop === 'enquiryType') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
       let params = {
         pageSize: this.tableOption.page.pageSize || 10,
         currentPage: 1,
@@ -220,6 +208,28 @@ export default {
         }
         this.tableOption.data = res.data.pageData.rows;
         this.tableOption.page.total = res.data.pageData.total;
+      });
+
+      ElsTemplateConfigService.find({
+        elsAccount: '307000',
+        businessModule: 'enquiry',
+        currentVersionFlag: 'Y'
+      }).then((res) => {
+        if (res.data && res.data.statusCode === '200' && res.data.pageData) {
+          const rows = res.data.pageData.rows || [];
+          console.log('rows', rows);
+          this.tableOption.option.column = this.tableOption.option.column.map((item) => {
+            if (item.prop === 'enquiryType') {
+              item.dicData = rows.map((item) => {
+                return {
+                  value: item.templateNumber,
+                  label: item.templateName
+                };
+              });
+            }
+            return item;
+          });
+        }
       });
     }
   }

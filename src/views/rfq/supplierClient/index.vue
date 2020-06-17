@@ -57,6 +57,7 @@ import tableOption from '@/const/rfq/supplierClient/index';
 import { postAction } from '@/api/rfq/supplierClient';
 import { getSupplierInfo } from '@/util/utils.js';
 import { dataDicAPI } from '@/api/rfq/common';
+import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 
 export default {
   components: {},
@@ -116,18 +117,6 @@ export default {
       };
     },
     initDicData() {
-      // 询价类型 数据字典（临时），最好写option dicUrl
-      dataDicAPI('enquiryType').then((res) => {
-        this.tableOption.option.column = this.tableOption.option.column.map((item) => {
-          if (item.prop === 'enquiryType') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
       // 报价方式 数据字典（临时），最好写option dicUrl
       dataDicAPI('quoteMethod').then((res) => {
         this.tableOption.option.column = this.tableOption.option.column.map((item) => {
@@ -155,10 +144,6 @@ export default {
         ...data,
         elsAccount: this.elsAccount
       };
-      // new itemStatus 0
-      // quoted itemStatus 1
-      // price itemStatus 4
-      // close itemStatusList 6/5
 
       // 未报价   itemStatus:1
       // 已报价   itemStatus:2
@@ -198,6 +183,28 @@ export default {
         }
         this.tableOption.data = res.data.pageData.rows;
         this.tableOption.page.total = res.data.pageData.total;
+      });
+
+      ElsTemplateConfigService.find({
+        elsAccount: '307000',
+        businessModule: 'enquiry',
+        currentVersionFlag: 'Y'
+      }).then((res) => {
+        if (res.data && res.data.statusCode === '200' && res.data.pageData) {
+          const rows = res.data.pageData.rows || [];
+          console.log('rows', rows);
+          this.tableOption.option.column = this.tableOption.option.column.map((item) => {
+            if (item.prop === 'enquiryType') {
+              item.dicData = rows.map((item) => {
+                return {
+                  value: item.templateNumber,
+                  label: item.templateName
+                };
+              });
+            }
+            return item;
+          });
+        }
       });
     }
   }

@@ -55,8 +55,6 @@ export default {
         prop: 'materialDesc'
       },
       {
-        dicUrl: '/layout/dics/value/enquiryType',
-        dicMethod: 'get',
         type: 'select',
         label: '询价类型',
         prop: 'enquiryType'

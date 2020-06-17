@@ -76,3 +76,12 @@ export const openPassWord = (params) => {
     data: params
   });
 };
+
+// 审批历史 POST /CommonAuditService/auditHislist
+export const auditHisList = (params) => {
+  return request({
+    url: `${prefix}/CommonAuditService/auditHislist`,
+    method: 'post',
+    data: params
+  });
+};

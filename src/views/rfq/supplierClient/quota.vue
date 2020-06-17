@@ -306,15 +306,17 @@ export default {
         { label: '税率', prop: 'taxRate' },
         { slot: true, label: '不含税价', prop: 'priceExcludingTax' }
       ];
-      const current = this.configurations[value].tableColumns.map((item) => {
-        let result = {};
-        result.prop = item.prop;
-        result.label = item.label;
-        result.display = item.saleShow;
-        result.span = item.span;
-        return result;
-      });
-      this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+      if (!validatenull(this.configurations)) {
+        const current = this.configurations[value].tableColumns.map((item) => {
+          let result = {};
+          result.prop = item.prop;
+          result.label = item.label;
+          result.display = item.saleShow;
+          result.span = item.span;
+          return result;
+        });
+        this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+      }
       this.inquiryListOption.option.column.push({
         slot: true,
         label: '是否报价',

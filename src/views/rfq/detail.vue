@@ -72,6 +72,16 @@
       :clientTab="true"
       :downloadClient="detailObj.quoteEndTime < new Date().getTime()"
     ></fast2-attachment-list>
+    <!-- 审批记录 -->
+    <avue-crud
+      v-show="tabActive === 'auditHistory'"
+      :data="auditListOption.data"
+      :option="auditListOption.option"
+      :page.sync="auditListOption.page"
+      v-model="auditListOption.obj"
+    >
+    </avue-crud>
+    <!-- 询价明细 -->
     <avue-crud
       v-show="tabActive === 'detail'"
       :data="inquiryListOption.data"
@@ -240,11 +250,19 @@ import { mySpanMethod } from '@/util/utils';
 import FormHeader from '@/components/views/formHeader';
 import formOption from '@/const/rfq/newAndView/detail';
 import tabOption from '@/const/rfq/newAndView/detailTabs';
+import tabAuditOption from '@/const/rfq/newAndView/detailTabsAudit';
 import inquiryListOption from '@/const/rfq/newAndView/detailInquiryList';
+import auditListOption from '@/const/rfq/newAndView/auditListOption';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
 import { getUserInfo, compare } from '@/util/utils.js';
-import { purchaseEnquiryAction, queryDetailAction, submitAudit, openPassWord } from '@/api/rfq';
+import {
+  purchaseEnquiryAction,
+  queryDetailAction,
+  submitAudit,
+  openPassWord,
+  auditHisList
+} from '@/api/rfq';
 import { dataDicAPI, supplierMasterListAction } from '@/api/rfq/common';
 import history from './history';
 import { validatenull } from '@/util/validate';
@@ -285,7 +303,9 @@ export default {
       ],
       formOption: formOption,
       tabOption: tabOption,
+      tabAuditOption: tabAuditOption,
       inquiryListOption: inquiryListOption,
+      auditListOption: auditListOption,
       quoteListOption: quoteListOption,
       filesOption: filesOption,
       tabActive: 'detail',
@@ -355,6 +375,23 @@ export default {
       if (!validatenull(newVal.enquiryType)) {
         this.handleEnquiryTypeChange(newVal.enquiryType);
       }
+    },
+    'detailObj.auditStatus'(newVal) {
+      if (newVal === '1') {
+        this.tabOption.option.column = [
+          { label: '询价明细', prop: 'detail' },
+          { label: '采购方文件', prop: 'files' },
+          { label: '供货方文件', prop: 'filesSupplier' }
+        ];
+      } else {
+        this.tabOption.option.column = [
+          { label: '询价明细', prop: 'detail' },
+          { label: '采购方文件', prop: 'files' },
+          { label: '供货方文件', prop: 'filesSupplier' },
+          { label: '审批记录', prop: 'auditHistory' }
+        ];
+      }
+      this.$forceUpdate();
     }
   },
   methods: {
@@ -395,17 +432,6 @@ export default {
       dataDicAPI('quoteMethod').then((res) => {
         this.quoteMethodData = res.data;
       });
-      // dataDicAPI('enquiryType').then((res) => {
-      //   this.formOption.column = this.formOption.column.map((item) => {
-      //     if (item.prop === 'enquiryType') {
-      //       return {
-      //         ...item,
-      //         dicData: res.data
-      //       };
-      //     }
-      //     return item;
-      //   });
-      // });
       // 供应商列表 supplierMasterListAction
       supplierMasterListAction({ elsAccount: this.elsAccount, pageSize: 10000 }).then((res) => {
         this.supplierList = res.data.pageData.rows;
@@ -659,9 +685,8 @@ export default {
     },
     handleShowCostTemplate(scope) {
       if (
-        this.detailObj.auditStatus !== '0' &&
-        this.detailObj.auditStatus !== '2' &&
-        scope.row.itemStatus === '2' &&
+        scope.row.itemStatus !== '1' &&
+        scope.row.itemStatus !== '3' &&
         this.detailObj.quoteEndTime < new Date().getTime()
       ) {
         const costJson = JSON.parse(scope.row.costConstituteJson);
@@ -782,7 +807,6 @@ export default {
         this.detailObj = res.data.data;
         if (this.detailObj.auditStatus === '0' || this.detailObj.auditStatus === '2') {
           this.inquiryListOption.option.header = false;
-
           this.headerButtons = [
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
             { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
@@ -837,6 +861,13 @@ export default {
             auditStatus: res.data.data.auditStatus
           };
           setStore({ name: this.currentEnquiryNumber, content, type: true });
+          auditHisList({ rootProcessInstanceId: res.data.data.flowCode }).then((res) => {
+            if (res.data.statusCode === '200') {
+              this.auditListOption.data = res.data.pageData.rows;
+            } else {
+              this.auditListOption.data = [];
+            }
+          });
         }
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {

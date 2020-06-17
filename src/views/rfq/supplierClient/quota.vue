@@ -49,7 +49,7 @@
       :elsAccount="detailObj.elsAccount"
       :businessElsAccount="detailObj.toElsAccount"
       businessModule="enquiry"
-      :readonly="detailObj.quoteEndTime < new Date().getTime()"
+      :readonly="detailObj.quoteEndTime < new Date().getTime() || !quoteStatus"
       v-show="tabActive === 'filesSupplier'"
       :passClient="false"
       :client="true"
@@ -206,6 +206,7 @@ export default {
   },
   data() {
     return {
+      quoteStatus: false,
       dic: [
         {
           label: '否',
@@ -236,9 +237,7 @@ export default {
       dialogWidth: '50%',
       headerButtons: [
         { power: true, text: '返回', type: '', size: '', action: 'on-back' },
-        { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
-        { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
-        { power: true, text: '发送', type: 'primary', size: '', action: 'on-send' }
+        { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
       ],
       currentEnquiryNumber: '',
       requestTypeDict: [],
@@ -584,12 +583,26 @@ export default {
       getAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
+          if (['1', '3'].includes(item.itemStatus)) this.quoteStatus = true;
           return {
-            // $cellEdit: ['1', '3'].includes(item.itemStatus) && item.noQuoted === 'Y', // 重报价/报价中，且报价 是
+            // $cellEdit: ['1', '3'].includes(item.itemStatus) && item.noQuoted === 'Y', // 重报价/报价中(未报价)，且报价 是
             ...item,
             noQuoted: item.noQuoted || 'Y'
           };
         });
+        if (this.quoteStatus) {
+          this.headerButtons = [
+            { power: true, text: '返回', type: '', size: '', action: 'on-back' },
+            { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
+            { power: true, text: '发送', type: 'primary', size: '', action: 'on-send' }
+          ];
+        } else {
+          this.headerButtons = [
+            { power: true, text: '返回', type: '', size: '', action: 'on-back' },
+            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
+          ];
+        }
       });
     },
     // 行信息 - 常规报价保存

@@ -67,6 +67,10 @@ export default {
         label: '供应商',
         prop: 'toElsAccount'
       },
+      // {
+      //   label: '供应商',
+      //   prop: 'toElsAccountName'
+      // },
       {
         type: 'select',
         label: '供应商状态',

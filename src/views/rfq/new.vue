@@ -332,7 +332,8 @@ export default {
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
-        { label: '供应商', prop: 'toElsAccountList' },
+        // { display: false, label: '供应商', prop: 'toElsAccountList' },
+        { label: '供应商', prop: 'accountList' },
         {
           type: 'date',
           format: 'yyyy-MM-dd',
@@ -764,6 +765,10 @@ export default {
                 return;
               }
               this.$message.success('保存成功');
+              if (this.currentEnquiryNumber) {
+                this.$router.go(0);
+                return;
+              }
               const enquiryNumber = res.data.data.enquiryNumber;
               this.currentEnquiryNumber = enquiryNumber;
               this.$forceUpdate();
@@ -800,7 +805,16 @@ export default {
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
-        this.inquiryListOption.data = res.data.pageData.rows;
+        this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
+          const accountList = item.toElsAccountList
+            .split(',')
+            .map((i) => {
+              return i.split('_')[1];
+            })
+            .toString();
+          item.accountList = accountList;
+          return item;
+        });
       });
       this.$forceUpdate();
     },
@@ -887,24 +901,35 @@ export default {
       this.relationDialogVisable = true;
     },
     suppliersDialogSaveTransfer(selectedSupplier) {
-      // this.currentSelectionDetailItems;
+      console.log('selectedSupplier', selectedSupplier, this.currentSelectionDetailItems);
       if (this.currentSelectionDetailItems.length > 0) {
         this.currentSelectionDetailItems.forEach((item) => {
+          console.log('selectedSupplier', selectedSupplier);
           const index = item.$index;
+          const suppliers = selectedSupplier.map((i) => {
+            console.log(i.split('_'));
+            return i.split('_')[1];
+          });
           this.$set(
             this.inquiryListOption.data[index],
             'toElsAccountList',
             selectedSupplier.toString()
           );
+          this.$set(this.inquiryListOption.data[index], 'accountList', suppliers.toString());
         });
-        return;
+      } else {
+        const index = this.currentDetailItem.$index;
+        this.$set(
+          this.inquiryListOption.data[index],
+          'toElsAccountList',
+          selectedSupplier.toString()
+        );
+        const suppliers = selectedSupplier.map((i) => {
+          console.log(i.split('_'));
+          return i.split('_')[1];
+        });
+        this.$set(this.inquiryListOption.data[index], 'accountList', suppliers.toString());
       }
-      const index = this.currentDetailItem.$index;
-      this.$set(
-        this.inquiryListOption.data[index],
-        'toElsAccountList',
-        selectedSupplier.toString()
-      );
       this.currentDetailItem = {};
       this.currentSelectionDetailItems = [];
     },

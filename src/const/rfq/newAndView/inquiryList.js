@@ -45,9 +45,14 @@ export default {
         label: '需求数量',
         prop: 'quantity'
       },
+      // {
+      //   display: false,
+      //   label: '供应商',
+      //   prop: 'toElsAccountList'
+      // },
       {
         label: '供应商',
-        prop: 'toElsAccountList'
+        prop: 'accountList'
       },
       {
         type: 'date',

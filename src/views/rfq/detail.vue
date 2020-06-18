@@ -466,6 +466,7 @@ export default {
         { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
         { slot: true, label: '成本模板', prop: 'costTemplate' },
         { label: '供应商', prop: 'toElsAccount' },
+        // { label: '供应商', prop: 'toElsAccountName' },
         {
           type: 'select',
           label: '供应商状态',
@@ -932,6 +933,7 @@ export default {
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
           return {
             id: item.uuid,
+            // toElsAccountName: item.toElsAccount.split('_')[1],
             $cellEdit:
               item.itemStatus === '4' &&
               this.detailObj.auditStatus !== '0' &&

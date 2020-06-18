@@ -465,8 +465,8 @@ export default {
         { slot: true, label: '报价方式', prop: 'quoteMethod' },
         { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
         { slot: true, label: '成本模板', prop: 'costTemplate' },
-        { label: '供应商', prop: 'toElsAccount' },
-        // { label: '供应商', prop: 'toElsAccountName' },
+        // { label: '供应商', prop: 'toElsAccount' },
+        { label: '供应商', prop: 'companyShortName' },
         {
           type: 'select',
           label: '供应商状态',

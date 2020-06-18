@@ -63,14 +63,14 @@ export default {
         label: '成本模板',
         prop: 'costTemplate'
       },
-      {
-        label: '供应商',
-        prop: 'toElsAccount'
-      },
       // {
       //   label: '供应商',
-      //   prop: 'toElsAccountName'
+      //   prop: 'toElsAccount'
       // },
+      {
+        label: '供应商',
+        prop: 'companyShortName'
+      },
       {
         type: 'select',
         label: '供应商状态',

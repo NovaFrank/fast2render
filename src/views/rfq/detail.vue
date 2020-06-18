@@ -644,12 +644,11 @@ export default {
       }).then(() => {
         const itemList = this.inquiryListOption.data.map((item) => {
           const index = this.suppliersDialogOptionColumn.data.findIndex(
-            (supplier) => supplier.toElsAccount === item.toElsAccount
+            (supplier) => supplier.label.indexOf(item.toElsAccount) !== -1
           );
-          const supplier = this.suppliersDialogOptionColumn.data[index];
+          const supplier = this.suppliersDialogOptionColumn.data[index].label.split('_');
           return {
-            toElsAccount: `${supplier.toElsAccount}_${supplier.supplierName}_${supplier.firstType ||
-              ''}`,
+            toElsAccount: `${supplier[0]}_${supplier[1]}_${supplier[2] || ''}`,
             ...item
           };
         });
@@ -966,15 +965,21 @@ export default {
       const newSuppliers = selectedSupplier.filter(
         (item) => !this.currentDetailItemSelected.includes(item)
       );
-
       const itemList = newSuppliers.map((item, index) => {
-        let costJson = JSON.parse(this.currentDetailItem.costConstituteJson);
-        let template = costJson.templateJson;
-        template = template.map((element) => {
-          element.propData = { tableData: [], formData: {} };
-          return element;
-        });
-        costJson.templateJson = template;
+        const supplierIndex = this.suppliersDialogOptionColumn.data.findIndex(
+          (supplier) => supplier.label.indexOf(item) !== -1
+        );
+        const supplier = this.suppliersDialogOptionColumn.data[supplierIndex].label.split('_');
+        let costJson = {};
+        if (item.quoteMethod === '2') {
+          costJson = JSON.parse(this.currentDetailItem.costConstituteJson);
+          let template = costJson.templateJson;
+          template = template.map((element) => {
+            element.propData = { tableData: [], formData: {} };
+            return element;
+          });
+          costJson.templateJson = template;
+        }
         return {
           id: `${index}`,
           materialNumber: this.currentDetailItem.materialNumber,
@@ -986,6 +991,8 @@ export default {
           quantity: this.currentDetailItem.quantity,
           elsAccount: this.currentDetailItem.elsAccount,
           toElsAccount: item,
+          supplierName: supplier[1],
+          supplierType: supplier[2],
           canDeliveryDate: this.currentDetailItem.canDeliveryDate,
           quoteMethod: this.currentDetailItem.quoteMethod,
           itemStatus: '1',

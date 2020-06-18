@@ -83,45 +83,6 @@ export default {
       maxlength: 8,
       showWordLimit: true
     }
-    // Test
-    // {
-    //   label: '数据类型',
-    //   span: 12,
-    //   labelPosition: 'top',
-    //   prop: 'datatype',
-    //   type: 'select',
-    //   dicUrl: '/layout/dics/value/data_type',
-    //   dicMethod: 'get'
-    // },
-    // {
-    //   type: 'tree',
-    //   label: '负责人',
-    //   span: 6,
-    //   prop: 'createUser',
-    //   rules: [
-    //     {
-    //       required: true,
-    //       message: '请选择负责人',
-    //       trigger: 'blur'
-    //     }
-    //   ]
-    // },
-    // {
-    //   type: 'select',
-    //   // dicData: DIC.ENQUIRY_METHOD,
-    //   dicUrl: '/layout/dics/value/enquiryMethod',
-    //   dicMethod: 'get',
-    //   label: '公开方式',
-    //   span: 6,
-    //   prop: 'enquiryMethod',
-    //   rules: [
-    //     {
-    //       required: true,
-    //       message: '请选择公开方式',
-    //       trigger: 'blur'
-    //     }
-    //   ]
-    // }
   ],
   labelWidth: 120,
   menuBtn: false

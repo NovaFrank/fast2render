@@ -47,6 +47,7 @@
       :passClient="false"
       :client="false"
       :clientTab="false"
+      version="attahcment-fiels_4_3"
     ></fast2-attachment-list>
     <avue-crud
       v-show="tabActive === 'detail'"
@@ -710,6 +711,7 @@ export default {
                   enquiryMethod: this.form.enquiryMethod,
                   canSeeRule: this.form.canSeeRule,
                   passWord: this.form.passWord,
+                  auditStatus: this.form.auditStatus,
                   itemList: this.inquiryListOption.data
                 };
                 if (this.currentEnquiryNumber) {

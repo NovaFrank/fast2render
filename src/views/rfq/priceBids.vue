@@ -471,7 +471,7 @@ export default {
         }
       });
       if (status) {
-        this.$message.error('已报价状态的单据不能提交审批');
+        this.$message.error('必须有接受状态的报价才能够提交审批');
         return;
       }
       if (result) {

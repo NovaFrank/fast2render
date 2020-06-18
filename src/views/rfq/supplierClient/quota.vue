@@ -41,6 +41,7 @@
       :passClient="false"
       :client="true"
       :clientTab="false"
+      version="attahcment-fiels_4_3"
     ></fast2-attachment-list>
     <!-- 供应商附件 -->
     <fast2-attachment-list
@@ -54,6 +55,7 @@
       :passClient="false"
       :client="true"
       :clientTab="true"
+      version="attahcment-fiels_4_3"
     ></fast2-attachment-list>
     <avue-crud
       v-show="tabActive === 'detail'"

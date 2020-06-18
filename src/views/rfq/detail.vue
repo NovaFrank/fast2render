@@ -59,6 +59,7 @@
       :passClient="false"
       :client="false"
       :clientTab="false"
+      version="attahcment-fiels_4_3"
     ></fast2-attachment-list>
     <!-- 供应商附件 -->
     <fast2-attachment-list
@@ -72,6 +73,7 @@
       :client="false"
       :clientTab="true"
       :downloadClient="detailObj.quoteEndTime < new Date().getTime()"
+      version="attahcment-fiels_4_3"
     ></fast2-attachment-list>
     <!-- 审批记录 -->
     <avue-crud
@@ -441,7 +443,7 @@ export default {
         this.supplierList = res.data.pageData.rows;
         this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
           return {
-            label: item.toElsAccount,
+            label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
             key: item.toElsAccount
           };
         });
@@ -464,6 +466,17 @@ export default {
         { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
         { slot: true, label: '成本模板', prop: 'costTemplate' },
         { label: '供应商', prop: 'toElsAccount' },
+        {
+          type: 'select',
+          label: '供应商状态',
+          prop: 'supplierType',
+          dicData: [
+            { label: '合格供应商', value: '1' },
+            { label: '潜在供应商', value: '2' },
+            { label: '陌生供应商', value: '3' },
+            { label: '淘汰供应商', value: '4' }
+          ]
+        },
         {
           type: 'select',
           label: '状态',
@@ -629,11 +642,22 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        const itemList = this.inquiryListOption.data.map((item) => {
+          const index = this.suppliersDialogOptionColumn.data.findIndex(
+            (supplier) => supplier.toElsAccount === item.toElsAccount
+          );
+          const supplier = this.suppliersDialogOptionColumn.data[index];
+          return {
+            toElsAccount: `${supplier.toElsAccount}_${supplier.supplierName}_${supplier.firstType ||
+              ''}`,
+            ...item
+          };
+        });
         const params = {
           ...formOption.detailObj,
           enquiryNumber: this.currentEnquiryNumber,
           quoteEndTime: this.detailObj.quoteEndTime,
-          itemList: this.inquiryListOption.data
+          itemList: itemList
         };
         purchaseEnquiryAction('newSupplierPublish', params).then((res) => {
           if (res.data.statusCode !== '200') {
@@ -753,7 +777,7 @@ export default {
         }
       });
       if (status) {
-        this.$message.error('已报价状态的单据不能提交审批');
+        this.$message.error('必须有接受状态的报价才能够提交审批');
         return;
       }
       if (result) {

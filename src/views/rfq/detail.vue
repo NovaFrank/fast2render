@@ -993,6 +993,7 @@ export default {
           quantity: this.currentDetailItem.quantity,
           elsAccount: this.currentDetailItem.elsAccount,
           toElsAccount: item,
+          companyShortName: supplier[1],
           supplierName: supplier[1],
           supplierType: supplier[2],
           canDeliveryDate: this.currentDetailItem.canDeliveryDate,

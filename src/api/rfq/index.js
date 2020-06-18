@@ -48,6 +48,17 @@ export const submitAudit = (action, params) => {
   });
 };
 
+// 撤回审批
+export const cancelAudit = (action, params) => {
+  return request({
+    url: `${prefix}/CommonAuditService/${action}`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};
+
 // 成本模板 POST /ElsTemplateConfigService/findPageList
 export const costTemplateList = (params) => {
   return request({

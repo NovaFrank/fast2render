@@ -9,7 +9,7 @@
     <avue-form ref="form" :option="dialogOption" v-model="form" class="new-field">
       <template slot="menuForm">
         <el-button @click="closeDialog">取消</el-button>
-        <el-button type="primary" @click="handleSubmit">保存</el-button>
+        <el-button type="primary" @click="handleSubmit">提交</el-button>
       </template>
     </avue-form>
   </el-dialog>

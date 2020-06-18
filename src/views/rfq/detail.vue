@@ -15,6 +15,7 @@
       @on-update-end="handleUpdateQuoteEndTime"
       @show-time-history="handleShowTimeHistory"
       @on-bid-price="handleBidPrice"
+      @on-cancel-approval="handleCancelApproval"
     ></form-header>
     <avue-form ref="form" v-model="detailObj" :option="formOption">
       <template slot="quoteEndTime">
@@ -262,6 +263,7 @@ import {
   purchaseEnquiryAction,
   queryDetailAction,
   submitAudit,
+  cancelAudit,
   openPassWord,
   auditHisList
 } from '@/api/rfq';
@@ -711,6 +713,26 @@ export default {
       }
       this.suppliersDialogVisable = true;
     },
+    handleCancelApproval() {
+      this.$confirm('是否撤回审批？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        cancelAudit('cancel', {
+          rootProcessInstanceId: this.detailObj.flowCode,
+          businessId: this.detailObj.enquiryNumber,
+          businessType: 'bargainEnquiryAudit'
+        }).then((res) => {
+          if (res.data.statusCode === '200') {
+            this.$message.success('已撤回审批');
+            this.$router.go(0);
+            return;
+          }
+          this.$message.error('撤回审批失败');
+        });
+      });
+    },
     handleSubmitApproval() {
       let status = true;
       let result = false;
@@ -814,6 +836,15 @@ export default {
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
             { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
           ];
+          if (this.detailObj.auditStatus === '2') {
+            this.headerButtons.push({
+              power: true,
+              text: '撤回',
+              type: 'primary',
+              size: '',
+              action: 'on-cancel-approval'
+            });
+          }
         } else {
           this.headerButtons = [
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },

@@ -71,15 +71,17 @@ export default {
   watch: {
     costPriceData(newValue) {
       this.currentMaterial = this.costPriceData[0];
-      const costJson = JSON.parse(newValue[0].costConstituteJson);
-      this.template = costJson.templateJson;
-      this.tabPermission = costJson.permissionJson;
-      this.providerData = {};
-      this.template.forEach((element) => {
-        this.providerData[element.prop] = element.propData;
-      });
-      this.initColumn();
-      this.initDetailColumn();
+      if (newValue[0] && newValue[0].costConstituteJson) {
+        const costJson = JSON.parse(newValue[0].costConstituteJson);
+        this.template = costJson.templateJson;
+        this.tabPermission = costJson.permissionJson;
+        this.providerData = {};
+        this.template.forEach((element) => {
+          this.providerData[element.prop] = element.propData;
+        });
+        this.initColumn();
+        this.initDetailColumn();
+      }
     }
   },
   methods: {
@@ -143,6 +145,7 @@ export default {
             }
             i[prop] = price;
           });
+          console.log(item.label, i);
         } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {
           let price = 0;
           this.suppliers.forEach((supplier) => {

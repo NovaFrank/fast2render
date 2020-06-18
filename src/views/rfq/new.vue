@@ -138,7 +138,6 @@
 <script>
 import FormHeader from '@/components/views/formHeader';
 import fieldDialog from '@/components/views/fieldDialog';
-// import SelectDialogTable from '@/components/views/SelectDialogTable';
 import fieldDialogOption from '@/const/rfq/newAndView/formDialog'; // 询价明细弹窗option
 import formOption from '@/const/rfq/newAndView/form';
 import tabOption from '@/const/rfq/newAndView/tabs';
@@ -182,7 +181,6 @@ export default {
   components: {
     FormHeader,
     fieldDialog,
-    // SelectDialogTable,
     selectSupplierDialog,
     relationDialog
   },
@@ -266,7 +264,6 @@ export default {
       if (this.form.purchaseRequestNumber) {
         this.inquiryListOption.option.menu = false;
         this.headerButtons = [
-          // { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
           { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
           { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
           { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
@@ -277,8 +274,6 @@ export default {
       } else {
         this.inquiryListOption.option.menu = true;
         this.headerButtons = [
-          // { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
-          // { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
           { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
           { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
           { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
@@ -335,7 +330,6 @@ export default {
         { label: '物料编号', prop: 'materialNumber' },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
-        // { label: '规格', prop: 'materialSpecifications' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
         { label: '供应商', prop: 'toElsAccountList' },
@@ -397,8 +391,6 @@ export default {
           rules: [{ trigger: 'change', validator: validateDateTime }]
         },
         {
-          // dicUrl: '/layout/dics/value/taxRate',
-          // dicMethod: 'get',
           type: 'select',
           label: '税码',
           prop: 'taxCode',
@@ -499,7 +491,7 @@ export default {
                 return {
                   ...item,
                   value: item.orgId,
-                  label: item.orgId // `${item.orgId}_${item.orgDesc}`
+                  label: item.orgId
                 };
               })
             };
@@ -702,12 +694,10 @@ export default {
                 let params = {
                   enquiryNumber: this.currentEnquiryNumber,
                   elsAccount: this.elsAccount,
-                  // beginDate: this.form.beginDate,
                   quoteEndTime: this.form.quoteEndTime,
                   enquiryType: this.form.enquiryType,
                   enquiryDesc: this.form.enquiryDesc,
                   companyCode: this.form.companyCode,
-                  // responsible: this.form.responsible,
                   enquiryMethod: this.form.enquiryMethod,
                   canSeeRule: this.form.canSeeRule,
                   passWord: this.form.passWord,
@@ -759,12 +749,10 @@ export default {
             const params = {
               enquiryNumber: this.currentEnquiryNumber,
               elsAccount: this.elsAccount,
-              // beginDate: this.form.beginDate,
               quoteEndTime: this.form.quoteEndTime,
               enquiryType: this.form.enquiryType,
               enquiryDesc: this.form.enquiryDesc,
               companyCode: this.form.companyCode,
-              // responsible: this.form.responsible,
               enquiryMethod: this.form.enquiryMethod,
               canSeeRule: this.form.canSeeRule,
               passWord: this.form.passWord,

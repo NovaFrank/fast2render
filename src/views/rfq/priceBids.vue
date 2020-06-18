@@ -269,9 +269,9 @@ export default {
           });
           price = Math.floor((result.num / result.den) * 100) / 100;
         }
-        return price || 0;
+        return price || '';
       }
-      return 0;
+      return '';
     },
     initDetailError(res) {
       if (res.data.statusCode !== '200') {

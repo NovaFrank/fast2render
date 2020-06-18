@@ -32,10 +32,10 @@ export default {
         label: '物料描述',
         prop: 'materialDesc'
       },
-      {
-        label: '规格',
-        prop: 'materialSpecifications'
-      },
+      // {
+      //   label: '规格',
+      //   prop: 'materialSpecifications'
+      // },
       {
         label: '单位',
         prop: 'baseUnit',

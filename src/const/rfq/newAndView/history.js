@@ -23,9 +23,17 @@ export default {
         prop: 'materialName'
       },
       {
-        label: '规格',
-        prop: 'materialSpecifications'
+        label: '供应商ELS账号',
+        prop: 'toElsAccount'
       },
+      {
+        label: '供应商名称',
+        prop: 'companyShortName'
+      },
+      // {
+      //   label: '规格',
+      //   prop: 'materialSpecifications'
+      // },
       {
         label: '单位',
         prop: 'baseUnit',

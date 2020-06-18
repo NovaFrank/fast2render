@@ -334,7 +334,7 @@ export default {
         { label: '物料编号', prop: 'materialNumber' },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
-        { label: '规格', prop: 'materialSpecifications' },
+        // { label: '规格', prop: 'materialSpecifications' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
         { label: '供应商', prop: 'toElsAccountList' },

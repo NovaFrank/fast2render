@@ -453,7 +453,7 @@ export default {
         { label: '物料编号', prop: 'materialNumber' },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
-        { label: '规格', prop: 'materialSpecifications' },
+        // { label: '规格', prop: 'materialSpecifications' },
         {
           label: '单位',
           prop: 'baseUnit',
@@ -538,9 +538,9 @@ export default {
           });
           price = Math.floor((result.num / result.den) * 100) / 100;
         }
-        return price || 0;
+        return price || '';
       }
-      return 0;
+      return '';
     },
     cellStyle() {
       return {

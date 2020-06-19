@@ -33,10 +33,17 @@ const routes = [
     name: 'rfqPrice',
     component: () => import('@/views/rfq/priceBids')
   },
+  // 比价提交报告审批页面
   {
     path: '/priceAuditReport/:enquiryNumber',
     name: 'priceAuditReport',
     component: () => import('@/views/rfq/priceAuditReport')
+  },
+  // 比价报告审批页面
+  {
+    path: '/priceReportDetail/:enquiryNumber',
+    name: 'priceAuditReportDetail',
+    component: () => import('@/views/rfq/priceAuditReportDetail')
   },
   {
     path: '/quotationTemplate',

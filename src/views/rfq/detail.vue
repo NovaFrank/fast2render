@@ -332,7 +332,8 @@ export default {
       quoteEndTimeChange: null,
       currentEnquiryNumber: '',
       requestTypeDict: [],
-      configurations: {}
+      configurations: {},
+      interval: null
     };
   },
   created() {
@@ -341,29 +342,29 @@ export default {
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
     this.currentEnquiryNumber = this.$route.params.enquiryNumber;
-    this.$getBlockItem('rfq-header-detail').then((res) => {
-      this.formOption.column = res[0].data.column.map((item) => {
-        item.disabled = true;
-        if (item.prop === 'companyCode') item.type = 'tree';
-        if (item.prop === 'quoteEndTime') {
-          item.type = 'datetime';
-          item.format = 'yyyy-MM-dd HH:mm:ss';
-          item.valueFormat = 'timestamp';
-          item.disabled = false;
-          item.formslot = true;
-        }
-        if (item.prop === 'createDate') {
-          item.type = 'date';
-          item.format = 'yyyy-MM-dd';
-          item.valueFormat = 'timestamp';
-        }
-        if (item.prop === 'enquiryType') {
-          item.type = 'select';
-          item.formslot = true;
-        }
-        return item;
-      });
-    });
+    // this.$getBlockItem('rfq-header-detail').then((res) => {
+    //   this.formOption.column = res[0].data.column.map((item) => {
+    //     item.disabled = true;
+    //     if (item.prop === 'companyCode') item.type = 'tree';
+    //     if (item.prop === 'quoteEndTime') {
+    //       item.type = 'datetime';
+    //       item.format = 'yyyy-MM-dd HH:mm:ss';
+    //       item.valueFormat = 'timestamp';
+    //       item.disabled = false;
+    //       item.formslot = true;
+    //     }
+    //     if (item.prop === 'createDate') {
+    //       item.type = 'date';
+    //       item.format = 'yyyy-MM-dd';
+    //       item.valueFormat = 'timestamp';
+    //     }
+    //     if (item.prop === 'enquiryType') {
+    //       item.type = 'select';
+    //       item.formslot = true;
+    //     }
+    //     return item;
+    //   });
+    // });
     this.tableData();
   },
   watch: {
@@ -597,6 +598,7 @@ export default {
       });
     },
     handleBack() {
+      clearInterval(this.interval);
       this.$router.push({ path: '/list' });
     },
     handleBidPrice() {
@@ -848,12 +850,24 @@ export default {
       }
       return true;
     },
+    checkQuoteEndTime() {
+      if (this.detailObj.quoteEndTime > new Date().getTime()) {
+        this.interval = setInterval(() => {
+          console.log('checkQuoteEndTime', this.detailObj.quoteEndTime < new Date().getTime());
+          if (this.detailObj.quoteEndTime < new Date().getTime()) {
+            clearInterval(this.interval);
+            this.$router.go(0);
+          }
+        }, 3000);
+      }
+    },
     initDetail() {
       this.detailObj = {};
       this.inquiryListOption.data = [];
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
+        this.checkQuoteEndTime();
         if (this.detailObj.auditStatus === '0' || this.detailObj.auditStatus === '2') {
           this.inquiryListOption.option.header = false;
           this.headerButtons = [

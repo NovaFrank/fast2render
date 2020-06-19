@@ -34,6 +34,11 @@ const routes = [
     component: () => import('@/views/rfq/priceBids')
   },
   {
+    path: '/priceAuditReport/:enquiryNumber',
+    name: 'priceAuditReport',
+    component: () => import('@/views/rfq/priceAuditReport')
+  },
+  {
     path: '/quotationTemplate',
     name: 'quotationTemplate',
     component: () => import('@/views/rfq/quotationTemplate/index')

@@ -21,7 +21,7 @@
                 size="small"
                 type="primary"
                 @click="handleSubmit"
-                >提交</el-button
+                >保存</el-button
               >
             </template>
             <template
@@ -120,7 +120,7 @@ import priceObjOption from '@/const/rfq/priceBids/priceObj';
 import historyChartOption from '@/const/rfq/priceBids/historyChart';
 import inquiryListOption from '@/const/rfq/priceBids/detailInquiryList';
 import { mySpanMethod } from '@/util/utils';
-import { queryDetailAction, submitAudit } from '@/api/rfq';
+import { queryDetailAction, submitAudit, purchaseEnquiryAction } from '@/api/rfq';
 import { historyAction } from '@/api/rfq/priceBids';
 import { compare } from '@/util/utils.js';
 import FormHeader from '@/components/views/formHeader';
@@ -452,64 +452,76 @@ export default {
       }
     },
     handleSubmit() {
-      let status = true;
-      let result = false;
-      this.crudData.forEach((item) => {
-        if (item.itemStatus === '4') {
-          status = false; // 必须有接受的报价才能够提交审批
-        }
-        if (item.itemStatus === '4') {
-          let quote = 0;
-          this.crudData
-            .filter(
-              (itemF) => itemF.materialNumber === item.materialNumber && item.itemStatus === '4'
-            )
-            .forEach((itemQuota) => {
-              quote += Number(itemQuota.quota);
-            });
-          if (Number(quote) !== 100) result = true; // 相同物料 已报价 分配的配额必须相加为100
-        }
-      });
-      if (status) {
-        this.$message.error('必须有接受状态的报价才能够提交审批');
-        return;
-      }
-      if (result) {
-        this.$message.error('物料配额必须等于100');
-        return;
-      }
-      this.$confirm('是否提交审批？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        const action = 'submit';
-        const param = {
-          enquiryNumber: this.currentEnquiryNumber,
-          elsAccount: this.elsAccount,
-          quoteEndTime: this.detailObj.quoteEndTime,
-          enquiryType: this.detailObj.enquiryType,
-          enquiryDesc: this.detailObj.enquiryDesc,
-          companyCode: this.detailObj.companyCode,
-          enquiryMethod: this.detailObj.enquiryMethod || '',
-          itemList: this.crudData
-        };
-        let params = {
-          elsAccount: this.detailObj.elsAccount,
-          // toElsAccount: this.detailObj.toElsAccount,
-          businessType: 'bargainEnquiryAudit',
-          businessId: this.detailObj.enquiryNumber,
-          params: JSON.stringify(param)
-        };
-        submitAudit(action, params).then((res) => {
-          if (res.data.statusCode === '200') {
-            this.$message.success('提交审批成功');
-            this.$router.back();
-            return;
-          }
-          this.$message.error('提交审批失败');
-        });
-      });
+      // 保存
+      this.$router.push({ path: `/priceAuditReport/${this.detailObj.enquiryNumber}` });
+      // const param = {
+      //   ...this.detailObj,
+      //   elsAccount: this.elsAccount,
+      //   itemList: this.crudData
+      // };
+      // purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
+      //   console.log(res);
+      // });
+
+      // 原 提交
+      // let status = true;
+      // let result = false;
+      // this.crudData.forEach((item) => {
+      //   if (item.itemStatus === '4') {
+      //     status = false; // 必须有接受的报价才能够提交审批
+      //   }
+      //   if (item.itemStatus === '4') {
+      //     let quote = 0;
+      //     this.crudData
+      //       .filter(
+      //         (itemF) => itemF.materialNumber === item.materialNumber && item.itemStatus === '4'
+      //       )
+      //       .forEach((itemQuota) => {
+      //         quote += Number(itemQuota.quota);
+      //       });
+      //     if (Number(quote) !== 100) result = true; // 相同物料 已报价 分配的配额必须相加为100
+      //   }
+      // });
+      // if (status) {
+      //   this.$message.error('必须有接受状态的报价才能够提交审批');
+      //   return;
+      // }
+      // if (result) {
+      //   this.$message.error('物料配额必须等于100');
+      //   return;
+      // }
+      // this.$confirm('是否保存？', '提示', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // }).then(() => {
+      // const action = 'submit';
+      // const param = {
+      //   enquiryNumber: this.currentEnquiryNumber,
+      //   elsAccount: this.elsAccount,
+      //   quoteEndTime: this.detailObj.quoteEndTime,
+      //   enquiryType: this.detailObj.enquiryType,
+      //   enquiryDesc: this.detailObj.enquiryDesc,
+      //   companyCode: this.detailObj.companyCode,
+      //   enquiryMethod: this.detailObj.enquiryMethod || '',
+      //   itemList: this.crudData
+      // };
+      // let params = {
+      //   elsAccount: this.detailObj.elsAccount,
+      //   // toElsAccount: this.detailObj.toElsAccount,
+      //   businessType: 'bargainEnquiryAudit',
+      //   businessId: this.detailObj.enquiryNumber,
+      //   params: JSON.stringify(param)
+      // };
+      // submitAudit(action, params).then((res) => {
+      //   if (res.data.statusCode === '200') {
+      //     this.$message.success('提交审批成功');
+      //     this.$router.back();
+      //     return;
+      //   }
+      //   this.$message.error('提交审批失败');
+      // });
+      // });
     },
     handleDateCheckChange(value) {
       this.dateChecked = value;

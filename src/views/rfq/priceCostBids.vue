@@ -237,7 +237,6 @@ export default {
       this.currentMaterial = this.costPriceData.filter(
         (item) => item.materialName === value.label
       )[0];
-      this.handleTabHistoryTitle();
       this.historyChartData();
     }
   }

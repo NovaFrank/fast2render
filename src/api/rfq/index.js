@@ -9,6 +9,7 @@ let prefix = '/apis';
 // 更新截止时间 updateQuoteEndTime post
 // 重报价 againQuote post
 // 发布新供应商 newSupplierPublish post
+// 比价页面保存配额 POST /PurchaseEnquiryService/acceptOrRefuse
 export const purchaseEnquiryAction = (action, params) =>
   request({
     url: `${prefix}/inquiry/PurchaseEnquiryService/${action}`,

@@ -50,7 +50,7 @@ export default {
   watch: {
     template(newValue) {
       this.sumData = newValue.map((item) => {
-        if (item.propData.tableData && item.propData.tableData.length > 0) {
+        if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
           let price = 0;
           item.propData.tableData.forEach((t) => {
             const formula = this.$getFormulaItem(item.prop);
@@ -61,7 +61,7 @@ export default {
             key: item.label,
             value: price
           };
-        } else if (item.propData.formData) {
+        } else if (item.propData && item.propData.formData) {
           const formula = this.$getFormulaItem(item.prop);
           let price = Number(this.$getFormulaValue(formula, item.propData.formData).price);
           return {

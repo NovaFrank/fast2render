@@ -361,7 +361,9 @@ export default {
               } else if (option === '税率') {
                 if (currentSupplierList.length > 0) d[prop] = current.taxRate;
               } else if (option === '交货日期') {
-                d[prop] = formatDate(new Date(current.deliveryDate), 'yyyy-MM-dd');
+                d[prop] = current.deliveryDate
+                  ? formatDate(new Date(current.deliveryDate), 'yyyy-MM-dd')
+                  : '';
               } else if (option === '配额') {
                 d[prop] = `${item.materialNumber}_${current.toElsAccount}`;
                 d[`quota_${item.materialNumber}_${current.toElsAccount}`] = current.quota;

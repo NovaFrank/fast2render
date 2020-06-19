@@ -124,18 +124,19 @@ export default {
           prop: item.toElsAccount
         };
       });
+      this.costBidsSum.option.column = [{ label: '', prop: 'key', display: false }];
       this.costBidsSum.option.column = this.costBidsSum.option.column.concat(this.supplierColumn);
 
       this.template.forEach((item) => {
         let i = {};
         const tempProp = item.prop;
-        if (
-          this.providerData[tempProp] &&
-          this.providerData[tempProp].tableData &&
-          this.providerData[tempProp].tableData.length > 0
-        ) {
-          this.suppliers.forEach((supplier) => {
-            const prop = this.initProviderData(supplier);
+        this.suppliers.forEach((supplier) => {
+          const prop = this.initProviderData(supplier);
+          if (
+            this.providerData[tempProp] &&
+            this.providerData[tempProp].tableData &&
+            this.providerData[tempProp].tableData.length > 0
+          ) {
             let price = 0;
             if (this.providerData[tempProp]) {
               this.providerData[tempProp].tableData.forEach((t) => {
@@ -144,20 +145,15 @@ export default {
               });
             }
             i[prop] = price;
-          });
-          console.log(item.label, i);
-        } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {
-          let price = 0;
-          this.suppliers.forEach((supplier) => {
-            const prop = this.initProviderData(supplier);
+          } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {
+            let price = 0;
             const formula = this.$getFormulaItem(tempProp);
             price += Number(
               this.$getFormulaValue(formula, this.providerData[tempProp].formData).price
             );
             i[prop] = price;
-          });
-          console.log(item.label, i);
-        }
+          }
+        });
         this.sumData.push({
           ...i,
           key: item.label
@@ -187,19 +183,23 @@ export default {
           prop: item.toElsAccount
         };
       });
+      this.costBidsSumDetail.option.column = [
+        { label: '', prop: 'key', display: false },
+        { label: '', prop: 'field', display: false }
+      ];
       this.costBidsSumDetail.option.column = this.costBidsSumDetail.option.column.concat(
         this.supplierColumn
       );
       this.template.forEach((item) => {
         let i = {};
         const tempProp = item.prop;
-        if (
-          this.providerData[tempProp] &&
-          this.providerData[tempProp].tableData &&
-          this.providerData[tempProp].tableData.length > 0
-        ) {
-          this.suppliers.forEach((supplier) => {
-            const prop = this.initProviderData(supplier);
+        this.suppliers.forEach((supplier) => {
+          const prop = this.initProviderData(supplier);
+          if (
+            this.providerData[tempProp] &&
+            this.providerData[tempProp].tableData &&
+            this.providerData[tempProp].tableData.length > 0
+          ) {
             this.providerData[tempProp].tableData.forEach((t) => {
               const formula = this.$getFormulaItem(tempProp);
               i[prop] = Number(this.$getFormulaValue(formula, t).price);
@@ -207,27 +207,24 @@ export default {
                 ...i,
                 prop: tempProp,
                 id: `${tempProp}_${t.$index}`,
-                field: t.name, // t.label
+                field: t.name || `项目_${t.$index + 1}`, // t.label
                 key: item.label
               });
             });
-          });
-        } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {
-          this.suppliers.forEach((supplier) => {
-            const prop = this.initProviderData(supplier);
+          } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {
             const formula = this.$getFormulaItem(tempProp);
             i[prop] = Number(
               this.$getFormulaValue(formula, this.providerData[tempProp].formData).price
             );
-          });
-          this.sumDetailData.push({
-            ...i,
-            prop: tempProp,
-            id: `${tempProp}`,
-            field: this.providerData[tempProp].formData.type,
-            key: item.label
-          });
-        }
+            this.sumDetailData.push({
+              ...i,
+              prop: tempProp,
+              id: `${tempProp}`,
+              field: this.providerData[tempProp].formData.type || '总计',
+              key: item.label
+            });
+          }
+        });
       });
     },
     spanMethod({ row, column, rowIndex, columnIndex }) {
@@ -237,7 +234,6 @@ export default {
       this.currentMaterial = this.costPriceData.filter(
         (item) => item.materialName === value.label
       )[0];
-      this.historyChartData();
     }
   }
 };

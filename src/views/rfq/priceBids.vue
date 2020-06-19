@@ -63,7 +63,7 @@
           </avue-crud>
         </el-tab-pane>
         <el-tab-pane label="成本比价" name="costChart">
-          <cost-bids :materialData="materialData" :costPriceData="costPriceData"></cost-bids>
+          <cost-bids :materialData="costMaterialData" :costPriceData="costPriceData"></cost-bids>
         </el-tab-pane>
         <el-tab-pane label="历史价格" name="historyChart">
           <div>
@@ -139,6 +139,7 @@ export default {
   data() {
     return {
       costPriceData: [],
+      costMaterialData: [],
       quotaInput: '',
       dic: [
         {
@@ -318,6 +319,7 @@ export default {
           this.materialData.push(item);
         }
       });
+      this.costMaterialData = this.materialData.filter((item) => item.quoteMethod === '2');
       // 最终数据
       let data = [];
       const options = ['含税价', '不含税价', '税率', '交货日期', '配额'];

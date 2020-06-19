@@ -589,13 +589,13 @@ export default {
       }
       return true;
     },
-    initDetail() {
+    async initDetail() {
       this.detailObj = {};
       this.inquiryListOption.data = [];
-      getAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
-        if (!this.initDetailError(res)) return;
-        this.detailObj = res.data.data;
-      });
+      const res = await getAction('findHeadDetails', this.currentEnquiryNumber);
+      if (!this.initDetailError(res)) return;
+      this.detailObj = res.data.data;
+
       getAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {

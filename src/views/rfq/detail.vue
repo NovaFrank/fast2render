@@ -518,6 +518,9 @@ export default {
       }
     },
     getPriceIndex(row, column) {
+      if (row.itemStatus === '1' || row.itemStatus === '3') {
+        return '';
+      }
       const quantity = row.quantity;
       const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
         return Number(item.ladderQuantity);

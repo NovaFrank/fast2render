@@ -70,7 +70,6 @@ export default {
   mounted() {},
   watch: {
     costPriceData(newValue) {
-      console.log('newValue', newValue);
       this.currentMaterial = this.costPriceData[0];
       if (newValue[0] && newValue[0].costConstituteJson) {
         const costJson = JSON.parse(newValue[0].costConstituteJson);
@@ -80,7 +79,6 @@ export default {
         this.template.forEach((element) => {
           this.providerData[element.prop] = element.propData;
         });
-        console.log(this.template);
         this.initColumn();
         this.initDetailColumn();
       }

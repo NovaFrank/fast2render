@@ -186,6 +186,25 @@ export default {
   },
   data() {
     return {
+      templateRule: {
+        // enquirySetRanking: true, 是否开启排名 - 在比价页面对比项中添加【排名】字段
+        // enquiryIsQuota: true, 是否配额 是否现实配额列（是否判断）
+        // enquiryQuotaType: 'percentage', 配额方式 百分比percentage/数量number
+        // enquiryIsProjectApproval: true, 是否立项 发布前需要提交审批，审批通过 则可发布
+        // enquiryPurchaserTax: true, 采购方税率/供方税率
+        // isMin3Supplier: true, 最小三家供应商
+        // enquiryPriceContrast: 'package', 比价 1打包比-package 2逐条比-item 3成本比-cost ： 成本比是否需要将成本含税价等传接口？
+        // ============================================================================
+        // enquiryIsOnlyQualifiedSupplier: true, 是否供应商资质审查 - 暂无
+        // enquiryWay: 'partner', 询价方式（合作伙伴、企企通、已认证、潜在、陌生） - 暂无
+        // ----------------------------------------------------------------------------
+        // isViewAbleAttachmentBefroeDealline: true 报价时间截止前，是否可查看供方附件
+        // ------------------- 不要 enquiryPriceQuote: 'normal', 报价方式
+        // ------------------- 不要 enquirySetPassword: true, 是否使用开启密码 是否与头部开启冲突？
+        // 公开原则 enquiryPublicRule 未知
+        // enquiryViewHistory: 'ranking', 查看历史记录 price/ranking/supplier 仅历史记录列表加入供应商名
+        // 询价范围？？？？？enquiryScope？？？？？？成本报价 true/false？？？？？ 合并到询价方式
+      },
       relation: {},
       selectedSupplier: [],
       data: {},
@@ -469,10 +488,12 @@ export default {
               });
               configurations[item.templateNumber] = {
                 name: item.templateName,
+                configRule: json.rule,
                 tableColumns: table
               };
             }
             this.configurations = configurations;
+            console.log('this.configurations', this.configurations);
           } else {
             this.requestTypeDict = [];
             this.$message.error('查找采购申请配置数据失败, ' + res.data.message || '');

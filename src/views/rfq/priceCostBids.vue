@@ -206,7 +206,7 @@ export default {
               this.sumDetailData.push({
                 ...i,
                 prop: tempProp,
-                id: `${tempProp}_${t.$index}`,
+                id: `${tempProp}_${t.$index}_${supplier.toElsAccount}`,
                 field: t.name || `项目_${t.$index + 1}`, // t.label
                 key: item.label
               });
@@ -219,13 +219,14 @@ export default {
             this.sumDetailData.push({
               ...i,
               prop: tempProp,
-              id: `${tempProp}`,
+              id: `${tempProp}_${supplier.toElsAccount}`,
               field: this.providerData[tempProp].formData.type || '总计',
               key: item.label
             });
           }
         });
       });
+      console.log('this.sumDetailData', this.sumDetailData);
     },
     spanMethod({ row, column, rowIndex, columnIndex }) {
       return mySpanMethod(this.sumDetailData, [0], 'prop', 'id', columnIndex, row);

@@ -368,6 +368,58 @@ export default {
       });
     },
     async tableData(data) {
+      // 公开方式 数据字典
+      dataDicAPI('enquiryMethod').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'enquiryMethod') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 付款方式 数据字典
+      dataDicAPI('payMethod').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'payMethod') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 询价范围 数据字典
+      dataDicAPI('enquiryScope').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'enquiryScope') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 询价范围 数据字典
+      dataDicAPI('currency').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'currency') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
       // 报价方式 数据字典
       dataDicAPI('quoteMethod').then((res) => {
         this.quoteMethodData = res.data;

@@ -160,6 +160,7 @@ import { validatenull, validateNumber } from '@/util/validate';
 import { testSuppliers } from '@/api/rfq/index';
 
 import { ElsTemplateConfigService } from '@/api/templateConfig.js';
+import { DIC } from '@/const/dic';
 
 const validateDateTime = (rule, value, callback) => {
   if (value && value < new Date().getTime()) {
@@ -247,30 +248,14 @@ export default {
       relationDialogVisable: false,
       currentEnquiryNumber: '',
       requestTypeDict: [],
-      configurations: {}
+      configurations: []
     };
   },
-  created() {
+  async created() {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
-    // this.$getBlockItem('rfq-header').then((res) => {
-    //   this.formOption.column = res[0].data.column.map((item) => {
-    //     if (item.prop === 'enquiryNumber') item.formslot = true;
-    //     if (item.prop === 'companyCode') item.type = 'tree';
-    //     if (item.prop === 'quoteEndTime') {
-    //       item.type = 'datetime';
-    //       item.format = 'yyyy-MM-dd HH:mm:ss';
-    //       item.valueFormat = 'timestamp';
-    //     }
-    //     if (item.prop === 'enquiryType') {
-    //       item.type = 'select';
-    //       item.formslot = true;
-    //     }
-    //     return item;
-    //   });
-    // });
-    this.tableData(); // 加载当前页面需要的数据
+    await this.tableData(); // 加载当前页面需要的数据
     if (!validatenull(this.$route.params.enquiryNumber)) {
       this.currentEnquiryNumber = this.$route.params.enquiryNumber;
       this.initDetail();
@@ -309,7 +294,7 @@ export default {
           action: 'on-delete'
         });
       }
-      if (newVal.enquiryType) {
+      if (!validatenull(newVal.enquiryType) && this.configurations[newVal.enquiryType]) {
         this.handleEnquiryTypeChange(newVal.enquiryType);
       }
       this.$forceUpdate();
@@ -344,14 +329,81 @@ export default {
     }
   },
   methods: {
-    handleEnquiryTypeChange(value) {
+    initColumns() {
+      const validateQuoteEndTime = (rule, value, callback) => {
+        if (value && value < new Date().getTime()) {
+          callback(new Error('截止时间不得小于当前时间'));
+        } else {
+          callback();
+        }
+      };
+      // 基本字段
+      this.formOption.column = [
+        {
+          formslot: true,
+          type: 'input',
+          label: '询价单号',
+          span: 6,
+          prop: 'enquiryNumber'
+        },
+        {
+          type: 'input',
+          label: '询价名称',
+          span: 6,
+          prop: 'enquiryDesc'
+        },
+        {
+          type: 'tree',
+          label: '公司代码',
+          span: 6,
+          prop: 'companyCode',
+          valueDefault: ''
+        },
+        {
+          type: 'datetime',
+          format: 'yyyy-MM-dd HH:mm:ss',
+          valueFormat: 'timestamp',
+          label: '报价截止时间',
+          span: 6,
+          prop: 'quoteEndTime',
+          rules: [
+            { required: true, message: '请选择报价截止时间', trigger: 'change' },
+            { trigger: 'change', validator: validateQuoteEndTime }
+          ]
+        },
+        {
+          type: 'select',
+          formslot: true,
+          label: '询价类型',
+          span: 6,
+          prop: 'enquiryType',
+          rules: [{ required: true, message: '请选择询价类型', trigger: 'change' }]
+        },
+        {
+          type: 'select',
+          dicData: DIC.CHECK_RULE,
+          label: '查看规则',
+          span: 6,
+          prop: 'canSeeRule',
+          value: '0',
+          rules: [{ required: true, message: '请选择查看规则', trigger: 'blur' }]
+        },
+        {
+          type: 'input',
+          label: '开启密码',
+          span: 6,
+          prop: 'passWord',
+          display: false,
+          maxlength: 8,
+          showWordLimit: true
+        }
+      ];
       const baseColumn = [
         { label: '物料编号', prop: 'materialNumber' },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
-        // { display: false, label: '供应商', prop: 'toElsAccountList' },
         { label: '供应商', prop: 'accountList' },
         {
           type: 'date',
@@ -443,6 +495,10 @@ export default {
           prop: 'ladderPriceJson'
         }
       ];
+    },
+    handleEnquiryTypeChange(value) {
+      this.initColumns();
+      // 配置字段
       const current = this.configurations[value].tableColumns.map((item) => {
         let result = {};
         result.prop = item.prop;
@@ -457,6 +513,15 @@ export default {
       });
       this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
       this.dialogOption.column = this.dialogOption.column.concat(current);
+      const fieldColumns = this.configurations[value].fieldColumns;
+      fieldColumns.forEach((item) => {
+        if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
+          this.formOption.column.push({
+            span: item.span || 6,
+            ...item
+          });
+        }
+      });
       this.tableData();
     },
     handleAddShow(title, row) {
@@ -467,42 +532,44 @@ export default {
         if (this.$refs.formField) this.$refs.formField.resetFields(); // 等弹窗里的form表单的dom渲染完在执行this.$refs.staffForm.resetFields()，去除验证
       });
     },
-    tableData(data) {
-      ElsTemplateConfigService.find({
+    async tableData(data) {
+      const res = await ElsTemplateConfigService.find({
         elsAccount: this.elsAccount,
         businessModule: 'enquiry',
         currentVersionFlag: 'Y'
-      })
-        .then((res) => {
-          this.requestTypeDict = [];
-          const configurations = [];
+      });
+      this.requestTypeDict = [];
+      const configurations = [];
 
-          if (res.data && res.data.statusCode === '200' && res.data.pageData) {
-            const rows = res.data.pageData.rows || [];
-            for (const item of rows) {
-              const json = JSON.parse(item.configJson);
-              const table = json.table;
-              this.requestTypeDict.push({
-                value: item.templateNumber,
-                label: item.templateName
+      if (res.data && res.data.statusCode === '200' && res.data.pageData) {
+        const rows = res.data.pageData.rows || [];
+        for (const item of rows) {
+          const json = JSON.parse(item.configJson);
+          const table = json.table;
+          let field = [];
+          Object.keys(json.fieldJson.purchase).forEach((item) => {
+            if (json.fieldJson.purchase[item].display) {
+              field.push({
+                prop: item,
+                ...json.fieldJson.purchase[item]
               });
-              configurations[item.templateNumber] = {
-                name: item.templateName,
-                configRule: json.rule,
-                tableColumns: table
-              };
             }
-            this.configurations = configurations;
-            console.log('this.configurations', this.configurations);
-          } else {
-            this.requestTypeDict = [];
-            this.$message.error('查找采购申请配置数据失败, ' + res.data.message || '');
-          }
-        })
-        .catch((err) => {
-          this.requestTypeDict = [];
-          this.$message.error('查找采购申请配置数据失败, ' + err.message || '');
-        });
+          });
+          this.requestTypeDict.push({
+            value: item.templateNumber,
+            label: item.templateName
+          });
+          configurations[item.templateNumber] = {
+            name: item.templateName, // 模板名称
+            fieldColumns: field, // 头信息
+            tableColumns: table // 行信息
+          };
+        }
+        this.configurations = configurations;
+      } else {
+        this.requestTypeDict = [];
+        this.$message.error('查找采购申请配置数据失败, ' + res.data.message || '');
+      }
       // 组织列表（公司）
       orgList().then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {
@@ -522,11 +589,25 @@ export default {
         });
       });
       // 公开方式 数据字典
-      // dataDicAPI('enquiryMethod').then((res) => {
+      dataDicAPI('enquiryMethod').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'enquiryMethod') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 公开方式 数据字典
+      // dataDicAPI('payMethod').then((res) => {
       //   this.formOption.column = this.formOption.column.map((item) => {
-      //     if (item.prop === 'enquiryMethod') {
+      //     if (item.prop === 'payMethod') {
       //       return {
       //         ...item,
+      //         type: 'select',
       //         dicData: res.data
       //       };
       //     }
@@ -714,6 +795,7 @@ export default {
                   return;
                 }
                 let params = {
+                  ...this.form,
                   enquiryNumber: this.currentEnquiryNumber,
                   elsAccount: this.elsAccount,
                   quoteEndTime: this.form.quoteEndTime,
@@ -748,7 +830,7 @@ export default {
           });
       });
     },
-    // 表单保存
+    // 保存
     handleSaveForm() {
       this.$refs.form.validate((valid) => {
         if (valid) {
@@ -769,6 +851,7 @@ export default {
               return;
             }
             const params = {
+              ...this.form,
               enquiryNumber: this.currentEnquiryNumber,
               elsAccount: this.elsAccount,
               quoteEndTime: this.form.quoteEndTime,

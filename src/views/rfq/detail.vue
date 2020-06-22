@@ -336,36 +336,13 @@ export default {
       interval: null
     };
   },
-  created() {
+  async created() {
     this.isAudit = this.$route.query.isAudit || false;
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
     this.currentEnquiryNumber = this.$route.params.enquiryNumber;
-    // this.$getBlockItem('rfq-header-detail').then((res) => {
-    //   this.formOption.column = res[0].data.column.map((item) => {
-    //     item.disabled = true;
-    //     if (item.prop === 'companyCode') item.type = 'tree';
-    //     if (item.prop === 'quoteEndTime') {
-    //       item.type = 'datetime';
-    //       item.format = 'yyyy-MM-dd HH:mm:ss';
-    //       item.valueFormat = 'timestamp';
-    //       item.disabled = false;
-    //       item.formslot = true;
-    //     }
-    //     if (item.prop === 'createDate') {
-    //       item.type = 'date';
-    //       item.format = 'yyyy-MM-dd';
-    //       item.valueFormat = 'timestamp';
-    //     }
-    //     if (item.prop === 'enquiryType') {
-    //       item.type = 'select';
-    //       item.formslot = true;
-    //     }
-    //     return item;
-    //   });
-    // });
-    this.tableData();
+    await this.tableData();
   },
   watch: {
     detailObj(newVal) {
@@ -379,7 +356,7 @@ export default {
           this.headerButtons.splice(index, 1);
         }
       }
-      if (!validatenull(newVal.enquiryType)) {
+      if (!validatenull(newVal.enquiryType) && this.configurations[newVal.enquiryType]) {
         this.handleEnquiryTypeChange(newVal.enquiryType);
       }
     },
@@ -424,13 +401,23 @@ export default {
         for (const item of rows) {
           const json = JSON.parse(item.configJson);
           const table = json.table;
+          let field = [];
+          Object.keys(json.fieldJson.purchase).forEach((item) => {
+            if (json.fieldJson.purchase[item].display) {
+              field.push({
+                prop: item,
+                ...json.fieldJson.purchase[item]
+              });
+            }
+          });
           this.requestTypeDict.push({
             value: item.templateNumber,
             label: item.templateName
           });
           configurations[item.templateNumber] = {
-            name: item.templateName,
-            tableColumns: table
+            name: item.templateName, // 模板名称
+            fieldColumns: field, // 头信息
+            tableColumns: table // 行信息
           };
         }
         this.configurations = configurations;
@@ -451,22 +438,49 @@ export default {
       });
       this.initDetail();
     },
-    handleEnquiryTypeChange(value) {
+    initColumns() {
+      this.formOption.column = [
+        { label: '询价单号', span: 6, prop: 'enquiryNumber', disabled: true },
+        { label: '询价名称', span: 6, prop: 'enquiryDesc', disabled: true },
+        {
+          type: 'select',
+          formslot: true,
+          label: '询价类型',
+          span: 6,
+          prop: 'enquiryType',
+          disabled: true
+        },
+        {
+          type: 'date',
+          format: 'yyyy-MM-dd',
+          valueFormat: 'timestamp',
+          label: '询价日期',
+          span: 6,
+          prop: 'createDate',
+          disabled: true
+        },
+        {
+          formslot: true,
+          type: 'datetime',
+          display: true,
+          format: 'yyyy-MM-dd HH:mm:ss',
+          valueFormat: 'timestamp',
+          label: '报价截止时间',
+          span: 6,
+          prop: 'quoteEndTime',
+          rules: [{ required: true, message: '请选择报价截止时间', trigger: 'blur' }]
+        },
+        { label: '负责人', span: 6, prop: 'createUser', disabled: true }
+      ];
       this.inquiryListOption.option.column = [
         { label: '物料编号', prop: 'materialNumber' },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
-        // { label: '规格', prop: 'materialSpecifications' },
-        {
-          label: '单位',
-          prop: 'baseUnit',
-          span: 4
-        },
+        { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
         { slot: true, label: '报价方式', prop: 'quoteMethod' },
         { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
         { slot: true, label: '成本模板', prop: 'costTemplate' },
-        // { label: '供应商', prop: 'toElsAccount' },
         { label: '供应商', prop: 'companyShortName' },
         {
           type: 'select',
@@ -505,7 +519,10 @@ export default {
         { slot: true, label: '操作', prop: 'option' },
         { label: '配额', prop: 'quota', cell: true }
       ];
-      if (!validatenull(this.configurations)) {
+    },
+    handleEnquiryTypeChange(value) {
+      this.initColumns();
+      if (this.configurations[value]) {
         const current = this.configurations[value].tableColumns.map((item) => {
           let result = {};
           result.prop = item.prop;
@@ -515,6 +532,16 @@ export default {
           return result;
         });
         this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+        const fieldColumns = this.configurations[value].fieldColumns;
+        fieldColumns.forEach((item) => {
+          if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
+            this.formOption.column.push({
+              span: item.span || 6,
+              ...item,
+              disabled: true
+            });
+          }
+        });
       }
     },
     getPriceIndex(row, column) {

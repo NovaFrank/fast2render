@@ -21,9 +21,6 @@ export default {
     },
     {
       type: 'select',
-      // dicData: DIC.TABLE_CONFIG_DEFAULT,
-      // dicUrl: '/layout/dics/value/enquiryType',
-      dicMethod: 'get',
       formslot: true,
       label: '询价类型',
       span: 6,
@@ -62,13 +59,7 @@ export default {
       prop: 'createUser',
       disabled: true
     }
-    // {
-    //   label: '备注',
-    //   prop: 'mark'
-    // }
   ],
   labelWidth: 120,
-  menuBtn: true,
-  emptyBtn: false,
-  submitBtn: false
+  menuBtn: false
 };

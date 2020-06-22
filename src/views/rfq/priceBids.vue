@@ -126,6 +126,7 @@ import { compare } from '@/util/utils.js';
 import FormHeader from '@/components/views/formHeader';
 import { formatDate } from '@/util/date';
 import costBids from './priceCostBids';
+import { validatenull } from '@/util/validate';
 
 let echarts = require('echarts/lib/echarts');
 const execMathExpress = require('exec-mathexpress');
@@ -235,6 +236,7 @@ export default {
       this.inquiryListOption.data[row.$index].count = sum;
     },
     getPriceIndex(row, column) {
+      if (validatenull(row.ladderPriceJson)) return;
       const quantity = row.quantity;
       const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
         return Number(item.ladderQuantity);

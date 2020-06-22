@@ -12,6 +12,7 @@
       @on-release="handleRelease"
       @on-save="handleSaveForm"
       @on-audit-submit="handleSubmitAudit"
+      @on-cancel-approval="handleCancelApproval"
     ></form-header>
     <avue-form ref="form" v-model="form" :option="formOption">
       <template slot="enquiryNumber">
@@ -45,6 +46,7 @@
       :businessElsAccount="elsAccount"
       businessModule="enquiry"
       v-show="tabActive === 'files' && form.enquiryNumber"
+      :readonly="form.auditStatus === '2'"
       :passClient="false"
       :client="false"
       :clientTab="false"
@@ -149,6 +151,7 @@ import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
 import relationDialog from './relationship/dialog';
 import selectSupplierDialog from '@/components/views/selectSupplierDialog';
 import { getUserInfo } from '@/util/utils.js';
+import { setStore } from '@/util/store.js';
 
 import {
   orgList,
@@ -157,7 +160,7 @@ import {
   supplierMasterListAction,
   accountListAction
 } from '@/api/rfq/common';
-import { purchaseEnquiryAction, queryDetailAction, submitAudit } from '@/api/rfq';
+import { purchaseEnquiryAction, queryDetailAction, submitAudit, cancelAudit } from '@/api/rfq';
 import { validatenull, validateNumber } from '@/util/validate';
 import { testSuppliers } from '@/api/rfq/index';
 
@@ -214,12 +217,12 @@ export default {
       elsAccount: '',
       elsSubAccount: '',
       headerButtons: [
-        { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
-        { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
-        { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
-        { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-        { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-        { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' }
+        // { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
+        // { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
+        // { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+        // { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+        // { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+        { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
       ],
       formOption: formOption, // 表头 option
       tabOption: tabOption, // tab option
@@ -267,34 +270,50 @@ export default {
   },
   watch: {
     form(newVal) {
-      if (this.form.purchaseRequestNumber) {
-        this.inquiryListOption.option.menu = false;
+      this.formOption.detail = newVal.auditStatus === '2';
+      this.inquiryListOption.option.menu = newVal.auditStatus !== '2';
+      this.inquiryListOption.option.header = newVal.auditStatus !== '2';
+      if (newVal.auditStatus === '2') {
         this.headerButtons = [
-          { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
-          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
-          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
-          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-          { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' }
+          {
+            power: true,
+            text: '撤回',
+            type: 'primary',
+            size: '',
+            action: 'on-cancel-approval'
+          },
+          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
         ];
       } else {
-        this.inquiryListOption.option.menu = true;
-        this.headerButtons = [
-          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
-          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
-          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-          { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' }
-        ];
-      }
-      if (newVal.enquiryNumber) {
-        this.headerButtons.push({
-          power: true,
-          text: '删除',
-          type: 'primary',
-          size: '',
-          action: 'on-delete'
-        });
+        if (this.form.purchaseRequestNumber) {
+          this.inquiryListOption.option.menu = false;
+          this.headerButtons = [
+            { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
+            { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
+            { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+            { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+            { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+            { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
+          ];
+        } else {
+          this.inquiryListOption.option.menu = true;
+          this.headerButtons = [
+            { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
+            { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+            { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+            { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+            { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
+          ];
+        }
+        if (newVal.enquiryNumber) {
+          this.headerButtons.push({
+            power: true,
+            text: '删除',
+            type: 'primary',
+            size: '',
+            action: 'on-delete'
+          });
+        }
       }
       if (!validatenull(newVal.enquiryType) && this.configurations[newVal.enquiryType]) {
         this.handleEnquiryTypeChange(newVal.enquiryType);
@@ -793,6 +812,35 @@ export default {
     },
     // 发布/提交审批
     handleRelease() {
+      if (this.templateRule.isMin3Supplier !== false) {
+        let result = false;
+        this.inquiryListOption.data.forEach((item) => {
+          if (item.toElsAccountList.split(',').length < 3) result = true;
+        });
+        if (result) {
+          this.$message.error('每个物料至少选择 3 个供应商参与报价');
+          return;
+        }
+      }
+      if (this.inquiryListOption.data.length === 0) {
+        this.$message.error('请添加询价明细');
+        return;
+      }
+      if (this.templateRule.enquiryPurchaserTax !== false) {
+        let validate = this.inquiryListOption.data.filter(
+          (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+        );
+        if (validate.length > 0) {
+          this.$message.error('请完善报价方式或税码/税率');
+          return;
+        }
+      } else if (this.templateRule.enquiryPurchaserTax === false) {
+        let validate = this.inquiryListOption.data.filter((item) => validatenull(item.quoteMethod));
+        if (validate.length > 0) {
+          this.$message.error('请完善报价方式');
+          return;
+        }
+      }
       this.$confirm('是否发布？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -807,27 +855,6 @@ export default {
             }
             this.$refs.form.validate((valid) => {
               if (valid) {
-                if (this.inquiryListOption.data.length === 0) {
-                  this.$message.error('请添加询价明细');
-                  return;
-                }
-                if (this.templateRule.enquiryPurchaserTax !== false) {
-                  let validate = this.inquiryListOption.data.filter(
-                    (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
-                  );
-                  if (validate.length > 0) {
-                    this.$message.error('请完善报价方式或税码/税率');
-                    return;
-                  }
-                } else if (this.templateRule.enquiryPurchaserTax === false) {
-                  let validate = this.inquiryListOption.data.filter((item) =>
-                    validatenull(item.quoteMethod)
-                  );
-                  if (validate.length > 0) {
-                    this.$message.error('请完善报价方式');
-                    return;
-                  }
-                }
                 let params = {
                   ...this.form,
                   enquiryNumber: this.currentEnquiryNumber,
@@ -862,6 +889,27 @@ export default {
           .catch((res) => {
             this.$message.error(res.message || '发布失败，请检查附件');
           });
+      });
+    },
+    // 是否立项 - 撤回
+    handleCancelApproval() {
+      this.$confirm('是否撤回审批？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        cancelAudit('cancel', {
+          rootProcessInstanceId: this.form.flowCode,
+          businessId: this.form.enquiryNumber,
+          businessType: 'editEnquiryAudit'
+        }).then((res) => {
+          if (res.data.statusCode === '200') {
+            this.$message.success('已撤回审批');
+            this.$router.go(0);
+            return;
+          }
+          this.$message.error('撤回审批失败');
+        });
       });
     },
     // 是否立项 - 提交审批
@@ -1007,6 +1055,15 @@ export default {
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.form = res.data.data;
+
+        if (res.data.data.flowCode) {
+          let content = {
+            flowId: res.data.data.flowCode,
+            businessType: 'editEnquiryAudit',
+            auditStatus: res.data.data.auditStatus
+          };
+          setStore({ name: this.currentEnquiryNumber, content, type: true });
+        }
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;

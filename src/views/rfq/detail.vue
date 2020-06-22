@@ -926,7 +926,9 @@ export default {
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
-        this.templateRule = this.configurations[this.detailObj.enquiryType].rule;
+        this.templateRule = this.configurations[this.detailObj.enquiryType]
+          ? this.configurations[this.detailObj.enquiryType].rule
+          : {};
         this.checkQuoteEndTime();
         if (this.detailObj.auditStatus === '0' || this.detailObj.auditStatus === '2') {
           this.inquiryListOption.option.header = false;

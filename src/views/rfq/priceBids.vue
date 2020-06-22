@@ -351,7 +351,7 @@ export default {
       // 最终数据
       let data = [];
       let options = ['含税价', '不含税价', '税率', '交货日期', '配额'];
-      if (this.templateRule.enquirySetRanking) options.push('排名');
+      if (this.templateRule.enquirySetRanking !== false) options.splice(4, 0, '排名');
       this.materialData.forEach((item) => {
         options.forEach((option) => {
           const d = {
@@ -393,13 +393,11 @@ export default {
                 d[prop] = current.deliveryDate
                   ? formatDate(new Date(current.deliveryDate), 'yyyy-MM-dd')
                   : '';
+              } else if (option === '排名') {
+                d[prop] = current.rank;
               } else if (option === '配额') {
                 d[prop] = `${item.materialNumber}_${current.toElsAccount}`;
                 d[`quota_${item.materialNumber}_${current.toElsAccount}`] = current.quota;
-                d[`itemStatus_${item.materialNumber}_${current.toElsAccount}`] = current.itemStatus;
-              } else if (option === '排名') {
-                d[prop] = `${item.materialNumber}_${current.toElsAccount}`;
-                d[`quota_${item.materialNumber}_${current.toElsAccount}`] = current.rank;
                 d[`itemStatus_${item.materialNumber}_${current.toElsAccount}`] = current.itemStatus;
               }
             } else {
@@ -471,7 +469,9 @@ export default {
       queryDetailAction('findHeadDetails', this.enquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
-        this.templateRule = this.configurations[this.detailObj.enquiryType].rule;
+        this.templateRule = this.configurations[this.detailObj.enquiryType]
+          ? this.configurations[this.detailObj.enquiryType].rule
+          : {};
       });
       queryDetailAction('findItemDetails', this.enquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;

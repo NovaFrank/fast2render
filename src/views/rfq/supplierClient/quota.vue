@@ -127,6 +127,12 @@
       </template>
       <template slot-scope="scope" slot="menu">
         <el-button
+          v-if="
+            (scope.row.noQuoted !== 'N' &&
+              scope.row.itemStatus === '1' &&
+              detailObj.quoteEndTime > new Date().getTime()) ||
+              scope.row.itemStatus === '3'
+          "
           @click.stop="handleQuoteRow(scope)"
           class="el-button el-button--text el-button--small"
         >

@@ -545,13 +545,19 @@ export default {
       }
     },
     getPriceIndex(row, column) {
-      if (row.itemStatus === '1' || row.itemStatus === '3') {
+      if (
+        row.itemStatus === '1' ||
+        row.itemStatus === '3' ||
+        validatenull(JSON.parse(row.ladderPriceJson))
+      ) {
         return '';
       }
       const quantity = row.quantity;
-      const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
-        return Number(item.ladderQuantity);
-      });
+      const quantityList = row.ladderPriceJson
+        ? JSON.parse(row.ladderPriceJson).map((item) => {
+            return Number(item.ladderQuantity);
+          })
+        : [];
       quantityList.push(quantity);
       const index = quantityList.findIndex((item) => item === Number(quantity));
       return JSON.parse(row.ladderPriceJson)[index - 1][column];

@@ -122,10 +122,12 @@ import inquiryListOption from '@/const/rfq/priceBids/detailInquiryList';
 import { mySpanMethod } from '@/util/utils';
 import { queryDetailAction, submitAudit } from '@/api/rfq';
 import { historyAction } from '@/api/rfq/priceBids';
-import { compare } from '@/util/utils.js';
+import { compare, getUserInfo } from '@/util/utils.js';
 import FormHeader from '@/components/views/formHeader';
 import { formatDate } from '@/util/date';
 import costBids from './priceCostBids';
+import { validatenull } from '@/util/validate';
+import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 
 let echarts = require('echarts/lib/echarts');
 const execMathExpress = require('exec-mathexpress');
@@ -138,6 +140,25 @@ export default {
   components: { FormHeader, costBids },
   data() {
     return {
+      templateRule: {
+        // enquirySetRanking: true, 是否开启排名 - 在比价页面对比项中添加【排名】字段
+        // enquiryIsQuota: true, 是否配额 是否现实配额列（是否判断）
+        // enquiryQuotaType: 'percentage', 配额方式 百分比percentage/数量number
+        // enquiryIsProjectApproval: true, 是否立项 发布前需要提交审批，审批通过 则可发布
+        // enquiryPurchaserTax: true, 采购方税率/供方税率
+        // isMin3Supplier: true, 最小三家供应商
+        // enquiryPriceContrast: 'package', 比价 1打包比-package 2逐条比-item 3成本比-cost ： 成本比是否需要将成本含税价等传接口？
+        // ============================================================================
+        // enquiryIsOnlyQualifiedSupplier: true, 是否供应商资质审查 - 暂无
+        // enquiryWay: 'partner', 询价方式（合作伙伴、企企通、已认证、潜在、陌生） - 暂无
+        // ----------------------------------------------------------------------------
+        // isViewAbleAttachmentBefroeDealline: true 报价时间截止前，是否可查看供方附件
+        // ------------------- 不要 enquiryPriceQuote: 'normal', 报价方式
+        // ------------------- 不要 enquirySetPassword: true, 是否使用开启密码 是否与头部开启冲突？
+        // 公开原则 enquiryPublicRule 未知
+        // enquiryViewHistory: 'ranking', 查看历史记录 price/ranking/supplier 仅历史记录列表加入供应商名
+        // 询价范围？？？？？enquiryScope？？？？？？成本报价 true/false？？？？？ 合并到询价方式
+      },
       costPriceData: [],
       costMaterialData: [],
       quotaInput: '',
@@ -187,6 +208,9 @@ export default {
     };
   },
   created() {
+    const userInfo = getUserInfo();
+    this.elsAccount = userInfo.elsAccount;
+    this.elsSubAccount = userInfo.elsSubAccount;
     this.enquiryNumber = this.$route.params.enquiryNumber;
     this.initDetail();
     this.chartTabActive = this.$route.query.type || 'bidChart';
@@ -235,6 +259,7 @@ export default {
       this.inquiryListOption.data[row.$index].count = sum;
     },
     getPriceIndex(row, column) {
+      if (validatenull(row.ladderPriceJson)) return;
       const quantity = row.quantity;
       const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
         return Number(item.ladderQuantity);
@@ -322,7 +347,8 @@ export default {
       this.costMaterialData = this.materialData.filter((item) => item.quoteMethod === '2');
       // 最终数据
       let data = [];
-      const options = ['含税价', '不含税价', '税率', '交货日期', '配额'];
+      let options = ['含税价', '不含税价', '税率', '交货日期', '配额'];
+      if (this.templateRule.enquirySetRanking) options.push('排名');
       this.materialData.forEach((item) => {
         options.forEach((option) => {
           const d = {
@@ -368,6 +394,10 @@ export default {
                 d[prop] = `${item.materialNumber}_${current.toElsAccount}`;
                 d[`quota_${item.materialNumber}_${current.toElsAccount}`] = current.quota;
                 d[`itemStatus_${item.materialNumber}_${current.toElsAccount}`] = current.itemStatus;
+              } else if (option === '排名') {
+                d[prop] = `${item.materialNumber}_${current.toElsAccount}`;
+                d[`quota_${item.materialNumber}_${current.toElsAccount}`] = current.rank;
+                d[`itemStatus_${item.materialNumber}_${current.toElsAccount}`] = current.itemStatus;
               }
             } else {
               d[prop] = '';
@@ -411,12 +441,35 @@ export default {
         prop: 'count'
       });
     },
-    initDetail() {
+    async initDetail() {
+      const res = await ElsTemplateConfigService.find({
+        elsAccount: this.elsAccount,
+        businessModule: 'enquiry',
+        currentVersionFlag: 'Y'
+      });
+      const configurations = [];
+
+      if (res.data && res.data.statusCode === '200' && res.data.pageData) {
+        const rows = res.data.pageData.rows || [];
+        for (const item of rows) {
+          const json = JSON.parse(item.configJson);
+          configurations[item.templateNumber] = {
+            name: item.templateName, // 模板名称
+            rule: json.rule
+          };
+        }
+        this.configurations = configurations;
+      } else {
+        this.requestTypeDict = [];
+        this.$message.error('查找采购申请配置数据失败, ' + res.data.message || '');
+      }
       this.detailObj = {};
       this.inquiryListOption.data = [];
       queryDetailAction('findHeadDetails', this.enquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
+        this.templateRule = this.configurations[this.detailObj.enquiryType].rule;
+        console.log('this.templateRule', this.templateRule);
       });
       queryDetailAction('findItemDetails', this.enquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;

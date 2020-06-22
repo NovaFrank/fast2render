@@ -45,9 +45,6 @@ export default {
     },
     {
       type: 'select',
-      // dicData: DIC.TABLE_CONFIG_DEFAULT,
-      // dicUrl: '/layout/dics/value/enquiryType',
-      // dicMethod: 'get',
       formslot: true,
       label: '询价类型',
       span: 6,

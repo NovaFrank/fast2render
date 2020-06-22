@@ -306,6 +306,7 @@ export default {
       // 应添加的供应商列
       this.supplierColumn = this.suppliers.map((item) => {
         return {
+          width: '150',
           slot: true,
           label: item.toElsAccount,
           prop: item.toElsAccount

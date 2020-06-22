@@ -568,7 +568,7 @@ export default {
           label: '交货日期',
           prop: 'deliveryDate'
         },
-        { slot: true, label: '操作', prop: 'option' },
+        { slot: true, label: '操作', prop: 'option', width: '120' },
         { label: '配额', prop: 'quota', cell: true }
       ];
     },

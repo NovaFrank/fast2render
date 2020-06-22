@@ -257,30 +257,9 @@ export default {
       configurations: {}
     };
   },
-  created() {
+  async created() {
     this.currentEnquiryNumber = this.$route.params.enquiryNumber;
-    this.$getBlockItem('rfq-header-detail').then((res) => {
-      this.formOption.column = res[0].data.column.map((item) => {
-        item.disabled = true;
-        if (item.prop === 'companyCode') item.type = 'tree';
-        if (item.prop === 'quoteEndTime') {
-          item.type = 'datetime';
-          item.format = 'yyyy-MM-dd HH:mm:ss';
-          item.valueFormat = 'timestamp';
-        }
-        if (item.prop === 'createDate') {
-          item.type = 'date';
-          item.format = 'yyyy-MM-dd';
-          item.valueFormat = 'timestamp';
-        }
-        if (item.prop === 'enquiryType') {
-          item.type = 'select';
-          item.formslot = true;
-        }
-        return item;
-      });
-    });
-    this.tableData();
+    await this.tableData();
   },
   watch: {
     detailObj(newVal) {
@@ -291,11 +270,44 @@ export default {
   },
   methods: {
     handleEnquiryTypeChange(value) {
+      this.formOption.column = [
+        { label: '询价单号', span: 6, prop: 'enquiryNumber', disabled: true },
+        { label: '询价名称', span: 6, prop: 'enquiryDesc', disabled: true },
+        {
+          type: 'select',
+          dicUrl: '/layout/dics/value/enquiryType',
+          dicMethod: 'get',
+          formslot: true,
+          label: '询价类型',
+          span: 6,
+          prop: 'enquiryType',
+          disabled: true
+        },
+        {
+          type: 'date',
+          format: 'yyyy-MM-dd',
+          valueFormat: 'timestamp',
+          label: '询价日期',
+          span: 6,
+          prop: 'createDate',
+          disabled: true
+        },
+        {
+          type: 'datetime',
+          display: true,
+          format: 'yyyy-MM-dd HH:mm:ss',
+          valueFormat: 'timestamp',
+          label: '报价截止时间',
+          span: 6,
+          prop: 'quoteEndTime',
+          disabled: true
+        },
+        { label: '负责人', span: 6, prop: 'createUser', disabled: true }
+      ];
       this.inquiryListOption.option.column = [
         { label: '物料编号', prop: 'materialNumber' },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
-        // { label: '规格', prop: 'materialSpecifications' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         {
           type: 'date',
@@ -318,7 +330,7 @@ export default {
         { label: '税率', prop: 'taxRate' },
         { slot: true, label: '不含税价', prop: 'priceExcludingTax' }
       ];
-      if (!validatenull(this.configurations)) {
+      if (this.configurations[value]) {
         const current = this.configurations[value].tableColumns.map((item) => {
           let result = {};
           result.prop = item.prop;
@@ -328,6 +340,16 @@ export default {
           return result;
         });
         this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+        const fieldColumns = this.configurations[value].fieldColumns;
+        fieldColumns.forEach((item) => {
+          if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
+            this.formOption.column.push({
+              span: item.span || 6,
+              ...item,
+              disabled: true
+            });
+          }
+        });
       }
       this.inquiryListOption.option.column.push({
         slot: true,
@@ -352,13 +374,23 @@ export default {
         for (const item of rows) {
           const json = JSON.parse(item.configJson);
           const table = json.table;
+          let field = [];
+          Object.keys(json.fieldJson.purchase).forEach((item) => {
+            if (json.fieldJson.purchase[item].display) {
+              field.push({
+                prop: item,
+                ...json.fieldJson.purchase[item]
+              });
+            }
+          });
           this.requestTypeDict.push({
             value: item.templateNumber,
             label: item.templateName
           });
           configurations[item.templateNumber] = {
-            name: item.templateName,
-            tableColumns: table
+            name: item.templateName, // 模板名称
+            fieldColumns: field, // 头信息
+            tableColumns: table // 行信息
           };
         }
         this.configurations = configurations;
@@ -589,13 +621,13 @@ export default {
       }
       return true;
     },
-    initDetail() {
+    async initDetail() {
       this.detailObj = {};
       this.inquiryListOption.data = [];
-      getAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
-        if (!this.initDetailError(res)) return;
-        this.detailObj = res.data.data;
-      });
+      const res = await getAction('findHeadDetails', this.currentEnquiryNumber);
+      if (!this.initDetailError(res)) return;
+      this.detailObj = res.data.data;
+
       getAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {

@@ -1,22 +1,12 @@
 export default {
   column: [
-    {
-      label: '询价单号',
-      span: 6,
-      prop: 'enquiryNumber',
-      disabled: true
-    },
-    {
-      label: '询价名称',
-      span: 6,
-      prop: 'enquiryDesc',
-      disabled: true
-    },
+    { label: '询价单号', span: 6, prop: 'enquiryNumber', disabled: true },
+    { label: '询价名称', span: 6, prop: 'enquiryDesc', disabled: true },
     {
       type: 'select',
-      // dicData: DIC.TABLE_CONFIG_DEFAULT,
       dicUrl: '/layout/dics/value/enquiryType',
       dicMethod: 'get',
+      formslot: true,
       label: '询价类型',
       span: 6,
       prop: 'enquiryType',
@@ -41,19 +31,8 @@ export default {
       prop: 'quoteEndTime',
       disabled: true
     },
-    {
-      label: '负责人',
-      span: 6,
-      prop: 'createUser',
-      disabled: true
-    }
-    // {
-    //   label: '备注',
-    //   prop: 'mark'
-    // }
+    { label: '负责人', span: 6, prop: 'createUser', disabled: true }
   ],
   labelWidth: 120,
-  menuBtn: true,
-  emptyBtn: false,
-  submitBtn: false
+  menuBtn: false
 };

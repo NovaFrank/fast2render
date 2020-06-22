@@ -44,7 +44,10 @@
                   </el-col>
                   <el-col :span="12">
                     <el-input
-                      v-show="row[`itemStatus_${row.materialNumber}_${column.prop}`] === '4'"
+                      v-show="
+                        row[`itemStatus_${row.materialNumber}_${column.prop}`] === '4' &&
+                          templateRule.enquiryIsQuota
+                      "
                       :disabled="
                         row[`itemStatus_${row.materialNumber}_${column.prop}`] === '5' ||
                           detailObj.auditStatus === '2'
@@ -455,7 +458,7 @@ export default {
           const json = JSON.parse(item.configJson);
           configurations[item.templateNumber] = {
             name: item.templateName, // 模板名称
-            rule: json.rule
+            rule: json.rule // 单规则
           };
         }
         this.configurations = configurations;
@@ -469,7 +472,6 @@ export default {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
         this.templateRule = this.configurations[this.detailObj.enquiryType].rule;
-        console.log('this.templateRule', this.templateRule);
       });
       queryDetailAction('findItemDetails', this.enquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
@@ -513,7 +515,8 @@ export default {
       let result = false;
       this.crudData.forEach((item) => {
         if (item.itemStatus === '4') {
-          status = false; // 必须有接受的报价才能够提交审批
+          // 必须有接受的报价才能够提交审批
+          status = false;
         }
         if (item.itemStatus === '4') {
           let quote = 0;
@@ -524,7 +527,20 @@ export default {
             .forEach((itemQuota) => {
               quote += Number(itemQuota.quota);
             });
-          if (Number(quote) !== 100) result = true; // 相同物料 已报价 分配的配额必须相加为100
+          // 相同物料 已报价 分配的配额必须相加为100（且 规则为配额是）
+          if (
+            Number(quote) !== 100 &&
+            this.templateRule.enquiryIsQuota &&
+            this.templateRule.enquiryQuotaType === 'percentage'
+          ) {
+            result = true;
+          } else if (
+            Number(quote) !== Number(item.quantity) &&
+            this.templateRule.enquiryIsQuota &&
+            this.templateRule.enquiryQuotaType === 'number'
+          ) {
+            result = true;
+          }
         }
       });
       if (status) {
@@ -532,7 +548,11 @@ export default {
         return;
       }
       if (result) {
-        this.$message.error('物料配额必须等于100');
+        this.$message.error(
+          `物料配额必须等于${
+            this.templateRule.enquiryQuotaType === 'percentage' ? '100' : '需求数量'
+          }`
+        );
         return;
       }
       this.$confirm('是否提交审批？', '提示', {

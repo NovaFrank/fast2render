@@ -532,7 +532,7 @@ export default {
           if (
             Number(quote) !== 100 &&
             this.templateRule.enquiryIsQuota &&
-            this.templateRule.enquiryQuotaType === 'percentage'
+            this.templateRule.enquiryQuotaType !== 'number'
           ) {
             result = true;
           } else if (
@@ -550,9 +550,7 @@ export default {
       }
       if (result) {
         this.$message.error(
-          `物料配额必须等于${
-            this.templateRule.enquiryQuotaType === 'percentage' ? '100' : '需求数量'
-          }`
+          `物料配额必须等于${this.templateRule.enquiryQuotaType !== 'number' ? '100' : '需求数量'}`
         );
         return;
       }

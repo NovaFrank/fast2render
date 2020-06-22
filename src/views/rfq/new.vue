@@ -526,7 +526,7 @@ export default {
         this.templateRule = this.configurations[value].rule;
         this.initColumns();
         // TODO: 是否立项 应为true
-        if (this.templateRule.enquiryIsProjectApproval === '') {
+        if (this.templateRule.enquiryIsProjectApproval !== false && this.form.auditStatus !== '0') {
           this.headerButtons = this.headerButtons.map((item) => {
             if (item.action === 'on-release') {
               item.text = '提交审批';

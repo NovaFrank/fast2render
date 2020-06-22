@@ -872,7 +872,7 @@ export default {
           if (
             Number(quote) !== 100 &&
             this.templateRule.enquiryIsQuota &&
-            this.templateRule.enquiryQuotaType === 'percentage'
+            this.templateRule.enquiryQuotaType !== 'number'
           ) {
             result = true;
           } else if (

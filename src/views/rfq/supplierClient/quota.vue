@@ -127,12 +127,6 @@
       </template>
       <template slot-scope="scope" slot="menu">
         <el-button
-          v-if="
-            (scope.row.noQuoted !== 'N' &&
-              scope.row.itemStatus === '1' &&
-              detailObj.quoteEndTime > new Date().getTime()) ||
-              scope.row.itemStatus === '3'
-          "
           @click.stop="handleQuoteRow(scope)"
           class="el-button el-button--text el-button--small"
         >
@@ -149,9 +143,11 @@
       :dialogWidth="dialogWidth"
       @on-save-form="onSaveForm"
       @close-field-dialog="closeFieldDialog"
+      :enquiryPurchaserTax="templateRule ? templateRule.enquiryPurchaserTax : true"
     ></quote-dialog>
     <!-- 阶梯报价 -->
     <quote-ladder-dialog
+      :enquiryPurchaserTax="templateRule ? templateRule.enquiryPurchaserTax : true"
       :dialogTitle="dialogTitle"
       :field="fieldDialogForm"
       :fieldDialogVisible="ladderQuoteVisible"
@@ -269,7 +265,7 @@ export default {
     }
   },
   methods: {
-    handleEnquiryTypeChange(value) {
+    initColumns() {
       this.formOption.column = [
         { label: '询价单号', span: 6, prop: 'enquiryNumber', disabled: true },
         { label: '询价名称', span: 6, prop: 'enquiryDesc', disabled: true },
@@ -330,7 +326,11 @@ export default {
         { label: '税率', prop: 'taxRate' },
         { slot: true, label: '不含税价', prop: 'priceExcludingTax' }
       ];
+    },
+    handleEnquiryTypeChange(value) {
       if (this.configurations[value]) {
+        this.templateRule = this.configurations[value].rule;
+        console.log('this.templateRule', this.templateRule);
         const current = this.configurations[value].tableColumns.map((item) => {
           let result = {};
           result.prop = item.prop;
@@ -339,6 +339,7 @@ export default {
           result.span = item.span;
           return result;
         });
+        this.initColumns();
         this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
         const fieldColumns = this.configurations[value].fieldColumns;
         fieldColumns.forEach((item) => {
@@ -350,6 +351,8 @@ export default {
             });
           }
         });
+      } else {
+        this.initColumns();
       }
       this.inquiryListOption.option.column.push({
         slot: true,
@@ -383,12 +386,14 @@ export default {
               });
             }
           });
+          console.log('field', field);
           this.requestTypeDict.push({
             value: item.templateNumber,
             label: item.templateName
           });
           configurations[item.templateNumber] = {
             name: item.templateName, // 模板名称
+            rule: json.rule, // 单规则
             fieldColumns: field, // 头信息
             tableColumns: table // 行信息
           };

@@ -116,6 +116,7 @@
       :field="fieldDialogForm"
       :fieldDialogVisible="fieldDialogVisible"
       :dialogWidth="dialogWidth"
+      :enquiryPurchaserTax="templateRule.enquiryPurchaserTax"
       @on-save-form="onSaveItemForm"
       @close-field-dialog="closeFieldDialog"
       @show-supplier-select="handleShowSupplierSelect"
@@ -426,7 +427,6 @@ export default {
         { slot: true, label: '成本模板', prop: 'costTemplate' }
       ];
       this.inquiryListOption.option.column = baseColumn;
-
       this.dialogOption.column = [
         {
           type: 'tree',
@@ -468,7 +468,11 @@ export default {
           type: 'select',
           label: '税码',
           prop: 'taxCode',
-          rules: [{ required: true, message: '请选择税码', trigger: 'blur' }]
+          disabled: this.templateRule.enquiryPurchaserTax !== false,
+          rules:
+            this.templateRule.enquiryPurchaserTax === false
+              ? []
+              : [{ required: true, message: '请选择税码', trigger: 'blur' }]
         },
         {
           label: '税率',
@@ -499,10 +503,9 @@ export default {
       ];
     },
     handleEnquiryTypeChange(value) {
-      this.initColumns();
       if (this.configurations[value]) {
         this.templateRule = this.configurations[value].rule;
-        console.log('this.templateRule', this.templateRule);
+        this.initColumns();
         // TODO: 是否立项 应为true
         if (this.templateRule.enquiryIsProjectApproval === '') {
           this.headerButtons = this.headerButtons.map((item) => {
@@ -538,6 +541,8 @@ export default {
             });
           }
         });
+      } else {
+        this.initColumns();
       }
       this.tableData();
     },
@@ -806,12 +811,22 @@ export default {
                   this.$message.error('请添加询价明细');
                   return;
                 }
-                let validate = this.inquiryListOption.data.filter(
-                  (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
-                );
-                if (validate.length > 0) {
-                  this.$message.error('请完善报价方式或税码/税率');
-                  return;
+                if (this.templateRule.enquiryPurchaserTax !== false) {
+                  let validate = this.inquiryListOption.data.filter(
+                    (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+                  );
+                  if (validate.length > 0) {
+                    this.$message.error('请完善报价方式或税码/税率');
+                    return;
+                  }
+                } else if (this.templateRule.enquiryPurchaserTax === false) {
+                  let validate = this.inquiryListOption.data.filter((item) =>
+                    validatenull(item.quoteMethod)
+                  );
+                  if (validate.length > 0) {
+                    this.$message.error('请完善报价方式');
+                    return;
+                  }
                 }
                 let params = {
                   ...this.form,

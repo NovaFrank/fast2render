@@ -20,7 +20,7 @@
 
 <script>
 import quoteFormOption from '@/const/rfq/supplierClient/quoteForm';
-import ladderOption from '@/const/rfq/supplierClient/quoteList';
+import { validatenull } from '@/util/validate';
 
 const execMathExpress = require('exec-mathexpress');
 
@@ -30,6 +30,7 @@ export default {
   components: {},
   created: function() {},
   props: {
+    enquiryPurchaserTax: Boolean,
     dialogWidth: String,
     dialogTitle: String,
     fieldDialogType: String,
@@ -47,13 +48,29 @@ export default {
   data() {
     return {
       quoteFormOption: quoteFormOption,
-      ladderOption: ladderOption,
       form: {
         remark: ''
       }
     };
   },
   watch: {
+    enquiryPurchaserTax(newVal) {
+      if (newVal === false) {
+        this.quoteFormOption.option.column = this.quoteFormOption.option.column.map((item) => {
+          if (item.prop === 'taxRate') {
+            item.disabled = false;
+          }
+          return item;
+        });
+      } else {
+        this.quoteFormOption.option.column = this.quoteFormOption.option.column.map((item) => {
+          if (item.prop === 'taxRate') {
+            item.disabled = true;
+          }
+          return item;
+        });
+      }
+    },
     field(newVal) {
       this.form = newVal;
     },
@@ -62,6 +79,14 @@ export default {
         v1: newVal,
         v2: 1,
         v3: this.form.taxRate
+      });
+      this.form.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
+    },
+    'form.taxRate'(newVal) {
+      const result = execMathExpress('v1 / ( v2 + v3 )', {
+        v1: this.form.priceIncludingTax,
+        v2: 1,
+        v3: newVal
       });
       this.form.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
     }
@@ -74,6 +99,10 @@ export default {
       this.form.suppliers.splice(index, 1);
     },
     handleSubmit() {
+      if (validatenull(this.form.taxRate)) {
+        this.$message.error('请填写税率');
+        return;
+      }
       const params = {
         ...this.form,
         remark: this.form.remark

@@ -851,6 +851,7 @@ export default {
       }).then(() => {
         const action = 'submit';
         const param = {
+          ...this.detailObj,
           enquiryNumber: this.currentEnquiryNumber,
           elsAccount: this.elsAccount,
           quoteEndTime: this.detailObj.quoteEndTime,

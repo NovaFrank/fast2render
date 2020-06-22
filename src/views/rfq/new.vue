@@ -11,6 +11,7 @@
       @on-delete="handleDelete"
       @on-release="handleRelease"
       @on-save="handleSaveForm"
+      @on-audit-submit="handleSubmitAudit"
     ></form-header>
     <avue-form ref="form" v-model="form" :option="formOption">
       <template slot="enquiryNumber">
@@ -155,7 +156,7 @@ import {
   supplierMasterListAction,
   accountListAction
 } from '@/api/rfq/common';
-import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
+import { purchaseEnquiryAction, queryDetailAction, submitAudit } from '@/api/rfq';
 import { validatenull, validateNumber } from '@/util/validate';
 import { testSuppliers } from '@/api/rfq/index';
 
@@ -296,6 +297,7 @@ export default {
       }
       if (!validatenull(newVal.enquiryType) && this.configurations[newVal.enquiryType]) {
         this.handleEnquiryTypeChange(newVal.enquiryType);
+        this.templateRule = this.configurations[newVal.enquiryType].rule;
       }
       this.$forceUpdate();
     },
@@ -498,30 +500,45 @@ export default {
     },
     handleEnquiryTypeChange(value) {
       this.initColumns();
-      // 配置字段
-      const current = this.configurations[value].tableColumns.map((item) => {
-        let result = {};
-        result.prop = item.prop;
-        result.label = item.label;
-        result.display = item.purchaseShow;
-        result.span = item.span;
-        result.type = item.type;
-        result.dicData = item.dicData;
-        result.dicUrl = item.dicUrl;
-        result.dicMethod = item.dicMethod;
-        return result;
-      });
-      this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
-      this.dialogOption.column = this.dialogOption.column.concat(current);
-      const fieldColumns = this.configurations[value].fieldColumns;
-      fieldColumns.forEach((item) => {
-        if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
-          this.formOption.column.push({
-            span: item.span || 6,
-            ...item
+      if (this.configurations[value]) {
+        this.templateRule = this.configurations[value].rule;
+        console.log('this.templateRule', this.templateRule);
+        // TODO: 是否立项 应为true
+        if (this.templateRule.enquiryIsProjectApproval === '') {
+          this.headerButtons = this.headerButtons.map((item) => {
+            if (item.action === 'on-release') {
+              item.text = '提交审批';
+              item.action = 'on-audit-submit';
+            }
+            return item;
           });
+          console.log('this.headerButtons', this.headerButtons);
         }
-      });
+        // 配置字段
+        const current = this.configurations[value].tableColumns.map((item) => {
+          let result = {};
+          result.prop = item.prop;
+          result.label = item.label;
+          result.display = item.purchaseShow;
+          result.span = item.span;
+          result.type = item.type;
+          result.dicData = item.dicData;
+          result.dicUrl = item.dicUrl;
+          result.dicMethod = item.dicMethod;
+          return result;
+        });
+        this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+        this.dialogOption.column = this.dialogOption.column.concat(current);
+        const fieldColumns = this.configurations[value].fieldColumns;
+        fieldColumns.forEach((item) => {
+          if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
+            this.formOption.column.push({
+              span: item.span || 6,
+              ...item
+            });
+          }
+        });
+      }
       this.tableData();
     },
     handleAddShow(title, row) {
@@ -545,6 +562,7 @@ export default {
         const rows = res.data.pageData.rows || [];
         for (const item of rows) {
           const json = JSON.parse(item.configJson);
+          // console.log('json', json);
           const table = json.table;
           let field = [];
           Object.keys(json.fieldJson.purchase).forEach((item) => {
@@ -822,6 +840,73 @@ export default {
                   }
                   this.$message.success('发布成功');
                   this.$router.push({ path: '/list' });
+                });
+              }
+            });
+          })
+          .catch((res) => {
+            this.$message.error(res.message || '发布失败，请检查附件');
+          });
+      });
+    },
+    // 是否立项 - 提交审批
+    handleSubmitAudit() {
+      if (validatenull(this.currentEnquiryNumber)) {
+        this.$message.error('请保存后提交立项审批');
+        return;
+      }
+      this.$confirm('是否提交审批？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$refs.attachment
+          .sendFiles()
+          .then((res) => {
+            if (!res.result) {
+              this.$message.error(res.message || '附件发送失败');
+              return;
+            }
+            this.$refs.form.validate((valid) => {
+              if (valid) {
+                if (this.inquiryListOption.data.length === 0) {
+                  this.$message.error('请添加询价明细');
+                  return;
+                }
+                let validate = this.inquiryListOption.data.filter(
+                  (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+                );
+                if (validate.length > 0) {
+                  this.$message.error('请完善报价方式或税码/税率');
+                  return;
+                }
+
+                const action = 'submit';
+                const param = {
+                  ...this.form,
+                  enquiryNumber: this.currentEnquiryNumber,
+                  elsAccount: this.elsAccount,
+                  quoteEndTime: this.form.quoteEndTime,
+                  enquiryType: this.form.enquiryType,
+                  enquiryDesc: this.form.enquiryDesc,
+                  companyCode: this.form.companyCode,
+                  enquiryMethod: this.form.enquiryMethod || '',
+                  itemList: this.inquiryListOption.data
+                };
+                let params = {
+                  elsAccount: this.form.elsAccount,
+                  // toElsAccount: this.detailObj.toElsAccount,
+                  businessType: 'editEnquiryAudit',
+                  businessId: this.form.enquiryNumber,
+                  params: JSON.stringify(param)
+                };
+                submitAudit(action, params).then((res) => {
+                  if (res.data.statusCode === '200') {
+                    this.$message.success('提交审批成功');
+                    this.$router.go(0);
+                    return;
+                  }
+                  this.$message.error('提交审批失败');
                 });
               }
             });

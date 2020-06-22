@@ -375,11 +375,11 @@ export default {
           const json = JSON.parse(item.configJson);
           const table = json.table;
           let field = [];
-          Object.keys(json.fieldJson.purchase).forEach((item) => {
-            if (json.fieldJson.purchase[item].display) {
+          Object.keys(json.fieldJson.sale).forEach((item) => {
+            if (json.fieldJson.sale[item].display) {
               field.push({
                 prop: item,
-                ...json.fieldJson.purchase[item]
+                ...json.fieldJson.sale[item]
               });
             }
           });

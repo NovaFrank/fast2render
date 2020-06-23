@@ -487,7 +487,7 @@ export default {
           type: 'select',
           label: '税码',
           prop: 'taxCode',
-          disabled: this.templateRule.enquiryPurchaserTax === true,
+          disabled: this.templateRule.enquiryPurchaserTax !== true,
           rules:
             this.templateRule.enquiryPurchaserTax === true
               ? [{ required: true, message: '请选择税码', trigger: 'blur' }]

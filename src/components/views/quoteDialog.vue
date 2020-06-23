@@ -55,21 +55,12 @@ export default {
   },
   watch: {
     enquiryPurchaserTax(newVal) {
-      if (newVal === true) {
-        this.quoteFormOption.option.column = this.quoteFormOption.option.column.map((item) => {
-          if (item.prop === 'taxRate') {
-            item.disabled = false;
-          }
-          return item;
-        });
-      } else {
-        this.quoteFormOption.option.column = this.quoteFormOption.option.column.map((item) => {
-          if (item.prop === 'taxRate') {
-            item.disabled = true;
-          }
-          return item;
-        });
-      }
+      this.quoteFormOption.option.column = this.quoteFormOption.option.column.map((item) => {
+        if (item.prop === 'taxRate') {
+          item.disabled = newVal === true;
+        }
+        return item;
+      });
     },
     field(newVal) {
       this.form = newVal;

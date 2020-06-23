@@ -18,7 +18,7 @@
           </template>
           <template slot-scope="scope" slot="taxRate">
             <el-input
-              :disabled="enquiryPurchaserTax !== true"
+              :disabled="enquiryPurchaserTax === true"
               placeholder="请输入 税率"
               v-model="scope.row.taxRate"
               @blur="(event) => handleInputRate(event, scope)"

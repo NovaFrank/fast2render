@@ -149,11 +149,11 @@
       :dialogWidth="dialogWidth"
       @on-save-form="onSaveForm"
       @close-field-dialog="closeFieldDialog"
-      :enquiryPurchaserTax="templateRule ? templateRule.enquiryPurchaserTax : true"
+      :enquiryPurchaserTax="templateRule ? templateRule.enquiryPurchaserTax : false"
     ></quote-dialog>
     <!-- 阶梯报价 -->
     <quote-ladder-dialog
-      :enquiryPurchaserTax="templateRule ? templateRule.enquiryPurchaserTax : true"
+      :enquiryPurchaserTax="templateRule ? templateRule.enquiryPurchaserTax : false"
       :dialogTitle="dialogTitle"
       :field="fieldDialogForm"
       :fieldDialogVisible="ladderQuoteVisible"
@@ -336,7 +336,6 @@ export default {
     handleEnquiryTypeChange(value) {
       if (this.configurations[value]) {
         this.templateRule = this.configurations[value].rule;
-        console.log('this.templateRule', this.templateRule);
         const current = this.configurations[value].tableColumns.map((item) => {
           let result = {};
           result.prop = item.prop;

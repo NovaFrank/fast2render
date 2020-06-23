@@ -57,6 +57,7 @@
       :clientTab="true"
       version="attahcment-fiels_4_3"
     ></fast2-attachment-list>
+    <!-- 询价明细 -->
     <avue-crud
       v-show="tabActive === 'detail'"
       :data="inquiryListOption.data"
@@ -443,7 +444,6 @@ export default {
               });
             }
           });
-          console.log('field', field);
           this.requestTypeDict.push({
             value: item.templateNumber,
             label: item.templateName
@@ -488,7 +488,7 @@ export default {
           const result = execMathExpress('v1 / ( v2 + v3 )', {
             v1: price || 0,
             v2: 1,
-            v3: row.taxRate
+            v3: row.taxRate || 0
           });
           price = Math.floor((result.num / result.den) * 100) / 100;
         }

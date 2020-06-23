@@ -195,7 +195,7 @@
         >
           <el-col :span="12">
             <avue-radio
-              v-model="scope.row.itemStatus"
+              v-model="scope.row.itemStatusCopy"
               :dic="dic"
               :disabled="detailObj.auditStatus === '0' || detailObj.auditStatus === '2'"
               @change="(value) => handleRadioChange(value, scope)"
@@ -744,7 +744,8 @@ export default {
           const supplier = this.suppliersDialogOptionColumn.data[index].label.split('_');
           return {
             toElsAccount: `${supplier[0]}_${supplier[1]}_${supplier[2] || ''}`,
-            ...item
+            ...item,
+            itemStatus: '1'
           };
         });
         const params = {
@@ -766,7 +767,7 @@ export default {
       this.quoteEndTimeChange = value;
     },
     handleRadioChange(value, scope) {
-      this.inquiryListOption.data[scope.row.$index].itemStatus = value;
+      this.inquiryListOption.data[scope.row.$index].itemStatusCopy = value;
       if (value === '5') {
         this.inquiryListOption.data[scope.row.$index].quota = '';
         this.inquiryListOption.data[scope.row.$index].$cellEdit = false;
@@ -854,6 +855,13 @@ export default {
     handleSubmitApproval() {
       let status = true;
       let result = false;
+      this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
+        return {
+          ...item,
+          itemStatus: item.itemStatusCopy
+        };
+      });
+      console.log(this.inquiryListOption.data);
       this.inquiryListOption.data.forEach((item) => {
         if (item.itemStatus === '4') {
           // 必须有接受的报价才能够提交审批
@@ -1066,6 +1074,7 @@ export default {
               item.itemStatus === '4' &&
               this.detailObj.auditStatus !== '0' &&
               this.detailObj.auditStatus !== '2',
+            itemStatusCopy: item.itemStatus,
             ...item
           };
         });

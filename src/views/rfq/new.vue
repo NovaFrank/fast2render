@@ -487,11 +487,11 @@ export default {
           type: 'select',
           label: '税码',
           prop: 'taxCode',
-          disabled: this.templateRule.enquiryPurchaserTax !== false,
+          disabled: this.templateRule.enquiryPurchaserTax === true,
           rules:
-            this.templateRule.enquiryPurchaserTax === false
-              ? []
-              : [{ required: true, message: '请选择税码', trigger: 'blur' }]
+            this.templateRule.enquiryPurchaserTax === true
+              ? [{ required: true, message: '请选择税码', trigger: 'blur' }]
+              : []
         },
         {
           label: '税率',
@@ -525,8 +525,7 @@ export default {
       if (this.configurations[value]) {
         this.templateRule = this.configurations[value].rule;
         this.initColumns();
-        // TODO: 是否立项 应为true
-        if (this.templateRule.enquiryIsProjectApproval !== false && this.form.auditStatus !== '0') {
+        if (this.templateRule.enquiryIsProjectApproval === true && this.form.auditStatus !== '0') {
           this.headerButtons = this.headerButtons.map((item) => {
             if (item.action === 'on-release') {
               item.text = '提交审批';
@@ -838,7 +837,7 @@ export default {
     },
     // 发布/提交审批
     handleRelease() {
-      if (this.templateRule.isMin3Supplier !== false) {
+      if (this.templateRule.isMin3Supplier === true) {
         let result = false;
         this.inquiryListOption.data.forEach((item) => {
           if (item.toElsAccountList.split(',').length < 3) result = true;
@@ -852,7 +851,7 @@ export default {
         this.$message.error('请添加询价明细');
         return;
       }
-      if (this.templateRule.enquiryPurchaserTax !== false) {
+      if (this.templateRule.enquiryPurchaserTax === true) {
         let validate = this.inquiryListOption.data.filter(
           (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
         );
@@ -860,7 +859,7 @@ export default {
           this.$message.error('请完善报价方式或税码/税率');
           return;
         }
-      } else if (this.templateRule.enquiryPurchaserTax === false) {
+      } else if (this.templateRule.enquiryPurchaserTax !== true) {
         let validate = this.inquiryListOption.data.filter((item) => validatenull(item.quoteMethod));
         if (validate.length > 0) {
           this.$message.error('请完善报价方式');

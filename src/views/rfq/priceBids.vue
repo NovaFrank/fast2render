@@ -352,7 +352,7 @@ export default {
       // 最终数据
       let data = [];
       let options = ['含税价', '不含税价', '税率', '交货日期', '配额'];
-      if (this.templateRule.enquirySetRanking !== false) options.splice(4, 0, '排名');
+      if (this.templateRule.enquirySetRanking === true) options.splice(4, 0, '排名');
       this.materialData.forEach((item) => {
         options.forEach((option) => {
           const d = {

@@ -55,7 +55,7 @@ export default {
   },
   watch: {
     enquiryPurchaserTax(newVal) {
-      if (newVal === false) {
+      if (newVal === true) {
         this.quoteFormOption.option.column = this.quoteFormOption.option.column.map((item) => {
           if (item.prop === 'taxRate') {
             item.disabled = false;

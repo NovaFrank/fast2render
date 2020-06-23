@@ -356,7 +356,7 @@ export default {
         this.materielListOption.data.push(row);
         this.params.addList.push(row);
       }
-      const priceString = Number(row.price).toFixed(2);
+      const priceString = Number(row.priceIncludingTax).toFixed(2);
       const quantityString = row.quantity.toString();
       const totalAmount = format(
         chain(bignumber(priceString))
@@ -389,7 +389,7 @@ export default {
       // loading();
       const data = this.materielListOption.data[index];
       console.log(data);
-      const priceString = Number(row.price).toFixed(2);
+      const priceString = Number(row.priceIncludingTax).toFixed(2);
       const quantityString = row.quantity.toString();
 
       const totalAmount = format(

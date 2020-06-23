@@ -126,7 +126,7 @@ export default {
       },
       {
         label: '含税单价',
-        prop: 'price',
+        prop: 'priceIncludingTax',
         type: 'number',
         precision: 2,
         rules: [

@@ -372,7 +372,7 @@ export default {
       }
       const data = this.materielListOption.data[index];
       console.log(data);
-      const priceString = Number(row.price).toFixed(2);
+      const priceString = Number(row.priceIncludingTax).toFixed(2);
       const quantityString = row.quantity.toString();
 
       const totalAmount = format(

@@ -38,9 +38,13 @@
     </avue-form>
     <!-- 单据规则 -->
     {{ templateRule }}
-    <fast2-block-provider version="rfq-rule-setting">
-      <template>
-        <business-rule-config v-model="templateRule" :list="templateRule"></business-rule-config>
+    <fast2-block-provider  version="rfq-rule-setting">
+      <template slot-scope="component">
+        <business-rule-config
+          v-model="templateRule"
+          :list="component.list"
+          :readonly="true"
+        ></business-rule-config>
       </template>
     </fast2-block-provider>
     <!-- 标准询价 -->

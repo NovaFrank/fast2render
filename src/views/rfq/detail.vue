@@ -48,6 +48,19 @@
       </template>
     </avue-form>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
+    <!-- 单据规则 -->
+    <fast2-block-provider
+      v-show="tabActive === 'rules' && !validatenull(templateRule)"
+      version="rfq-rule-setting"
+    >
+      <template slot-scope="component">
+        <business-rule-config
+          v-model="templateRule"
+          :list="component.list"
+          :readonly="true"
+        ></business-rule-config>
+      </template>
+    </fast2-block-provider>
     <!-- 采购方附件 -->
     <fast2-attachment-list
       :id="detailObj.enquiryNumber"
@@ -365,14 +378,16 @@ export default {
         this.tabOption.option.column = [
           { label: '询价明细', prop: 'detail' },
           { label: '采购方文件', prop: 'files' },
-          { label: '供货方文件', prop: 'filesSupplier' }
+          { label: '供货方文件', prop: 'filesSupplier' },
+          { label: '询价规则', prop: 'rules' }
         ];
       } else {
         this.tabOption.option.column = [
           { label: '询价明细', prop: 'detail' },
           { label: '采购方文件', prop: 'files' },
           { label: '供货方文件', prop: 'filesSupplier' },
-          { label: '审批记录', prop: 'auditHistory' }
+          { label: '审批记录', prop: 'auditHistory' },
+          { label: '询价规则', prop: 'rules' }
         ];
       }
       this.$forceUpdate();

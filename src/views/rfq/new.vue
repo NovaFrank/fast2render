@@ -36,9 +36,13 @@
         </el-select>
       </template>
     </avue-form>
+    <!-- 标准询价 -->
+    <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <!-- 单据规则 -->
-    {{ templateRule }}
-    <fast2-block-provider  version="rfq-rule-setting">
+    <fast2-block-provider
+      v-show="tabActive === 'rules' && !validatenull(templateRule)"
+      version="rfq-rule-setting"
+    >
       <template slot-scope="component">
         <business-rule-config
           v-model="templateRule"
@@ -47,8 +51,6 @@
         ></business-rule-config>
       </template>
     </fast2-block-provider>
-    <!-- 标准询价 -->
-    <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <!-- 表单文件 -->
     <fast2-attachment-list
       ref="attachment"
@@ -204,21 +206,6 @@ export default {
   data() {
     return {
       templateRule: {
-        enquiryWay: 'qualified',
-        $enquiryWay: '已认证供应商（邀请）',
-        enquiryIsQuota: true,
-        isMin3Supplier: true,
-        enquiryQuotaType: 'percentage',
-        $enquiryQuotaType: '百分比',
-        enquiryPriceQuote: 'normal',
-        enquirySetRanking: true,
-        $enquiryPriceQuote: '正常报价',
-        enquiryViewHistory: 'ranking',
-        $enquiryViewHistory: '排名',
-        enquirySetSealedBid: true,
-        enquiryPriceContrast: 'package',
-        $enquiryPriceContrast: '打包比',
-        enquiryGeneratePurRecord: true
         // enquirySetRanking: true, 是否开启排名 - 在比价页面对比项中添加【排名】字段
         // enquiryIsQuota: true, 是否配额 是否现实配额列（是否判断）
         // enquiryQuotaType: 'percentage', 配额方式 百分比percentage/数量number

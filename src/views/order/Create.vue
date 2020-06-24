@@ -6,7 +6,6 @@
       :buttons="headerButtons"
       @on-cancel="handleCancel"
       @on-save="handleSave"
-      @on-file="handleFile"
       @on-submit="handleSubmit"
     ></form-header>
     <div class="clear" style="margin-bottom: 30px;"></div>
@@ -201,11 +200,6 @@ export default {
           text: '返回',
           size: 'small',
           action: 'on-cancel'
-        },
-        {
-          text: '添加附件',
-          size: 'small',
-          action: 'on-file'
         },
         {
           text: '保存',

@@ -10,6 +10,13 @@
       <template slot="priceIncludingTax">
         <el-input placeholder="请输入 含税价" v-model="form.priceIncludingTax"></el-input>
       </template>
+      <template slot="taxRate">
+        <el-input
+          :disabled="enquiryPurchaserTax === true"
+          placeholder="请输入 税率"
+          v-model="form.taxRate"
+        ></el-input>
+      </template>
       <template slot="menuForm">
         <el-button @click="closeDialog">取消</el-button>
         <el-button type="primary" @click="handleSubmit">保存</el-button>
@@ -54,14 +61,6 @@ export default {
     };
   },
   watch: {
-    enquiryPurchaserTax(newVal) {
-      this.quoteFormOption.option.column = this.quoteFormOption.option.column.map((item) => {
-        if (item.prop === 'taxRate') {
-          item.disabled = newVal === true;
-        }
-        return item;
-      });
-    },
     field(newVal) {
       this.form = newVal;
     },

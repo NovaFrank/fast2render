@@ -28,7 +28,7 @@ module.exports = {
     proxy: {
       '/apis/': {
         // 这里最好有一个/
-        target: 'http://cs.51qqt.com/ELSServer_SRM/rest', // 后台接口域名
+        target: 'http://cs.51qqt.com/ELSServer_SRM/rest', // 后台接口域名 https://uat.51qqt.com/
         secure: false, // 如果是https接口，需要配置这个参数
         changeOrigin: true, // 是否跨域
         pathRewrite: {

@@ -1127,11 +1127,13 @@ export default {
         if (!this.initDetailError(res)) return;
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
           const accountList = item.toElsAccountList
-            .split(',')
-            .map((i) => {
-              return i.split('_')[1];
-            })
-            .toString();
+            ? item.toElsAccountList
+                .split(',')
+                .map((i) => {
+                  return i.split('_')[1];
+                })
+                .toString()
+            : '';
           item.accountList = accountList;
           return item;
         });

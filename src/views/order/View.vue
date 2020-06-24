@@ -258,7 +258,6 @@ export default {
     // 切换表格
     handleTabClick(value) {
       this.tabActive = value;
-      this.tableData();
       sessionStorage.setItem('materialRow', JSON.stringify(this.materielListOption.data));
       if (this.tabActive.prop === 'plan') {
         let sessionCateCode = sessionStorage.getItem('materialRow');

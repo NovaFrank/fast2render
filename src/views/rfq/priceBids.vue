@@ -46,7 +46,7 @@
                     <el-input
                       v-show="
                         row[`itemStatus_${row.materialNumber}_${column.prop}`] === '4' &&
-                          templateRule.enquiryIsQuota
+                          templateRule.enquiryIsQuota === true
                       "
                       :disabled="
                         row[`itemStatus_${row.materialNumber}_${column.prop}`] === '5' ||
@@ -531,13 +531,13 @@ export default {
           // 相同物料 已报价 分配的配额必须相加为100（且 规则为配额是）
           if (
             Number(quote) !== 100 &&
-            this.templateRule.enquiryIsQuota &&
+            this.templateRule.enquiryIsQuota === true &&
             this.templateRule.enquiryQuotaType !== 'number'
           ) {
             result = true;
           } else if (
             Number(quote) !== Number(item.quantity) &&
-            this.templateRule.enquiryIsQuota &&
+            this.templateRule.enquiryIsQuota === true &&
             this.templateRule.enquiryQuotaType === 'number'
           ) {
             result = true;

@@ -587,8 +587,8 @@ export default {
         { slot: true, label: '操作', prop: 'option' }
       ];
       // this.templateRule.enquiryIsQuota = false; // 测试是否配额 否
-      this.templateRule.enquiryIsQuota = 'number'; // 测试配额方式
-      if (this.templateRule.enquiryIsQuota)
+      // this.templateRule.enquiryIsQuota = 'number'; // 测试配额方式
+      if (this.templateRule.enquiryIsQuota === true)
         this.inquiryListOption.option.column.push({ label: '配额', prop: 'quota', cell: true });
     },
     handleEnquiryTypeChange(value) {
@@ -894,13 +894,13 @@ export default {
           // 相同物料 已报价 分配的配额必须相加为100（且 规则为配额是）
           if (
             Number(quote) !== 100 &&
-            this.templateRule.enquiryIsQuota &&
+            this.templateRule.enquiryIsQuota === true &&
             this.templateRule.enquiryQuotaType !== 'number'
           ) {
             result = true;
           } else if (
             Number(quote) !== Number(item.quantity) &&
-            this.templateRule.enquiryIsQuota &&
+            this.templateRule.enquiryIsQuota === true &&
             this.templateRule.enquiryQuotaType === 'number'
           ) {
             result = true;

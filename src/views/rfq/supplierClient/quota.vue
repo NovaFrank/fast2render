@@ -436,11 +436,12 @@ export default {
           const json = JSON.parse(item.configJson);
           const table = json.table;
           let field = [];
+          console.log('json.fieldJson', json.fieldJson);
           Object.keys(json.fieldJson.sale).forEach((item) => {
             if (json.fieldJson.sale[item].display) {
               field.push({
                 prop: item,
-                ...json.fieldJson.sale[item]
+                ...json.fieldJson.purchase[item] // TODO: sale临时换purchase
               });
             }
           });

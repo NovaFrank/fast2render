@@ -987,12 +987,11 @@ export default {
     checkQuoteEndTime() {
       if (this.detailObj.quoteEndTime > new Date().getTime()) {
         this.interval = setInterval(() => {
-          console.log('checkQuoteEndTime', this.detailObj.quoteEndTime < new Date().getTime());
           if (this.detailObj.quoteEndTime < new Date().getTime()) {
             clearInterval(this.interval);
             this.$router.go(0);
           }
-        }, 3000);
+        }, 5000);
       }
     },
     initDetail() {

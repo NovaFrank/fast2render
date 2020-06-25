@@ -16,6 +16,9 @@
             :span-method="spanMethod"
           >
             <template slot="menuLeft">
+              <el-button v-if="detailObj.auditStatus !== '2'" size="small" @click="handleSave">
+                保存
+              </el-button>
               <el-button
                 v-if="detailObj.auditStatus !== '2'"
                 size="small"
@@ -123,7 +126,7 @@ import priceObjOption from '@/const/rfq/priceBids/priceObj';
 import historyChartOption from '@/const/rfq/priceBids/historyChart';
 import inquiryListOption from '@/const/rfq/priceBids/detailInquiryList';
 import { mySpanMethod } from '@/util/utils';
-import { queryDetailAction, submitAudit } from '@/api/rfq';
+import { queryDetailAction, submitAudit, purchaseEnquiryAction } from '@/api/rfq';
 import { historyAction } from '@/api/rfq/priceBids';
 import { compare, getUserInfo } from '@/util/utils.js';
 import FormHeader from '@/components/views/formHeader';
@@ -511,13 +514,31 @@ export default {
         this.$router.go(0);
       }
     },
+    handleSave() {
+      const param = {
+        ...this.detailObj,
+        elsAccount: this.elsAccount,
+        itemList: this.crudData
+      };
+      purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
+        if (res.data.statusCode === '200') {
+          this.$message.success('保存成功');
+        } else {
+          this.$message.error(res.data.message);
+        }
+      });
+    },
     handleSubmit() {
       let status = true;
+      let itemStatus = false;
       let result = false;
       this.crudData.forEach((item) => {
         if (item.itemStatus === '4') {
           // 必须有接受的报价才能够提交审批
           status = false;
+        }
+        if (item.itemStatus !== '4' && item.itemStatus !== '5') {
+          itemStatus = true;
         }
         if (item.itemStatus === '4') {
           let quote = 0;
@@ -545,7 +566,11 @@ export default {
         }
       });
       if (status) {
-        this.$message.error('必须有接受状态的报价才能够提交审批');
+        this.$message.error('必须有接受状态的报价才能够提交审批,保存后再提交');
+        return;
+      }
+      if (itemStatus) {
+        this.$message.error('请完善比价内容,保存后再提交');
         return;
       }
       if (result) {

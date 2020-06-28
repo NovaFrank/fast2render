@@ -843,13 +843,15 @@ export default {
       this.inquiryListOption.data.splice(row.$index, 1);
     },
     handleDetailItemClick(row, event, column) {
-      this.currentDetailItemSelected = row.toElsAccountList.split(',').map((item) => {
-        const i = item.split('_');
-        return {
-          id: i[0],
-          label: `${i[0]}_${i[1]}_${i[2]}`
-        };
-      });
+      this.currentDetailItemSelected = validatenull(row.toElsAccountList)
+        ? []
+        : row.toElsAccountList.split(',').map((item) => {
+            const i = item.split('_');
+            return {
+              id: i[0],
+              label: `${i[0]}_${i[1]}_${i[2]}`
+            };
+          });
       this.currentDetailItem = {
         ...row,
         selectedSupplier: this.currentDetailItemSelected

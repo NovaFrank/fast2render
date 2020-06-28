@@ -49,7 +49,8 @@
                 <div
                   v-if="
                     row[column.prop] === `${row.materialNumber}_${column.prop}` &&
-                      row.itemStatus !== '1'
+                      row.itemStatus !== '1' &&
+                      row.itemStatus !== '3'
                   "
                 >
                   <el-col :span="12">

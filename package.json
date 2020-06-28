@@ -19,6 +19,7 @@
     "fast2render": "^0.4.41",
     "jquery": "^1.12.4",
     "js-md5": "^0.7.3",
+    "krry-transfer": "^1.4.4",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",
     "vue-router": "^3.1.3",

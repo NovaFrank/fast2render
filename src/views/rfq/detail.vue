@@ -500,7 +500,8 @@ export default {
         this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
           return {
             label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
-            key: item.toElsAccount
+            key: item.toElsAccount,
+            id: item.toElsAccount
           };
         });
       });
@@ -732,9 +733,13 @@ export default {
     },
     handleDetailItemClick(row, event, column) {
       this.currentDetailItemSelected = this.inquiryListOption.data
-        .filter((item) => item.materialNumber === row.materialNumber)
+        .filter((item) => item.materialNumber === row.materialNumber)[0]
+        .toElsAccountList.split(',')
         .map((item) => {
-          return item.toElsAccount;
+          return {
+            id: item.split('_')[0],
+            label: item
+          };
         });
       this.currentDetailItem = {
         ...row,
@@ -1115,24 +1120,25 @@ export default {
     },
     // 保存供应商选项
     suppliersDialogSaveTransfer(selectedSupplier) {
+      console.log(this.currentDetailItemSelected);
       const newSuppliers = selectedSupplier.filter(
-        (item) => !this.currentDetailItemSelected.includes(item)
+        (item) => !this.currentDetailItemSelected.map((item) => item.id).includes(item)
       );
       const itemList = newSuppliers.map((item, index) => {
         const supplierIndex = this.suppliersDialogOptionColumn.data.findIndex(
           (supplier) => supplier.label.indexOf(item) !== -1
         );
         const supplier = this.suppliersDialogOptionColumn.data[supplierIndex].label.split('_');
-        let costJson = {};
-        if (item.quoteMethod === '2') {
-          costJson = JSON.parse(this.currentDetailItem.costConstituteJson);
-          let template = costJson.templateJson;
-          template = template.map((element) => {
-            element.propData = { tableData: [], formData: {} };
-            return element;
-          });
-          costJson.templateJson = template;
-        }
+        // let costJson = {};
+        // if (item.quoteMethod === '2') {
+        //   costJson = JSON.parse(this.currentDetailItem.costConstituteJson);
+        //   let template = costJson.templateJson;
+        //   template = template.map((element) => {
+        //     element.propData = { tableData: [], formData: {} };
+        //     return element;
+        //   });
+        //   costJson.templateJson = template;
+        // }
         return {
           id: `${index}`,
           materialNumber: this.currentDetailItem.materialNumber,
@@ -1155,7 +1161,7 @@ export default {
           priceIncludingTax: '',
           quota: '',
           ladderPriceJson: this.currentDetailItem.ladderPriceJson || null,
-          costConstituteJson: JSON.stringify(costJson) || null,
+          costConstituteJson: this.currentDetailItem.costConstituteJson || null,
           $cellEdit: false
         };
       });

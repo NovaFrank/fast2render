@@ -49,8 +49,8 @@
                 <div
                   v-if="
                     row[column.prop] === `${row.materialNumber}_${column.prop}` &&
-                      row.itemStatus !== '1' &&
-                      row.itemStatus !== '3'
+                      row[`itemStatus_${row.materialNumber}_${column.prop}`] !== '1' &&
+                      row[`itemStatus_${row.materialNumber}_${column.prop}`] !== '3'
                   "
                 >
                   <el-col :span="12">
@@ -82,7 +82,9 @@
                     ></el-input>
                   </el-col>
                 </div>
-                <span v-else>{{ row[column.prop] }}</span>
+                <span v-else-if="row[column.prop] !== `${row.materialNumber}_${column.prop}`">
+                  {{ row[column.prop] }}
+                </span>
               </div>
             </template>
           </avue-crud>

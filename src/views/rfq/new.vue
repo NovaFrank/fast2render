@@ -1077,7 +1077,7 @@ export default {
               }
               this.$message.success('保存成功');
               if (this.currentEnquiryNumber) {
-                this.$router.go(0);
+                // this.$router.go(0);
                 return;
               }
               const enquiryNumber = res.data.data.enquiryNumber;

@@ -102,6 +102,12 @@ export default {
         return 'attahcment-fiels_4_3';
       }
     },
+    domain: {
+      type: String,
+      default: () => {
+        return null;
+      }
+    },
     readonly: {
       type: Boolean,
       default: false
@@ -179,7 +185,7 @@ export default {
   },
   data() {
     return {
-      dome: 'http://cs.51qqt.com',
+      dome: window.location.host,
       showUpdate: true,
       uploadRow: null,
       fileList: [],
@@ -194,14 +200,22 @@ export default {
       this.businessId = this.id;
       this.initData();
     }
+    if (window.location.host.includes('uat')) {
+      this.dome = 'https://uat.51qqt.com/';
+    } else {
+      // uat 环境定位到 v4 版本
+      this.dome = 'http://cs.51qqt.com/';
+    }
+    if (this.domain) {
+      this.dome = this.domain;
+    }
   },
   watch: {
     id(newValue) {
       this.businessId = newValue;
       this.initData();
     },
-    attachmentTemplate(newValue) {
-      console.log(newValue);
+    attachmentTemplate() {
       this.initData();
     }
   },

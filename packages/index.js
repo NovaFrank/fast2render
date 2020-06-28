@@ -19,6 +19,7 @@ import auth from './lib/auth';
 import SelectDialog from './components/render/selectDialog/selectDialog';
 import SelectDialogTable from './components/render/selectDialog/selectDialogTable';
 import Tree from './components/render/tree/index';
+import { getStore, setStore } from './lib/store';
 import util, {
   loadDic,
   getDicItem,
@@ -62,6 +63,8 @@ export default {
     Vue.prototype.$getBlockItem = getBlockItem;
     Vue.prototype.$getBlockFieldItem = getBlockFieldItem;
     Vue.prototype.$util = util;
+    Vue.prototype.$util.setStore = setStore;
+    Vue.prototype.$util.getStore = getStore;
     Vue.prototype.$auth = auth;
     Vue.component(BusinessRuleConfig.name, BusinessRuleConfig);
     Vue.component(SelectDialog.name, SelectDialog);

@@ -365,7 +365,7 @@ export default {
             materialName: item.materialName,
             baseUnit: item.baseUnit,
             quantity: item.quantity,
-            option: option
+            option: this.templateRule.enquiryIsQuota !== true && option === '配额' ? '' : option
           };
           // 分配 对比项 数据
           this.suppliers.forEach((supplier) => {

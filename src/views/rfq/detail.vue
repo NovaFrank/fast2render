@@ -732,13 +732,15 @@ export default {
       });
     },
     handleDetailItemClick(row, event, column) {
+      console.log(
+        this.inquiryListOption.data.filter((item) => item.materialNumber === row.materialNumber)[0]
+      );
       this.currentDetailItemSelected = this.inquiryListOption.data
-        .filter((item) => item.materialNumber === row.materialNumber)[0]
-        .toElsAccountList.split(',')
+        .filter((item) => item.materialNumber === row.materialNumber)
         .map((item) => {
           return {
-            id: item.split('_')[0],
-            label: item
+            id: item.toElsAccount,
+            label: `${item.toElsAccount}_${item.companyShortName}_${item.supplierType}`
           };
         });
       this.currentDetailItem = {

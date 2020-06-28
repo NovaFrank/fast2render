@@ -46,7 +46,12 @@
               :v-key="`${row.materialNumber}_${column.prop}`"
             >
               <div :key="`${row.materialNumber}_${column.prop}`">
-                <div v-if="row[column.prop] === `${row.materialNumber}_${column.prop}`">
+                <div
+                  v-if="
+                    row[column.prop] === `${row.materialNumber}_${column.prop}` &&
+                      row.itemStatus !== '1'
+                  "
+                >
                   <el-col :span="12">
                     <avue-radio
                       :disabled="detailObj.auditStatus === '2' || detailObj.auditStatus === '0'"

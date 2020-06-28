@@ -9,6 +9,40 @@
             :name="subItem.prop"
             :key="subItem.prop"
           >
+            <slot :name="subItem.prop">
+              <fast2-block-provider
+                :option="subItem.option"
+                :version="subItem.option ? null : subItem.version"
+              >
+                <template v-slot="component">
+                  <div>
+                    <fast2-component-render
+                      :providerData="tabData[subItem.prop]"
+                      :list="component.list"
+                      :ref="subItem.prop"
+                      :readOnly="readOnly"
+                      :addInCell="true"
+                      :permission="newPermission[subItem.prop]"
+                      :dataSource="subItem.prop"
+                      v-on="$listeners"
+                    ></fast2-component-render>
+                  </div>
+                </template>
+              </fast2-block-provider>
+            </slot>
+          </el-tab-pane>
+        </template>
+      </el-tabs>
+    </template>
+    <template v-if="newList && newList.length && !tabView">
+      <template v-for="subItem in newList">
+        <div
+          class="tab-block"
+          :key="subItem.prop"
+          v-if="newPermission && newPermission[subItem.prop]"
+        >
+          <h4 class="block-title">{{ subItem.label }}</h4>
+          <slot :name="subItem.prop">
             <fast2-block-provider
               :option="subItem.option"
               :version="subItem.option ? null : subItem.version"
@@ -20,52 +54,21 @@
                     :list="component.list"
                     :ref="subItem.prop"
                     :readOnly="readOnly"
+                    :addInCell="true"
                     :permission="newPermission[subItem.prop]"
                     :dataSource="subItem.prop"
                     v-on="$listeners"
-                  >
-                  </fast2-component-render></div></template
-            ></fast2-block-provider> </el-tab-pane></template
-      ></el-tabs>
-    </template>
-    <template v-if="newList && newList.length && !tabView">
-      <template v-for="subItem in newList">
-        <div
-          class="tab-block"
-          :key="subItem.prop"
-          v-if="newPermission && newPermission[subItem.prop]"
-        >
-          <h4 class="block-title">{{ subItem.label }}</h4>
-          <fast2-block-provider
-            :option="subItem.option"
-            :version="subItem.option ? null : subItem.version"
-          >
-            <template v-slot="component">
-              <div>
-                <fast2-component-render
-                  :providerData="tabData[subItem.prop]"
-                  :list="component.list"
-                  :ref="subItem.prop"
-                  :readOnly="readOnly"
-                  :permission="newPermission[subItem.prop]"
-                  :dataSource="subItem.prop"
-                  v-on="$listeners"
-                >
-                </fast2-component-render></div></template
-          ></fast2-block-provider>
+                  ></fast2-component-render>
+                </div>
+              </template>
+            </fast2-block-provider>
+          </slot>
         </div>
       </template>
     </template>
   </div>
 </template>
 <script>
-/**
- * 界面配置总管理界面
- * 左侧 维护 所有可配数据列表
- * 主内容根据 可配数据类型 展示 表单，表格，详情，组件列表管理，可选择设置对应的数据
- * 进入屏蔽其他操作状态，单纯进行布局， 保存 及 发布 ， 可维护类型为 表格 表单 详情， 组合， 可 维护 模版 页面  模块
- * block 内含一组组件
- */
 import { test } from '../demo/template.js';
 // import { zhunru } from '../demo/template2.js';
 import permisssion from '../demo/tableJson2';
@@ -119,7 +122,7 @@ export default {
     list: {
       handler(val) {
         this.newList = val;
-        if (this.newList[0]) {
+        if (this.newList[0] && !this.active) {
           this.active = this.newList[0].prop;
         }
         // this.$emit('design-update', this.editData);
@@ -156,7 +159,7 @@ export default {
     if (this.debugger === 'true') {
       this.newPermission = permisssion;
     }
-    if (this.newList[0]) {
+    if (this.newList[0] && !this.active) {
       this.active = this.newList[0].prop;
     }
   }

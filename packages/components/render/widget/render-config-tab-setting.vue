@@ -137,10 +137,10 @@ export default {
       if (!column || !column.length) {
         return false;
       }
-      let newColumn = [];
+      const newColumn = [];
       column.map((item) => {
-        let list = this.templateConfig.column[prop];
-        let isShow = list && item.label && list.includes(item.label);
+        const list = this.templateConfig.column[prop];
+        const isShow = list && item.label && list.includes(item.label);
         delete item.hide;
         if (isShow) {
           newColumn.push(item);
@@ -165,8 +165,8 @@ export default {
     handleTemplateBlock() {
       this.showlist = [];
       this.list.map((item) => {
-        let list = this.templateConfig.tab;
-        let isShow = list && item.label && list.includes(item.label);
+        const list = this.templateConfig.tab;
+        const isShow = list && item.label && list.includes(item.label);
         item.option = { column: [] };
         if (isShow) {
           this.showlist.push(item);

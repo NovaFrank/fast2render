@@ -4,10 +4,10 @@
       <template
         v-if="
           item &&
-            !item.hide &&
-            (item.type === BLOCK_TYPE.DETAIL ||
-              item.type === BLOCK_TYPE.FORM ||
-              item.type === BLOCK_TYPE.FIELD)
+          !item.hide &&
+          (item.type === BLOCK_TYPE.DETAIL ||
+            item.type === BLOCK_TYPE.FORM ||
+            item.type === BLOCK_TYPE.FIELD)
         "
       >
         <div :key="item.slug">
@@ -17,6 +17,7 @@
             :readOnly="readOnly"
             :hasRowPermission="hasFieldPermission"
             :rowPermission="getRowPromession(permission.fieldJson)"
+            :formulas="permission.formulas"
             theme="block"
             ref="themebox"
           >
@@ -36,11 +37,13 @@
       </template>
       <template v-else-if="item && !item.hide && item.type === BLOCK_TYPE.LIST">
         <div :key="item.slug">
-          <fast2-theme-provider
+          <ThemeProvider
             :option="item.data"
             :readOnly="readOnly"
             :hasRowPermission="hasRowPermission"
             :rowPermission="getRowPromession(permission.tableJson)"
+            :addInCell="addInCell"
+            :formulas="permission.formulas"
             theme="block"
             ref="themebox"
           >
@@ -64,7 +67,7 @@
               </avue-crud>
               <slot name="crud-footer"></slot>
             </template>
-          </fast2-theme-provider>
+          </ThemeProvider>
         </div>
       </template>
       <template v-else-if="item && !item.hide && item.type === BLOCK_TYPE.DYNAMIC">
@@ -97,6 +100,8 @@
 import itemAttachment from './cards/item-attachment';
 import { getObjType } from '../../lib/utils';
 import { validateNull } from '../../lib/validate';
+import ThemeProvider from './widget/theme-provider';
+
 const BLOCK_TYPE = {
   LIST: 'crud',
   FORM: 'form',
@@ -109,7 +114,7 @@ const BLOCK_TYPE = {
 
 export default {
   name: 'ComponentRender',
-  components: { itemAttachment },
+  components: { itemAttachment, ThemeProvider },
   props: {
     list: {
       type: Array,
@@ -129,12 +134,17 @@ export default {
       type: Boolean,
       default: false
     },
+    addInCell: {
+      type: Boolean,
+      default: false
+    },
     permission: {
       type: Object,
       default: () => {
         return {
           tableJson: [],
-          fieldJson: []
+          fieldJson: [],
+          formulas: []
         };
       }
     },
@@ -154,6 +164,7 @@ export default {
       tableObj: {},
       tableData: [],
       formData: {},
+      lockCalc: false,
       inited: false
     };
   },
@@ -172,13 +183,16 @@ export default {
     }
   },
   watch: {
-    readOnly: function() {
+    readOnly: function () {
       this.initList();
     }
   },
   created() {},
   mounted() {
     this.initList();
+    if (!this.readOnly) {
+      // this.watchList();
+    }
   },
   methods: {
     initList() {
@@ -196,13 +210,15 @@ export default {
     },
     listRowUpdate(row, index, done, loading) {
       // 行修改
-      this.$set(this.providerData.tableData, index, row);
+      const calcPayload = this.checkFormFormulas(row);
+      this.$set(this.providerData.tableData, index, calcPayload);
       loading();
       this.updateRootTable(this.providerData.tableData);
       done();
     },
     listRowSave(payload, done) {
-      this.providerData.tableData.push(payload);
+      const calcPayload = this.checkFormFormulas(payload);
+      this.providerData.tableData.push(calcPayload);
       this.updateRootTable(this.providerData.tableData);
       done();
     },
@@ -210,8 +226,36 @@ export default {
       this.providerData.tableData.splice(payload.index, 1);
       this.updateRootTable(this.providerData.tableData);
     },
+    checkFormulas(data = this.providerData.tableData) {
+      if (this.permission.formules && data.length) {
+        //  console.log(this.permission.formules, '要执行的权限方法');
+        //  console.log(data, '要执行的权限对象');
+        // 进行公式计算
+        const list = this.$util.doListCalc(this.permission.formules, data);
+        this.providerData.tableData = list;
+        console.log('计算结果', this.providerData.tableData);
+        this.lockCalc = false;
+        // 打开允许计算
+      }
+    },
+    checkFormFormulas(data) {
+      if (this.permission.formules && data) {
+        const obj = this.$util.doCalc(this.permission.formules, data);
+        return obj;
+      }
+      return data;
+    },
     listRowAdd() {
-      this.$refs.table[0].rowAdd();
+      if (this.addInCell) {
+        const lenth = this.providerData.tableData.length;
+        if (!this.lockCalc) {
+          this.providerData.tableData.splice(lenth + 1, 0, { $cellEdit: true });
+        } else {
+          setTimeout(this.listRowAdd, 1000);
+        }
+      } else {
+        this.$refs.table[0].rowAdd();
+      }
     },
     updateRootTable(tableData) {
       let data = { tableData };
@@ -226,16 +270,22 @@ export default {
       let newData = {};
       if (getObjType(data) === 'array') {
         data.map((item) => {
+          // 进行真假字符串识别转换
+          if (item.display === 'true') {
+            item.display = true;
+          } else if (item.display === 'false') {
+            item.display = false;
+          }
           newData[item.prop] = item;
         });
       } else if (getObjType(data) === 'object') {
         newData = data;
       }
-      console.log('end data', newData);
+      // console.log('End Peromession data', newData);
       return newData;
     },
     getComponent(type, component) {
-      let KEY_COMPONENT_NAME = 'item-';
+      const KEY_COMPONENT_NAME = 'item-';
       let result = 'normal';
       if (!this.validatenull(component)) {
         result = component;

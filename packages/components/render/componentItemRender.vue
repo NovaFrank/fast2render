@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     getComponent(component) {
-      let KEY_COMPONENT_NAME = 'item-';
+      const KEY_COMPONENT_NAME = 'item-';
       let result = 'normal';
       if (component === 'attachment') {
         result = component;

@@ -9,7 +9,7 @@
         <div v-if="component.option && component.option.column && component.option.column.length">
           <avue-crud :data="fileList" :option="component.option" @row-del="handleDelete">
             <template v-slot:fileAction="scope">
-              <div v-if="!readonly">
+              <div v-if="!readonly && downloadClient">
                 <el-upload
                   id="webpicker"
                   :show-file-list="false"
@@ -50,7 +50,7 @@
                   </template>
                 </el-upload>
               </div>
-              <div v-else>
+              <div v-else-if="downloadClient">
                 <el-link
                   v-if="scope.row.attachmentUrl"
                   download
@@ -76,10 +76,30 @@ import { validateNull } from '../../lib/validate';
 export default {
   name: 'AttachmentList',
   props: {
+    // 是否屏蔽下载供应商附件
+    downloadClient: {
+      type: Boolean,
+      default: true
+    },
+    // 跳过 是否判断供应商以及供应商tab
+    passClient: {
+      type: Boolean,
+      default: true
+    },
+    // 是否为供应商端
+    client: {
+      type: Boolean,
+      default: true
+    },
+    // 是否为供应商tab
+    clientTab: {
+      type: Boolean,
+      default: true
+    },
     version: {
       type: String,
       default: () => {
-        return 'attahcment-fiels_2_2';
+        return 'attahcment-fiels_4_3';
       }
     },
     readonly: {
@@ -100,7 +120,7 @@ export default {
     },
     attachmentTemplate: {
       type: Array,
-      default: function() {
+      default: function () {
         return [];
       }
     },
@@ -281,7 +301,7 @@ export default {
     // 可增加行方法
     downloadFile(row) {
       if (row.attachmentUrl) {
-        let params = {
+        const params = {
           elsAccount: row.elsAccount,
           elsSubAccount: row.elsSubAccount,
           filePath: `${this.dome}${row.attachmentUrl}`
@@ -295,30 +315,50 @@ export default {
     },
     async getBase64(file) {
       return new Promise((resolve, reject) => {
-        let reader = new FileReader();
+        const reader = new FileReader();
         let fileResult = '';
         reader.readAsDataURL(file); // 开始转
-        reader.onload = function() {
+        reader.onload = function () {
           fileResult = reader.result;
         }; // 转 失败
-        reader.onerror = function(error) {
+        reader.onerror = function (error) {
           reject(error);
         }; // 转 结束  咱就 resolve 出去
-        reader.onloadend = function() {
+        reader.onloadend = function () {
           resolve(fileResult);
         };
       });
     },
     getList() {
-      let action = 'findList';
-      let params = {
+      const action = 'findList';
+      const params = {
         businessElsAccount: this.businessElsAccount,
         businessModule: this.businessModule,
         businessId: this.businessId
       };
       uploadApi.attachmentServer(action, params).then((res) => {
         if (res.data.pageData && res.data.pageData.rows) {
-          this.fileList = res.data.pageData.rows;
+          if (this.passClient) {
+            this.fileList = res.data.pageData.rows;
+          } else {
+            if (this.client && this.clientTab) {
+              this.fileList = res.data.pageData.rows.filter(
+                (item) => item.elsAccount === this.elsAccount
+              );
+            } else if (this.client && !this.clientTab) {
+              this.fileList = res.data.pageData.rows.filter(
+                (item) => item.elsAccount !== this.elsAccount
+              );
+            } else if (!this.client && !this.clientTab) {
+              this.fileList = res.data.pageData.rows.filter(
+                (item) => item.elsAccount === this.businessElsAccount
+              );
+            } else if (!this.client && this.clientTab) {
+              this.fileList = res.data.pageData.rows.filter(
+                (item) => item.elsAccount !== this.businessElsAccount
+              );
+            }
+          }
         }
         // businessItemId 根据该值判断 替换或直接push
         const itemIds = this.fileList.map((item) => item.businessItemId);
@@ -347,7 +387,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let action = 'delete';
+        const action = 'delete';
         if (row.uuid) {
           uploadApi.attachmentServer(action, { uuid: row.uuid }).then((res) => {
             if (res.data.statusCode !== '200') {
@@ -360,7 +400,8 @@ export default {
       });
     },
     listRowAdd() {
-      let fileItem = {
+      const fileItem = {
+        elsAccount: this.elsAccount,
         businessItemId: this.id + '_00' + (this.fileList.length + 1)
       };
       this.fileList.push(fileItem);
@@ -369,11 +410,11 @@ export default {
       if (!item) {
         return;
       }
-      let type = item.attachmentType || item.fileType;
+      const type = item.attachmentType || item.fileType;
       if (!type) {
         return;
       }
-      let fileItem = {
+      const fileItem = {
         businessItemId: this.id + type + (this.fileList.length + 1),
         attachmentType: type
       };
@@ -414,7 +455,7 @@ export default {
         .then((res) => {
           console.log('上传结束', res);
           if (res.data.statusCode === '200') {
-            let data = res.data.data[0];
+            const data = res.data.data[0];
             const file = {
               fileSize: data.size,
               fileName: data.name,
@@ -463,12 +504,13 @@ export default {
     },
     updateFileList(file) {
       const _this = this;
-      let action = _this.uploadRow.attachmentName
+      const action = _this.uploadRow.attachmentName
         ? 'update'
         : _this.uploadRow.uuid
         ? 'update'
         : 'create';
-      let checkProp = 'businessItemId';
+      const checkProp = 'businessItemId';
+      console.log('this.elsAccount', this.elsAccount);
       let itemRow = {
         ...this.uploadRow,
         elsAccount: this.elsAccount,
@@ -481,7 +523,7 @@ export default {
         businessElsAccount: this.businessElsAccount,
         businessId: this.businessId
       };
-      let uploadRow = {
+      const uploadRow = {
         ...this.uploadRow,
         elsAttachmentVOList: [itemRow]
       };

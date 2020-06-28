@@ -1,15 +1,9 @@
 <template>
   <div>
     <div v-if="spanMethodData.prop">
-      <slot
-        :inited="inited"
-        :option="finalOption"
-        :data="myData"
-        :spanMethod="spanMethod"
-        :reload="reload"
-      ></slot>
+      <slot :option="finalOption" :data="myData" :spanMethod="spanMethod" :reload="reload"></slot>
     </div>
-    <div>
+    <div v-else>
       <slot :option="finalOption" :data="myData" :reload="reload"></slot>
     </div>
   </div>
@@ -49,6 +43,10 @@ export default {
       type: Boolean,
       default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
     },
+    addInCell: {
+      type: Boolean,
+      default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
+    },
     rowPermission: {
       type: Object,
       default: function() {
@@ -81,7 +79,7 @@ export default {
   data() {
     return {
       finalOption: {},
-      reload: false, // 是否重新加载完成
+      reload: false,
       optionHash: ''
     };
   },
@@ -96,24 +94,25 @@ export default {
     // 单点监测 ，避免多次触发
     hash: {
       handler(val) {
-        this.inited = false;
         this.finalOption = getStore(val);
+        this.finalOption = null;
         if (!this.finalOption) {
           this.handlerChange();
         } else {
           this.reload = true;
         }
-        console.log('参数变化');
       },
       immediate: true // 刷新加载 立马触发一次handler
     }
   },
   computed: {
     hash: function() {
-      let { version, theme, type, optionHash, rowPermission } = this;
-      let fullText = zipLayout(JSON.stringify({ version, theme, type, optionHash, rowPermission }));
-      let str = fullText.substring(fullText.length - 32);
-      let obj = (version || 'local') + '-' + str;
+      const { version, theme, type, optionHash, rowPermission } = this;
+      const fullText = zipLayout(
+        JSON.stringify({ version, theme, type, optionHash, rowPermission })
+      );
+      const str = fullText.substring(fullText.length - 32);
+      const obj = (version || 'local') + '-' + str;
       return obj;
     },
     myData: function() {
@@ -129,13 +128,10 @@ export default {
       this.version ? this.mergeRemoteOption() : this.mergeLocalOption();
     },
     setFinalOption(option) {
-      // 最后统一规则
-      option.detail = this.readOnly;
-      if (this.type !== 'crud' && this.hasRowPermission) {
-        // option.menuBtn = !this.readOnly;
-        //  option.menu = !this.readOnly;
+      if (this.readOnly) {
+        option.detail = true;
+        option.menu = false;
       }
-
       if (this.hasRowPermission) {
         this.finalOption = this.filterColumWithRule(option, this.rowPermission);
       } else {
@@ -143,55 +139,71 @@ export default {
       }
       setStore({ name: this.hash, content: this.finalOption });
       this.reload = true;
-      console.log('输出配置', option);
     },
     filterColumWithRule(option, rowPermission) {
-      let newColumn = [];
-      if (!option || !option.column) {
-        console.log('请使用正确的 option 参数');
-        return false;
-      }
-      if (validateNull(rowPermission)) {
-        console.log('请使用配置生成的权限配置');
-        return false;
-      }
+      const newColumn = [];
       option.column.map((item) => {
-        const prop = item.prop;
-        const permissionItem = rowPermission[prop];
-
-        if (permissionItem) {
-          let isDisplay = permissionItem.display === true || permissionItem.display === 'true';
-
-          if (isDisplay) {
-            item.readonly = permissionItem.readonly;
-            item.disabled = item.readonly;
+        const itemProp = rowPermission[item.prop];
+        if (itemProp) {
+          if (itemProp.display && itemProp.display !== false) {
+            if (item.displayName) {
+              item.label = item.displayName;
+            }
+            const isRequired = !!itemProp.isRequired;
+            if (isRequired) {
+              const rule = {
+                required: true,
+                message: '请输入' + item.label,
+                trigger: 'blur'
+              };
+              if (item.rules) {
+                item.rules.push(rule);
+              } else {
+                item.rules = [rule];
+              }
+            }
+            if (itemProp.isDisabled || itemProp.readonly) {
+              item.disabled = 'disabled';
+              item.cell = false;
+              item.rules = [];
+            } else {
+              item.cell = true;
+            }
+            if (itemProp.displayName) {
+              item.label = itemProp.displayName;
+            }
+            item.display = true;
             newColumn.push(item);
           }
         } else {
-          let isLocalDefine = this.option.column.find((subitem) => {
-            return subitem.prop === prop;
+          const isLocalDefine = this.option.column.find((subitem) => {
+            return subitem.prop === item.prop;
           });
 
-          if (isLocalDefine) {
+          if (!validateNull(isLocalDefine)) {
             newColumn.push(item);
           }
         }
       });
-
       option.column = newColumn;
+      if (this.addInCell) {
+        option.editBtn = false;
+        option.cellBtn = true;
+        option.saveBtn = true;
+      }
       return option;
     },
     // 只有本地配置的处理方法
     mergeLocalOption() {
-      let localOption = this.getIntiOption();
+      const localOption = this.getInitOption();
       localOption.column = this.handlerColumn(localOption.column);
       this.setFinalOption(localOption);
       this.$forceUpdate();
     },
     // 使用远程配置的处理方法
-    mergeRemoteOption() {
-      let localOption = this.getIntiOption();
-      let remoteOption = loadBlockConfig(this.version, localOption, this.type);
+    async mergeRemoteOption() {
+      const localOption = this.getInitOption();
+      const remoteOption = await loadBlockConfig(this.version, localOption, this.type);
       if (remoteOption) {
         this.setFinalOption(remoteOption);
         this.$forceUpdate();
@@ -202,7 +214,7 @@ export default {
       }
     },
     // 先初始化 本地配置和默认配置
-    getIntiOption() {
+    getInitOption() {
       let localOption;
       if (this.type === 'crud') {
         localOption = this.handlerOption(this.option, this.theme === 'page');
@@ -216,14 +228,13 @@ export default {
       return handleColumn(column);
     },
     handlerOption(option, isBig) {
-      let newOption = JSON.parse(
-        JSON.stringify(Object.assign(isBig ? BigListTemplate : SmallListTemplate, option))
-      );
+      const bigTemp = JSON.parse(JSON.stringify(BigListTemplate));
+      const smallTemp = JSON.parse(JSON.stringify(SmallListTemplate));
+      const newOption = Object.assign(isBig ? bigTemp : smallTemp, option);
       // set option header
-      // if (!option.addBtn && !option.header) {
-      //   option.header = false;
-      // }
-
+      if (!option.addBtn && !option.header) {
+        option.header = false;
+      }
       // set search menu span
       const column = option.column || [];
 
@@ -237,15 +248,13 @@ export default {
       return newOption;
     },
     handlerOptionForm(option, isBig) {
-      // 全部获取身拷贝
-      let handlerOption = JSON.parse(JSON.stringify(option));
-      let newBigForm = JSON.parse(JSON.stringify(BigFormTemplate));
-      let newSmallForm = JSON.parse(JSON.stringify(SmallFormTemplate));
-      let newOption = Object.assign(isBig ? newBigForm : newSmallForm, handlerOption);
+      const bigTemp = JSON.parse(JSON.stringify(BigFormTemplate));
+      const smallTemp = JSON.parse(JSON.stringify(SmallFormTemplate));
+      const newOption = Object.assign(isBig ? bigTemp : smallTemp, option);
       return newOption;
     },
-    loadOption(slug) {
-      let option = loadBlockConfig(slug);
+    async loadOption(slug) {
+      const option = await loadBlockConfig(slug);
       if (option) {
         this.updateOption(option);
       } else {

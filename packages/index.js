@@ -15,7 +15,10 @@ import PageListHeader from './components/render/widget/page-list-header';
 import PageDetailHeader from './components/render/widget/page-detail-header';
 import BusinessRuleConfig from './components/render/widget/render-rule-config';
 import AttachmentList from './components/render/attachmentList';
-
+import auth from './lib/auth';
+import SelectDialog from './components/render/selectDialog/selectDialog';
+import SelectDialogTable from './components/render/selectDialog/selectDialogTable';
+import Tree from './components/render/tree/index';
 import util, {
   loadDic,
   getDicItem,
@@ -28,9 +31,6 @@ import util, {
   getBlockFieldItem,
   getTableList
 } from './lib/utils';
-import auth from './lib/auth';
-import SelectDialog from './components/render/selectDialog/selectDialog';
-import SelectDialogTable from './components/render/selectDialog/selectDialogTable';
 
 export default {
   install(Vue) {
@@ -66,5 +66,6 @@ export default {
     Vue.component(BusinessRuleConfig.name, BusinessRuleConfig);
     Vue.component(SelectDialog.name, SelectDialog);
     Vue.component(SelectDialogTable.name, SelectDialogTable);
+    Vue.component(Tree.name, Tree);
   }
 };

@@ -16,11 +16,23 @@
             :span-method="spanMethod"
           >
             <template slot="menuLeft">
-              <el-button v-if="detailObj.auditStatus !== '2'" size="small" @click="handleSave">
+              <el-button
+                v-if="
+                  detailObj.auditStatus &&
+                    detailObj.auditStatus !== '2' &&
+                    detailObj.auditStatus !== '0'
+                "
+                size="small"
+                @click="handleSave"
+              >
                 保存
               </el-button>
               <el-button
-                v-if="detailObj.auditStatus !== '2'"
+                v-if="
+                  detailObj.auditStatus &&
+                    detailObj.auditStatus !== '2' &&
+                    detailObj.auditStatus !== '0'
+                "
                 size="small"
                 type="primary"
                 @click="handleSubmit"
@@ -34,10 +46,15 @@
               :v-key="`${row.materialNumber}_${column.prop}`"
             >
               <div :key="`${row.materialNumber}_${column.prop}`">
-                <div v-if="row[column.prop] === `${row.materialNumber}_${column.prop}`">
+                <div
+                  v-if="
+                    row[column.prop] === `${row.materialNumber}_${column.prop}` &&
+                      row.itemStatus !== '1'
+                  "
+                >
                   <el-col :span="12">
                     <avue-radio
-                      :disabled="detailObj.auditStatus === '2'"
+                      :disabled="detailObj.auditStatus === '2' || detailObj.auditStatus === '0'"
                       v-model="row[`itemStatus_${row.materialNumber}_${column.prop}`]"
                       :dic="dic"
                       @change="
@@ -53,7 +70,8 @@
                       "
                       :disabled="
                         row[`itemStatus_${row.materialNumber}_${column.prop}`] === '5' ||
-                          detailObj.auditStatus === '2'
+                          detailObj.auditStatus === '2' ||
+                          detailObj.auditStatus === '0'
                       "
                       v-model="row[`quota_${row.materialNumber}_${column.prop}`]"
                       placeholder="配额"

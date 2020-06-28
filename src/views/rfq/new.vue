@@ -273,6 +273,8 @@ export default {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
+    this.form = {};
+    this.inquiryListOption.data = [];
     await this.tableData(); // 加载当前页面需要的数据
     if (!validatenull(this.$route.params.enquiryNumber)) {
       this.currentEnquiryNumber = this.$route.params.enquiryNumber;
@@ -1077,7 +1079,7 @@ export default {
               }
               this.$message.success('保存成功');
               if (this.currentEnquiryNumber) {
-                this.$router.go(0);
+                // this.$router.go(0);
                 return;
               }
               const enquiryNumber = res.data.data.enquiryNumber;
@@ -1108,8 +1110,6 @@ export default {
       return true;
     },
     initDetail() {
-      this.form = {};
-      this.inquiryListOption.data = [];
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.form = res.data.data;
@@ -1171,7 +1171,21 @@ export default {
         toElsAccountList: form.toElsAccountList ? form.toElsAccountList.toString() : '',
         quoteMethod: form.quoteMethod // 0、1
       };
-      if (form.quoteMethod === '1') {
+      // if (form.quoteMethod === '1') {
+      //   item = {
+      //     ...item,
+      //     ladderPriceJson: JSON.stringify(
+      //       form.ladderPriceJson.map((item) => {
+      //         return {
+      //           ladderQuantity: item.ladderQuantity,
+      //           ladderGrade: item.ladderGrade
+      //         };
+      //       })
+      //     )
+      //   };
+      // }
+
+      if (form.ladderPriceJson) {
         item = {
           ...item,
           ladderPriceJson: JSON.stringify(

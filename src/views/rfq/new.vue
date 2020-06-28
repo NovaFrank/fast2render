@@ -725,7 +725,8 @@ export default {
         this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
           return {
             label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
-            key: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`
+            key: item.toElsAccount,
+            id: item.toElsAccount
           };
         });
         this.dialogOption.column = this.dialogOption.column.map((item) => {
@@ -842,9 +843,16 @@ export default {
       this.inquiryListOption.data.splice(row.$index, 1);
     },
     handleDetailItemClick(row, event, column) {
+      this.currentDetailItemSelected = row.toElsAccountList.split(',').map((item) => {
+        const i = item.split('_');
+        return {
+          id: i[0],
+          label: `${i[0]}_${i[1]}_${i[2]}`
+        };
+      });
       this.currentDetailItem = {
         ...row,
-        selectedSupplier: row.toElsAccountList ? row.toElsAccountList.split(',') : []
+        selectedSupplier: this.currentDetailItemSelected
       };
     },
     handleMaterialSelectChange(selection) {
@@ -1237,13 +1245,13 @@ export default {
       this.relationDialogVisable = true;
     },
     suppliersDialogSaveTransfer(selectedSupplier) {
-      console.log('selectedSupplier', selectedSupplier, this.currentSelectionDetailItems);
+      selectedSupplier = this.suppliersDialogOptionColumn.data
+        .filter((item) => selectedSupplier.includes(item.key))
+        .map((item) => item.label);
       if (this.currentSelectionDetailItems.length > 0) {
         this.currentSelectionDetailItems.forEach((item) => {
-          console.log('selectedSupplier', selectedSupplier);
           const index = item.$index;
           const suppliers = selectedSupplier.map((i) => {
-            console.log(i.split('_'));
             return i.split('_')[1];
           });
           this.$set(

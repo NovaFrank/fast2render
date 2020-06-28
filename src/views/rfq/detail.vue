@@ -732,9 +732,6 @@ export default {
       });
     },
     handleDetailItemClick(row, event, column) {
-      console.log(
-        this.inquiryListOption.data.filter((item) => item.materialNumber === row.materialNumber)[0]
-      );
       this.currentDetailItemSelected = this.inquiryListOption.data
         .filter((item) => item.materialNumber === row.materialNumber)
         .map((item) => {
@@ -813,7 +810,6 @@ export default {
       });
     },
     handleOpenSubmit(form) {
-      console.log('this.form', form);
       // this.detailObj.quoteEndTime = new Date().getTime();
       openPassWord({ enquiryNumber: this.detailObj.enquiryNumber, passWord: form.password }).then(
         (res) => {
@@ -883,7 +879,6 @@ export default {
           itemStatus: item.itemStatusCopy
         };
       });
-      console.log(this.inquiryListOption.data);
       this.inquiryListOption.data.forEach((item) => {
         if (item.itemStatus === '4') {
           // 必须有接受的报价才能够提交审批
@@ -1122,7 +1117,6 @@ export default {
     },
     // 保存供应商选项
     suppliersDialogSaveTransfer(selectedSupplier) {
-      console.log(this.currentDetailItemSelected);
       const newSuppliers = selectedSupplier.filter(
         (item) => !this.currentDetailItemSelected.map((item) => item.id).includes(item)
       );

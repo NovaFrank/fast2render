@@ -82,11 +82,12 @@ export default {
       this.visable = false;
     },
     handleSubmit() {
-      // console.log('this.form.selectedSupplier', this.form.selectedSupplier, selectColumns);
+      console.log('this.selectColumns', this.selectColumns);
       this.$emit('on-save', this.selectColumns);
       this.visable = false;
     },
     onChange(val) {
+      console.log('val', val);
       this.selectColumns = val;
     }
   }

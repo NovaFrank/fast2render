@@ -273,6 +273,8 @@ export default {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
+    this.form = {};
+    this.inquiryListOption.data = [];
     await this.tableData(); // 加载当前页面需要的数据
     if (!validatenull(this.$route.params.enquiryNumber)) {
       this.currentEnquiryNumber = this.$route.params.enquiryNumber;
@@ -1108,8 +1110,6 @@ export default {
       return true;
     },
     initDetail() {
-      this.form = {};
-      this.inquiryListOption.data = [];
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.form = res.data.data;

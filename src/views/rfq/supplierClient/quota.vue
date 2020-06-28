@@ -461,6 +461,7 @@ export default {
       this.initDetail();
     },
     getPriceIndex(row, column) {
+      if (validatenull(row.ladderPriceJson)) return;
       const quantity = row.quantity;
       const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
         return Number(item.ladderQuantity);

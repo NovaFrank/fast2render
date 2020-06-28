@@ -42,6 +42,7 @@
 </template>
 <script>
 import historyOption from '@/const/rfq/newAndView/history';
+import { validatenull } from '@/util/validate';
 
 const execMathExpress = require('exec-mathexpress');
 
@@ -137,6 +138,7 @@ export default {
   },
   methods: {
     getPriceIndex(row, column) {
+      if (validatenull(row.ladderPriceJson)) return;
       if (
         (row.itemStatus === '2' || row.itemStatus === '4') &&
         this.detailObj.quoteEndTime > new Date().getTime()

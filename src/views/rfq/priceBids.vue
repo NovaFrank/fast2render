@@ -551,15 +551,11 @@ export default {
     },
     handleSubmit() {
       let status = true;
-      let itemStatus = false;
       let result = false;
       this.crudData.forEach((item) => {
         if (item.itemStatus === '4') {
           // 必须有接受的报价才能够提交审批
           status = false;
-        }
-        if (item.itemStatus !== '4' && item.itemStatus !== '5') {
-          itemStatus = true;
         }
         if (item.itemStatus === '4') {
           let quote = 0;
@@ -588,10 +584,6 @@ export default {
       });
       if (status) {
         this.$message.error('必须有接受状态的报价才能够提交审批,保存后再提交');
-        return;
-      }
-      if (itemStatus) {
-        this.$message.error('请完善比价内容,保存后再提交');
         return;
       }
       if (result) {

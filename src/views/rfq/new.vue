@@ -924,6 +924,13 @@ export default {
             }
             this.$refs.form.validate((valid) => {
               if (valid) {
+                const itemList = this.inquiryListOption.data.map((item) => {
+                  const index = this.materialList.findIndex(
+                    (m) => m.materialNumber === item.materialNumber
+                  );
+                  item.queryUuid = this.materialList[index].uuid;
+                  return item;
+                });
                 let params = {
                   ...this.form,
                   enquiryNumber: this.currentEnquiryNumber,
@@ -936,7 +943,7 @@ export default {
                   canSeeRule: this.form.canSeeRule,
                   passWord: this.form.passWord,
                   auditStatus: this.form.auditStatus,
-                  itemList: this.inquiryListOption.data
+                  itemList
                 };
                 if (this.currentEnquiryNumber) {
                   params = {
@@ -1024,6 +1031,13 @@ export default {
                 }
 
                 const action = 'submit';
+                const itemList = this.inquiryListOption.data.map((item) => {
+                  const index = this.materialList.findIndex(
+                    (m) => m.materialNumber === item.materialNumber
+                  );
+                  item.queryUuid = this.materialList[index].uuid;
+                  return item;
+                });
                 const param = {
                   ...this.form,
                   enquiryNumber: this.currentEnquiryNumber,
@@ -1033,7 +1047,7 @@ export default {
                   enquiryDesc: this.form.enquiryDesc,
                   companyCode: this.form.companyCode,
                   enquiryMethod: this.form.enquiryMethod || '',
-                  itemList: this.inquiryListOption.data
+                  itemList
                 };
                 let params = {
                   elsAccount: this.form.elsAccount,
@@ -1088,6 +1102,13 @@ export default {
                 return;
               }
             }
+            const itemList = this.inquiryListOption.data.map((item) => {
+              const index = this.materialList.findIndex(
+                (m) => m.materialNumber === item.materialNumber
+              );
+              item.queryUuid = this.materialList[index].uuid;
+              return item;
+            });
             const params = {
               ...this.form,
               enquiryNumber: this.currentEnquiryNumber,
@@ -1099,7 +1120,7 @@ export default {
               enquiryMethod: this.form.enquiryMethod,
               canSeeRule: this.form.canSeeRule,
               passWord: this.form.passWord,
-              itemList: this.inquiryListOption.data
+              itemList
             };
             purchaseEnquiryAction('save', params).then((res) => {
               if (res.data.statusCode !== '200') {

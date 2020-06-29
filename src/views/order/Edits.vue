@@ -124,7 +124,7 @@ import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielList';
 import purchaseGroupOption from '@/const/order/purchaseGroupList';
-import { getOrderList, dataDicAPI, createOrder, submitAudit } from '@/api/order.js';
+import { getOrderList, dataDicAPI, createOrder, submitAudit, getPriceDetail } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
@@ -536,14 +536,26 @@ export default {
     materialDialogOpen() {
       this.dialogVisible = true;
     },
-    materialDialogSave(selectColumns) {
+    async materialDialogSave(selectColumns) {
       if (selectColumns.length !== 0) {
         this.crudObj.materialNumber = selectColumns[0].materialNumber;
         this.crudObj.materialDesc = selectColumns[0].materialDesc;
-        // this.crudObj.materialSpecifications = selectColumns[0].materialSpecifications;
-        // this.crudObj.baseUnit = selectColumns[0].baseUnit;
-        this.crudObj.priceIncludingTax = selectColumns[0].priceIncludingTax;
-        this.crudObj.taxRate = selectColumns[0].taxRate;
+        this.crudObj.materialSpecifications = selectColumns[0].materialSpecifications;
+        this.crudObj.baseUnit = selectColumns[0].baseUnit;
+        // this.crudObj.priceIncludingTax = selectColumns[0].priceIncludingTax;
+        // this.crudObj.taxRate = selectColumns[0].taxRate;
+        const action = 'getToElsEffectivePrice';
+        let params = {
+          elsAccount: this.elsAccount,
+          toElsAccount: this.formOption.obj.toElsAccount,
+          materialNumber: selectColumns[0].materialNumber
+        };
+        // console.log('params: ' + JSON.stringify(params));
+        let res = await getPriceDetail(action, params);
+        if (res.data.data !== null) {
+          this.crudObj.priceIncludingTax = res.data.data.priceIncludingTax;
+          this.crudObj.taxRate = res.data.data.taxRate;
+        }
       }
     },
     purchaseDialogOpen() {

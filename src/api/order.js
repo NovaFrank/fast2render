@@ -37,6 +37,17 @@ export const getPriceData = (action, params) => {
     }
   });
 };
+// 获取价格主数据 -- 获取详情
+export const getPriceDetail = (action, params) => {
+  return axios({
+    url: `${baseUrl}/inquiry/PurchasePriceRecordsService/${action}`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};
+
 // 获取供应商列表
 export const getSupplierData = (action, params) => {
   return axios({

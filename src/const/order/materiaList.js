@@ -34,19 +34,19 @@ export default {
       },
       {
         label: '物料名称',
-        prop: 'materialDesc',
+        prop: 'materialName',
         overHidden: true
       },
       {
-        label: '含税单价',
-        prop: 'priceIncludingTax',
+        label: '单位',
+        prop: 'baseUnit',
         overHidden: true,
         addDisplay: false,
         editDisplay: false
       },
       {
-        label: '税率',
-        prop: 'taxRate',
+        label: '物料规格',
+        prop: 'materialSpecifications',
         overHidden: true,
         addDisplay: false,
         editDisplay: false

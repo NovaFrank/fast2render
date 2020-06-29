@@ -147,7 +147,13 @@ import selectDialog2 from '@/common/selectDialog2';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
 import { getUserInfo } from '@/util/utils.js';
-import { createOrder, dataDicAPI, uploadServlet, submitAudit } from '@/api/order.js';
+import {
+  createOrder,
+  dataDicAPI,
+  uploadServlet,
+  submitAudit,
+  getPriceDetail
+} from '@/api/order.js';
 import { format, chain, bignumber } from 'mathjs';
 export default {
   components: {
@@ -548,14 +554,30 @@ export default {
     purchaseGroupDialogOpen() {
       this.dialogPurchaseGroupVisible = true;
     },
-    materialDialogSave(selectColumns) {
+    async materialDialogSave(selectColumns) {
+      this.crudObj = {};
+      this.crudObj.priceIncludingTax = '';
       if (selectColumns.length !== 0) {
         this.crudObj.materialNumber = selectColumns[0].materialNumber;
         this.crudObj.materialDesc = selectColumns[0].materialDesc;
-        // this.crudObj.materialSpecifications = selectColumns[0].materialSpecifications;
-        // this.crudObj.baseUnit = selectColumns[0].baseUnit;
-        this.crudObj.priceIncludingTax = selectColumns[0].priceIncludingTax;
-        this.crudObj.taxRate = selectColumns[0].taxRate;
+        this.crudObj.materialSpecifications = selectColumns[0].materialSpecifications;
+        this.crudObj.baseUnit = selectColumns[0].baseUnit;
+        // this.crudObj.priceIncludingTax = selectColumns[0].priceIncludingTax;
+        // this.crudObj.taxRate = selectColumns[0].taxRate;
+        const action = 'getToElsEffectivePrice';
+        let params = {
+          elsAccount: this.elsAccount,
+          toElsAccount: this.formOption.obj.toElsAccount,
+          materialNumber: selectColumns[0].materialNumber
+        };
+        // console.log('params: ' + JSON.stringify(params));
+        let res = await getPriceDetail(action, params);
+        console.log('dfdf:', res);
+        if (res.data.data !== null) {
+          this.crudObj.priceIncludingTax = res.data.data.priceIncludingTax;
+          this.crudObj.taxRate = res.data.data.taxRate;
+        }
+
         this.crudObj.queryUuid = selectColumns[0].uuid;
       }
     },

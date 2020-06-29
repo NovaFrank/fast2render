@@ -78,18 +78,18 @@ export default {
         editDisplay: false,
         hide: true
       },
-      // {
-      //   label: '规格',
-      //   prop: 'materialSpecifications',
-      //   addDisplay: false,
-      //   editDisplay: false
-      // },
-      // {
-      //   label: '单位',
-      //   prop: 'baseUnit',
-      //   addDisplay: false,
-      //   editDisplay: false
-      // },
+      {
+        label: '规格',
+        prop: 'materialSpecifications',
+        addDisplay: false,
+        editDisplay: false
+      },
+      {
+        label: '单位',
+        prop: 'baseUnit',
+        addDisplay: false,
+        editDisplay: false
+      },
       {
         label: '需求数量',
         prop: 'quantity',
@@ -108,8 +108,7 @@ export default {
         prop: 'taxCode',
         dicUrl: '/layout/dics/value/taxCode',
         dicMethod: 'get',
-        type: 'select',
-        disabled: true
+        type: 'select'
         // rules: [
         //   {
         //     required: true,

@@ -75,7 +75,7 @@ import fileOption from '@/const/order/files';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielList';
-import { getOrderList, dataDicAPI, createOrder, submitAudit } from '@/api/order.js';
+import { getOrderList, createOrder, submitAudit } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import { getUserInfo } from '@/util/utils.js';
 import { setStore } from '@/util/store.js';
@@ -159,28 +159,28 @@ export default {
   },
   methods: {
     async getDicData(data) {
-      dataDicAPI('orderType').then((res) => {
-        this.formOption.option.column = this.formOption.option.column.map((item) => {
-          if (item.prop === 'orderType') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
-      dataDicAPI('purchaseType').then((res) => {
-        this.formOption.option.column = this.formOption.option.column.map((item) => {
-          if (item.prop === 'purchaseType') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
+      // dataDicAPI('orderType').then((res) => {
+      //   this.formOption.option.column = this.formOption.option.column.map((item) => {
+      //     if (item.prop === 'orderType') {
+      //       return {
+      //         ...item,
+      //         dicData: res.data
+      //       };
+      //     }
+      //     return item;
+      //   });
+      // });
+      // dataDicAPI('purchaseType').then((res) => {
+      //   this.formOption.option.column = this.formOption.option.column.map((item) => {
+      //     if (item.prop === 'purchaseType') {
+      //       return {
+      //         ...item,
+      //         dicData: res.data
+      //       };
+      //     }
+      //     return item;
+      //   });
+      // });
     },
     // 获取头数据和行数据findDeliveryPlanList
     async tableData(data) {

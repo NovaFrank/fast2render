@@ -210,28 +210,28 @@ export default {
   methods: {
     // 获取数据字典下拉列表
     async getDicData(data) {
-      dataDicAPI('orderType').then((res) => {
-        this.formOption.option.column = this.formOption.option.column.map((item) => {
-          if (item.prop === 'orderType') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
-      dataDicAPI('purchaseType').then((res) => {
-        this.formOption.option.column = this.formOption.option.column.map((item) => {
-          if (item.prop === 'purchaseType') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
+      // dataDicAPI('orderType').then((res) => {
+      //   this.formOption.option.column = this.formOption.option.column.map((item) => {
+      //     if (item.prop === 'orderType') {
+      //       return {
+      //         ...item,
+      //         dicData: res.data
+      //       };
+      //     }
+      //     return item;
+      //   });
+      // });
+      // dataDicAPI('purchaseType').then((res) => {
+      //   this.formOption.option.column = this.formOption.option.column.map((item) => {
+      //     if (item.prop === 'purchaseType') {
+      //       return {
+      //         ...item,
+      //         dicData: res.data
+      //       };
+      //     }
+      //     return item;
+      //   });
+      // });
       // 税码
       dataDicAPI('taxRateNo').then((res) => {
         this.materielListOption.option.column = this.materielListOption.option.column.map(

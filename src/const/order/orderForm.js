@@ -18,7 +18,13 @@ export default {
         prop: 'orderType',
         span: 6,
         type: 'select',
-        dicData: [],
+        dicData: [
+          { id: 221, label: '商品类目', value: '商品类目' },
+          { id: 222, label: '服务', value: '服务' },
+          { id: 223, label: '寄售', value: '寄售' },
+          { id: 363, label: '订单类型-1', value: 'ORDERTYPE_1' },
+          { id: 364, label: '订单类型-2', value: 'ORDERTYPE-2' }
+        ],
         // dicUrl: '/layout/dics/value/orderType',
         // dicMethod: 'get',
         rules: [
@@ -66,7 +72,10 @@ export default {
         prop: 'purchaseType',
         span: 6,
         type: 'select',
-        dicData: [],
+        dicData: [
+          { id: 228, label: '原材料', value: '1' },
+          { id: 229, label: '加工', value: '2' }
+        ],
         // dicUrl: '/layout/dics/value/purchaseType',
         // dicMethod: 'get',
         rules: [

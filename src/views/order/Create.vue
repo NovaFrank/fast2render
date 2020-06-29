@@ -236,8 +236,8 @@ export default {
     this.elsSubAccount = userInfo.elsSubAccount;
     this.materielListOption.data = [];
     this.fileOption.option.menu = true;
-    this.getDicData();
     this.tabActive = this.tabOption.option.column[0];
+    await this.getDicData();
     this.formOption.obj.orderStatus = '0';
     this.formOption.obj.sendStatus = '0';
     this.formOption.obj.deliveryStatus = '0';

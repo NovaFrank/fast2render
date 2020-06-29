@@ -5,16 +5,19 @@ const validateDateTime = (rule, value, callback) => {
     callback();
   }
 };
-let sessionRequestQuan = sessionStorage.getItem('requestQuantity');
-let replyRequest = Number(JSON.parse(sessionRequestQuan));
-const validateNumber = (rule, value, callback) => {
-  console.log(value);
-  if (value && value > replyRequest) {
-    callback(new Error('计划交货数量不可大于需求数量'));
-  } else {
-    callback();
-  }
-};
+// const sessionRequestQuan = sessionStorage.getItem('requestQuantity');
+// const replyRequest = Number(JSON.parse(sessionRequestQuan));
+// console.log('dsdsewewew:', replyRequest);
+// const validateNumber = (rule, value, callback) => {
+//   console.log('sessionRequestQuan:', replyRequest);
+//   console.log(value);
+//   if (value > replyRequest) {
+//     callback(new Error('计划交货数量不可大于需求数量'));
+//   } else {
+//     console.log('342');
+//     callback();
+//   }
+// };
 export default {
   data: [],
   page: {
@@ -81,8 +84,8 @@ export default {
         label: '计划交货数量',
         labelWidth: 120,
         type: 'number',
-        prop: 'replyDeliveryQuantity',
-        rules: [{ trigger: 'change', validator: validateNumber }]
+        prop: 'replyDeliveryQuantity'
+        // rules: [{ trigger: 'blur', message: 'ddddddd' }]
       }
     ]
   }

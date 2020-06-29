@@ -248,6 +248,18 @@ export default {
     },
     rowUpdatePlan(row, index, done, loading) {
       loading();
+      if (row.requestDeliveryQuantity < row.replyDeliveryQuantity) {
+        this.planListOption.option.column.forEach((item) => {
+          if (item.prop === 'replyDeliveryQuantity') {
+            this.$message({
+              type: 'error',
+              message: '计划交货数量不可大于需求数量!'
+            });
+            return false;
+          }
+        });
+        return false;
+      }
       this.$set(this.planListOption.data, index, row);
       done();
     },
@@ -366,7 +378,7 @@ export default {
       if (['edit'].includes(type)) {
         // 编辑
         const data = this.planListOption.planObj.requestDeliveryQuantity;
-        window.sessionStorage.setItem('requestQuantity', JSON.stringify(data));
+        sessionStorage.setItem('requestQuantity', JSON.stringify(data));
       }
       done();
     }

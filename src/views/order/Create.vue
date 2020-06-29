@@ -489,7 +489,7 @@ export default {
         orderItemVOList: this.materielListOption.data,
         deliveryPlanVOList: this.planListOption.data
       };
-      // console.log('params: ' + JSON.stringify(params));
+      // console.log('params: ', params);
       await createOrder(action, params);
       this.$message({
         type: 'success',
@@ -556,6 +556,7 @@ export default {
         // this.crudObj.baseUnit = selectColumns[0].baseUnit;
         this.crudObj.priceIncludingTax = selectColumns[0].priceIncludingTax;
         this.crudObj.taxRate = selectColumns[0].taxRate;
+        this.crudObj.queryUuid = selectColumns[0].uuid;
       }
     },
     supplierDialogSave(selectColumns) {

@@ -11,6 +11,7 @@
       @on-history="handleShowHistory"
       @on-new-supplier="handleNewSupplier"
       @on-open="handleShowOpen"
+      @on-save-approval="handleSave"
       @on-submit-approval="handleSubmitApproval"
       @on-update-end="handleUpdateQuoteEndTime"
       @show-time-history="handleShowTimeHistory"
@@ -889,6 +890,33 @@ export default {
       };
       window.parent.postMessage(event, '*');
     },
+    handleSave() {
+      this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
+        return {
+          ...item,
+          itemStatus: item.itemStatusCopy
+        };
+      });
+      const param = {
+        ...this.detailObj,
+        enquiryNumber: this.currentEnquiryNumber,
+        elsAccount: this.elsAccount,
+        quoteEndTime: this.detailObj.quoteEndTime,
+        enquiryType: this.detailObj.enquiryType,
+        enquiryDesc: this.detailObj.enquiryDesc,
+        companyCode: this.detailObj.companyCode,
+        enquiryMethod: this.detailObj.enquiryMethod || '',
+        itemList: this.inquiryListOption.data
+      };
+      purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
+        if (res.data.statusCode === '200') {
+          this.$message.success('保存成功');
+          this.$router.go(0);
+        } else {
+          this.$message.error(res.data.message);
+        }
+      });
+    },
     handleSubmitApproval() {
       let status = true;
       let result = false;
@@ -1044,6 +1072,13 @@ export default {
           this.headerButtons = [
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
             { power: true, text: '更新时间', type: 'primary', size: '', action: 'on-update-end' },
+            {
+              power: true,
+              text: '保存',
+              type: 'primary',
+              size: '',
+              action: 'on-save-approval'
+            },
             {
               power: true,
               text: '提交审批',

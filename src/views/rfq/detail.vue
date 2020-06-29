@@ -550,7 +550,7 @@ export default {
         { label: '负责人', span: 6, prop: 'createUser', disabled: true }
       ];
       this.inquiryListOption.option.column = [
-        { label: '物料编号', prop: 'materialNumber', slot: true },
+        { label: '物料编号', prop: 'materialNumber', slot: true, width: 150 },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },

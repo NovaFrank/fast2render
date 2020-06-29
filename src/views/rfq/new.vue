@@ -444,7 +444,7 @@ export default {
         }
       ];
       const baseColumn = [
-        { label: '物料编号', prop: 'materialNumber', slot: true },
+        { label: '物料编号', prop: 'materialNumber', slot: true, width: 150 },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },

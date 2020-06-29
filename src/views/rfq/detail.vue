@@ -112,6 +112,14 @@
       <template slot="menuLeft">
         <el-button size="small" @click.stop="handleShowSupplierSelect()">新供应商</el-button>
       </template>
+      <template slot-scope="scope" slot="materialNumber">
+        <el-button
+          @click="handleClickMaterial(scope)"
+          class="el-button el-button--text el-button--small"
+        >
+          {{ scope.row.materialNumber }}
+        </el-button>
+      </template>
       <template slot-scope="scope" slot="quoteMethod">
         <span v-for="method in quoteMethodData" :key="method.value">
           <span v-if="scope.row.quoteMethod === method.value">{{ method.label }}</span>
@@ -542,7 +550,7 @@ export default {
         { label: '负责人', span: 6, prop: 'createUser', disabled: true }
       ];
       this.inquiryListOption.option.column = [
-        { label: '物料编号', prop: 'materialNumber' },
+        { label: '物料编号', prop: 'materialNumber', slot: true },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
@@ -869,6 +877,17 @@ export default {
           this.$message.error('撤回审批失败');
         });
       });
+    },
+    handleClickMaterial(scope) {
+      const router = {
+        name: `物料详情(${scope.row.materialNumber})`,
+        src: `/masterdata/material/#/view/${scope.row.materialNumber}_${scope.row.factory}`
+      };
+      const event = {
+        name: 'openNewTag',
+        props: router
+      };
+      window.parent.postMessage(event, '*');
     },
     handleSubmitApproval() {
       let status = true;

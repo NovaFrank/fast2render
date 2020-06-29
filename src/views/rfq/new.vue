@@ -76,6 +76,14 @@
       @size-change="sizeChange"
       @selection-change="handleMaterialSelectChange"
     >
+      <template slot-scope="scope" slot="materialNumber">
+        <el-button
+          @click="handleClickMaterial(scope)"
+          class="el-button el-button--text el-button--small"
+        >
+          {{ scope.row.materialNumber }}
+        </el-button>
+      </template>
       <template slot-scope="scope" slot="quoteMethod">
         <span v-for="method in quoteMethodData" :key="method.value">
           <span v-if="scope.row.quoteMethod === method.value">{{ method.label }}</span>
@@ -436,7 +444,7 @@ export default {
         }
       ];
       const baseColumn = [
-        { label: '物料编号', prop: 'materialNumber' },
+        { label: '物料编号', prop: 'materialNumber', slot: true },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
@@ -856,6 +864,17 @@ export default {
         ...row,
         selectedSupplier: this.currentDetailItemSelected
       };
+    },
+    handleClickMaterial(scope) {
+      const router = {
+        name: `物料详情(${scope.row.materialNumber})`,
+        src: `/masterdata/material/#/view/${scope.row.materialNumber}_${scope.row.factory}`
+      };
+      const event = {
+        name: 'openNewTag',
+        props: router
+      };
+      window.parent.postMessage(event, '*');
     },
     handleMaterialSelectChange(selection) {
       this.currentSelectionDetailItems = selection;

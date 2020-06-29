@@ -24,7 +24,8 @@
   </div>
 </template>
 <script>
-import { getCrudData } from '@/api/order';
+// import { getCrudData } from '@/api/order';
+import { getPriceData } from '@/api/order';
 // import { deepClone } from '@/util/utils';
 export default {
   name: 'selectDialog',
@@ -104,7 +105,7 @@ export default {
       listParams.elsAccount = this.elsAccount;
       listParams.currentPage = this.crudPage.currentPage;
       listParams.pageSize = this.crudPage.pageSize;
-      getCrudData(this.actionPath, listParams).then((res) => {
+      getPriceData(this.actionPath, listParams).then((res) => {
         const data = res.data;
         if (data.statusCode !== '200') {
           this.$message.error(data.message);

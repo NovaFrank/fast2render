@@ -311,8 +311,10 @@ export default {
       if (selectColumns.length !== 0) {
         this.crudObj.materialNumber = selectColumns[0].materialNumber;
         this.crudObj.materialDesc = selectColumns[0].materialDesc;
-        this.crudObj.materialSpecifications = selectColumns[0].materialSpecifications;
-        this.crudObj.baseUnit = selectColumns[0].baseUnit;
+        // this.crudObj.materialSpecifications = selectColumns[0].materialSpecifications;
+        // this.crudObj.baseUnit = selectColumns[0].baseUnit;
+        this.crudObj.priceIncludingTax = selectColumns[0].priceIncludingTax;
+        this.crudObj.taxRate = selectColumns[0].taxRate;
       }
     },
     purchaseDialogOpen() {

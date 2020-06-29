@@ -74,19 +74,19 @@ export default {
         hide: true,
         disabled: true
       },
-      {
-        label: '规格',
-        prop: 'materialSpecifications',
-        addDisplay: false,
-        editDisplay: false,
-        disabled: true
-      },
-      {
-        label: '单位',
-        prop: 'baseUnit',
-        addDisplay: false,
-        editDisplay: false
-      },
+      // {
+      //   label: '规格',
+      //   prop: 'materialSpecifications',
+      //   addDisplay: false,
+      //   editDisplay: false,
+      //   disabled: true
+      // },
+      // {
+      //   label: '单位',
+      //   prop: 'baseUnit',
+      //   addDisplay: false,
+      //   editDisplay: false
+      // },
       {
         label: '需求数量',
         prop: 'quantity',

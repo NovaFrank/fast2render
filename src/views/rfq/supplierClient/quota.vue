@@ -204,7 +204,7 @@ import filesOption from '@/const/rfq/newAndView/fileList';
 import costTemplateDialog from '@/components/views/costTemplateDialog';
 import { getAction, postAction, queryQuote } from '@/api/rfq/supplierClient';
 import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
-import history from './../history';
+import history from './history';
 import { validatenull } from '@/util/validate';
 import { dataDicAPI } from '@/api/rfq/common';
 import { ElsTemplateConfigService } from '@/api/templateConfig.js';

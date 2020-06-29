@@ -7,14 +7,6 @@
       :before-close="closeDialog"
     >
       <avue-crud :data.sync="crudData" :option="crudOption.option">
-        <template slot-scope="scope" slot="materialNumber">
-          <el-button
-            @click="handleClickMaterial(scope)"
-            class="el-button el-button--text el-button--small"
-          >
-            {{ scope.row.materialNumber }}
-          </el-button>
-        </template>
         <!-- 含税 -->
         <template slot-scope="scope" slot="priceIncludingTax">
           <span v-if="scope.row.quoteMethod === '0'">
@@ -129,13 +121,6 @@ export default {
   watch: {
     quoteMethodData: function(newValue) {
       this.crudOption.option.column = this.crudOption.option.column.map((item) => {
-        if (item.prop === 'materialNumber') {
-          return {
-            ...item,
-            slot: true,
-            width: 150
-          };
-        }
         if (item.prop === 'quoteMethod') {
           return {
             ...item,
@@ -159,17 +144,6 @@ export default {
   methods: {
     closeDialog() {
       this.$emit('close-field-dialog');
-    },
-    handleClickMaterial(scope) {
-      const router = {
-        name: `物料详情(${scope.row.materialNumber})`,
-        src: `/masterdata/material/#/view/${scope.row.materialNumber}_${scope.row.factory}`
-      };
-      const event = {
-        name: 'openNewTag',
-        props: router
-      };
-      window.parent.postMessage(event, '*');
     },
     getPriceIndex(row, column) {
       if (validatenull(row.ladderPriceJson)) return;

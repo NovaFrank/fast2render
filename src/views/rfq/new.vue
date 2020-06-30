@@ -105,7 +105,7 @@
           {{ JSON.parse(scope.row.costConstituteJson).templateName }}
         </span>
       </template>
-      <template slot="menuLeft" v-if="!form.purchaseRequestNumber">
+      <template slot="menuLeft" v-if="validatenull(form.purchaseRequestNumber)">
         <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>
       </template>
       <template slot="menuLeft">
@@ -123,6 +123,7 @@
           </el-col>
           <el-col :span="6">
             <el-button
+              v-if="validatenull(form.purchaseRequestNumber)"
               class="el-button el-button--text el-button--small"
               @click.stop="handleDeleteDetailItem(scope.row)"
             >
@@ -309,7 +310,7 @@ export default {
         ];
       } else {
         if (this.form.purchaseRequestNumber) {
-          this.inquiryListOption.option.menu = false;
+          this.inquiryListOption.option.menu = true;
           this.headerButtons = [
             { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
             { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
@@ -474,6 +475,7 @@ export default {
           type: 'tree',
           label: '物料编号',
           prop: 'materialNumber',
+          disabled: !validatenull(this.form.purchaseRequestNumber),
           dicData: this.materialList.map((item) => {
             return {
               label: item.materialNumber,
@@ -491,6 +493,7 @@ export default {
           rules: [{ trigger: 'change', validator: validateDateTime }]
         },
         {
+          disabled: !validatenull(this.form.purchaseRequestNumber),
           label: '需求数量',
           prop: 'quantity',
           rules: [

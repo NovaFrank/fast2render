@@ -2,7 +2,7 @@
   <basic-container>
     <form-header
       v-if="!isAudit"
-      titleText="预览"
+      titleText="询价单详情"
       showButton
       :buttons="headerButtons"
       :timeHistory="timeHistory"

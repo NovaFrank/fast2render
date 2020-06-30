@@ -1,7 +1,7 @@
 <template>
   <basic-container>
     <form-header
-      titleText="新建询价单"
+      titleText="新建/编辑询价单"
       showButton
       :buttons="headerButtons"
       @on-test="handleTest"

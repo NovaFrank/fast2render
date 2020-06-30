@@ -10,6 +10,7 @@ import store from './store';
 import axios from './router/axios';
 import VueAxios from 'vue-axios';
 import Fast2Render from 'fast2render'; // ../
+import 'fast2render/lib/index.css';
 import basicContainer from './components/basic-container/main';
 import { getCommonRes } from '@/util/commonRes';
 import { krryPaging } from 'krry-transfer';

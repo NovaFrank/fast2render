@@ -60,6 +60,6 @@ export default {
       disabled: true
     }
   ],
-  labelWidth: 120,
-  menuBtn: false
+  labelPostion:'top',
+  menuBtn: false,
 };

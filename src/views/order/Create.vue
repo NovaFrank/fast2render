@@ -634,20 +634,25 @@ export default {
             };
             // console.log('params: ' + JSON.stringify(params));
             let newRow = await createOrder(action, params);
-            // console.log('newRow:' + JSON.stringify(newRow));
-
-            if (this.materielListOption.data.length <= 0) {
-              this.materielListOption.data.push(newRow.data.data[0]);
-              this.params.addList.push(newRow.data.data[0]);
-              this.materielListOption.data[0].orderItemNumber = '1';
-              this.materielListOption.data[0].deliveryItemNumber = '1';
+            if (newRow.data.statusCode === '200') {
+              if (this.materielListOption.data.length <= 0) {
+                this.materielListOption.data.push(newRow.data.data[0]);
+                this.params.addList.push(newRow.data.data[0]);
+                this.materielListOption.data[0].orderItemNumber = '1';
+                this.materielListOption.data[0].deliveryItemNumber = '1';
+              } else {
+                this.materielListOption.data.push(newRow.data.data[0]);
+                this.materielListOption.data[this.params.addList.length].orderItemNumber = (
+                  this.params.addList.length + 1
+                ).toString();
+                this.materielListOption.data[0].deliveryItemNumber = '1';
+                this.params.addList.push(newRow.data.data[0]);
+              }
             } else {
-              this.materielListOption.data.push(newRow.data.data[0]);
-              this.materielListOption.data[this.params.addList.length].orderItemNumber = (
-                this.params.addList.length + 1
-              ).toString();
-              this.materielListOption.data[0].deliveryItemNumber = '1';
-              this.params.addList.push(newRow.data.data[0]);
+              this.$message({
+                type: 'error',
+                message: newRow.data.message
+              });
             }
           } else {
             this.$message.error('上传失败');

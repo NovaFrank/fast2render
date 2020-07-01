@@ -157,7 +157,8 @@ export default {
         label: '退回原因',
         prop: 'rejectReason',
         span: 24,
-        type: 'input'
+        type: 'input',
+        display: false
       }
     ]
   }

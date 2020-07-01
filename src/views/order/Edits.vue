@@ -477,7 +477,6 @@ export default {
       }
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
-      console.log(this.tabActive);
       const action = 'updateOrder';
       let params = {
         elsAccount: this.elsAccount,

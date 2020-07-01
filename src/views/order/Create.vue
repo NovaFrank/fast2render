@@ -572,7 +572,6 @@ export default {
         };
         // console.log('params: ' + JSON.stringify(params));
         let res = await getPriceDetail(action, params);
-        console.log('dfdf:', res);
         if (res.data.data !== null) {
           this.crudObj.priceIncludingTax = res.data.data.priceIncludingTax;
           this.crudObj.taxRate = res.data.data.taxRate;
@@ -611,11 +610,9 @@ export default {
         return false;
       }
       const formdata = new FormData();
-      console.log('111' + JSON.stringify(this.taxCodeArr));
       formdata.append('file', myfile.file);
       await uploadServlet(formdata)
         .then(async (res) => {
-          console.log('上传结束', res);
           if (res.data.statusCode === '200') {
             let data = res.data.data[0];
             const file = {
@@ -627,7 +624,6 @@ export default {
             this.$emit('upload-file', file);
             // this.updateFileList(file);
             const action = 'importExcel';
-            console.log(data.url);
             let params = {
               elsAccount: this.elsAccount,
               urlStr: data.url,
@@ -640,7 +636,6 @@ export default {
             if (this.materielListOption.data.length <= 0) {
               this.materielListOption.data.push(newRow.data.data[0]);
               this.params.addList.push(newRow.data.data[0]);
-              console.log('newRow:' + this.materielListOption.data[0]);
               this.materielListOption.data[0].orderItemNumber = '1';
               this.materielListOption.data[0].deliveryItemNumber = '1';
             } else {

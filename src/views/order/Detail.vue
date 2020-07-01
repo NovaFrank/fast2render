@@ -151,6 +151,18 @@ export default {
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
     this.tabActive = this.tabOption.option.column[0];
+    this.formOption.option.column.forEach((item) => {
+      if (item.prop === 'rejectReason') {
+        item.display = false;
+      }
+    });
+    if (this.$route.query.isAudit) {
+      this.formOption.option.column.forEach((item) => {
+        if (item.prop === 'rejectReason') {
+          item.display = false;
+        }
+      });
+    }
     this.tableData();
     this.getDicData();
     this.materielListOption.option.header = false;
@@ -218,6 +230,13 @@ export default {
         this.headerButtons = this.audit2;
       }
       this.formOption.obj = resp.data.data;
+      if (this.formOption.obj.orderStatus === '2' || this.formOption.obj.orderStatus === '5') {
+        this.formOption.option.column.forEach((item) => {
+          if (item.prop === 'rejectReason') {
+            item.display = true;
+          }
+        });
+      }
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;
       let orderItemArr = [];

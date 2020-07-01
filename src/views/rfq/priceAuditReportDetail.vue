@@ -133,8 +133,7 @@ export default {
             span: 24,
             label: '推荐理由',
             prop: 'reason',
-            type: 'textarea',
-            rules: [{ required: true, message: '请输入推荐理由', trigger: 'blur' }]
+            type: 'textarea'
           }
         ]
       },
@@ -426,6 +425,7 @@ export default {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
         this.inquiryListOption.option.header = false;
+        this.reasonObj.reason = this.detailObj.reason;
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;

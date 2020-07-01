@@ -36,8 +36,9 @@
                 size="small"
                 type="primary"
                 @click="handleSubmit"
-                >保存</el-button
               >
+                提交
+              </el-button>
             </template>
             <template
               v-for="(column, index) in supplierColumn"

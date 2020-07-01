@@ -1101,6 +1101,7 @@ export default {
         }
 
         if (this.detailObj.quoteEndTime < new Date().getTime()) {
+          this.inquiryListOption.option.header = false;
           this.headerButtons.push({
             power: true,
             text: '比价',

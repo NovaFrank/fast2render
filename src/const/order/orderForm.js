@@ -2,6 +2,7 @@ export default {
   obj: {},
   option: {
     menuPosition: 'left',
+    labelPosition: 'top',
     labelWidth: 120,
     menuBtn: false,
     column: [

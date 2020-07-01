@@ -1,6 +1,7 @@
 export default {
   obj: {},
   option: {
+    labelPosition: 'top',
     menuPosition: 'left',
     labelWidth: 120,
     menuBtn: false,

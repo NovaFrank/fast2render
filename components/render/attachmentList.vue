@@ -273,12 +273,14 @@ export default {
               reject(res);
             });
         } else {
+          resolve({ result: true, statusCode: '200' });
           // eslint-disable-next-line prefer-promise-reject-errors
-          reject({
-            result: false,
-            message: '请上传附件',
-            statusCode: '-100'
-          });
+          // 不需要强制上传
+          // reject({
+          //   result: false,
+          //   message: '请上传附件',
+          //   statusCode: '-100'
+          // });
         }
       });
     },

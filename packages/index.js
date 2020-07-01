@@ -30,7 +30,8 @@ import util, {
   getFormulaList,
   getBlockItem,
   getBlockFieldItem,
-  getTableList
+  getTableList,
+  getDicNow
 } from './lib/utils';
 
 export default {
@@ -54,6 +55,7 @@ export default {
     Vue.component(AttachmentList.name, AttachmentList);
     Vue.prototype.$loadDic = loadDic;
     Vue.prototype.$getDicItem = getDicItem;
+    Vue.prototype.$getDicNow = getDicNow;
     Vue.prototype.$getTableItem = getTableItem;
     Vue.prototype.$getTableList = getTableList;
     Vue.prototype.$getTemplateItem = getTemplateItem;

@@ -15,6 +15,7 @@
           <fast2-theme-provider
             :option="item.data"
             :readOnly="readOnly"
+            :inTab="inTab"
             :hasRowPermission="hasFieldPermission"
             :rowPermission="getRowPromession(permission.fieldJson)"
             :formulas="permission.formulas"
@@ -135,6 +136,10 @@ export default {
       default: false
     },
     addInCell: {
+      type: Boolean,
+      default: false
+    },
+    inTab: {
       type: Boolean,
       default: false
     },

@@ -47,6 +47,10 @@ export default {
       type: Boolean,
       default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
     },
+    inTab: {
+      type: Boolean,
+      default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
+    },
     rowPermission: {
       type: Object,
       default: function() {
@@ -137,6 +141,19 @@ export default {
       } else {
         this.finalOption = option;
       }
+      if (this.inTab && this.type !== 'crud') {
+        this.finalOption.menuBtn = false;
+        this.finalOption.menu = false;
+      }
+       if (this.addInCell && this.type === 'crud') {
+         this.finalOption.editBtn = false;
+         this.finalOption.cellBtn = true;
+         this.finalOption.saveBtn = true;
+      }
+      if (this.readOnly) {
+         this.finalOption.detail = true;
+         this.finalOption.menu = false;
+      }
       setStore({ name: this.hash, content: this.finalOption });
       this.reload = true;
     },
@@ -146,14 +163,16 @@ export default {
         const itemProp = rowPermission[item.prop];
         if (itemProp) {
           if (itemProp.display && itemProp.display !== false) {
+            let label = item.label
             if (item.displayName) {
               item.label = item.displayName;
+              label = item.displayName
             }
             const isRequired = !!itemProp.isRequired;
             if (isRequired) {
               const rule = {
                 required: true,
-                message: '请输入' + item.label,
+                message: '请输入' + label,
                 trigger: 'blur'
               };
               if (item.rules) {
@@ -169,9 +188,6 @@ export default {
             } else {
               item.cell = true;
             }
-            if (itemProp.displayName) {
-              item.label = itemProp.displayName;
-            }
             item.display = true;
             newColumn.push(item);
           }
@@ -186,11 +202,6 @@ export default {
         }
       });
       option.column = newColumn;
-      if (this.addInCell) {
-        option.editBtn = false;
-        option.cellBtn = true;
-        option.saveBtn = true;
-      }
       return option;
     },
     // 只有本地配置的处理方法

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="rulebox">
     <h4 class="widget-card__head">规则配置选项</h4>
     <avue-form :option="finalOption" v-bind="$attrs" v-on="$listeners"></avue-form>
   </div>
@@ -11,14 +11,16 @@ export default {
   props: ['list', 'readonly'],
   data() {
     return {
-      selectWidget: this.select
+      selectWidget: this.select,
+      inited: false
     };
   },
   computed: {
-    finalOption: function() {
+    finalOption: function () {
       const option = { column: [], menuBtn: false, labelWidth: '300px' };
       if (this.readonly) {
         option.detail = true;
+        option.menuBtn = false;
       }
       const list = this.list;
       if (list[0] && list[0].data && list[0].data.tableData) {
@@ -38,7 +40,7 @@ export default {
             if (item.multiple) {
               formItem.multiple = true;
             }
-            formItem.dicData = await this.$getDicItem(dic);
+            formItem.dicData = this.$getDicNow(dic);
           }
           option.column.push(formItem);
         });
@@ -49,3 +51,14 @@ export default {
   methods: {}
 };
 </script>
+<style scope>
+.el-form-item__content {
+  display: block;
+}
+.el-form-item--small .el-form-item__content,
+.el-form-item--small .el-form-item__label {
+  display: block;
+  float: none;
+  text-align: left;
+}
+</style>

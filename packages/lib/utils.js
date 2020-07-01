@@ -477,6 +477,14 @@ export const getDicItem = async (action, dic = 'commondic') => {
   return item;
 };
 
+export const getDicNow = (action, dic = 'commondic') => {
+  const item = getItemFormMap(action, dic);
+  if (!item) {
+    loadFormula();
+  }
+  return item;
+};
+
 /**
  *
  * @param {*} action  获取字典条目

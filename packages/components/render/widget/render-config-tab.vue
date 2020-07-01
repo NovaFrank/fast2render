@@ -22,6 +22,7 @@
                       :ref="subItem.prop"
                       :readOnly="readOnly"
                       :addInCell="addInCell"
+                      :inTab="true"
                       :permission="newPermission[subItem.prop]"
                       :dataSource="subItem.prop"
                       v-on="$listeners"

@@ -468,7 +468,9 @@ export default {
       });
       quantityList.push(quantity);
       const index = quantityList.findIndex((item) => item === Number(quantity));
-      return JSON.parse(row.ladderPriceJson)[index - 1][column];
+      const price = JSON.parse(row.ladderPriceJson)[index - 1][column];
+      this.inquiryListOption.data[row.$index][column] = price || '';
+      return price;
     },
     getCostPriceIndex(row, column) {
       const costJson = JSON.parse(row.costConstituteJson);
@@ -494,6 +496,7 @@ export default {
           });
           price = Math.floor((result.num / result.den) * 100) / 100;
         }
+        this.inquiryListOption.data[row.$index][column] = price || '';
         return price || '';
       }
       return '';

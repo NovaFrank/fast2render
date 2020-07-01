@@ -18,37 +18,37 @@
       @on-bid-price="handleBidPrice"
       @on-cancel-approval="handleCancelApproval"
     ></form-header>
-    <div class='avue-form-box'>
-    <avue-form ref="form" v-model="detailObj" :option="formOption">
-      <template slot="quoteEndTime">
-        <el-date-picker
-          v-model="quoteEndTimeChange"
-          :disabled="detailObj.auditStatus === '0' || detailObj.auditStatus === '2'"
-          type="datetime"
-          placeholder="选择日期时间"
-          value-format="timestamp"
-          @change="handleQuoteEndTime"
-        ></el-date-picker>
-      </template>
-      <template slot="enquiryType">
-        <el-select
-          v-model="detailObj.enquiryType"
-          @change="handleEnquiryTypeChange"
-          filterable
-          clearable
-          disabled
-          placeholder="请选择 成本模板"
-        >
-          <el-option
-            v-for="item in requestTypeDict"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
+    <div class="avue-form-box">
+      <avue-form ref="form" v-model="detailObj" :option="formOption">
+        <template slot="quoteEndTime">
+          <el-date-picker
+            v-model="quoteEndTimeChange"
+            :disabled="detailObj.auditStatus === '0' || detailObj.auditStatus === '2'"
+            type="datetime"
+            placeholder="选择日期时间"
+            value-format="timestamp"
+            @change="handleQuoteEndTime"
+          ></el-date-picker>
+        </template>
+        <template slot="enquiryType">
+          <el-select
+            v-model="detailObj.enquiryType"
+            @change="handleEnquiryTypeChange"
+            filterable
+            clearable
+            disabled
+            placeholder="请选择 成本模板"
           >
-          </el-option>
-        </el-select>
-      </template>
-    </avue-form>
+            <el-option
+              v-for="item in requestTypeDict"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
+        </template>
+      </avue-form>
     </div>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <!-- 单据规则 -->
@@ -647,7 +647,7 @@ export default {
     },
     getCostPriceIndex(row, column) {
       if (row.itemStatus === '1' || row.itemStatus === '3') {
-        return '**';
+        return '';
       }
       const costJson = JSON.parse(row.costConstituteJson);
       if (costJson) {

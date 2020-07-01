@@ -18,6 +18,7 @@
       @on-bid-price="handleBidPrice"
       @on-cancel-approval="handleCancelApproval"
     ></form-header>
+    <div class='avue-form-box'>
     <avue-form ref="form" v-model="detailObj" :option="formOption">
       <template slot="quoteEndTime">
         <el-date-picker
@@ -48,6 +49,7 @@
         </el-select>
       </template>
     </avue-form>
+    </div>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
     <!-- 单据规则 -->
     <fast2-block-provider

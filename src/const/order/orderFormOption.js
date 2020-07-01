@@ -54,7 +54,15 @@ export default {
       {
         label: '采购负责人',
         prop: 'purchasePerson',
-        formslot: true
+        labelWidth: 140,
+        formslot: true,
+        rules: [
+          {
+            required: true,
+            message: '请输入 采购负责人',
+            trigger: 'blur'
+          }
+        ]
       },
       {
         label: '订单状态',

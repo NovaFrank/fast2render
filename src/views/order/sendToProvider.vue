@@ -7,7 +7,9 @@
       @on-cancel="handleCancel"
       @on-submit="handleSendProvider"
     ></form-header>
-    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
+    <div class="avue-form-box">
+      <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
+    </div>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
     <span v-if="tabActive.prop === 'detail'">

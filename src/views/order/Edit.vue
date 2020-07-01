@@ -9,26 +9,28 @@
       @on-submit="handleSubmit"
       @on-save="handleSave"
     ></form-header>
-    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form">
-      <template slot="purchasePerson">
-        <el-input v-model="formOption.obj.purchasePerson" :readonly="true">
-          <i
-            slot="suffix"
-            class=" el-input_icon el-icon-search pointer"
-            @click="purchaseDialogOpen"
-          ></i>
-        </el-input>
-      </template>
-      <template slot="purchaseGroup">
-        <el-input v-model="formOption.obj.purchaseGroup" :readonly="true">
-          <i
-            slot="suffix"
-            class=" el-input_icon el-icon-search pointer"
-            @click="purchaseGroupDialogOpen"
-          ></i>
-        </el-input>
-      </template>
-    </avue-form>
+    <div class="avue-form-box">
+      <avue-form :option="formOption.option" v-model="formOption.obj" ref="form">
+        <template slot="purchasePerson">
+          <el-input v-model="formOption.obj.purchasePerson" :readonly="true">
+            <i
+              slot="suffix"
+              class=" el-input_icon el-icon-search pointer"
+              @click="purchaseDialogOpen"
+            ></i>
+          </el-input>
+        </template>
+        <template slot="purchaseGroup">
+          <el-input v-model="formOption.obj.purchaseGroup" :readonly="true">
+            <i
+              slot="suffix"
+              class=" el-input_icon el-icon-search pointer"
+              @click="purchaseGroupDialogOpen"
+            ></i>
+          </el-input>
+        </template>
+      </avue-form>
+    </div>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
     <span v-if="tabActive.prop === 'detail'">

@@ -400,6 +400,13 @@ export default {
 
     async rowUpdate(row, index, done, loading) {
       loading();
+      if (!this.listOption.purchasePerson) {
+        this.$message({
+          type: 'error',
+          message: '请选择采购负责人!'
+        });
+        return false;
+      }
       this.$confirm('确定将此数据移管吗?', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

@@ -10,7 +10,9 @@
     ></form-header>
     <!-- @on-sendProvider="handleSendProvider" -->
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
-    <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
+    <div class="avue-form-box">
+      <avue-form :option="formOption.option" v-model="formOption.obj" ref="form"> </avue-form>
+    </div>
     <div class="clear" style="margin-bottom: 30px;"></div>
     <avue-tabs :option="tabOption.option" @change="handleTabClick"></avue-tabs>
     <span v-if="tabActive.prop === 'detail'">
@@ -165,6 +167,11 @@ export default {
     this.elsSubAccount = userInfo.elsSubAccount;
     this.tabActive = this.tabOption.option.column[0];
     this.formOption.option.detail = true;
+    this.formOption.option.column.forEach((item) => {
+      if (item.prop === 'rejectReason') {
+        item.display = false;
+      }
+    });
     this.getDicData();
     this.tableData();
   },
@@ -224,6 +231,13 @@ export default {
       this.formOption.obj = resp.data.data;
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;
+      if (this.formOption.obj.orderStatus === '2' || this.formOption.obj.orderStatus === '5') {
+        this.formOption.option.column.forEach((item) => {
+          if (item.prop === 'rejectReason') {
+            item.display = true;
+          }
+        });
+      }
       let orderItemArr = [];
       resp2.data.data.forEach((i) => {
         orderItemArr.push(Number(i.orderItemNumber));

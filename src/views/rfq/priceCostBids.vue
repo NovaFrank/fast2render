@@ -43,7 +43,7 @@
             :v-key="row.id"
           >
             <span v-if="row.suppliers.includes(column.prop)" :key="column.prop">
-              {{ row[column.prop] }}
+              {{ row[column.prop + row.field] }}
             </span>
           </template>
         </avue-crud>
@@ -215,7 +215,7 @@ export default {
           ) {
             this.providerData[tempProp].tableData.forEach((t) => {
               const formula = this.$getFormulaItem(tempProp);
-              i[prop] = Number(this.$getFormulaValue(formula, t).price);
+              i[prop + t.name] = Number(this.$getFormulaValue(formula, t).price);
               const length = this.sumDetailData.filter((i) => i.field.trim() === t.name.trim())
                 .length;
               if (length > 0) {
@@ -243,7 +243,7 @@ export default {
             });
           } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {
             const formula = this.$getFormulaItem(tempProp);
-            i[prop] = Number(
+            i[prop + (this.providerData[tempProp].formData.type || '总计')] = Number(
               this.$getFormulaValue(formula, this.providerData[tempProp].formData).price
             );
             this.sumDetailData.push({

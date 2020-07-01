@@ -468,8 +468,10 @@ export default {
       });
       quantityList.push(quantity);
       const index = quantityList.findIndex((item) => item === Number(quantity));
-      const price = JSON.parse(row.ladderPriceJson)[index - 1][column];
+      const current = JSON.parse(row.ladderPriceJson)[index - 1];
+      const price = current[column];
       this.inquiryListOption.data[row.$index][column] = price || '';
+      this.inquiryListOption.data[row.$index].taxRate = current.taxRate;
       return price;
     },
     getCostPriceIndex(row, column) {
@@ -497,6 +499,7 @@ export default {
           price = Math.floor((result.num / result.den) * 100) / 100;
         }
         this.inquiryListOption.data[row.$index][column] = price || '';
+        this.inquiryListOption.data[row.$index].taxRate = row.taxRate || '0';
         return price || '';
       }
       return '';
@@ -603,19 +606,23 @@ export default {
       });
     },
     handleSend() {
+      let rateResult = true;
       let result = true;
       this.inquiryListOption.data.forEach((item) => {
+        if (validatenull(item.taxRate)) {
+          rateResult = false;
+        }
         if (
           item.noQuoted !== 'N' &&
           item.quoteMethod === '0' &&
-          validatenull(item.priceIncludingTax)
+          (validatenull(item.priceIncludingTax) || validatenull(item.taxRate))
         ) {
           // 常规报价
           result = false;
         }
         if (item.noQuoted !== 'N' && item.quoteMethod === '1') {
           JSON.parse(item.ladderPriceJson).forEach((ladder) => {
-            if (validatenull(ladder.priceIncludingTax)) {
+            if (validatenull(ladder.priceIncludingTax) || validatenull(ladder.taxRate)) {
               result = false;
             }
           });
@@ -646,6 +653,10 @@ export default {
         //   });
         // }
       });
+      if (!rateResult) {
+        this.$message.error('税率不得为空');
+        return;
+      }
       if (!result) {
         this.$message.error('请完善报价信息');
         return;
@@ -705,7 +716,7 @@ export default {
             noQuoted: item.noQuoted || 'Y'
           };
         });
-        if (this.detailObj.quoteEndTime < new Date().getTime() || !this.quoteStatus) {
+        if (this.detailObj.quoteEndTime < new Date().getTime() && !this.quoteStatus) {
           this.headerButtons = [
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
             { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }

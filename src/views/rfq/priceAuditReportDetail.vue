@@ -106,6 +106,7 @@
 </template>
 
 <script>
+import { setStore } from '@/util/store.js';
 import FormHeader from '@/components/views/formHeader';
 import formOption from '@/const/rfq/priceBids/reportHeader';
 import inquiryListOption from '@/const/rfq/priceBids/reportInquiryList';
@@ -426,6 +427,15 @@ export default {
         this.detailObj = res.data.data;
         this.inquiryListOption.option.header = false;
         this.reasonObj.reason = this.detailObj.reason;
+
+        if (res.data.data.flowCode) {
+          let content = {
+            flowId: res.data.data.flowCode,
+            businessType: 'bargainEnquiryAudit',
+            auditStatus: res.data.data.auditStatus
+          };
+          setStore({ name: this.currentEnquiryNumber, content, type: true });
+        }
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;

@@ -12,10 +12,6 @@ export default {
       {
         label: '供货方文件',
         prop: 'filesSupplier'
-      },
-      {
-        label: '询价规则',
-        prop: 'rules'
       }
     ]
   }

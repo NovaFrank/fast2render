@@ -57,6 +57,7 @@
       :clientTab="true"
       version="attahcment-fiels_4_3"
     ></fast2-attachment-list>
+    <!-- 询价明细 -->
     <avue-crud
       v-show="tabActive === 'detail'"
       :data="inquiryListOption.data"
@@ -149,9 +150,11 @@
       :dialogWidth="dialogWidth"
       @on-save-form="onSaveForm"
       @close-field-dialog="closeFieldDialog"
+      :enquiryPurchaserTax="templateRule ? templateRule.enquiryPurchaserTax : false"
     ></quote-dialog>
     <!-- 阶梯报价 -->
     <quote-ladder-dialog
+      :enquiryPurchaserTax="templateRule ? templateRule.enquiryPurchaserTax : false"
       :dialogTitle="dialogTitle"
       :field="fieldDialogForm"
       :fieldDialogVisible="ladderQuoteVisible"
@@ -195,13 +198,13 @@ import costQuoteDialog from '@/components/views/costQuoteDialog'; // 成本报�
 import quoteLadderDialog from '@/components/views/ladderQuoteDialog'; // 阶梯报价
 import quoteDialog from '@/components/views/quoteDialog'; // 常规报价
 import formOption from '@/const/rfq/supplierClient/detail';
-import tabOption from '@/const/rfq/newAndView/detailTabs';
+import tabOption from '@/const/rfq/supplierClient/detailTabs';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
 import costTemplateDialog from '@/components/views/costTemplateDialog';
 import { getAction, postAction, queryQuote } from '@/api/rfq/supplierClient';
 import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
-import history from './../history';
+import history from './history';
 import { validatenull } from '@/util/validate';
 import { dataDicAPI } from '@/api/rfq/common';
 import { ElsTemplateConfigService } from '@/api/templateConfig.js';
@@ -269,7 +272,7 @@ export default {
     }
   },
   methods: {
-    handleEnquiryTypeChange(value) {
+    initColumns() {
       this.formOption.column = [
         { label: '询价单号', span: 6, prop: 'enquiryNumber', disabled: true },
         { label: '询价名称', span: 6, prop: 'enquiryDesc', disabled: true },
@@ -330,7 +333,10 @@ export default {
         { label: '税率', prop: 'taxRate' },
         { slot: true, label: '不含税价', prop: 'priceExcludingTax' }
       ];
+    },
+    handleEnquiryTypeChange(value) {
       if (this.configurations[value]) {
+        this.templateRule = this.configurations[value].rule;
         const current = this.configurations[value].tableColumns.map((item) => {
           let result = {};
           result.prop = item.prop;
@@ -339,6 +345,7 @@ export default {
           result.span = item.span;
           return result;
         });
+        this.initColumns();
         this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
         const fieldColumns = this.configurations[value].fieldColumns;
         fieldColumns.forEach((item) => {
@@ -350,6 +357,8 @@ export default {
             });
           }
         });
+      } else {
+        this.initColumns();
       }
       this.inquiryListOption.option.column.push({
         slot: true,
@@ -359,6 +368,58 @@ export default {
       });
     },
     async tableData(data) {
+      // 公开方式 数据字典
+      dataDicAPI('enquiryMethod').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'enquiryMethod') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 付款方式 数据字典
+      dataDicAPI('payMethod').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'payMethod') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 询价范围 数据字典
+      dataDicAPI('enquiryScope').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'enquiryScope') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 询价范围 数据字典
+      dataDicAPI('currency').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'currency') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
       // 报价方式 数据字典
       dataDicAPI('quoteMethod').then((res) => {
         this.quoteMethodData = res.data;
@@ -375,11 +436,12 @@ export default {
           const json = JSON.parse(item.configJson);
           const table = json.table;
           let field = [];
-          Object.keys(json.fieldJson.purchase).forEach((item) => {
-            if (json.fieldJson.purchase[item].display) {
+          console.log('json.fieldJson', json.fieldJson);
+          Object.keys(json.fieldJson.sale).forEach((item) => {
+            if (json.fieldJson.sale[item].display) {
               field.push({
                 prop: item,
-                ...json.fieldJson.purchase[item]
+                ...json.fieldJson.purchase[item] // TODO: sale临时换purchase
               });
             }
           });
@@ -389,6 +451,7 @@ export default {
           });
           configurations[item.templateNumber] = {
             name: item.templateName, // 模板名称
+            rule: json.rule, // 单规则
             fieldColumns: field, // 头信息
             tableColumns: table // 行信息
           };
@@ -398,13 +461,16 @@ export default {
       this.initDetail();
     },
     getPriceIndex(row, column) {
+      if (validatenull(row.ladderPriceJson)) return;
       const quantity = row.quantity;
       const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
         return Number(item.ladderQuantity);
       });
       quantityList.push(quantity);
       const index = quantityList.findIndex((item) => item === Number(quantity));
-      return JSON.parse(row.ladderPriceJson)[index - 1][column];
+      const price = JSON.parse(row.ladderPriceJson)[index - 1][column];
+      this.inquiryListOption.data[row.$index][column] = price || '';
+      return price;
     },
     getCostPriceIndex(row, column) {
       const costJson = JSON.parse(row.costConstituteJson);
@@ -426,10 +492,11 @@ export default {
           const result = execMathExpress('v1 / ( v2 + v3 )', {
             v1: price || 0,
             v2: 1,
-            v3: row.taxRate
+            v3: row.taxRate || 0
           });
           price = Math.floor((result.num / result.den) * 100) / 100;
         }
+        this.inquiryListOption.data[row.$index][column] = price || '';
         return price || '';
       }
       return '';

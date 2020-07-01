@@ -1,7 +1,7 @@
 <template>
   <basic-container>
     <form-header
-      titleText="新建询价单"
+      titleText="新建/编辑询价单"
       showButton
       :buttons="headerButtons"
       @on-test="handleTest"
@@ -11,6 +11,8 @@
       @on-delete="handleDelete"
       @on-release="handleRelease"
       @on-save="handleSaveForm"
+      @on-audit-submit="handleSubmitAudit"
+      @on-cancel-approval="handleCancelApproval"
     ></form-header>
     <avue-form ref="form" v-model="form" :option="formOption">
       <template slot="enquiryNumber">
@@ -36,6 +38,19 @@
     </avue-form>
     <!-- 标准询价 -->
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
+    <!-- 单据规则 -->
+    <fast2-block-provider
+      v-show="tabActive === 'rules' && !validatenull(templateRule)"
+      version="rfq-rule-setting"
+    >
+      <template slot-scope="component">
+        <business-rule-config
+          v-model="templateRule"
+          :list="component.list"
+          :readonly="true"
+        ></business-rule-config>
+      </template>
+    </fast2-block-provider>
     <!-- 表单文件 -->
     <fast2-attachment-list
       ref="attachment"
@@ -44,6 +59,7 @@
       :businessElsAccount="elsAccount"
       businessModule="enquiry"
       v-show="tabActive === 'files' && form.enquiryNumber"
+      :readonly="form.auditStatus === '2'"
       :passClient="false"
       :client="false"
       :clientTab="false"
@@ -60,6 +76,14 @@
       @size-change="sizeChange"
       @selection-change="handleMaterialSelectChange"
     >
+      <template slot-scope="scope" slot="materialNumber">
+        <el-button
+          @click="handleClickMaterial(scope)"
+          class="el-button el-button--text el-button--small"
+        >
+          {{ scope.row.materialNumber }}
+        </el-button>
+      </template>
       <template slot-scope="scope" slot="quoteMethod">
         <span v-for="method in quoteMethodData" :key="method.value">
           <span v-if="scope.row.quoteMethod === method.value">{{ method.label }}</span>
@@ -81,7 +105,7 @@
           {{ JSON.parse(scope.row.costConstituteJson).templateName }}
         </span>
       </template>
-      <template slot="menuLeft" v-if="!form.purchaseRequestNumber">
+      <template slot="menuLeft" v-if="validatenull(form.purchaseRequestNumber)">
         <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>
       </template>
       <template slot="menuLeft">
@@ -99,6 +123,7 @@
           </el-col>
           <el-col :span="6">
             <el-button
+              v-if="validatenull(form.purchaseRequestNumber)"
               class="el-button el-button--text el-button--small"
               @click.stop="handleDeleteDetailItem(scope.row)"
             >
@@ -115,6 +140,7 @@
       :field="fieldDialogForm"
       :fieldDialogVisible="fieldDialogVisible"
       :dialogWidth="dialogWidth"
+      :enquiryPurchaserTax="templateRule.enquiryPurchaserTax"
       @on-save-form="onSaveItemForm"
       @close-field-dialog="closeFieldDialog"
       @show-supplier-select="handleShowSupplierSelect"
@@ -147,6 +173,7 @@ import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
 import relationDialog from './relationship/dialog';
 import selectSupplierDialog from '@/components/views/selectSupplierDialog';
 import { getUserInfo } from '@/util/utils.js';
+import { setStore } from '@/util/store.js';
 
 import {
   orgList,
@@ -155,7 +182,7 @@ import {
   supplierMasterListAction,
   accountListAction
 } from '@/api/rfq/common';
-import { purchaseEnquiryAction, queryDetailAction } from '@/api/rfq';
+import { purchaseEnquiryAction, queryDetailAction, submitAudit, cancelAudit } from '@/api/rfq';
 import { validatenull, validateNumber } from '@/util/validate';
 import { testSuppliers } from '@/api/rfq/index';
 
@@ -187,18 +214,37 @@ export default {
   },
   data() {
     return {
+      templateRule: {
+        // enquirySetRanking: true, 是否开启排名 - 在比价页面对比项中添加【排名】字段
+        // enquiryIsQuota: true, 是否配额 是否现实配额列（是否判断）
+        // enquiryQuotaType: 'percentage', 配额方式 百分比percentage/数量number
+        // enquiryIsProjectApproval: true, 是否立项 发布前需要提交审批，审批通过 则可发布
+        // enquiryPurchaserTax: true, 采购方税率/供方税率
+        // isMin3Supplier: true, 最小三家供应商
+        // enquiryPriceContrast: 'package', 比价 1打包比-package 2逐条比-item 3成本比-cost ： 成本比是否需要将成本含税价等传接口？
+        // ============================================================================
+        // enquiryIsOnlyQualifiedSupplier: true, 是否供应商资质审查 - 暂无
+        // enquiryWay: 'partner', 询价方式（合作伙伴、企企通、已认证、潜在、陌生） - 暂无
+        // ----------------------------------------------------------------------------
+        // isViewAbleAttachmentBefroeDealline: true 报价时间截止前，是否可查看供方附件
+        // ------------------- 不要 enquiryPriceQuote: 'normal', 报价方式
+        // ------------------- 不要 enquirySetPassword: true, 是否使用开启密码 是否与头部开启冲突？
+        // 公开原则 enquiryPublicRule 未知
+        // enquiryViewHistory: 'ranking', 查看历史记录 price/ranking/supplier 仅历史记录列表加入供应商名
+        // 询价范围？？？？？enquiryScope？？？？？？成本报价 true/false？？？？？ 合并到询价方式
+      },
       relation: {},
       selectedSupplier: [],
       data: {},
       elsAccount: '',
       elsSubAccount: '',
       headerButtons: [
-        { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
-        { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
-        { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
-        { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-        { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-        { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' }
+        // { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
+        // { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
+        // { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+        // { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+        // { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+        { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
       ],
       formOption: formOption, // 表头 option
       tabOption: tabOption, // tab option
@@ -236,6 +282,8 @@ export default {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
+    this.form = {};
+    this.inquiryListOption.data = [];
     await this.tableData(); // 加载当前页面需要的数据
     if (!validatenull(this.$route.params.enquiryNumber)) {
       this.currentEnquiryNumber = this.$route.params.enquiryNumber;
@@ -246,37 +294,54 @@ export default {
   },
   watch: {
     form(newVal) {
-      if (this.form.purchaseRequestNumber) {
-        this.inquiryListOption.option.menu = false;
+      this.formOption.detail = newVal.auditStatus === '2';
+      this.inquiryListOption.option.menu = newVal.auditStatus !== '2';
+      this.inquiryListOption.option.header = newVal.auditStatus !== '2';
+      if (newVal.auditStatus === '2') {
         this.headerButtons = [
-          { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
-          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
-          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
-          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-          { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' }
+          {
+            power: true,
+            text: '撤回',
+            type: 'primary',
+            size: '',
+            action: 'on-cancel-approval'
+          },
+          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
         ];
       } else {
-        this.inquiryListOption.option.menu = true;
-        this.headerButtons = [
-          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' },
-          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
-          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-          { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' }
-        ];
-      }
-      if (newVal.enquiryNumber) {
-        this.headerButtons.push({
-          power: true,
-          text: '删除',
-          type: 'primary',
-          size: '',
-          action: 'on-delete'
-        });
+        if (this.form.purchaseRequestNumber) {
+          this.inquiryListOption.option.menu = true;
+          this.headerButtons = [
+            { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
+            { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
+            { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+            { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+            { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+            { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
+          ];
+        } else {
+          this.inquiryListOption.option.menu = true;
+          this.headerButtons = [
+            { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
+            { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+            { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+            { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+            { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
+          ];
+        }
+        if (newVal.enquiryNumber) {
+          this.headerButtons.push({
+            power: true,
+            text: '删除',
+            type: 'primary',
+            size: '',
+            action: 'on-delete'
+          });
+        }
       }
       if (!validatenull(newVal.enquiryType) && this.configurations[newVal.enquiryType]) {
         this.handleEnquiryTypeChange(newVal.enquiryType);
+        this.templateRule = this.configurations[newVal.enquiryType].rule;
       }
       this.$forceUpdate();
     },
@@ -380,7 +445,7 @@ export default {
         }
       ];
       const baseColumn = [
-        { label: '物料编号', prop: 'materialNumber' },
+        { label: '物料编号', prop: 'materialNumber', slot: true, width: 150 },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
@@ -405,12 +470,12 @@ export default {
         { slot: true, label: '成本模板', prop: 'costTemplate' }
       ];
       this.inquiryListOption.option.column = baseColumn;
-
       this.dialogOption.column = [
         {
           type: 'tree',
           label: '物料编号',
           prop: 'materialNumber',
+          disabled: !validatenull(this.form.purchaseRequestNumber),
           dicData: this.materialList.map((item) => {
             return {
               label: item.materialNumber,
@@ -428,6 +493,7 @@ export default {
           rules: [{ trigger: 'change', validator: validateDateTime }]
         },
         {
+          disabled: !validatenull(this.form.purchaseRequestNumber),
           label: '需求数量',
           prop: 'quantity',
           rules: [
@@ -447,7 +513,11 @@ export default {
           type: 'select',
           label: '税码',
           prop: 'taxCode',
-          rules: [{ required: true, message: '请选择税码', trigger: 'blur' }]
+          disabled: this.templateRule.enquiryPurchaserTax !== true,
+          rules:
+            this.templateRule.enquiryPurchaserTax === true
+              ? [{ required: true, message: '请选择税码', trigger: 'blur' }]
+              : []
         },
         {
           label: '税率',
@@ -478,31 +548,46 @@ export default {
       ];
     },
     handleEnquiryTypeChange(value) {
-      this.initColumns();
-      // 配置字段
-      const current = this.configurations[value].tableColumns.map((item) => {
-        let result = {};
-        result.prop = item.prop;
-        result.label = item.label;
-        result.display = item.purchaseShow;
-        result.span = item.span;
-        result.type = item.type;
-        result.dicData = item.dicData;
-        result.dicUrl = item.dicUrl;
-        result.dicMethod = item.dicMethod;
-        return result;
-      });
-      this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
-      this.dialogOption.column = this.dialogOption.column.concat(current);
-      const fieldColumns = this.configurations[value].fieldColumns;
-      fieldColumns.forEach((item) => {
-        if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
-          this.formOption.column.push({
-            span: item.span || 6,
-            ...item
+      if (this.configurations[value]) {
+        this.templateRule = this.configurations[value].rule;
+        this.initColumns();
+        if (this.templateRule.enquiryIsProjectApproval === true && this.form.auditStatus !== '0') {
+          this.headerButtons = this.headerButtons.map((item) => {
+            if (item.action === 'on-release') {
+              item.text = '提交审批';
+              item.action = 'on-audit-submit';
+            }
+            return item;
           });
+          console.log('this.headerButtons', this.headerButtons);
         }
-      });
+        // 配置字段
+        const current = this.configurations[value].tableColumns.map((item) => {
+          let result = {};
+          result.prop = item.prop;
+          result.label = item.label;
+          result.display = item.purchaseShow;
+          result.span = item.span;
+          result.type = item.type;
+          result.dicData = item.dicData;
+          result.dicUrl = item.dicUrl;
+          result.dicMethod = item.dicMethod;
+          return result;
+        });
+        this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+        this.dialogOption.column = this.dialogOption.column.concat(current);
+        const fieldColumns = this.configurations[value].fieldColumns;
+        fieldColumns.forEach((item) => {
+          if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
+            this.formOption.column.push({
+              span: item.span || 6,
+              ...item
+            });
+          }
+        });
+      } else {
+        this.initColumns();
+      }
       this.tableData();
     },
     handleAddShow(title, row) {
@@ -526,6 +611,7 @@ export default {
         const rows = res.data.pageData.rows || [];
         for (const item of rows) {
           const json = JSON.parse(item.configJson);
+          // console.log('json', json);
           const table = json.table;
           let field = [];
           Object.keys(json.fieldJson.purchase).forEach((item) => {
@@ -542,6 +628,7 @@ export default {
           });
           configurations[item.templateNumber] = {
             name: item.templateName, // 模板名称
+            rule: json.rule, // 单规则
             fieldColumns: field, // 头信息
             tableColumns: table // 行信息
           };
@@ -582,19 +669,45 @@ export default {
           return item;
         });
       });
-      // 公开方式 数据字典
-      // dataDicAPI('payMethod').then((res) => {
-      //   this.formOption.column = this.formOption.column.map((item) => {
-      //     if (item.prop === 'payMethod') {
-      //       return {
-      //         ...item,
-      //         type: 'select',
-      //         dicData: res.data
-      //       };
-      //     }
-      //     return item;
-      //   });
-      // });
+      // 付款方式 数据字典
+      dataDicAPI('payMethod').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'payMethod') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 询价范围 数据字典
+      dataDicAPI('enquiryScope').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'enquiryScope') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 询价范围 数据字典
+      dataDicAPI('currency').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'currency') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
       // 负责人 accountListAction
       accountListAction({ elsAccount: this.elsAccount }).then((res) => {
         this.accountList = res.data.pageData.rows;
@@ -623,7 +736,8 @@ export default {
         this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
           return {
             label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
-            key: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`
+            key: item.toElsAccount,
+            id: item.toElsAccount
           };
         });
         this.dialogOption.column = this.dialogOption.column.map((item) => {
@@ -740,16 +854,65 @@ export default {
       this.inquiryListOption.data.splice(row.$index, 1);
     },
     handleDetailItemClick(row, event, column) {
+      this.currentDetailItemSelected = validatenull(row.toElsAccountList)
+        ? []
+        : row.toElsAccountList.split(',').map((item) => {
+            const i = item.split('_');
+            return {
+              id: i[0],
+              label: `${i[0]}_${i[1]}_${i[2]}`
+            };
+          });
       this.currentDetailItem = {
         ...row,
-        selectedSupplier: row.toElsAccountList ? row.toElsAccountList.split(',') : []
+        selectedSupplier: this.currentDetailItemSelected
       };
+    },
+    handleClickMaterial(scope) {
+      const router = {
+        name: `物料详情(${scope.row.materialNumber})`,
+        src: `/masterdata/material/#/view/${scope.row.materialNumber}_${scope.row.factory}`
+      };
+      const event = {
+        name: 'openNewTag',
+        props: router
+      };
+      window.parent.postMessage(event, '*');
     },
     handleMaterialSelectChange(selection) {
       this.currentSelectionDetailItems = selection;
     },
     // 发布/提交审批
     handleRelease() {
+      if (this.templateRule.isMin3Supplier === true) {
+        let result = false;
+        this.inquiryListOption.data.forEach((item) => {
+          if (item.toElsAccountList.split(',').length < 3) result = true;
+        });
+        if (result) {
+          this.$message.error('每个物料至少选择 3 个供应商参与报价');
+          return;
+        }
+      }
+      if (this.inquiryListOption.data.length === 0) {
+        this.$message.error('请添加询价明细');
+        return;
+      }
+      if (this.templateRule.enquiryPurchaserTax === true) {
+        let validate = this.inquiryListOption.data.filter(
+          (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+        );
+        if (validate.length > 0) {
+          this.$message.error('请完善报价方式或税码/税率');
+          return;
+        }
+      } else if (this.templateRule.enquiryPurchaserTax !== true) {
+        let validate = this.inquiryListOption.data.filter((item) => validatenull(item.quoteMethod));
+        if (validate.length > 0) {
+          this.$message.error('请完善报价方式');
+          return;
+        }
+      }
       this.$confirm('是否发布？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -764,17 +927,13 @@ export default {
             }
             this.$refs.form.validate((valid) => {
               if (valid) {
-                if (this.inquiryListOption.data.length === 0) {
-                  this.$message.error('请添加询价明细');
-                  return;
-                }
-                let validate = this.inquiryListOption.data.filter(
-                  (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
-                );
-                if (validate.length > 0) {
-                  this.$message.error('请完善报价方式或税码/税率');
-                  return;
-                }
+                const itemList = this.inquiryListOption.data.map((item) => {
+                  const index = this.materialList.findIndex(
+                    (m) => m.materialNumber === item.materialNumber
+                  );
+                  item.queryUuid = this.materialList[index].uuid;
+                  return item;
+                });
                 let params = {
                   ...this.form,
                   enquiryNumber: this.currentEnquiryNumber,
@@ -787,7 +946,7 @@ export default {
                   canSeeRule: this.form.canSeeRule,
                   passWord: this.form.passWord,
                   auditStatus: this.form.auditStatus,
-                  itemList: this.inquiryListOption.data
+                  itemList
                 };
                 if (this.currentEnquiryNumber) {
                   params = {
@@ -811,6 +970,111 @@ export default {
           });
       });
     },
+    // 是否立项 - 撤回
+    handleCancelApproval() {
+      this.$confirm('是否撤回审批？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        cancelAudit('cancel', {
+          rootProcessInstanceId: this.form.flowCode,
+          businessId: this.form.enquiryNumber,
+          businessType: 'editEnquiryAudit'
+        }).then((res) => {
+          if (res.data.statusCode === '200') {
+            this.$message.success('已撤回审批');
+            this.$router.go(0);
+            return;
+          }
+          this.$message.error('撤回审批失败');
+        });
+      });
+    },
+    // 是否立项 - 提交审批
+    handleSubmitAudit() {
+      if (validatenull(this.currentEnquiryNumber)) {
+        this.$message.error('请保存后提交立项审批');
+        return;
+      }
+      this.$confirm('是否提交审批？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$refs.attachment
+          .sendFiles()
+          .then((res) => {
+            if (!res.result) {
+              this.$message.error(res.message || '附件发送失败');
+              return;
+            }
+            this.$refs.form.validate((valid) => {
+              if (valid) {
+                if (this.inquiryListOption.data.length === 0) {
+                  this.$message.error('请添加询价明细');
+                  return;
+                }
+                if (this.templateRule.enquiryPurchaserTax === true) {
+                  let validate = this.inquiryListOption.data.filter(
+                    (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+                  );
+                  if (validate.length > 0) {
+                    this.$message.error('请完善报价方式或税码/税率');
+                    return;
+                  }
+                } else if (this.templateRule.enquiryPurchaserTax !== true) {
+                  let validate = this.inquiryListOption.data.filter((item) =>
+                    validatenull(item.quoteMethod)
+                  );
+                  if (validate.length > 0) {
+                    this.$message.error('请完善报价方式');
+                    return;
+                  }
+                }
+
+                const action = 'submit';
+                const itemList = this.inquiryListOption.data.map((item) => {
+                  const index = this.materialList.findIndex(
+                    (m) => m.materialNumber === item.materialNumber
+                  );
+                  item.queryUuid = this.materialList[index].uuid;
+                  return item;
+                });
+                const param = {
+                  ...this.form,
+                  enquiryNumber: this.currentEnquiryNumber,
+                  elsAccount: this.elsAccount,
+                  quoteEndTime: this.form.quoteEndTime,
+                  enquiryType: this.form.enquiryType,
+                  enquiryDesc: this.form.enquiryDesc,
+                  companyCode: this.form.companyCode,
+                  enquiryMethod: this.form.enquiryMethod || '',
+                  itemList
+                };
+                let params = {
+                  elsAccount: this.form.elsAccount,
+                  // toElsAccount: this.detailObj.toElsAccount,
+                  businessType: 'editEnquiryAudit',
+                  businessId: this.form.enquiryNumber,
+                  params: JSON.stringify(param)
+                };
+                submitAudit(action, params).then((res) => {
+                  if (res.data.statusCode === '200') {
+                    this.$message.success('提交审批成功');
+                    this.$router.go(0);
+                    return;
+                  }
+                  this.$message.error('提交审批失败');
+                });
+              }
+            });
+          })
+          .catch((res) => {
+            this.$message.error(res.message || '发布失败，请检查附件');
+          });
+      });
+    },
     // 保存
     handleSaveForm() {
       this.$refs.form.validate((valid) => {
@@ -824,13 +1088,30 @@ export default {
               this.$message.error('请添加询价明细');
               return;
             }
-            let validate = this.inquiryListOption.data.filter(
-              (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
-            );
-            if (validate.length > 0) {
-              this.$message.error('请完善报价方式或税码/税率');
-              return;
+            if (this.templateRule.enquiryPurchaserTax === true) {
+              let validate = this.inquiryListOption.data.filter(
+                (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+              );
+              if (validate.length > 0) {
+                this.$message.error('请完善报价方式或税码/税率');
+                return;
+              }
+            } else if (this.templateRule.enquiryPurchaserTax !== true) {
+              let validate = this.inquiryListOption.data.filter((item) =>
+                validatenull(item.quoteMethod)
+              );
+              if (validate.length > 0) {
+                this.$message.error('请完善报价方式');
+                return;
+              }
             }
+            const itemList = this.inquiryListOption.data.map((item) => {
+              const index = this.materialList.findIndex(
+                (m) => m.materialNumber === item.materialNumber
+              );
+              item.queryUuid = this.materialList[index].uuid;
+              return item;
+            });
             const params = {
               ...this.form,
               enquiryNumber: this.currentEnquiryNumber,
@@ -842,7 +1123,7 @@ export default {
               enquiryMethod: this.form.enquiryMethod,
               canSeeRule: this.form.canSeeRule,
               passWord: this.form.passWord,
-              itemList: this.inquiryListOption.data
+              itemList
             };
             purchaseEnquiryAction('save', params).then((res) => {
               if (res.data.statusCode !== '200') {
@@ -851,7 +1132,7 @@ export default {
               }
               this.$message.success('保存成功');
               if (this.currentEnquiryNumber) {
-                this.$router.go(0);
+                // this.$router.go(0);
                 return;
               }
               const enquiryNumber = res.data.data.enquiryNumber;
@@ -882,21 +1163,30 @@ export default {
       return true;
     },
     initDetail() {
-      this.form = {};
-      this.inquiryListOption.data = [];
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.form = res.data.data;
+
+        if (res.data.data.flowCode) {
+          let content = {
+            flowId: res.data.data.flowCode,
+            businessType: 'editEnquiryAudit',
+            auditStatus: res.data.data.auditStatus
+          };
+          setStore({ name: this.currentEnquiryNumber, content, type: true });
+        }
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
           const accountList = item.toElsAccountList
-            .split(',')
-            .map((i) => {
-              return i.split('_')[1];
-            })
-            .toString();
+            ? item.toElsAccountList
+                .split(',')
+                .map((i) => {
+                  return i.split('_')[1];
+                })
+                .toString()
+            : '';
           item.accountList = accountList;
           return item;
         });
@@ -934,7 +1224,21 @@ export default {
         toElsAccountList: form.toElsAccountList ? form.toElsAccountList.toString() : '',
         quoteMethod: form.quoteMethod // 0、1
       };
-      if (form.quoteMethod === '1') {
+      // if (form.quoteMethod === '1') {
+      //   item = {
+      //     ...item,
+      //     ladderPriceJson: JSON.stringify(
+      //       form.ladderPriceJson.map((item) => {
+      //         return {
+      //           ladderQuantity: item.ladderQuantity,
+      //           ladderGrade: item.ladderGrade
+      //         };
+      //       })
+      //     )
+      //   };
+      // }
+
+      if (form.ladderPriceJson) {
         item = {
           ...item,
           ladderPriceJson: JSON.stringify(
@@ -986,13 +1290,13 @@ export default {
       this.relationDialogVisable = true;
     },
     suppliersDialogSaveTransfer(selectedSupplier) {
-      console.log('selectedSupplier', selectedSupplier, this.currentSelectionDetailItems);
+      selectedSupplier = this.suppliersDialogOptionColumn.data
+        .filter((item) => selectedSupplier.includes(item.key))
+        .map((item) => item.label);
       if (this.currentSelectionDetailItems.length > 0) {
         this.currentSelectionDetailItems.forEach((item) => {
-          console.log('selectedSupplier', selectedSupplier);
           const index = item.$index;
           const suppliers = selectedSupplier.map((i) => {
-            console.log(i.split('_'));
             return i.split('_')[1];
           });
           this.$set(

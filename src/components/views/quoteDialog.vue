@@ -10,6 +10,13 @@
       <template slot="priceIncludingTax">
         <el-input placeholder="请输入 含税价" v-model="form.priceIncludingTax"></el-input>
       </template>
+      <template slot="taxRate">
+        <el-input
+          :disabled="enquiryPurchaserTax === true"
+          placeholder="请输入 税率"
+          v-model="form.taxRate"
+        ></el-input>
+      </template>
       <template slot="menuForm">
         <el-button @click="closeDialog">取消</el-button>
         <el-button type="primary" @click="handleSubmit">保存</el-button>
@@ -20,7 +27,7 @@
 
 <script>
 import quoteFormOption from '@/const/rfq/supplierClient/quoteForm';
-import ladderOption from '@/const/rfq/supplierClient/quoteList';
+import { validatenull } from '@/util/validate';
 
 const execMathExpress = require('exec-mathexpress');
 
@@ -30,6 +37,7 @@ export default {
   components: {},
   created: function() {},
   props: {
+    enquiryPurchaserTax: Boolean,
     dialogWidth: String,
     dialogTitle: String,
     fieldDialogType: String,
@@ -47,7 +55,6 @@ export default {
   data() {
     return {
       quoteFormOption: quoteFormOption,
-      ladderOption: ladderOption,
       form: {
         remark: ''
       }
@@ -64,6 +71,14 @@ export default {
         v3: this.form.taxRate
       });
       this.form.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
+    },
+    'form.taxRate'(newVal) {
+      const result = execMathExpress('v1 / ( v2 + v3 )', {
+        v1: this.form.priceIncludingTax,
+        v2: 1,
+        v3: newVal
+      });
+      this.form.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
     }
   },
   methods: {
@@ -74,6 +89,10 @@ export default {
       this.form.suppliers.splice(index, 1);
     },
     handleSubmit() {
+      if (validatenull(this.form.taxRate)) {
+        this.$message.error('请填写税率');
+        return;
+      }
       const params = {
         ...this.form,
         remark: this.form.remark

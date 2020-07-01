@@ -35,7 +35,18 @@
           :option="costBidsSumDetail.option"
           :data="sumDetailData"
           :span-method="spanMethod"
-        ></avue-crud>
+        >
+          <template
+            v-for="(column, index) in supplierColumnDetail"
+            :slot="column.prop"
+            slot-scope="{ row }"
+            :v-key="row.id"
+          >
+            <span v-if="row.suppliers.includes(column.prop)" :key="column.prop">
+              {{ row[column.prop + row.field] }}
+            </span>
+          </template>
+        </avue-crud>
       </el-col>
     </el-row>
   </div>
@@ -62,6 +73,7 @@ export default {
       costBidsSumDetail: costBidsSumDetail,
       currentMaterial: {},
       supplierColumn: [],
+      supplierColumnDetail: [],
       suppliers: [],
       crudData: []
     };
@@ -177,10 +189,11 @@ export default {
       // 应有的供应商数量
       this.suppliers = this.costPriceData.filter((item) => item.materialNumber === materialNumber);
       // 应添加的供应商列
-      this.supplierColumn = this.suppliers.map((item) => {
+      this.supplierColumnDetail = this.suppliers.map((item) => {
         return {
           label: item.toElsAccount,
-          prop: item.toElsAccount
+          prop: item.toElsAccount,
+          slot: true
         };
       });
       this.costBidsSumDetail.option.column = [
@@ -188,7 +201,7 @@ export default {
         { label: '', prop: 'field', display: false }
       ];
       this.costBidsSumDetail.option.column = this.costBidsSumDetail.option.column.concat(
-        this.supplierColumn
+        this.supplierColumnDetail
       );
       this.template.forEach((item) => {
         let i = {};
@@ -202,30 +215,76 @@ export default {
           ) {
             this.providerData[tempProp].tableData.forEach((t) => {
               const formula = this.$getFormulaItem(tempProp);
-              i[prop] = Number(this.$getFormulaValue(formula, t).price);
-              this.sumDetailData.push({
-                ...i,
-                prop: tempProp,
-                id: `${tempProp}_${t.$index}`,
-                field: t.name || `项目_${t.$index + 1}`, // t.label
-                key: item.label
-              });
+              i[prop + t.name] = Number(this.$getFormulaValue(formula, t).price);
+              const length = this.sumDetailData.filter((i) => i.field.trim() === t.name.trim())
+                .length;
+              if (length > 0) {
+                const index = this.sumDetailData.findIndex((i) => i.field.trim() === t.name.trim());
+                this.sumDetailData[index].suppliers.push(prop);
+                const dataItem = {
+                  ...i,
+                  suppliers: this.sumDetailData[index].suppliers,
+                  prop: tempProp,
+                  id: `${tempProp}_${t.$index}_${supplier.toElsAccount}`,
+                  field: t.name || `项目_${t.$index + 1}`, // t.label
+                  key: item.label
+                };
+                this.sumDetailData.splice(index, 1, dataItem);
+              } else {
+                this.sumDetailData.push({
+                  ...i,
+                  suppliers: [prop],
+                  prop: tempProp,
+                  id: `${tempProp}_${t.$index}_${supplier.toElsAccount}`,
+                  field: t.name || `项目_${t.$index + 1}`, // t.label
+                  key: item.label
+                });
+              }
             });
           } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {
             const formula = this.$getFormulaItem(tempProp);
-            i[prop] = Number(
+            i[prop + (this.providerData[tempProp].formData.type || '总计')] = Number(
               this.$getFormulaValue(formula, this.providerData[tempProp].formData).price
             );
             this.sumDetailData.push({
               ...i,
+              suppliers: [prop],
               prop: tempProp,
-              id: `${tempProp}`,
+              id: `${tempProp}_${supplier.toElsAccount}`,
               field: this.providerData[tempProp].formData.type || '总计',
               key: item.label
             });
+            // const length = this.sumDetailData.filter(
+            //   (i) => i.field.trim() === this.providerData[tempProp].formData.type.trim()
+            // ).length;
+            // if (length > 0) {
+            //   const index = this.sumDetailData.findIndex(
+            //     (i) => i.field.trim() === this.providerData[tempProp].formData.type.trim()
+            //   );
+            //   this.sumDetailData[index].suppliers.push(prop);
+            //   const dataItem = {
+            //     ...i,
+            //     suppliers: this.sumDetailData[index].suppliers,
+            //     prop: tempProp,
+            //     id: `${tempProp}_${supplier.toElsAccount}`,
+            //     field: this.providerData[tempProp].formData.type || '总计',
+            //     key: item.label
+            //   };
+            //   this.sumDetailData.splice(index, 1, dataItem);
+            // } else {
+            //   this.sumDetailData.push({
+            //     ...i,
+            //     suppliers: [prop],
+            //     prop: tempProp,
+            //     id: `${tempProp}_${supplier.toElsAccount}`,
+            //     field: this.providerData[tempProp].formData.type || '总计',
+            //     key: item.label
+            //   });
+            // }
           }
         });
       });
+      console.log('this.sumDetailData', this.sumDetailData);
     },
     spanMethod({ row, column, rowIndex, columnIndex }) {
       return mySpanMethod(this.sumDetailData, [0], 'prop', 'id', columnIndex, row);

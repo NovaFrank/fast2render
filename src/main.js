@@ -10,13 +10,16 @@ import store from './store';
 import axios from './router/axios';
 import VueAxios from 'vue-axios';
 import Fast2Render from 'fast2render'; // ../
+import 'fast2render/lib/index.css';
 import basicContainer from './components/basic-container/main';
 import { getCommonRes } from '@/util/commonRes';
+import { krryPaging } from 'krry-transfer';
 
 Vue.use(VueAxios, axios);
 Vue.use(Fast2Render);
 Vue.use(ElementUI);
 Vue.use(Avue);
+Vue.use(krryPaging);
 Vue.config.productionTip = false;
 // 注册全局容器
 Vue.component('basicContainer', basicContainer);

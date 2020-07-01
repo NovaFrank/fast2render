@@ -17,7 +17,22 @@
           >
             <template slot="menuLeft">
               <el-button
-                v-if="detailObj.auditStatus !== '2'"
+                v-if="
+                  detailObj.auditStatus &&
+                    detailObj.auditStatus !== '2' &&
+                    detailObj.auditStatus !== '0'
+                "
+                size="small"
+                @click="handleSave"
+              >
+                保存
+              </el-button>
+              <el-button
+                v-if="
+                  detailObj.auditStatus &&
+                    detailObj.auditStatus !== '2' &&
+                    detailObj.auditStatus !== '0'
+                "
                 size="small"
                 type="primary"
                 @click="handleSubmit"
@@ -31,10 +46,16 @@
               :v-key="`${row.materialNumber}_${column.prop}`"
             >
               <div :key="`${row.materialNumber}_${column.prop}`">
-                <div v-if="row[column.prop] === `${row.materialNumber}_${column.prop}`">
+                <div
+                  v-if="
+                    row[column.prop] === `${row.materialNumber}_${column.prop}` &&
+                      row[`itemStatus_${row.materialNumber}_${column.prop}`] !== '1' &&
+                      row[`itemStatus_${row.materialNumber}_${column.prop}`] !== '3'
+                  "
+                >
                   <el-col :span="12">
                     <avue-radio
-                      :disabled="detailObj.auditStatus === '2'"
+                      :disabled="detailObj.auditStatus === '2' || detailObj.auditStatus === '0'"
                       v-model="row[`itemStatus_${row.materialNumber}_${column.prop}`]"
                       :dic="dic"
                       @change="
@@ -44,10 +65,14 @@
                   </el-col>
                   <el-col :span="12">
                     <el-input
-                      v-show="row[`itemStatus_${row.materialNumber}_${column.prop}`] === '4'"
+                      v-show="
+                        row[`itemStatus_${row.materialNumber}_${column.prop}`] === '4' &&
+                          templateRule.enquiryIsQuota === true
+                      "
                       :disabled="
                         row[`itemStatus_${row.materialNumber}_${column.prop}`] === '5' ||
-                          detailObj.auditStatus === '2'
+                          detailObj.auditStatus === '2' ||
+                          detailObj.auditStatus === '0'
                       "
                       v-model="row[`quota_${row.materialNumber}_${column.prop}`]"
                       placeholder="配额"
@@ -57,7 +82,9 @@
                     ></el-input>
                   </el-col>
                 </div>
-                <span v-else>{{ row[column.prop] }}</span>
+                <span v-else-if="row[column.prop] !== `${row.materialNumber}_${column.prop}`">
+                  {{ row[column.prop] }}
+                </span>
               </div>
             </template>
           </avue-crud>
@@ -120,12 +147,14 @@ import priceObjOption from '@/const/rfq/priceBids/priceObj';
 import historyChartOption from '@/const/rfq/priceBids/historyChart';
 import inquiryListOption from '@/const/rfq/priceBids/detailInquiryList';
 import { mySpanMethod } from '@/util/utils';
-import { queryDetailAction, submitAudit, purchaseEnquiryAction } from '@/api/rfq';
+import { queryDetailAction, purchaseEnquiryAction } from '@/api/rfq';
 import { historyAction } from '@/api/rfq/priceBids';
-import { compare } from '@/util/utils.js';
+import { compare, getUserInfo } from '@/util/utils.js';
 import FormHeader from '@/components/views/formHeader';
 import { formatDate } from '@/util/date';
 import costBids from './priceCostBids';
+import { validatenull } from '@/util/validate';
+import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 
 let echarts = require('echarts/lib/echarts');
 const execMathExpress = require('exec-mathexpress');
@@ -138,6 +167,25 @@ export default {
   components: { FormHeader, costBids },
   data() {
     return {
+      templateRule: {
+        // enquirySetRanking: true, 是否开启排名 - 在比价页面对比项中添加【排名】字段
+        // enquiryIsQuota: true, 是否配额 是否现实配额列（是否判断）
+        // enquiryQuotaType: 'percentage', 配额方式 百分比percentage/数量number
+        // enquiryIsProjectApproval: true, 是否立项 发布前需要提交审批，审批通过 则可发布
+        // enquiryPurchaserTax: true, 采购方税率/供方税率
+        // isMin3Supplier: true, 最小三家供应商
+        // enquiryPriceContrast: 'package', 比价 1打包比-package 2逐条比-item 3成本比-cost ： 成本比是否需要将成本含税价等传接口？
+        // ============================================================================
+        // enquiryIsOnlyQualifiedSupplier: true, 是否供应商资质审查 - 暂无
+        // enquiryWay: 'partner', 询价方式（合作伙伴、企企通、已认证、潜在、陌生） - 暂无
+        // ----------------------------------------------------------------------------
+        // isViewAbleAttachmentBefroeDealline: true 报价时间截止前，是否可查看供方附件
+        // ------------------- 不要 enquiryPriceQuote: 'normal', 报价方式
+        // ------------------- 不要 enquirySetPassword: true, 是否使用开启密码 是否与头部开启冲突？
+        // 公开原则 enquiryPublicRule 未知
+        // enquiryViewHistory: 'ranking', 查看历史记录 price/ranking/supplier 仅历史记录列表加入供应商名
+        // 询价范围？？？？？enquiryScope？？？？？？成本报价 true/false？？？？？ 合并到询价方式
+      },
       costPriceData: [],
       costMaterialData: [],
       quotaInput: '',
@@ -187,6 +235,9 @@ export default {
     };
   },
   created() {
+    const userInfo = getUserInfo();
+    this.elsAccount = userInfo.elsAccount;
+    this.elsSubAccount = userInfo.elsSubAccount;
     this.enquiryNumber = this.$route.params.enquiryNumber;
     this.initDetail();
     this.chartTabActive = this.$route.query.type || 'bidChart';
@@ -235,6 +286,7 @@ export default {
       this.inquiryListOption.data[row.$index].count = sum;
     },
     getPriceIndex(row, column) {
+      if (validatenull(row.ladderPriceJson)) return;
       const quantity = row.quantity;
       const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
         return Number(item.ladderQuantity);
@@ -304,6 +356,7 @@ export default {
       // 应添加的供应商列
       this.supplierColumn = this.suppliers.map((item) => {
         return {
+          width: '150',
           slot: true,
           label: item.toElsAccount,
           prop: item.toElsAccount
@@ -322,7 +375,8 @@ export default {
       this.costMaterialData = this.materialData.filter((item) => item.quoteMethod === '2');
       // 最终数据
       let data = [];
-      const options = ['含税价', '不含税价', '税率', '交货日期', '配额'];
+      let options = ['含税价', '不含税价', '税率', '交货日期', '配额'];
+      if (this.templateRule.enquirySetRanking === true) options.splice(4, 0, '排名');
       this.materialData.forEach((item) => {
         options.forEach((option) => {
           const d = {
@@ -332,7 +386,7 @@ export default {
             materialName: item.materialName,
             baseUnit: item.baseUnit,
             quantity: item.quantity,
-            option: option
+            option: this.templateRule.enquiryIsQuota !== true && option === '配额' ? '' : option
           };
           // 分配 对比项 数据
           this.suppliers.forEach((supplier) => {
@@ -364,6 +418,8 @@ export default {
                 d[prop] = current.deliveryDate
                   ? formatDate(new Date(current.deliveryDate), 'yyyy-MM-dd')
                   : '';
+              } else if (option === '排名') {
+                d[prop] = current.rank;
               } else if (option === '配额') {
                 d[prop] = `${item.materialNumber}_${current.toElsAccount}`;
                 d[`quota_${item.materialNumber}_${current.toElsAccount}`] = current.quota;
@@ -411,12 +467,36 @@ export default {
         prop: 'count'
       });
     },
-    initDetail() {
+    async initDetail() {
+      const res = await ElsTemplateConfigService.find({
+        elsAccount: this.elsAccount,
+        businessModule: 'enquiry',
+        currentVersionFlag: 'Y'
+      });
+      const configurations = [];
+
+      if (res.data && res.data.statusCode === '200' && res.data.pageData) {
+        const rows = res.data.pageData.rows || [];
+        for (const item of rows) {
+          const json = JSON.parse(item.configJson);
+          configurations[item.templateNumber] = {
+            name: item.templateName, // 模板名称
+            rule: json.rule // 单规则
+          };
+        }
+        this.configurations = configurations;
+      } else {
+        this.requestTypeDict = [];
+        this.$message.error('查找采购申请配置数据失败, ' + res.data.message || '');
+      }
       this.detailObj = {};
       this.inquiryListOption.data = [];
       queryDetailAction('findHeadDetails', this.enquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
+        this.templateRule = this.configurations[this.detailObj.enquiryType]
+          ? this.configurations[this.detailObj.enquiryType].rule
+          : {};
       });
       queryDetailAction('findItemDetails', this.enquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
@@ -455,24 +535,29 @@ export default {
         this.$router.go(0);
       }
     },
+    handleSave() {
+      const param = {
+        ...this.detailObj,
+        elsAccount: this.elsAccount,
+        itemList: this.crudData
+      };
+      purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
+        if (res.data.statusCode === '200') {
+          this.$message.success('保存成功');
+        } else {
+          this.$message.error(res.data.message);
+        }
+      });
+    },
     handleSubmit() {
       // 保存
       this.$router.push({ path: `/priceAuditReport/${this.detailObj.enquiryNumber}` });
-      // const param = {
-      //   ...this.detailObj,
-      //   elsAccount: this.elsAccount,
-      //   itemList: this.crudData
-      // };
-      // purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
-      //   console.log(res);
-      // });
-
-      // 原 提交
       // let status = true;
       // let result = false;
       // this.crudData.forEach((item) => {
       //   if (item.itemStatus === '4') {
-      //     status = false; // 必须有接受的报价才能够提交审批
+      //     // 必须有接受的报价才能够提交审批
+      //     status = false;
       //   }
       //   if (item.itemStatus === '4') {
       //     let quote = 0;
@@ -483,48 +568,63 @@ export default {
       //       .forEach((itemQuota) => {
       //         quote += Number(itemQuota.quota);
       //       });
-      //     if (Number(quote) !== 100) result = true; // 相同物料 已报价 分配的配额必须相加为100
+      //     // 相同物料 已报价 分配的配额必须相加为100（且 规则为配额是）
+      //     if (
+      //       Number(quote) !== 100 &&
+      //       this.templateRule.enquiryIsQuota === true &&
+      //       this.templateRule.enquiryQuotaType !== 'number'
+      //     ) {
+      //       result = true;
+      //     } else if (
+      //       Number(quote) !== Number(item.quantity) &&
+      //       this.templateRule.enquiryIsQuota === true &&
+      //       this.templateRule.enquiryQuotaType === 'number'
+      //     ) {
+      //       result = true;
+      //     }
       //   }
       // });
       // if (status) {
-      //   this.$message.error('必须有接受状态的报价才能够提交审批');
+      //   this.$message.error('必须有接受状态的报价才能够提交审批,保存后再提交');
       //   return;
       // }
       // if (result) {
-      //   this.$message.error('物料配额必须等于100');
+      //   this.$message.error(
+      //     `物料配额必须等于${this.templateRule.enquiryQuotaType !== 'number' ? '100' : '需求数量'}`
+      //   );
       //   return;
       // }
-      // this.$confirm('是否保存？', '提示', {
+      // this.$confirm('是否提交审批？', '提示', {
       //   confirmButtonText: '确定',
       //   cancelButtonText: '取消',
       //   type: 'warning'
       // }).then(() => {
-      // const action = 'submit';
-      // const param = {
-      //   enquiryNumber: this.currentEnquiryNumber,
-      //   elsAccount: this.elsAccount,
-      //   quoteEndTime: this.detailObj.quoteEndTime,
-      //   enquiryType: this.detailObj.enquiryType,
-      //   enquiryDesc: this.detailObj.enquiryDesc,
-      //   companyCode: this.detailObj.companyCode,
-      //   enquiryMethod: this.detailObj.enquiryMethod || '',
-      //   itemList: this.crudData
-      // };
-      // let params = {
-      //   elsAccount: this.detailObj.elsAccount,
-      //   // toElsAccount: this.detailObj.toElsAccount,
-      //   businessType: 'bargainEnquiryAudit',
-      //   businessId: this.detailObj.enquiryNumber,
-      //   params: JSON.stringify(param)
-      // };
-      // submitAudit(action, params).then((res) => {
-      //   if (res.data.statusCode === '200') {
-      //     this.$message.success('提交审批成功');
-      //     this.$router.back();
-      //     return;
-      //   }
-      //   this.$message.error('提交审批失败');
-      // });
+      //   const action = 'submit';
+      //   const param = {
+      //     enquiryNumber: this.currentEnquiryNumber,
+      //     elsAccount: this.elsAccount,
+      //     quoteEndTime: this.detailObj.quoteEndTime,
+      //     enquiryType: this.detailObj.enquiryType,
+      //     enquiryDesc: this.detailObj.enquiryDesc,
+      //     companyCode: this.detailObj.companyCode,
+      //     enquiryMethod: this.detailObj.enquiryMethod || '',
+      //     itemList: this.crudData
+      //   };
+      //   let params = {
+      //     elsAccount: this.detailObj.elsAccount,
+      //     // toElsAccount: this.detailObj.toElsAccount,
+      //     businessType: 'bargainEnquiryAudit',
+      //     businessId: this.detailObj.enquiryNumber,
+      //     params: JSON.stringify(param)
+      //   };
+      //   submitAudit(action, params).then((res) => {
+      //     if (res.data.statusCode === '200') {
+      //       this.$message.success('提交审批成功');
+      //       this.$router.back();
+      //       return;
+      //     }
+      //     this.$message.error('提交审批失败');
+      //   });
       // });
     },
     handleDateCheckChange(value) {

@@ -125,7 +125,7 @@ export default {
 }
 .form-title {
   margin: 0px 20px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
 }
 .form-buttons {

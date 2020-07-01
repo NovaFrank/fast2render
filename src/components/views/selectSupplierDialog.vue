@@ -1,8 +1,15 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visable">
-    <avue-form :option="formOption" v-model="form" ref="form">
+  <el-dialog :title="title" :visible.sync="visable" width="70%">
+    <avue-form class="select-supplier" :option="formOption" v-model="form" ref="form">
       <template slot="suppliers">
-        <el-transfer filterable v-model="form.selectedSupplier" :data="data"></el-transfer>
+        <!-- <el-transfer filterable v-model="form.selectedSupplier" :data="data"></el-transfer> -->
+        <kr-paging
+          filterable
+          :dataList="data"
+          :selectedData="form.selectedSupplier"
+          :pageSize="100"
+          @onChange="onChange"
+        ></kr-paging>
       </template>
       <template slot="menuForm">
         <el-button size="small" @click="closeDialog">取消</el-button>
@@ -75,15 +82,28 @@ export default {
       this.visable = false;
     },
     handleSubmit() {
-      this.$emit('on-save', this.form.selectedSupplier);
+      console.log('this.selectColumns', this.selectColumns);
+      this.$emit('on-save', this.selectColumns);
       this.visable = false;
+    },
+    onChange(val) {
+      console.log('val', val);
+      this.selectColumns = val;
     }
   }
 };
 </script>
 
-<style>
-.el-transfer-panel {
-  width: 430px;
+<style scope>
+.district-panel {
+  width: 430px !important;
+  min-width: 200px;
+}
+.el-transfer-panel .district-panel {
+  width: 430px !important;
+  min-width: 200px;
+}
+.el-dialog__body .select-supplier .el-col-sm-12 {
+  width: 100%;
 }
 </style>

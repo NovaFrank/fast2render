@@ -2,7 +2,7 @@
   <basic-container>
     <form-header
       v-if="!isAudit"
-      titleText="预览"
+      titleText="询价单详情"
       showButton
       :buttons="headerButtons"
       :timeHistory="timeHistory"
@@ -11,43 +11,59 @@
       @on-history="handleShowHistory"
       @on-new-supplier="handleNewSupplier"
       @on-open="handleShowOpen"
+      @on-save-approval="handleSave"
       @on-submit-approval="handleSubmitApproval"
       @on-update-end="handleUpdateQuoteEndTime"
       @show-time-history="handleShowTimeHistory"
       @on-bid-price="handleBidPrice"
       @on-cancel-approval="handleCancelApproval"
     ></form-header>
-    <avue-form ref="form" v-model="detailObj" :option="formOption">
-      <template slot="quoteEndTime">
-        <el-date-picker
-          v-model="quoteEndTimeChange"
-          :disabled="detailObj.auditStatus === '0' || detailObj.auditStatus === '2'"
-          type="datetime"
-          placeholder="选择日期时间"
-          value-format="timestamp"
-          @change="handleQuoteEndTime"
-        ></el-date-picker>
-      </template>
-      <template slot="enquiryType">
-        <el-select
-          v-model="detailObj.enquiryType"
-          @change="handleEnquiryTypeChange"
-          filterable
-          clearable
-          disabled
-          placeholder="请选择 成本模板"
-        >
-          <el-option
-            v-for="item in requestTypeDict"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
+    <div class="avue-form-box">
+      <avue-form ref="form" v-model="detailObj" :option="formOption">
+        <template slot="quoteEndTime">
+          <el-date-picker
+            v-model="quoteEndTimeChange"
+            :disabled="detailObj.auditStatus === '0' || detailObj.auditStatus === '2'"
+            type="datetime"
+            placeholder="选择日期时间"
+            value-format="timestamp"
+            @change="handleQuoteEndTime"
+          ></el-date-picker>
+        </template>
+        <template slot="enquiryType">
+          <el-select
+            v-model="detailObj.enquiryType"
+            @change="handleEnquiryTypeChange"
+            filterable
+            clearable
+            disabled
+            placeholder="请选择 成本模板"
           >
-          </el-option>
-        </el-select>
-      </template>
-    </avue-form>
+            <el-option
+              v-for="item in requestTypeDict"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
+        </template>
+      </avue-form>
+    </div>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
+    <!-- 单据规则 -->
+    <fast2-block-provider
+      v-show="tabActive === 'rules' && !validatenull(templateRule)"
+      version="rfq-rule-setting"
+    >
+      <template slot-scope="component">
+        <business-rule-config
+          v-model="templateRule"
+          :list="component.list"
+          :readonly="true"
+        ></business-rule-config>
+      </template>
+    </fast2-block-provider>
     <!-- 采购方附件 -->
     <fast2-attachment-list
       :id="detailObj.enquiryNumber"
@@ -98,6 +114,14 @@
     >
       <template slot="menuLeft">
         <el-button size="small" @click.stop="handleShowSupplierSelect()">新供应商</el-button>
+      </template>
+      <template slot-scope="scope" slot="materialNumber">
+        <el-button
+          @click="handleClickMaterial(scope)"
+          class="el-button el-button--text el-button--small"
+        >
+          {{ scope.row.materialNumber }}
+        </el-button>
       </template>
       <template slot-scope="scope" slot="quoteMethod">
         <span v-for="method in quoteMethodData" :key="method.value">
@@ -195,7 +219,7 @@
         >
           <el-col :span="12">
             <avue-radio
-              v-model="scope.row.itemStatus"
+              v-model="scope.row.itemStatusCopy"
               :dic="dic"
               :disabled="detailObj.auditStatus === '0' || detailObj.auditStatus === '2'"
               @change="(value) => handleRadioChange(value, scope)"
@@ -365,14 +389,16 @@ export default {
         this.tabOption.option.column = [
           { label: '询价明细', prop: 'detail' },
           { label: '采购方文件', prop: 'files' },
-          { label: '供货方文件', prop: 'filesSupplier' }
+          { label: '供货方文件', prop: 'filesSupplier' },
+          { label: '询价规则', prop: 'rules' }
         ];
       } else {
         this.tabOption.option.column = [
           { label: '询价明细', prop: 'detail' },
           { label: '采购方文件', prop: 'files' },
           { label: '供货方文件', prop: 'filesSupplier' },
-          { label: '审批记录', prop: 'auditHistory' }
+          { label: '审批记录', prop: 'auditHistory' },
+          { label: '询价规则', prop: 'rules' }
         ];
       }
       this.$forceUpdate();
@@ -416,12 +442,65 @@ export default {
           });
           configurations[item.templateNumber] = {
             name: item.templateName, // 模板名称
+            rule: json.rule, // 单规则
             fieldColumns: field, // 头信息
             tableColumns: table // 行信息
           };
         }
         this.configurations = configurations;
       }
+      // 公开方式 数据字典
+      dataDicAPI('enquiryMethod').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'enquiryMethod') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 付款方式 数据字典
+      dataDicAPI('payMethod').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'payMethod') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 询价范围 数据字典
+      dataDicAPI('enquiryScope').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'enquiryScope') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
+      // 询价范围 数据字典
+      dataDicAPI('currency').then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'currency') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
       // 报价方式 数据字典
       dataDicAPI('quoteMethod').then((res) => {
         this.quoteMethodData = res.data;
@@ -432,7 +511,8 @@ export default {
         this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
           return {
             label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
-            key: item.toElsAccount
+            key: item.toElsAccount,
+            id: item.toElsAccount
           };
         });
       });
@@ -473,7 +553,7 @@ export default {
         { label: '负责人', span: 6, prop: 'createUser', disabled: true }
       ];
       this.inquiryListOption.option.column = [
-        { label: '物料编号', prop: 'materialNumber' },
+        { label: '物料编号', prop: 'materialNumber', slot: true, width: 150 },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
@@ -516,9 +596,12 @@ export default {
           label: '交货日期',
           prop: 'deliveryDate'
         },
-        { slot: true, label: '操作', prop: 'option' },
-        { label: '配额', prop: 'quota', cell: true }
+        { slot: true, label: '操作', prop: 'option' }
       ];
+      // this.templateRule.enquiryIsQuota = false; // 测试是否配额 否
+      // this.templateRule.enquiryIsQuota = 'number'; // 测试配额方式
+      if (this.templateRule.enquiryIsQuota === true)
+        this.inquiryListOption.option.column.push({ label: '配额', prop: 'quota', cell: true });
     },
     handleEnquiryTypeChange(value) {
       this.initColumns();
@@ -564,7 +647,7 @@ export default {
     },
     getCostPriceIndex(row, column) {
       if (row.itemStatus === '1' || row.itemStatus === '3') {
-        return '**';
+        return '';
       }
       const costJson = JSON.parse(row.costConstituteJson);
       if (costJson) {
@@ -663,7 +746,10 @@ export default {
       this.currentDetailItemSelected = this.inquiryListOption.data
         .filter((item) => item.materialNumber === row.materialNumber)
         .map((item) => {
-          return item.toElsAccount;
+          return {
+            id: item.toElsAccount,
+            label: `${item.toElsAccount}_${item.companyShortName}_${item.supplierType}`
+          };
         });
       this.currentDetailItem = {
         ...row,
@@ -688,7 +774,8 @@ export default {
           const supplier = this.suppliersDialogOptionColumn.data[index].label.split('_');
           return {
             toElsAccount: `${supplier[0]}_${supplier[1]}_${supplier[2] || ''}`,
-            ...item
+            ...item,
+            itemStatus: '1'
           };
         });
         const params = {
@@ -710,7 +797,7 @@ export default {
       this.quoteEndTimeChange = value;
     },
     handleRadioChange(value, scope) {
-      this.inquiryListOption.data[scope.row.$index].itemStatus = value;
+      this.inquiryListOption.data[scope.row.$index].itemStatusCopy = value;
       if (value === '5') {
         this.inquiryListOption.data[scope.row.$index].quota = '';
         this.inquiryListOption.data[scope.row.$index].$cellEdit = false;
@@ -734,7 +821,6 @@ export default {
       });
     },
     handleOpenSubmit(form) {
-      console.log('this.form', form);
       // this.detailObj.quoteEndTime = new Date().getTime();
       openPassWord({ enquiryNumber: this.detailObj.enquiryNumber, passWord: form.password }).then(
         (res) => {
@@ -795,12 +881,57 @@ export default {
         });
       });
     },
+    handleClickMaterial(scope) {
+      const router = {
+        name: `物料详情(${scope.row.materialNumber})`,
+        src: `/masterdata/material/#/view/${scope.row.materialNumber}_${scope.row.factory}`
+      };
+      const event = {
+        name: 'openNewTag',
+        props: router
+      };
+      window.parent.postMessage(event, '*');
+    },
+    handleSave() {
+      this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
+        return {
+          ...item,
+          itemStatus: item.itemStatusCopy
+        };
+      });
+      const param = {
+        ...this.detailObj,
+        enquiryNumber: this.currentEnquiryNumber,
+        elsAccount: this.elsAccount,
+        quoteEndTime: this.detailObj.quoteEndTime,
+        enquiryType: this.detailObj.enquiryType,
+        enquiryDesc: this.detailObj.enquiryDesc,
+        companyCode: this.detailObj.companyCode,
+        enquiryMethod: this.detailObj.enquiryMethod || '',
+        itemList: this.inquiryListOption.data
+      };
+      purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
+        if (res.data.statusCode === '200') {
+          this.$message.success('保存成功');
+          this.$router.go(0);
+        } else {
+          this.$message.error(res.data.message);
+        }
+      });
+    },
     handleSubmitApproval() {
       let status = true;
       let result = false;
+      this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
+        return {
+          ...item,
+          itemStatus: item.itemStatusCopy
+        };
+      });
       this.inquiryListOption.data.forEach((item) => {
         if (item.itemStatus === '4') {
-          status = false; // 必须有接受的报价才能够提交审批
+          // 必须有接受的报价才能够提交审批
+          status = false;
         }
         if (item.itemStatus === '4') {
           let quote = 0;
@@ -811,7 +942,20 @@ export default {
             .forEach((itemQuota) => {
               quote += Number(itemQuota.quota);
             });
-          if (Number(quote) !== 100) result = true; // 相同物料 已报价 分配的配额必须相加为100
+          // 相同物料 已报价 分配的配额必须相加为100（且 规则为配额是）
+          if (
+            Number(quote) !== 100 &&
+            this.templateRule.enquiryIsQuota === true &&
+            this.templateRule.enquiryQuotaType !== 'number'
+          ) {
+            result = true;
+          } else if (
+            Number(quote) !== Number(item.quantity) &&
+            this.templateRule.enquiryIsQuota === true &&
+            this.templateRule.enquiryQuotaType === 'number'
+          ) {
+            result = true;
+          }
         }
       });
       if (status) {
@@ -819,7 +963,11 @@ export default {
         return;
       }
       if (result) {
-        this.$message.error('物料配额必须等于100');
+        this.$message.error(
+          `物料配额必须等于${
+            this.templateRule.enquiryQuotaType === 'percentage' ? '100' : '需求数量'
+          }`
+        );
         return;
       }
       this.$confirm('是否提交审批？', '提示', {
@@ -829,6 +977,7 @@ export default {
       }).then(() => {
         const action = 'submit';
         const param = {
+          ...this.detailObj,
           enquiryNumber: this.currentEnquiryNumber,
           elsAccount: this.elsAccount,
           quoteEndTime: this.detailObj.quoteEndTime,
@@ -889,12 +1038,11 @@ export default {
     checkQuoteEndTime() {
       if (this.detailObj.quoteEndTime > new Date().getTime()) {
         this.interval = setInterval(() => {
-          console.log('checkQuoteEndTime', this.detailObj.quoteEndTime < new Date().getTime());
           if (this.detailObj.quoteEndTime < new Date().getTime()) {
             clearInterval(this.interval);
             this.$router.go(0);
           }
-        }, 3000);
+        }, 5000);
       }
     },
     initDetail() {
@@ -903,6 +1051,9 @@ export default {
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
+        this.templateRule = this.configurations[this.detailObj.enquiryType]
+          ? this.configurations[this.detailObj.enquiryType].rule
+          : {};
         this.checkQuoteEndTime();
         if (this.detailObj.auditStatus === '0' || this.detailObj.auditStatus === '2') {
           this.inquiryListOption.option.header = false;
@@ -923,6 +1074,13 @@ export default {
           this.headerButtons = [
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
             { power: true, text: '更新时间', type: 'primary', size: '', action: 'on-update-end' },
+            {
+              power: true,
+              text: '保存',
+              type: 'primary',
+              size: '',
+              action: 'on-save-approval'
+            },
             {
               power: true,
               text: '提交审批',
@@ -988,6 +1146,7 @@ export default {
               item.itemStatus === '4' &&
               this.detailObj.auditStatus !== '0' &&
               this.detailObj.auditStatus !== '2',
+            itemStatusCopy: item.itemStatus,
             ...item
           };
         });
@@ -1015,23 +1174,23 @@ export default {
     // 保存供应商选项
     suppliersDialogSaveTransfer(selectedSupplier) {
       const newSuppliers = selectedSupplier.filter(
-        (item) => !this.currentDetailItemSelected.includes(item)
+        (item) => !this.currentDetailItemSelected.map((item) => item.id).includes(item)
       );
       const itemList = newSuppliers.map((item, index) => {
         const supplierIndex = this.suppliersDialogOptionColumn.data.findIndex(
           (supplier) => supplier.label.indexOf(item) !== -1
         );
         const supplier = this.suppliersDialogOptionColumn.data[supplierIndex].label.split('_');
-        let costJson = {};
-        if (item.quoteMethod === '2') {
-          costJson = JSON.parse(this.currentDetailItem.costConstituteJson);
-          let template = costJson.templateJson;
-          template = template.map((element) => {
-            element.propData = { tableData: [], formData: {} };
-            return element;
-          });
-          costJson.templateJson = template;
-        }
+        // let costJson = {};
+        // if (item.quoteMethod === '2') {
+        //   costJson = JSON.parse(this.currentDetailItem.costConstituteJson);
+        //   let template = costJson.templateJson;
+        //   template = template.map((element) => {
+        //     element.propData = { tableData: [], formData: {} };
+        //     return element;
+        //   });
+        //   costJson.templateJson = template;
+        // }
         return {
           id: `${index}`,
           materialNumber: this.currentDetailItem.materialNumber,
@@ -1054,7 +1213,7 @@ export default {
           priceIncludingTax: '',
           quota: '',
           ladderPriceJson: this.currentDetailItem.ladderPriceJson || null,
-          costConstituteJson: JSON.stringify(costJson) || null,
+          costConstituteJson: this.currentDetailItem.costConstituteJson || null,
           $cellEdit: false
         };
       });

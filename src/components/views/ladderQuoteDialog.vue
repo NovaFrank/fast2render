@@ -16,6 +16,14 @@
               @blur="(event) => handleInputPrice(event, scope)"
             ></el-input>
           </template>
+          <template slot-scope="scope" slot="taxRate">
+            <el-input
+              :disabled="enquiryPurchaserTax === true"
+              placeholder="请输入 税率"
+              v-model="scope.row.taxRate"
+              @blur="(event) => handleInputRate(event, scope)"
+            ></el-input>
+          </template>
         </avue-crud>
       </template>
       <template slot="menuForm">
@@ -29,6 +37,7 @@
 <script>
 import quoteFormOption from '@/const/rfq/supplierClient/ladderQuoteForm';
 import ladderOption from '@/const/rfq/supplierClient/quoteList';
+import { validatenull } from '@/util/validate';
 
 const execMathExpress = require('exec-mathexpress');
 
@@ -38,6 +47,7 @@ export default {
   components: {},
   created: function() {},
   props: {
+    enquiryPurchaserTax: Boolean,
     dialogWidth: String,
     dialogTitle: String,
     fieldDialogType: String,
@@ -67,17 +77,18 @@ export default {
   watch: {
     field(newVal) {
       this.form = newVal;
-      this.ladderOption.data =
-        JSON.parse(newVal.ladderPriceJson).map((item) => {
-          return {
-            ladderQuantity: item.ladderQuantity,
-            ladderGrade: item.ladderGrade,
-            priceIncludingTax: item.priceIncludingTax || '',
-            taxRate: item.taxRate || newVal.taxRate,
-            priceExcludingTax: item.priceExcludingTax || '',
-            $cellEdit: true
-          };
-        }) || [];
+      if (newVal.ladderPriceJson)
+        this.ladderOption.data =
+          JSON.parse(newVal.ladderPriceJson).map((item) => {
+            return {
+              ladderQuantity: item.ladderQuantity,
+              ladderGrade: item.ladderGrade,
+              priceIncludingTax: item.priceIncludingTax || '',
+              taxRate: item.taxRate || newVal.taxRate,
+              priceExcludingTax: item.priceExcludingTax || '',
+              $cellEdit: true
+            };
+          }) || [];
     }
   },
   methods: {
@@ -86,6 +97,15 @@ export default {
     },
     handleDeleteSupplier(row, index) {
       this.form.suppliers.splice(index, 1);
+    },
+    handleInputRate(event, scope) {
+      const currentItem = this.ladderOption.data[scope.row.$index];
+      const result = execMathExpress('v1 / ( v2 + v3 )', {
+        v1: currentItem.priceIncludingTax,
+        v2: 1,
+        v3: event.target.value
+      });
+      currentItem.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
     },
     handleInputPrice(event, scope) {
       const currentItem = this.ladderOption.data[scope.row.$index];
@@ -97,6 +117,20 @@ export default {
       currentItem.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
     },
     handleSubmit() {
+      let result = false;
+      this.ladderOption.data.forEach((item) => {
+        if (
+          validatenull(item.priceIncludingTax) ||
+          validatenull(item.priceExcludingTax) ||
+          validatenull(item.taxRate)
+        ) {
+          result = true;
+        }
+      });
+      if (result) {
+        this.$message.error('请填写完整报价信息');
+        return;
+      }
       const params = {
         ...this.form,
         ladderPriceJson: JSON.stringify(this.ladderOption.data),

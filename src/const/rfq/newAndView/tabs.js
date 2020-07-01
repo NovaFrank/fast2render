@@ -8,6 +8,10 @@ export default {
       {
         label: '表单文件',
         prop: 'files'
+      },
+      {
+        label: '询价规则',
+        prop: 'rules'
       }
     ]
   }

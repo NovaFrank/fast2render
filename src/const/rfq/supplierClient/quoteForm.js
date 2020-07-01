@@ -17,10 +17,10 @@ export default {
         prop: 'priceIncludingTax'
       },
       {
+        formslot: true,
         span: 8,
         label: '税率',
-        prop: 'taxRate',
-        disabled: true
+        prop: 'taxRate'
       },
       {
         span: 8,

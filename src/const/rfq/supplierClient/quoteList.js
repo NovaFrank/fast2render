@@ -23,6 +23,7 @@ export default {
         prop: 'priceIncludingTax'
       },
       {
+        slot: true,
         label: '税率',
         prop: 'taxRate'
       },

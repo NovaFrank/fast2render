@@ -17,7 +17,7 @@ export default {
     {
       label: '提交部门',
       span: 6,
-      prop: 'orgName'
+      prop: 'submitDepartment'
     },
     {
       type: 'date',

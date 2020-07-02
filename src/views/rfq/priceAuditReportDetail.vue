@@ -1,7 +1,7 @@
 <template>
   <basic-container>
     <form-header titleText="询价审批报告"></form-header>
-    <!-- <avue-form ref="form" v-model="detailObj" :option="formOption"></avue-form> -->
+    <avue-form ref="form" v-model="detailObj" :option="formOption"></avue-form>
     <!-- 询价明细 -->
     <avue-crud
       :data="inquiryListOption.data"

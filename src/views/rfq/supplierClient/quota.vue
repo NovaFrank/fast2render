@@ -471,7 +471,6 @@ export default {
       const current = JSON.parse(row.ladderPriceJson)[index - 1];
       const price = current[column];
       this.inquiryListOption.data[row.$index][column] = price || '';
-      this.inquiryListOption.data[row.$index].taxRate = current.taxRate;
       return price;
     },
     getCostPriceIndex(row, column) {

@@ -213,6 +213,7 @@ export default {
           };
         }
         this.configurations = configurations;
+        console.log(this.configurations);
       }
       // 报价方式 数据字典
       dataDicAPI('quoteMethod').then((res) => {
@@ -376,7 +377,20 @@ export default {
                 .forEach((itemQuota) => {
                   quote += Number(itemQuota.quota);
                 });
-              if (Number(quote) !== 100) result = true; // 相同物料 已报价 分配的配额必须相加为100
+              if (
+                Number(quote) !== 100 &&
+                this.templateRule.enquiryIsQuota === true &&
+                this.templateRule.enquiryQuotaType !== 'number'
+              ) {
+                result = true;
+              } else if (
+                Number(quote) !== Number(item.quantity) &&
+                this.templateRule.enquiryIsQuota === true &&
+                this.templateRule.enquiryQuotaType === 'number'
+              ) {
+                result = true;
+              }
+              // if (Number(quote) !== 100) result = true; // 相同物料 已报价 分配的配额必须相加为100
             }
           });
           if (status) {
@@ -437,6 +451,9 @@ export default {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
         this.inquiryListOption.option.header = false;
+        const current = this.configurations[this.detailObj.enquiryType];
+        if (current.rule) this.templateRule = current.rule;
+        else this.templateRule = {};
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;

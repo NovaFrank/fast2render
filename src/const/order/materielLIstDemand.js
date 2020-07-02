@@ -121,8 +121,7 @@ export default {
             message: '请输入 税码',
             trigger: 'blur'
           }
-        ],
-        disabled: true
+        ]
       },
       {
         label: '税率',

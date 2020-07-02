@@ -7,7 +7,7 @@
       </el-radio-group>
     </el-row>
     <el-row v-if="bidChecked === '汇总比'">
-      <el-col :span="4">
+      <el-col :span="2">
         <el-tabs @tab-click="handleClickMaterial" tab-position="left" style="height: 200px;">
           <el-tab-pane
             v-for="material in materialData"
@@ -16,12 +16,12 @@
           ></el-tab-pane>
         </el-tabs>
       </el-col>
-      <el-col span="20">
+      <el-col span="22">
         <avue-crud :option="costBidsSum.option" :data="sumData"></avue-crud>
       </el-col>
     </el-row>
     <el-row v-if="bidChecked === '明细比'">
-      <el-col :span="4">
+      <el-col :span="2">
         <el-tabs tab-position="left" style="height: 200px;">
           <el-tab-pane
             v-for="material in materialData"
@@ -30,7 +30,7 @@
           ></el-tab-pane>
         </el-tabs>
       </el-col>
-      <el-col span="20">
+      <el-col span="22">
         <avue-crud
           :option="costBidsSumDetail.option"
           :data="sumDetailData"
@@ -85,7 +85,12 @@ export default {
       this.currentMaterial = this.costPriceData[0];
       if (newValue[0] && newValue[0].costConstituteJson) {
         const costJson = JSON.parse(newValue[0].costConstituteJson);
-        this.template = costJson.templateJson;
+        this.template = [];
+        costJson.templateJson.map((item) => {
+          if (costJson.permissionJson[item.prop]) {
+            this.template.push(item);
+          }
+        });
         this.tabPermission = costJson.permissionJson;
         this.providerData = {};
         this.template.forEach((element) => {
@@ -216,10 +221,12 @@ export default {
             this.providerData[tempProp].tableData.forEach((t) => {
               const formula = this.$getFormulaItem(tempProp);
               i[prop + t.name] = Number(this.$getFormulaValue(formula, t).price);
-              const length = this.sumDetailData.filter((i) => i.field.trim() === t.name.trim())
+              const length = this.sumDetailData.filter((i) => i?.field?.trim() === t?.name?.trim())
                 .length;
               if (length > 0) {
-                const index = this.sumDetailData.findIndex((i) => i.field.trim() === t.name.trim());
+                const index = this.sumDetailData.findIndex(
+                  (i) => i?.field?.trim() === t?.name?.trim()
+                );
                 this.sumDetailData[index].suppliers.push(prop);
                 const dataItem = {
                   ...i,

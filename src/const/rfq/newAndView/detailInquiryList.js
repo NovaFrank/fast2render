@@ -69,17 +69,18 @@ export default {
       // },
       {
         label: '供应商',
-        prop: 'companyShortName'
+        prop: 'companyShortName',
+        width: '160'
       },
       {
         type: 'select',
         label: '供应商状态',
         prop: 'supplierType',
         dicData: [
-          { label: '合格供应商', value: '1' },
-          { label: '潜在供应商', value: '2' },
-          { label: '陌生供应商', value: '3' },
-          { label: '淘汰供应商', value: '4' }
+          { label: '合格', value: '1' },
+          { label: '潜在', value: '2' },
+          { label: '陌生', value: '3' },
+          { label: '淘汰', value: '4' }
         ]
       },
       {
@@ -126,6 +127,7 @@ export default {
       {
         slot: true,
         label: '操作',
+        width: '150',
         prop: 'option'
       },
       {

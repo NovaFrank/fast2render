@@ -60,6 +60,6 @@ export default {
       disabled: true
     }
   ],
-  labelPostion:'top',
-  menuBtn: false,
+  labelPosition: 'top',
+  menuBtn: false
 };

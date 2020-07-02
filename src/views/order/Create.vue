@@ -152,7 +152,7 @@ import selectDialog4 from '@/common/selectDialog4';
 import { getUserInfo } from '@/util/utils.js';
 import {
   createOrder,
-  dataDicAPI,
+  // dataDicAPI,
   uploadServlet,
   submitAudit,
   getPriceDetail
@@ -277,26 +277,26 @@ export default {
       //   });
       // });
       // 税码
-      dataDicAPI('taxRateNo').then((res) => {
-        this.materielListOption.option.column = this.materielListOption.option.column.map(
-          (item) => {
-            if (item.prop === 'taxCode') {
-              return {
-                ...item,
-                dicData: res.data.map((item, index) => {
-                  // arr3[key] = { purchase: item.suppliers[index2][key], sale: '', diff: '' };
-                  this.taxCodeArr[item.label] = item.value;
-                  return {
-                    label: `${item.label}`,
-                    value: `${item.value}`
-                  };
-                })
-              };
-            }
-            return item;
-          }
-        );
-      });
+      // dataDicAPI('taxRateNo').then((res) => {
+      //   this.materielListOption.option.column = this.materielListOption.option.column.map(
+      //     (item) => {
+      //       if (item.prop === 'taxCode') {
+      //         return {
+      //           ...item,
+      //           dicData: res.data.map((item, index) => {
+      //             // arr3[key] = { purchase: item.suppliers[index2][key], sale: '', diff: '' };
+      //             this.taxCodeArr[item.label] = item.value;
+      //             return {
+      //               label: `${item.label}`,
+      //               value: `${item.value}`
+      //             };
+      //           })
+      //         };
+      //       }
+      //       return item;
+      //     }
+      //   );
+      // });
     },
     itemAdd() {
       if (!this.formOption.obj.toElsAccount) {

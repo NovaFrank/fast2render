@@ -107,16 +107,21 @@ export default {
       {
         label: '税码',
         prop: 'taxCode',
-        dicUrl: '/layout/dics/value/taxCode',
-        dicMethod: 'get',
+        dicData: [
+          { id: 357, label: '001', value: '0.01' },
+          { id: 358, label: '002', value: '0.02' },
+          { id: 452, label: '0', value: '0' }
+        ],
+        // dicUrl: '/layout/dics/value/taxCode',
+        // dicMethod: 'get',
         type: 'select',
-        // rules: [
-        //   {
-        //     required: true,
-        //     message: '请输入 税码',
-        //     trigger: 'blur'
-        //   }
-        // ],
+        rules: [
+          {
+            required: true,
+            message: '请输入 税码',
+            trigger: 'blur'
+          }
+        ],
         disabled: true
       },
       {

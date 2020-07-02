@@ -118,7 +118,7 @@ import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielLIstDemand';
 import purchaseGroupOption from '@/const/order/purchaseGroupList';
-import { getOrderList, dataDicAPI, createOrder, submitAudit, getPriceDetail } from '@/api/order.js';
+import { getOrderList, createOrder, submitAudit, getPriceDetail } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
@@ -235,24 +235,24 @@ export default {
       //   });
       // });
       // 税码
-      dataDicAPI('taxRateNo').then((res) => {
-        this.materielListOption.option.column = this.materielListOption.option.column.map(
-          (item) => {
-            if (item.prop === 'taxCode') {
-              return {
-                ...item,
-                dicData: res.data.map((item) => {
-                  return {
-                    label: `${item.label}`,
-                    value: `${item.value}`
-                  };
-                })
-              };
-            }
-            return item;
-          }
-        );
-      });
+      // dataDicAPI('taxRateNo').then((res) => {
+      //   this.materielListOption.option.column = this.materielListOption.option.column.map(
+      //     (item) => {
+      //       if (item.prop === 'taxCode') {
+      //         return {
+      //           ...item,
+      //           dicData: res.data.map((item) => {
+      //             return {
+      //               label: `${item.label}`,
+      //               value: `${item.value}`
+      //             };
+      //           })
+      //         };
+      //       }
+      //       return item;
+      //     }
+      //   );
+      // });
     },
     // 获取头数据和行数据findDeliveryPlanList
     async tableData(data) {

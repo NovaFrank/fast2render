@@ -304,6 +304,9 @@ export default {
       if (costJson) {
         const template = costJson.templateJson;
         let price = 0;
+        if (!template || !template.length) {
+          return '';
+        }
         template.forEach((item) => {
           if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
             item.propData.tableData.forEach((t) => {

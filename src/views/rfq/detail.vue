@@ -650,6 +650,7 @@ export default {
         return '';
       }
       const costJson = JSON.parse(row.costConstituteJson);
+      console.log(row.toElsAccount, costJson);
       if (costJson) {
         const template = costJson.templateJson;
         let price = 0;
@@ -659,7 +660,7 @@ export default {
               const formula = this.$getFormulaItem(item.prop);
               price += Number(this.$getFormulaValue(formula, t).price);
             });
-          } else if (item.propData && item.propData.formData) {
+          } else if (item.propData && !validatenull(item.propData.formData)) {
             const formula = this.$getFormulaItem(item.prop);
             price += Number(this.$getFormulaValue(formula, item.propData.formData).price);
           }
@@ -672,6 +673,7 @@ export default {
           });
           price = Math.floor((result.num / result.den) * 100) / 100;
         }
+        console.log(row.toElsAccount, price);
         return price || '';
       }
       return '';

@@ -56,6 +56,7 @@
 import costBidsSum from '@/const/rfq/costBidsSum';
 import costBidsSumDetail from '@/const/rfq/costBidsSumDetail';
 import { mySpanMethod } from '@/util/utils';
+import { validatenull } from '@/util/validate';
 
 export default {
   name: 'cost-bids',
@@ -162,7 +163,10 @@ export default {
               });
             }
             i[prop] = price;
-          } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {
+          } else if (
+            this.providerData[tempProp] &&
+            !validatenull(this.providerData[tempProp].formData)
+          ) {
             let price = 0;
             const formula = this.$getFormulaItem(tempProp);
             price += Number(
@@ -248,7 +252,10 @@ export default {
                 });
               }
             });
-          } else if (this.providerData[tempProp] && this.providerData[tempProp].formData) {
+          } else if (
+            this.providerData[tempProp] &&
+            !validatenull(this.providerData[tempProp].formData)
+          ) {
             const formula = this.$getFormulaItem(tempProp);
             i[prop + (this.providerData[tempProp].formData.type || '总计')] = Number(
               this.$getFormulaValue(formula, this.providerData[tempProp].formData).price

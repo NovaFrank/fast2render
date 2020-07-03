@@ -25,6 +25,7 @@
 
 <script>
 import costTemplateSum from '@/const/rfq/costTemplateSum';
+import { validatenull } from '@/util/validate';
 // 成本模板、数据
 export default {
   name: 'cost-template-dialog',
@@ -60,7 +61,7 @@ export default {
               const p = Number(this.$getFormulaValue(formula, t).price);
               price += p;
             });
-          } else if (item.propData && item.propData.formData) {
+          } else if (item.propData && !validatenull(item.propData.formData)) {
             const formula = this.$getFormulaItem(item.prop);
             price = Number(this.$getFormulaValue(formula, item.propData.formData).price);
           }

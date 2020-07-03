@@ -474,7 +474,6 @@ export default {
     },
     getCostPriceIndex(row, column) {
       const costJson = JSON.parse(row.costConstituteJson);
-      console.log('costJson', costJson);
       if (costJson) {
         const template = costJson.templateJson;
         let price = 0;

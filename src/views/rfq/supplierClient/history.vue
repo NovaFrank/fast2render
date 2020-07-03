@@ -178,7 +178,7 @@ export default {
               const formula = this.$getFormulaItem(item.prop);
               price += Number(this.$getFormulaValue(formula, t).price);
             });
-          } else if (item.propData && item.propData.formData) {
+          } else if (item.propData && !validatenull(item.propData.formData)) {
             const formula = this.$getFormulaItem(item.prop);
             price += Number(this.$getFormulaValue(formula, item.propData.formData).price);
           }

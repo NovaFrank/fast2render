@@ -26,6 +26,7 @@
 <script>
 import quoteFormOption from '@/const/rfq/supplierClient/costQuoteForm';
 import ladderOption from '@/const/rfq/supplierClient/quoteList';
+import { validatenull } from '@/util/validate';
 
 // 销售方阶梯报价
 export default {
@@ -66,7 +67,6 @@ export default {
   watch: {
     field(newVal) {
       this.form = newVal;
-      console.log('this.form', this.form);
 
       // const costJson = JSON.parse(newVal.costConstituteJson);
       // const templateData = costJson.templateJson;
@@ -85,6 +85,24 @@ export default {
       this.$emit('close-field-dialog');
     },
     handleSubmit() {
+      let result = true;
+      Object.keys(this.form.tabPermission).forEach((item) => {
+        if (this.form.providerData[item].formData) {
+          Object.keys(this.form.providerData[item].formData).forEach((i) => {
+            if (validatenull(this.form.providerData[item].formData[i])) {
+              result = false;
+            }
+          });
+        } else {
+          if (this.form.providerData[item].tableData.length === 0) {
+            result = false;
+          }
+        }
+      });
+      if (!result) {
+        this.$message.error('请完善成本报价信息');
+        return;
+      }
       this.form.costConstituteJson = this.form.template.map((item) => {
         return {
           ...item,

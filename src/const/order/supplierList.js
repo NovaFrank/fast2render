@@ -8,8 +8,8 @@ export default {
   option: {
     indexLabel: '序号',
     indexFixed: false,
-    searchShow: false,
-    searchBtn: false,
+    searchShow: true,
+    searchBtn: true,
     columnBtn: false,
     align: 'center',
     menu: false,
@@ -23,17 +23,21 @@ export default {
     delBtn: false,
     index: true,
     sortable: true,
-    tip: false,
+    // tip: false,
     indeterminate: true,
     column: [
       {
-        label: '供应商ELS',
+        label: '供应商ELS号',
         prop: 'toElsAccount',
-        overHidden: true
+        searchLabelWidth: 130,
+        overHidden: true,
+        search: true,
+        searchSpan: 12
       },
       {
         label: '供应商名称',
         prop: 'toElsAccountName',
+        labelWidth: 130,
         overHidden: true
         // supplierName
       }

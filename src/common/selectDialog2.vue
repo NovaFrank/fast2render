@@ -57,11 +57,12 @@ export default {
       selectColumns: [],
       crudObj: {},
       crudData: [],
+      searchParams: {},
       crudOption: {
         indexLabel: '序号',
         indexFixed: false,
-        searchShow: false,
-        searchBtn: false,
+        searchShow: true,
+        searchBtn: true,
         columnBtn: false,
         align: 'center',
         menu: false,
@@ -114,12 +115,14 @@ export default {
     }
   },
   methods: {
-    handleList() {
+    handleList(params = {}) {
       let listParams = {};
       listParams.elsAccount = this.elsAccount;
       // listParams.toElsAccout = '307002';
       listParams.currentPage = this.crudPage.currentPage;
       listParams.pageSize = this.crudPage.pageSize;
+      listParams.toElsAccount = params.toElsAccount;
+
       getSupplierData(this.actionPath, listParams).then((res) => {
         const data = res.data;
         if (data.statusCode !== '200') {
@@ -160,8 +163,9 @@ export default {
     },
     searchChange(params, done) {
       this.crudPageParam.currentPage = 1;
+      console.log('params', params);
       // Object.assign(this.crudQueryParam, params);
-      this.handleList();
+      this.handleList(params);
       done();
     },
     refreshChange() {

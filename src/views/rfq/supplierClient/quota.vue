@@ -625,31 +625,31 @@ export default {
             }
           });
         }
-        // if (item.noQuoted !== 'N' && item.quoteMethod === '2') {
-        //   const costJson = JSON.parse(item.costConstituteJson);
-        //   const template = costJson.templateJson;
-        //   const tabPermission = costJson.permissionJson;
-        //   template.forEach((item) => {
-        //     console.log(
-        //       item.prop,
-        //       !validatenull(tabPermission[item.prop]),
-        //       item.propData.tableData,
-        //       item.propData.tableData.length === 0,
-        //       item.propData.formData,
-        //       validatenull(item.propData.formData),
-        //       !validatenull(tabPermission[item.prop]) &&
-        //         item.propData.tableData.length === 0 &&
-        //         validatenull(item.propData.formData)
-        //     );
-        //     if (
-        //       tabPermission[item.prop] &&
-        //       item.propData.tableData.length === 0 &&
-        //       validatenull(item.propData.formData)
-        //     ) {
-        //       result = false;
-        //     }
-        //   });
-        // }
+        if (item.noQuoted !== 'N' && item.quoteMethod === '2') {
+          const costJson = JSON.parse(item.costConstituteJson);
+          const template = costJson.templateJson;
+          const tabPermission = costJson.permissionJson;
+
+          let providerData = {};
+          template.forEach((element) => {
+            providerData[element.prop] = element.propData;
+          });
+          Object.keys(tabPermission).forEach((item) => {
+            if (providerData[item]) {
+              if (providerData[item].formData) {
+                Object.keys(providerData[item].formData).forEach((i) => {
+                  if (validatenull(providerData[item].formData[i])) {
+                    result = false;
+                  }
+                });
+              } else {
+                if (providerData[item].tableData.length === 0) {
+                  result = false;
+                }
+              }
+            } else result = false;
+          });
+        }
       });
       if (!rateResult) {
         this.$message.error('税率不得为空');

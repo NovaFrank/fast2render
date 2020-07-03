@@ -51,6 +51,15 @@
         ></business-rule-config>
       </template>
     </fast2-block-provider>
+    <!-- 审批记录 -->
+    <avue-crud
+      v-show="tabActive === 'auditHistory'"
+      :data="auditListOption.data"
+      :option="auditListOption.option"
+      :page.sync="auditListOption.page"
+      v-model="auditListOption.obj"
+    >
+    </avue-crud>
     <!-- 表单文件 -->
     <fast2-attachment-list
       ref="attachment"
@@ -172,6 +181,7 @@ import filesOption from '@/const/rfq/newAndView/files';
 import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
 import relationDialog from './relationship/dialog';
 import selectSupplierDialog from '@/components/views/selectSupplierDialog';
+import auditListOption from '@/const/rfq/newAndView/auditListOption';
 import { getUserInfo } from '@/util/utils.js';
 import { setStore } from '@/util/store.js';
 
@@ -182,7 +192,13 @@ import {
   supplierMasterListAction,
   accountListAction
 } from '@/api/rfq/common';
-import { purchaseEnquiryAction, queryDetailAction, submitAudit, cancelAudit } from '@/api/rfq';
+import {
+  purchaseEnquiryAction,
+  queryDetailAction,
+  submitAudit,
+  cancelAudit,
+  auditHisList
+} from '@/api/rfq';
 import { validatenull, validateNumber } from '@/util/validate';
 import { testSuppliers } from '@/api/rfq/index';
 
@@ -233,6 +249,7 @@ export default {
         // enquiryViewHistory: 'ranking', 查看历史记录 price/ranking/supplier 仅历史记录列表加入供应商名
         // 询价范围？？？？？enquiryScope？？？？？？成本报价 true/false？？？？？ 合并到询价方式
       },
+      auditListOption: auditListOption,
       relation: {},
       selectedSupplier: [],
       data: {},
@@ -551,6 +568,21 @@ export default {
       if (this.configurations[value]) {
         this.templateRule = this.configurations[value].rule;
         this.initColumns();
+        this.tabOption.option.column = [
+          { label: '询价明细', prop: 'detail' },
+          { label: '表单文件', prop: 'files' },
+          { label: '询价规则', prop: 'rules' }
+        ];
+        if (this.templateRule.enquiryIsProjectApproval === true && this.form.flowCode) {
+          this.tabOption.option.column.push({ label: '审批记录', prop: 'auditHistory' });
+          auditHisList({ rootProcessInstanceId: this.form.flowCode }).then((res) => {
+            if (res.data.statusCode === '200') {
+              this.auditListOption.data = res.data.pageData.rows;
+            } else {
+              this.auditListOption.data = [];
+            }
+          });
+        }
         if (this.templateRule.enquiryIsProjectApproval === true && this.form.auditStatus !== '0') {
           this.headerButtons = this.headerButtons.map((item) => {
             if (item.action === 'on-release') {
@@ -559,7 +591,7 @@ export default {
             }
             return item;
           });
-          console.log('this.headerButtons', this.headerButtons);
+        } else {
         }
         // 配置字段
         const current = this.configurations[value].tableColumns.map((item) => {

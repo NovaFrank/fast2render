@@ -49,31 +49,52 @@ export default {
   },
   watch: {
     template(newValue) {
-      this.sumData = newValue.map((item) => {
-        if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
+      const permission = Object.keys(this.tabPermission);
+      this.sumData = [];
+      newValue.forEach((item) => {
+        if (permission.includes(item.prop)) {
           let price = 0;
-          item.propData.tableData.forEach((t) => {
+          if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
+            item.propData.tableData.forEach((t) => {
+              const formula = this.$getFormulaItem(item.prop);
+              const p = Number(this.$getFormulaValue(formula, t).price);
+              price += p;
+            });
+          } else if (item.propData && item.propData.formData) {
             const formula = this.$getFormulaItem(item.prop);
-            const p = Number(this.$getFormulaValue(formula, t).price);
-            price += p;
+            price = Number(this.$getFormulaValue(formula, item.propData.formData).price);
+          }
+          this.sumData.push({
+            key: item.label,
+            value: price
           });
-          return {
-            key: item.label,
-            value: price
-          };
-        } else if (item.propData && item.propData.formData) {
-          const formula = this.$getFormulaItem(item.prop);
-          let price = Number(this.$getFormulaValue(formula, item.propData.formData).price);
-          return {
-            key: item.label,
-            value: price
-          };
         }
-        return {
-          key: item.label,
-          value: 0
-        };
       });
+      // this.sumData = newValue.map((item) => {
+      //   if (item.propData && item.propData.tableData && item.propData.tableData.length > 0) {
+      //     let price = 0;
+      //     item.propData.tableData.forEach((t) => {
+      //       const formula = this.$getFormulaItem(item.prop);
+      //       const p = Number(this.$getFormulaValue(formula, t).price);
+      //       price += p;
+      //     });
+      //     return {
+      //       key: item.label,
+      //       value: price
+      //     };
+      //   } else if (item.propData && item.propData.formData) {
+      //     const formula = this.$getFormulaItem(item.prop);
+      //     let price = Number(this.$getFormulaValue(formula, item.propData.formData).price);
+      //     return {
+      //       key: item.label,
+      //       value: price
+      //     };
+      //   }
+      //   return {
+      //     key: item.label,
+      //     value: 0
+      //   };
+      // });
     }
   },
   methods: {

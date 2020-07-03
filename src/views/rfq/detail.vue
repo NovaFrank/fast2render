@@ -770,6 +770,15 @@ export default {
         type: 'warning'
       }).then(() => {
         const itemList = this.inquiryListOption.data.map((item) => {
+          if (item.quoteMethod === '1') {
+            if (validatenull(item.ladderPriceJson)) {
+              const filterList = this.inquiryListOption.data.filter(
+                (i) => i.materialNumber === item.materialNumber && !validatenull(i.ladderPriceJson)
+              );
+              item.ladderPriceJson = filterList[0].ladderPriceJson;
+            }
+          }
+
           const index = this.suppliersDialogOptionColumn.data.findIndex(
             (supplier) => supplier.label.indexOf(item.toElsAccount) !== -1
           );
@@ -1184,6 +1193,16 @@ export default {
           (supplier) => supplier.label.indexOf(item) !== -1
         );
         const supplier = this.suppliersDialogOptionColumn.data[supplierIndex].label.split('_');
+        if (this.currentDetailItem.quoteMethod === '1') {
+          if (validatenull(this.currentDetailItem.ladderPriceJson)) {
+            const filterList = this.inquiryListOption.data.filter(
+              (item) =>
+                item.materialNumber === this.currentDetailItem.materialNumber &&
+                !validatenull(item.ladderPriceJson)
+            );
+            this.currentDetailItem.ladderPriceJson = filterList[0].ladderPriceJson;
+          }
+        }
         let costJson = {};
         if (this.currentDetailItem.quoteMethod === '2') {
           costJson = JSON.parse(this.currentDetailItem.costConstituteJson);

@@ -1182,16 +1182,17 @@ export default {
           (supplier) => supplier.label.indexOf(item) !== -1
         );
         const supplier = this.suppliersDialogOptionColumn.data[supplierIndex].label.split('_');
-        // let costJson = {};
-        // if (item.quoteMethod === '2') {
-        //   costJson = JSON.parse(this.currentDetailItem.costConstituteJson);
-        //   let template = costJson.templateJson;
-        //   template = template.map((element) => {
-        //     element.propData = { tableData: [], formData: {} };
-        //     return element;
-        //   });
-        //   costJson.templateJson = template;
-        // }
+        let costJson = {};
+        if (this.currentDetailItem.quoteMethod === '2') {
+          costJson = JSON.parse(this.currentDetailItem.costConstituteJson);
+          let template = costJson.templateJson;
+          template = template.map((element) => {
+            element.propData = { formData: {}, tableData: [] };
+            return element;
+          });
+          costJson.templateJson = template;
+          this.currentDetailItem.costConstituteJson = JSON.stringify(costJson);
+        }
         return {
           id: `${index}`,
           materialNumber: this.currentDetailItem.materialNumber,

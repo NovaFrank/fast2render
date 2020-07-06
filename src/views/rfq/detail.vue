@@ -1139,7 +1139,10 @@ export default {
             auditStatus: res.data.data.auditStatus
           };
           setStore({ name: this.currentEnquiryNumber, content, type: true });
-          auditHisList({ rootProcessInstanceId: res.data.data.flowCode }).then((res) => {
+          auditHisList({
+            rootProcessInstanceId: res.data.data.flowCode,
+            businessId: res.data.data.enquiryNumber
+          }).then((res) => {
             if (res.data.statusCode === '200') {
               this.auditListOption.data = res.data.pageData.rows;
             } else {
@@ -1200,7 +1203,8 @@ export default {
                 item.materialNumber === this.currentDetailItem.materialNumber &&
                 !validatenull(item.ladderPriceJson)
             );
-            this.currentDetailItem.ladderPriceJson = filterList[0].ladderPriceJson;
+            if (!validatenull(filterList[0]))
+              this.currentDetailItem.ladderPriceJson = filterList[0].ladderPriceJson || '';
           }
         }
         let costJson = {};

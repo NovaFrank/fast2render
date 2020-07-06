@@ -576,7 +576,10 @@ export default {
         ];
         if (this.templateRule.enquiryIsProjectApproval === true && this.form.flowCode) {
           this.tabOption.option.column.push({ label: '审批记录', prop: 'auditHistory' });
-          auditHisList({ rootProcessInstanceId: this.form.flowCode }).then((res) => {
+          auditHisList({
+            rootProcessInstanceId: this.form.flowCode,
+            businessId: this.form.enquiryNumber
+          }).then((res) => {
             if (res.data.statusCode === '200') {
               this.auditListOption.data = res.data.pageData.rows;
             } else {

@@ -1,19 +1,11 @@
 import axios from './request';
 // import { getUserInfo } from '@/util/utils.js';
-let baseUrl = '/apis';
+import { getApiPath } from '@/util/utils';
+const baseUrl = getApiPath();
 // const userInfo = getUserInfo();
 // const elsAccount = userInfo.elsAccount;
 // const elsSubAccount = userInfo.elsSubAccount;
-// 获取登录信息
-export const login = (params) => {
-  return axios({
-    url: `${baseUrl}/ElsAuthService/login`,
-    method: 'post',
-    data: {
-      ...params
-    }
-  });
-};
+
 // 配置平台数据字典查询
 export const dataDicAPI = (code) => {
   return axios({

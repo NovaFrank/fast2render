@@ -1,6 +1,6 @@
 import axios from './request';
-import { getUserInfo } from '@/util/utils';
-const baseUrl = '/apis';
+import { getUserInfo, getApiPath } from '@/util/utils';
+const baseUrl = getApiPath();
 const layout = '/layout';
 const userInfo = getUserInfo();
 const elsAccount = userInfo ? userInfo.elsAccount : '307000';

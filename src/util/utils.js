@@ -4,7 +4,7 @@
  * @param {表单实例} form
  */
 import { getStore, setStore } from '@/util/store.js';
-import { login } from '@/api/order';
+import { login } from '@/api/common';
 import { setToken } from '@/util/auth.js';
 import md5 from 'js-md5';
 
@@ -43,7 +43,18 @@ export const getAccount = () => {
     token: ''
   };
 };
+export const getApiPath = () => {
+  let projectPath;
+  if (top.location.pathname) {
+    projectPath = top.location.pathname.split('/')[1];
+  }
 
+  if (projectPath) {
+    return '/' + projectPath + '/apis';
+  } else {
+    return '/apis';
+  }
+};
 export const getLocalToken = (supplier) => {
   const params = {
     elsAccount: supplier ? '3070027' : '307000',

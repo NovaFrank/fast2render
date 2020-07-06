@@ -1,15 +1,7 @@
 import axios from './request';
-let baseUrl = '/apis';
-// 获取登录信息
-export const login = (params) => {
-  return axios({
-    url: `${baseUrl}/ElsAuthService/login`,
-    method: 'post',
-    data: {
-      ...params
-    }
-  });
-};
+import { getApiPath } from '@/util/utils';
+let baseUrl = getApiPath();
+
 // 配置平台数据字典查询
 export const dataDicAPI = (code) => {
   return axios({

@@ -1,6 +1,8 @@
 import axios from '@/router/axios';
 import { getUserInfo } from '@/util/auth';
-const baseUrl = '/apis';
+import { getApiPath } from '@/util/utils.js';
+
+let baseUrl = getApiPath();
 const layout = '/layout';
 const userInfo = getUserInfo();
 const elsAccount = userInfo.elsAccount;

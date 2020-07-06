@@ -1,6 +1,7 @@
 import request from '@/router/axios';
-import { getAccount } from '@/util/utils.js';
-let prefix = '/apis';
+import { getAccount, getApiPath } from '@/util/utils.js';
+
+let prefix = getApiPath();
 const userInfo = getAccount();
 const elsAccount = userInfo.elsAccount;
 

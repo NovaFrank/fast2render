@@ -4,6 +4,19 @@ import { login } from '@/api/index';
 import { setToken } from '@/util/auth.js';
 import md5 from 'js-md5';
 
+export const getApiPath = () => {
+  let projectPath;
+  if (top.location.pathname) {
+    projectPath = top.location.pathname.split('/')[1];
+  }
+
+  if (projectPath) {
+    return '/' + projectPath + '/apis';
+  } else {
+    return '/apis';
+  }
+};
+
 // 对象数组排序
 export const compare = function(prop) {
   return function(obj1, obj2) {

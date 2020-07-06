@@ -1,5 +1,7 @@
 import request from '@/router/axios';
-let prefix = '/apis';
+import { getApiPath } from '@/util/utils.js';
+
+let prefix = getApiPath();
 
 // 配置平台数据字典查询
 export const dataDicAPI = (code) =>

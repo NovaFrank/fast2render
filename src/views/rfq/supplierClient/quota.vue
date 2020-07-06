@@ -460,6 +460,8 @@ export default {
       this.initDetail();
     },
     getPriceIndex(row, column) {
+      if (column === 'priceIncludingTax' && row.priceIncludingTax) return row.priceIncludingTax;
+      if (column === 'priceExcludingTax' && row.priceExcludingTax) return row.priceExcludingTax;
       if (validatenull(row.ladderPriceJson)) return;
       const quantity = row.quantity;
       const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
@@ -473,6 +475,8 @@ export default {
       return price;
     },
     getCostPriceIndex(row, column) {
+      if (column === 'priceIncludingTax' && row.priceIncludingTax) return row.priceIncludingTax;
+      if (column === 'priceExcludingTax' && row.priceExcludingTax) return row.priceExcludingTax;
       const costJson = JSON.parse(row.costConstituteJson);
       if (costJson) {
         const template = costJson.templateJson;

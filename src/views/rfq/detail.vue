@@ -635,6 +635,8 @@ export default {
       ) {
         return '';
       }
+      if (column === 'priceIncludingTax' && row.priceIncludingTax) return row.priceIncludingTax;
+      if (column === 'priceExcludingTax' && row.priceExcludingTax) return row.priceExcludingTax;
       const quantity = row.quantity;
       const quantityList = row.ladderPriceJson
         ? JSON.parse(row.ladderPriceJson).map((item) => {
@@ -649,8 +651,9 @@ export default {
       if (row.itemStatus === '1' || row.itemStatus === '3') {
         return '';
       }
+      if (column === 'priceIncludingTax' && row.priceIncludingTax) return row.priceIncludingTax;
+      if (column === 'priceExcludingTax' && row.priceExcludingTax) return row.priceExcludingTax;
       const costJson = JSON.parse(row.costConstituteJson);
-      console.log(row.toElsAccount, costJson);
       if (costJson) {
         const template = costJson.templateJson;
         let price = 0;

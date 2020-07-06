@@ -75,6 +75,7 @@
       version="attahcment-fiels_4_3"
     ></fast2-attachment-list>
     <avue-crud
+      ref="itemList"
       v-show="tabActive === 'detail'"
       :data="inquiryListOption.data"
       :option="inquiryListOption.option"
@@ -1164,7 +1165,7 @@ export default {
               }
               this.$message.success('保存成功');
               if (this.currentEnquiryNumber) {
-                // this.$router.go(0);
+                this.$router.go(0);
                 return;
               }
               const enquiryNumber = res.data.data.enquiryNumber;
@@ -1353,6 +1354,7 @@ export default {
       }
       this.currentDetailItem = {};
       this.currentSelectionDetailItems = [];
+      this.$refs.itemList.toggleSelection(false);
     },
     handleTest() {
       let selectSuppliers = [];

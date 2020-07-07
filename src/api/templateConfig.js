@@ -1,6 +1,6 @@
 import axios from '@/router/axios';
-
-const baseUrl = '/apis';
+import { getApiPath } from '@/util/utils.js';
+let baseUrl = getApiPath();
 
 export const find = (params) => {
   const url = `${baseUrl}/ElsTemplateConfigService/findPageList`;

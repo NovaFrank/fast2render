@@ -14,6 +14,7 @@
       @on-load="tableData"
       @size-change="sizeChange"
       @current-change="currentChange"
+      @search-change="search"
       ref="crud"
     >
       <template slot-scope="{ row, index }" slot="menu">
@@ -291,6 +292,7 @@ export default {
       formOption: formOption,
       dialogPurchaseVisible: false,
       purchaseOption: purchaseOption,
+      searchParams: {},
       listOption: {
         purchasePerson: ''
       }
@@ -308,7 +310,7 @@ export default {
       this.tabActive = tab.prop;
       this.tab = tab;
     },
-    async tableData(data) {
+    async tableData(data, searchParams = {}) {
       const action = 'findPageList';
       let params = {
         elsAccount: this.elsAccount,
@@ -430,7 +432,12 @@ export default {
 
       done();
     },
-
+    search(params, done) {
+      console.log(params);
+      // 搜索
+      this.tableData(params);
+      done();
+    },
     // 分页
     currentChange(val) {
       this.formOption.page.currentPage = val;

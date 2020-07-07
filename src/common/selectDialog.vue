@@ -53,8 +53,8 @@ export default {
       crudOption: {
         indexLabel: '序号',
         indexFixed: false,
-        searchShow: false,
-        searchBtn: false,
+        searchShow: true,
+        searchBtn: true,
         columnBtn: false,
         align: 'center',
         menu: false,
@@ -70,14 +70,16 @@ export default {
         sortable: true,
         tip: false,
         indeterminate: true,
-        column: []
+        column: [],
+        searchMenuSpan: 6
       },
       crudPage: {
         total: 0, // 总页数
         currentPage: 1, // 当前页数
         pageSize: 10 // 每页显示多少条
       },
-      crudMultiple: true
+      crudMultiple: true,
+      params: {}
     };
   },
   created() {
@@ -99,12 +101,13 @@ export default {
     }
   },
   methods: {
-    handleList() {
+    handleList(params = {}) {
       let listParams = {};
       listParams.elsAccount = this.elsAccount;
       listParams.currentPage = this.crudPage.currentPage;
       listParams.pageSize = this.crudPage.pageSize;
-      getCrudData(this.actionPath, listParams).then((res) => {
+      const newlist = Object.assign(params, listParams);
+      getCrudData(this.actionPath, newlist).then((res) => {
         const data = res.data;
         if (data.statusCode !== '200') {
           this.$message.error(data.message);
@@ -136,7 +139,7 @@ export default {
     searchChange(params, done) {
       this.crudPage.currentPage = 1;
       // Object.assign(this.crudQueryParam, params);
-      this.handleList();
+      this.handleList(params);
       done();
     },
     refreshChange() {

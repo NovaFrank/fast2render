@@ -30,12 +30,18 @@ export default {
       {
         prop: 'materialNumber',
         label: '物料编码',
-        overHidden: true
+        overHidden: true,
+        search: true,
+        searchLabelWidth: 90,
+        searchSpan: 8
       },
       {
         label: '物料名称',
         prop: 'materialName',
-        overHidden: true
+        overHidden: true,
+        search: true,
+        searchLabelWidth: 90,
+        searchSpan: 8
       },
       {
         label: '单位',

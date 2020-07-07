@@ -6,7 +6,7 @@ export default {
     pageSize: 10
   },
   option: {
-    header: false,
+    header: true,
     menu: true,
     border: true,
     stripe: true,
@@ -20,22 +20,35 @@ export default {
     align: 'center',
     menuAlign: 'center',
     menuWidth: '130',
+    searchBtn: true,
+    searchShow: true,
+    searchMenuSpan: 6,
+    columnBtn: false,
     column: [
       {
         label: '订单号',
         prop: 'orderNumber',
         width: 200,
         slot: true,
+        search: true,
+        searchLabelWidth: 90,
+        searchSpan: 6,
         editDisplay: false
       },
       {
         label: '供应商ELS账号',
         prop: 'toElsAccount',
+        search: true,
+        searchLabelWidth: 130,
+        searchSpan: 6,
         editDisplay: false
       },
       {
         label: '公司名称',
         prop: 'toElsAccountName',
+        search: true,
+        searchLabelWidth: 90,
+        searchSpan: 6,
         editDisplay: false
       },
       {

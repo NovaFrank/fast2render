@@ -6,13 +6,9 @@ export default {
     pageSize: 10
   },
   option: {
-    header: false,
-    align: 'center',
-    // selection: true,
-    addBtn: false,
     refreshBtn: false,
-    columnBtn: false,
-    searchBtn: false,
+    align: 'center',
+    addBtn: false,
     menu: false,
     menuAlign: 'left',
     indexLabel: '序号',

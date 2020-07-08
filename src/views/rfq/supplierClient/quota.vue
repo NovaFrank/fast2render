@@ -340,7 +340,7 @@ export default {
         const current = this.configurations[value].tableColumns.map((item) => {
           let result = { ...item };
           result.prop = item.prop;
-          result.label = item.label;
+          result.label = item.fbk1 || item.label;
           result.display = item.saleShow;
           result.span = item.span;
           result.type = item.type;

@@ -342,7 +342,6 @@ export default {
           this.headerButtons = [
             { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
             { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-            { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
             { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
             { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
           ];

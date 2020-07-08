@@ -3,6 +3,19 @@ import _ from 'lodash';
 import { setStore, getStore } from './store';
 import Formula from '@hapi/formula';
 
+export const getApiPath = () => {
+  let projectPath;
+  if (top.location.pathname) {
+    projectPath = top.location.pathname.split('/')[1];
+  }
+
+  if (projectPath) {
+    return '/' + projectPath + '/apis';
+  } else {
+    return '/apis';
+  }
+};
+
 /**
  * 验证表单
  *
@@ -204,7 +217,7 @@ export const getObjValue = (stringOfObj, obj) => {
     return null;
   }
   const tempObj = obj;
-  const value = array.reduce(function (prev, cur) {
+  const value = array.reduce(function(prev, cur) {
     const currentObj = getObjType(prev) === 'object' ? prev : getItemChildrenProp(prev, tempObj);
     const newObj = getItemChildrenProp(cur, currentObj);
     // console.log(newObj, currentObj, 'current level obj');
@@ -275,7 +288,7 @@ export const vaildData = (val, dafult) => {
  * @param {*} obj   要处理的数据对象
  */
 export const getFormulaValue = (formulaItem, obj = {}) => {
-  const reference = function (name) {
+  const reference = function(name) {
     return (context) => getNum(context[name]);
   };
   const checkNum = (n) => {
@@ -284,7 +297,7 @@ export const getFormulaValue = (formulaItem, obj = {}) => {
     }
     return false;
   };
-  const getNum = function (value) {
+  const getNum = function(value) {
     let n = 0;
     // 如果是字符串转数字
     if (getObjType(value) === 'string') {
@@ -341,7 +354,7 @@ export const getFormulaValue = (formulaItem, obj = {}) => {
  * @param {*} prop 排序对比属性
  */
 export const sortArrys = (list, prop) => {
-  list.sort(function (a, b) {
+  list.sort(function(a, b) {
     if (a[prop] > b[prop]) {
       return -1;
     }
@@ -369,7 +382,7 @@ export const checkObjExist = (stringOfObj, obj) => {
     return false;
   }
   const tempObj = obj;
-  const value = array.reduce(function (prev, cur) {
+  const value = array.reduce(function(prev, cur) {
     const currentObj = getObjType(prev) === 'object' ? prev : getItemChildrenProp(prev, tempObj);
     const newObj = getItemChildrenProp(cur, currentObj);
     return newObj;
@@ -471,7 +484,7 @@ export const getParseJson = (str) => {
 export const getDicItem = async (action, dic = 'commondic') => {
   let item = getItemFormMap(action, dic);
   if (!item) {
-    await loadFormula();
+    await loadDic();
     item = getItemFormMap(action, dic);
   }
   return item;
@@ -480,7 +493,7 @@ export const getDicItem = async (action, dic = 'commondic') => {
 export const getDicNow = (action, dic = 'commondic') => {
   const item = getItemFormMap(action, dic);
   if (!item) {
-    loadFormula();
+    loadDic();
   }
   return item;
 };
@@ -698,11 +711,11 @@ export const initJson = () => {
 };
 
 export const loadJson = (url, name) => {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     const xhr = new XMLHttpRequest();
     xhr.open('get', url, true);
     xhr.responseType = 'json';
-    xhr.onload = function () {
+    xhr.onload = function() {
       if (xhr.status === 200) {
         console.log('获取文件', url);
         setStore({ name, content: xhr.response });
@@ -862,9 +875,7 @@ const util = {
   doListCalc,
   uniqBy,
   initJson,
-  getDicList,
-  getStore,
-  setStore
+  getDicList
 };
 
 export default util;

@@ -8,7 +8,6 @@
         <button-group :option="buttons" v-on="$listeners"></button-group>
       </el-col>
     </el-row>
-    <el-divider class="header-line"></el-divider>
   </div>
 </template>
 <script>

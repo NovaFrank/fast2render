@@ -140,13 +140,11 @@ export default {
     list: {
       handler(val) {
         this.newList = val;
-        if (this.newList[0] && !this.active) {
-          this.active = this.newList[0].prop;
-        }
       },
       deep: true,
       immediate: true
     },
+
     tabPermission: {
       handler(val) {
         this.newPermission = val;
@@ -176,7 +174,9 @@ export default {
         });
         return showList;
       } else {
-        return this.newList;
+        // 无权限配置 ，不展示任何tab
+        // return this.newList;
+        return []
       }
     }
   },
@@ -184,16 +184,25 @@ export default {
     console.log('启动tab组件');
     if (this.debugger === 'true') {
       this.newList = zhunru;
-    }
-    if (this.debugger === 'true') {
       this.newPermission = permisssion;
     }
-    if (this.showList[0] && !this.active) {
-      this.active = this.showList[0].prop;
-    }
+    this.checkInited();
   },
   methods: {
-    checkFirstLoad() {}
+    checkInited() {
+      setTimeout(() => {
+        const exist = this.showList.find((item) => {
+          return item.prop === this.active;
+        });
+        if (!exist) {
+          if (this.showList[0]) {
+            this.active = this.showList[0].prop;
+          } else {
+            this.checkInited();
+          }
+        }
+      }, 1000);
+    }
   }
 };
 </script>

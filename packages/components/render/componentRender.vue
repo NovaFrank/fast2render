@@ -16,6 +16,7 @@
             :option="item.data"
             :readOnly="readOnly"
             :inTab="inTab"
+            type='form'
             :hasRowPermission="hasFieldPermission"
             :rowPermission="getRowPromession(permission.fieldJson)"
             :formulas="permission.formulas"
@@ -44,6 +45,7 @@
             :hasRowPermission="hasRowPermission"
             :rowPermission="getRowPromession(permission.tableJson)"
             :addInCell="addInCell"
+            type='crud'
             :formulas="permission.formulas"
             theme="block"
             ref="themebox"

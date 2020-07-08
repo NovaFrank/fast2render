@@ -35,7 +35,8 @@ export default {
           if (item.type === 'select' && item.settingValue) {
             let dic = item.settingValue;
             if (item.dicUrl && item.dicUrl.length) {
-              dic = item.dicUrl;
+              dic = item.dicUrl + '';
+              delete item.dicUrl
             }
             if (item.multiple) {
               formItem.multiple = true;
@@ -52,11 +53,11 @@ export default {
 };
 </script>
 <style scope>
-.el-form-item__content {
+.rulebox .el-form-item__content {
   display: block;
 }
-.el-form-item--small .el-form-item__content,
-.el-form-item--small .el-form-item__label {
+.rulebox .el-form-item--small .el-form-item__content,
+.rulebox .el-form-item--small .el-form-item__label {
   display: block;
   float: none;
   text-align: left;

@@ -192,7 +192,98 @@ export default {
       uploadRow: null,
       fileList: [],
       businessId: '',
-      uploader: null
+      uploader: null,
+      fileTypeDic: [
+          {
+            label: '营业执照',
+
+            value: '营业执照'
+          },
+
+          {
+            label: '法人代表证明',
+
+            value: '法人代表证明'
+          },
+
+          {
+            label: '组织机构代码证',
+
+            value: '组织机构代码证'
+          },
+
+          {
+            label: '税务登记证',
+
+            value: '税务登记证'
+          },
+
+          {
+            label: '银行开户证明',
+
+            value: '银行开户证明'
+          },
+
+          {
+            label: '银行资信证明',
+
+            value: '银行资信证明'
+          },
+
+          {
+            label: '经营许可证',
+
+            value: '经营许可证'
+          },
+
+          {
+            label: '生产许可证',
+
+            value: '生产许可证'
+          },
+
+          {
+            label: '质量认证',
+
+            value: '质量认证'
+          },
+
+          {
+            label: '产品认证',
+
+            value: '产品认证'
+          },
+
+          {
+            label: '环境认证',
+
+            value: '环境认证'
+          },
+
+          {
+            label: '制造商授权书',
+
+            value: '制造商授权书'
+          },
+
+          {
+            label: '代理经销认证',
+
+            value: '代理经销认证'
+          },
+
+          {
+            label: '进出口企业资格证',
+
+            value: '进出口企业资格证'
+          },
+
+          {
+            label: '其他',
+
+            value: '其他'
+          }
+        ]
     };
   },
   created() {},
@@ -290,11 +381,12 @@ export default {
             });
         } else {
           // eslint-disable-next-line prefer-promise-reject-errors
-          reject({
-            result: false,
-            message: '请上传附件',
-            statusCode: '-100'
-          });
+           resolve({ result: true, statusCode: '200' });
+          // reject({
+          //   result: false,
+          //   message: '请上传附件',
+          //   statusCode: '-100'
+          // });
         }
       });
     },

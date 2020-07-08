@@ -598,7 +598,7 @@ export default {
         }
         // 配置字段
         const current = this.configurations[value].tableColumns.map((item) => {
-          let result = {};
+          let result = { ...item };
           result.prop = item.prop;
           result.label = item.label;
           result.display = item.purchaseShow;
@@ -609,8 +609,25 @@ export default {
           result.dicMethod = item.dicMethod;
           return result;
         });
-        this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
-        this.dialogOption.column = this.dialogOption.column.concat(current);
+        current.forEach((item) => {
+          if (
+            this.inquiryListOption.option.column.filter((i) => i.prop === item.prop).length === 0
+          ) {
+            this.inquiryListOption.option.column.push({
+              span: item.span || 6,
+              ...item
+            });
+          }
+          if (this.dialogOption.column.filter((i) => i.prop === item.prop).length === 0) {
+            this.dialogOption.column.push({
+              span: item.span || 6,
+              ...item
+            });
+          }
+        });
+        // this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+        // this.dialogOption.column = this.dialogOption.column.concat(current);
+        // 头信息
         const fieldColumns = this.configurations[value].fieldColumns;
         fieldColumns.forEach((item) => {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {

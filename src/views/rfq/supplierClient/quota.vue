@@ -338,15 +338,29 @@ export default {
       if (this.configurations[value]) {
         this.templateRule = this.configurations[value].rule;
         const current = this.configurations[value].tableColumns.map((item) => {
-          let result = {};
+          let result = { ...item };
           result.prop = item.prop;
           result.label = item.label;
           result.display = item.saleShow;
           result.span = item.span;
+          result.type = item.type;
+          result.dicData = item.dicData;
+          result.dicUrl = item.dicUrl;
+          result.dicMethod = item.dicMethod;
           return result;
         });
         this.initColumns();
-        this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+        current.forEach((item) => {
+          if (
+            this.inquiryListOption.option.column.filter((i) => i.prop === item.prop).length === 0
+          ) {
+            this.inquiryListOption.option.column.push({
+              span: item.span || 6,
+              ...item
+            });
+          }
+        });
+        // this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
         const fieldColumns = this.configurations[value].fieldColumns;
         fieldColumns.forEach((item) => {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {

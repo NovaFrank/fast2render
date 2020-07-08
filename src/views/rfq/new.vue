@@ -808,7 +808,7 @@ export default {
         });
       });
       // 物料列表
-      materialListAction({ elsAccount: this.elsAccount }).then((res) => {
+      materialListAction({ elsAccount: this.elsAccount, pageSize: '200' }).then((res) => {
         this.materialList = res.data.pageData.rows;
         this.dialogOption.column = this.dialogOption.column.map((item) => {
           if (item.prop === 'materialNumber') {

@@ -115,7 +115,7 @@
           {{ JSON.parse(scope.row.costConstituteJson).templateName }}
         </span>
       </template>
-      <template slot="menuLeft" v-if="validatenull(form.purchaseRequestNumber)">
+      <template slot="menuLeft" v-if="!purchaseRequest">
         <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>
       </template>
       <template slot="menuLeft">
@@ -133,7 +133,7 @@
           </el-col>
           <el-col :span="6">
             <el-button
-              v-if="validatenull(form.purchaseRequestNumber)"
+              v-if="!purchaseRequest"
               class="el-button el-button--text el-button--small"
               @click.stop="handleDeleteDetailItem(scope.row)"
             >
@@ -327,7 +327,7 @@ export default {
           { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
         ];
       } else {
-        if (this.form.purchaseRequestNumber) {
+        if (this.purchaseRequest) {
           this.inquiryListOption.option.menu = true;
           this.headerButtons = [
             { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
@@ -492,7 +492,7 @@ export default {
           type: 'tree',
           label: '物料编号',
           prop: 'materialNumber',
-          disabled: !validatenull(this.form.purchaseRequestNumber),
+          disabled: this.purchaseRequest,
           dicData: this.materialList.map((item) => {
             return {
               label: item.materialNumber,
@@ -510,7 +510,7 @@ export default {
           rules: [{ trigger: 'change', validator: validateDateTime }]
         },
         {
-          disabled: !validatenull(this.form.purchaseRequestNumber),
+          disabled: this.purchaseRequest,
           label: '需求数量',
           prop: 'quantity',
           rules: [
@@ -1231,6 +1231,7 @@ export default {
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
+          this.purchaseRequest = !validatenull(item.purchaseRequestNumber);
           const accountList = item.toElsAccountList
             ? item.toElsAccountList
                 .split(',')

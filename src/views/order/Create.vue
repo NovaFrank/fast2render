@@ -245,6 +245,8 @@ export default {
     this.elsSubAccount = userInfo.elsSubAccount;
     this.materielListOption.data = [];
     this.fileOption.option.menu = true;
+    this.materielListOption.option.header = true;
+    this.materielListOption.option.menu = true;
     this.tabActive = this.tabOption.option.column[0];
     await this.getDicData();
     this.formOption.obj.orderStatus = '0';

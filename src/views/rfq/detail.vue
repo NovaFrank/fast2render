@@ -607,7 +607,7 @@ export default {
       this.initColumns();
       if (this.configurations[value]) {
         const current = this.configurations[value].tableColumns.map((item) => {
-          let result = { ...item };
+          let result = {};
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.purchaseShow;

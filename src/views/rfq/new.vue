@@ -598,7 +598,7 @@ export default {
         }
         // 配置字段
         const current = this.configurations[value].tableColumns.map((item) => {
-          let result = { ...item };
+          let result = {};
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.purchaseShow;
@@ -663,7 +663,6 @@ export default {
         const rows = res.data.pageData.rows || [];
         for (const item of rows) {
           const json = JSON.parse(item.configJson);
-          // console.log('json', json);
           const table = json.table;
           let field = [];
           Object.keys(json.fieldJson.purchase).forEach((item) => {

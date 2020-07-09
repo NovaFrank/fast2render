@@ -338,7 +338,7 @@ export default {
       if (this.configurations[value]) {
         this.templateRule = this.configurations[value].rule;
         const current = this.configurations[value].tableColumns.map((item) => {
-          let result = { ...item };
+          let result = {};
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.saleShow;

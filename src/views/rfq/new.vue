@@ -819,6 +819,7 @@ export default {
                   value: item.materialNumber
                 };
               }),
+              disabled: this.purchaseRequest,
               ...item
             };
           }

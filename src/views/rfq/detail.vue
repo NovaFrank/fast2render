@@ -589,13 +589,13 @@ export default {
         { slot: true, label: '税率', prop: 'taxRate' },
         { slot: true, label: '含税价', prop: 'priceIncludingTax' },
         { slot: true, label: '不含税价', prop: 'priceExcludingTax' },
-        {
-          type: 'date',
-          format: 'yyyy-MM-dd',
-          valueFormat: 'timestamp',
-          label: '交货日期',
-          prop: 'deliveryDate'
-        },
+        // {
+        //   type: 'date',
+        //   format: 'yyyy-MM-dd',
+        //   valueFormat: 'timestamp',
+        //   label: '交货日期',
+        //   prop: 'deliveryDate'
+        // },
         { slot: true, label: '操作', prop: 'option' }
       ];
       // this.templateRule.enquiryIsQuota = false; // 测试是否配额 否

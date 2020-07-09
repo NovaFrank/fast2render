@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-dialog :title="title" :visible.sync="visable">
+      <div v-if="subtitle" style="margin-bottom: 10px; margin-top: -15px;" v-text="subtitle"></div>
       <avue-crud
         ref="crud"
         v-model="crudObj"
@@ -27,8 +28,9 @@
 export default {
   name: 'selectDialogTable',
   props: {
-    btnText: { type: String, default: '保存' }, // 保存按钮文字
-    title: { type: String, default: '' }, // dialog标题
+    btnText: { type: String, default: '确定' }, // 保存按钮文字
+    title: { type: String, default: '' }, // dialog 标题
+    subtitle: { type: String, default: '' }, // dialog 副标题
     dialogVisible: { type: Boolean, default: false }, // dialog显隐
     // 表格的列配置
     column: {
@@ -62,7 +64,7 @@ export default {
     pageParam: {
       type: Object,
       default: () => {
-        return { pageNo: 1, pageSize: 10 };
+        return { pageNo: 1, currentPage: 1, pageSize: 10 };
       }
     },
     // 是否多选
@@ -74,7 +76,7 @@ export default {
   data() {
     return {
       visable: this.dialogVisible,
-      selectColumns: [],
+      multipleSelection: [],
       crudObj: {},
       crudData: [],
       crudOption: {
@@ -95,8 +97,8 @@ export default {
         pageSize: 10 // 每页显示多少条
       },
       crudQueryParam: {},
-      crudPageParam: {},
-      crudMultiple: true
+      crudMultiple: false,
+      currentRow: null
     };
   },
   created() {
@@ -104,17 +106,19 @@ export default {
     this.crudData = this.data;
     this.crudPage = this.page;
     this.crudQueryParam = this.queryParam;
-    this.crudPageParam = this.pageParam;
+    // this.page = this.pageParam;
     this.crudMultiple = this.multiple;
     this.crudOption.selection = this.multiple;
     this.crudOption.highlightCurrentRow = !this.multiple;
-    this.$emit('handleList');
+
+    this.$emit('handleList', this.queryParam, this.page);
   },
   watch: {
     data: function(newValue) {
       this.crudData = newValue;
     },
     page: function(newValue) {
+      console.log('dialog page', newValue);
       this.crudPage = newValue;
     },
     column: function(newValue) {
@@ -131,48 +135,65 @@ export default {
     //   this.$emit('update:queryParam', newValue);
     // },
     // // TODO:直接修改对象中的属性不会触发此事件，而父对象传入的参数也会对应改变
-    // crudPageParam: function(newValue) {
+    // page: function(newValue) {
     //   this.$emit('update:pageParam', newValue);
     // }
   },
   methods: {
     doAction() {
-      let selectItems = this.selectColumns;
-      this.selectColumns = [];
+      const selectItems = this.multipleSelection;
+
+      // if (selectItems.length < 1) {
+      //   this.$message.warning('请选择至少一条数据');
+      //   return;
+      // }
+
+      this.multipleSelection = [];
       this.$refs.crud.selectClear();
-      this.$emit('save', selectItems);
+      this.$refs.crud.setCurrentRow();
+      this.$emit('ok', selectItems);
       this.visable = false;
     },
     selectionChange(list) {
       if (this.crudMultiple) {
-        this.selectColumns = list;
+        this.multipleSelection = list;
       }
     },
     currentRowChange(row) {
       if (!this.crudMultiple) {
-        let list = [];
+        const list = [];
         list.push(row);
-        this.selectColumns = list;
+        this.multipleSelection = list;
       }
     },
+
     searchChange(params, done) {
-      this.crudPageParam.pageNo = 2;
+      this.page.currentPage = 1;
       Object.assign(this.crudQueryParam, params);
-      this.$emit('handleList');
+      this.$emit('handleList', this.queryParam, this.page);
       done();
     },
     refreshChange() {
-      this.crudPageParam.pageNo = 1;
-      this.$emit('handleList');
+      this.page.currentPage = 1;
+      this.$emit('handleList', this.queryParam, this.page);
     },
     currentChange(page) {
-      this.crudPageParam.pageNo = page;
-      this.$emit('handleList');
+      this.page.currentPage = page;
+      this.$emit('handleList', this.queryParam, this.page);
     },
     sizeChange(pageSize) {
-      this.crudPageParam.pageNo = 1;
-      this.crudPageParam.pageSize = pageSize;
-      this.$emit('handleList');
+      this.page.currentPage = 1;
+      this.page.pageSize = pageSize;
+      this.$emit('handleList', this.queryParam, this.page);
+    },
+    toggleSelection(rows) {
+      if (rows) {
+        rows.forEach((row) => {
+          this.$refs.crud.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.crud.clearSelection();
+      }
     }
   }
 };

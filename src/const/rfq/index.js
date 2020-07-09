@@ -73,13 +73,13 @@ export default {
         label: '数量',
         prop: 'quantity'
       },
-      {
-        type: 'date',
-        format: 'yyyy-MM-dd',
-        valueFormat: 'timestamp',
-        label: '交货日期',
-        prop: 'canDeliveryDate'
-      },
+      // {
+      //   type: 'date',
+      //   format: 'yyyy-MM-dd',
+      //   valueFormat: 'timestamp',
+      //   label: '交货日期',
+      //   prop: 'canDeliveryDate'
+      // },
       {
         label: '创建人',
         prop: 'createUser'

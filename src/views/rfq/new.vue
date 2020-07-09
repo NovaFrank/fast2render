@@ -145,6 +145,8 @@
     </avue-crud>
     <!-- 询价明细表单 -->
     <field-dialog
+      purchaseRequest
+      :elsAccount="elsAccount"
       :dialogTitle="dialogTitle"
       :dialogOption="dialogOption"
       :field="fieldDialogForm"
@@ -186,13 +188,7 @@ import auditListOption from '@/const/rfq/newAndView/auditListOption';
 import { getUserInfo } from '@/util/utils.js';
 import { setStore } from '@/util/store.js';
 
-import {
-  orgList,
-  dataDicAPI,
-  materialListAction,
-  supplierMasterListAction,
-  accountListAction
-} from '@/api/rfq/common';
+import { orgList, dataDicAPI, supplierMasterListAction, accountListAction } from '@/api/rfq/common';
 import {
   purchaseEnquiryAction,
   queryDetailAction,
@@ -205,14 +201,6 @@ import { testSuppliers } from '@/api/rfq/index';
 
 import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 import { DIC } from '@/const/dic';
-
-const validateDateTime = (rule, value, callback) => {
-  if (value && value < new Date().getTime()) {
-    callback(new Error('时间不得小于当前时间'));
-  } else {
-    callback();
-  }
-};
 
 const validateQuantity = (rule, value, callback) => {
   if (!validateNumber(value)) {
@@ -231,39 +219,14 @@ export default {
   },
   data() {
     return {
-      templateRule: {
-        // enquirySetRanking: true, 是否开启排名 - 在比价页面对比项中添加【排名】字段
-        // enquiryIsQuota: true, 是否配额 是否现实配额列（是否判断）
-        // enquiryQuotaType: 'percentage', 配额方式 百分比percentage/数量number
-        // enquiryIsProjectApproval: true, 是否立项 发布前需要提交审批，审批通过 则可发布
-        // enquiryPurchaserTax: true, 采购方税率/供方税率
-        // isMin3Supplier: true, 最小三家供应商
-        // enquiryPriceContrast: 'package', 比价 1打包比-package 2逐条比-item 3成本比-cost ： 成本比是否需要将成本含税价等传接口？
-        // ============================================================================
-        // enquiryIsOnlyQualifiedSupplier: true, 是否供应商资质审查 - 暂无
-        // enquiryWay: 'partner', 询价方式（合作伙伴、企企通、已认证、潜在、陌生） - 暂无
-        // ----------------------------------------------------------------------------
-        // isViewAbleAttachmentBefroeDealline: true 报价时间截止前，是否可查看供方附件
-        // ------------------- 不要 enquiryPriceQuote: 'normal', 报价方式
-        // ------------------- 不要 enquirySetPassword: true, 是否使用开启密码 是否与头部开启冲突？
-        // 公开原则 enquiryPublicRule 未知
-        // enquiryViewHistory: 'ranking', 查看历史记录 price/ranking/supplier 仅历史记录列表加入供应商名
-        // 询价范围？？？？？enquiryScope？？？？？？成本报价 true/false？？？？？ 合并到询价方式
-      },
+      templateRule: {},
       auditListOption: auditListOption,
       relation: {},
       selectedSupplier: [],
       data: {},
       elsAccount: '',
       elsSubAccount: '',
-      headerButtons: [
-        // { power: true, text: '删除', type: 'primary', size: '', action: 'on-delete' },
-        // { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
-        // { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-        // { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-        // { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
-        { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
-      ],
+      headerButtons: [{ power: true, text: '返回', type: '', size: '', action: 'on-cancel' }],
       formOption: formOption, // 表头 option
       tabOption: tabOption, // tab option
       inquiryListOption: inquiryListOption, // 询价明细（行信息）Option
@@ -302,6 +265,8 @@ export default {
     this.elsSubAccount = userInfo.elsSubAccount;
     this.form = {};
     this.inquiryListOption.data = [];
+    this.purchaseRequest = false;
+    this.initColumns();
     await this.tableData(); // 加载当前页面需要的数据
     if (!validatenull(this.$route.params.enquiryNumber)) {
       this.currentEnquiryNumber = this.$route.params.enquiryNumber;
@@ -311,6 +276,27 @@ export default {
     }
   },
   watch: {
+    purchaseRequest(newVal) {
+      if (newVal) {
+        this.inquiryListOption.option.menu = true;
+        this.headerButtons = [
+          { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
+          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
+          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+          { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
+        ];
+      } else {
+        this.inquiryListOption.option.menu = true;
+        this.headerButtons = [
+          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
+          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
+        ];
+      }
+    },
     form(newVal) {
       this.formOption.detail = newVal.auditStatus === '2';
       this.inquiryListOption.option.menu = newVal.auditStatus !== '2';
@@ -468,20 +454,6 @@ export default {
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
         { label: '供应商', prop: 'accountList' },
-        {
-          type: 'date',
-          format: 'yyyy-MM-dd',
-          valueFormat: 'timestamp',
-          label: '要求交期',
-          prop: 'deliveryDate'
-        },
-        {
-          type: 'date',
-          format: 'yyyy-MM-dd',
-          valueFormat: 'timestamp',
-          label: '交货日期',
-          prop: 'canDeliveryDate'
-        },
         { slot: true, label: '报价方式', prop: 'quoteMethod' },
         { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
         { slot: true, label: '成本模板', prop: 'costTemplate' }
@@ -492,22 +464,9 @@ export default {
           type: 'tree',
           label: '物料编号',
           prop: 'materialNumber',
+          formslot: true,
           disabled: this.purchaseRequest,
-          dicData: this.materialList.map((item) => {
-            return {
-              label: item.materialNumber,
-              value: item.materialNumber
-            };
-          }),
-          rules: [{ required: true, message: '请选择物料编号', trigger: 'blur' }]
-        },
-        {
-          type: 'date',
-          format: 'yyyy-MM-dd',
-          valueFormat: 'timestamp',
-          label: '要求交期',
-          prop: 'deliveryDate',
-          rules: [{ trigger: 'change', validator: validateDateTime }]
+          rules: [{ required: true, message: '请选择物料编号' }]
         },
         {
           disabled: this.purchaseRequest,
@@ -517,14 +476,6 @@ export default {
             { required: true, message: '请填写需求数量', trigger: 'blur' },
             { trigger: 'change', validator: validateQuantity }
           ]
-        },
-        {
-          type: 'date',
-          format: 'yyyy-MM-dd',
-          valueFormat: 'timestamp',
-          label: '交货日期',
-          prop: 'canDeliveryDate',
-          rules: [{ trigger: 'change', validator: validateDateTime }]
         },
         {
           type: 'select',
@@ -540,13 +491,6 @@ export default {
           label: '税率',
           prop: 'taxRate',
           disabled: true
-        },
-        {
-          dicUrl: '/layout/dics/value/currency',
-          dicMethod: 'get',
-          type: 'select',
-          label: '币别',
-          prop: 'currency'
         },
         {
           dicUrl: '/layout/dics/value/quoteMethod',
@@ -607,6 +551,11 @@ export default {
           result.dicData = item.dicData;
           result.dicUrl = item.dicUrl;
           result.dicMethod = item.dicMethod;
+          if (['materialDesc', 'materialName', 'materialSpecifications'].includes(item.prop)) {
+            result.disabled = true;
+          } else {
+            result.disabled = !item.purchaseEdit;
+          }
           return result;
         });
         current.forEach((item) => {
@@ -625,8 +574,6 @@ export default {
             });
           }
         });
-        // this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
-        // this.dialogOption.column = this.dialogOption.column.concat(current);
         // 头信息
         const fieldColumns = this.configurations[value].fieldColumns;
         fieldColumns.forEach((item) => {
@@ -807,25 +754,6 @@ export default {
           return item;
         });
       });
-      // 物料列表
-      materialListAction({ elsAccount: this.elsAccount, pageSize: '200' }).then((res) => {
-        this.materialList = res.data.pageData.rows;
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'materialNumber') {
-            return {
-              dicData: this.materialList.map((item) => {
-                return {
-                  label: item.materialNumber,
-                  value: item.materialNumber
-                };
-              }),
-              ...item,
-              disabled: this.purchaseRequest
-            };
-          }
-          return item;
-        });
-      });
       // 税率
       dataDicAPI('taxRate').then((res) => {
         this.dialogOption.column = this.dialogOption.column.map((item) => {
@@ -980,13 +908,7 @@ export default {
             }
             this.$refs.form.validate((valid) => {
               if (valid) {
-                const itemList = this.inquiryListOption.data.map((item) => {
-                  const index = this.materialList.findIndex(
-                    (m) => m.materialNumber === item.materialNumber
-                  );
-                  item.queryUuid = this.materialList[index].uuid;
-                  return item;
-                });
+                const itemList = this.inquiryListOption.data;
                 let params = {
                   ...this.form,
                   enquiryNumber: this.currentEnquiryNumber,
@@ -1158,13 +1080,7 @@ export default {
                 return;
               }
             }
-            const itemList = this.inquiryListOption.data.map((item) => {
-              const index = this.materialList.findIndex(
-                (m) => m.materialNumber === item.materialNumber
-              );
-              item.queryUuid = this.materialList[index].uuid;
-              return item;
-            });
+            const itemList = this.inquiryListOption.data;
             const params = {
               ...this.form,
               enquiryNumber: this.currentEnquiryNumber,
@@ -1233,6 +1149,23 @@ export default {
         if (!this.initDetailError(res)) return;
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
           this.purchaseRequest = !validatenull(item.purchaseRequestNumber);
+
+          this.dialogOption.column = this.dialogOption.column.map((item) => {
+            if (
+              [
+                'materialNumber',
+                'quantity',
+                'materialDesc',
+                'materialName',
+                'materialSpecifications'
+              ].includes(item.prop) &&
+              this.purchaseRequest
+            ) {
+              item.disabled = true;
+            }
+            return item;
+          });
+
           const accountList = item.toElsAccountList
             ? item.toElsAccountList
                 .split(',')
@@ -1257,17 +1190,8 @@ export default {
         this.$message.error('物料编号不可重复');
         return;
       }
-      const materialIndex = this.materialList.findIndex(
-        (item) => item.materialNumber === form.materialNumber
-      );
-      const currentMaterial = this.materialList[materialIndex];
       let item = {
         ...form,
-        materialNumber: currentMaterial.materialNumber,
-        materialName: currentMaterial.materialName,
-        materialDesc: currentMaterial.materialDesc,
-        materialSpecifications: currentMaterial.materialSpecifications,
-        baseUnit: currentMaterial.baseUnit,
         deliveryDate: form.deliveryDate,
         quantity: form.quantity,
         taxCode: form.taxCode,

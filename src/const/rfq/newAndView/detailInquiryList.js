@@ -117,13 +117,13 @@ export default {
         label: '不含税价',
         prop: 'priceExcludingTax'
       },
-      {
-        type: 'date',
-        format: 'yyyy-MM-dd',
-        valueFormat: 'timestamp',
-        label: '交货日期',
-        prop: 'deliveryDate'
-      },
+      // {
+      //   type: 'date',
+      //   format: 'yyyy-MM-dd',
+      //   valueFormat: 'timestamp',
+      //   label: '交货日期',
+      //   prop: 'deliveryDate'
+      // },
       {
         slot: true,
         label: '操作',

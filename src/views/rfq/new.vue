@@ -301,19 +301,17 @@ export default {
       this.formOption.detail = newVal.auditStatus === '2';
       this.inquiryListOption.option.menu = newVal.auditStatus !== '2';
       this.inquiryListOption.option.header = newVal.auditStatus !== '2';
-      if (newVal.auditStatus === '0' || newVal.auditStatus === '2') {
+      if (newVal.auditStatus === '2') {
         this.headerButtons = [
-          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
-        ];
-        if (this.detailObj.auditStatus === '2') {
-          this.headerButtons.push({
+          {
             power: true,
             text: '撤回',
             type: 'primary',
             size: '',
             action: 'on-cancel-approval'
-          });
-        }
+          },
+          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
+        ];
       } else {
         if (this.purchaseRequest) {
           this.inquiryListOption.option.menu = true;

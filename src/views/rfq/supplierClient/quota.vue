@@ -758,16 +758,23 @@ export default {
         form.ladderPriceJson || null
       );
       this.$set(this.inquiryListOption.data[form.index], 'remark', form.remark);
+      form.$index = form.index;
+      form.taxRate = this.inquiryListOption.data[form.index].taxRate;
+      this.getPriceIndex(form, 'priceIncludingTax');
+      this.getPriceIndex(form, 'priceExcludingTax');
     },
     // 行信息 - 成本报价保存
     onSaveCostForm(form) {
-      console.log('form', form);
       this.costQuoteVisible = false;
       this.$set(
         this.inquiryListOption.data[form.index],
         'costConstituteJson',
         form.costConstituteJson || null
       );
+      form.$index = form.index;
+      form.taxRate = this.inquiryListOption.data[form.index].taxRate;
+      this.getCostPriceIndex(form, 'priceIncludingTax');
+      this.getCostPriceIndex(form, 'priceExcludingTax');
     },
     sizeChange(val) {
       this.inquiryListOption.page.pageSize = val;

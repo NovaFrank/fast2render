@@ -808,7 +808,7 @@ export default {
           };
         });
         const params = {
-          ...formOption.detailObj,
+          ...this.detailObj,
           enquiryNumber: this.currentEnquiryNumber,
           quoteEndTime: this.detailObj.quoteEndTime,
           itemList: itemList
@@ -925,7 +925,7 @@ export default {
       const event = {
         name: 'openFlowDialog',
         props: {
-          flowId: this.formOption.detailObj.flowCode
+          flowId: this.detailObj.flowCode
         }
       };
       window.parent.postMessage(event, '*');

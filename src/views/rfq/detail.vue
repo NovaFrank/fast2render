@@ -290,7 +290,7 @@ import { getUserInfo, compare } from '@/util/utils.js';
 import {
   purchaseEnquiryAction,
   queryDetailAction,
-  submitAudit,
+  // submitAudit,
   cancelAudit,
   openPassWord,
   auditHisList
@@ -959,7 +959,31 @@ export default {
       });
     },
     handleSubmitApproval() {
-      this.$router.push({ path: `/priceAuditReport/${this.currentEnquiryNumber}` });
+      // 保存后跳转到比价报告页面
+      this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
+        return {
+          ...item,
+          itemStatus: item.itemStatusCopy
+        };
+      });
+      const param = {
+        ...this.detailObj,
+        enquiryNumber: this.currentEnquiryNumber,
+        elsAccount: this.elsAccount,
+        quoteEndTime: this.detailObj.quoteEndTime,
+        enquiryType: this.detailObj.enquiryType,
+        enquiryDesc: this.detailObj.enquiryDesc,
+        companyCode: this.detailObj.companyCode,
+        enquiryMethod: this.detailObj.enquiryMethod || '',
+        itemList: this.inquiryListOption.data
+      };
+      purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
+        if (res.data.statusCode === '200') {
+          this.$router.push({ path: `/priceAuditReport/${this.currentEnquiryNumber}` });
+        } else {
+          this.$message.error(res.data.message);
+        }
+      });
       // let status = true;
       // let result = false;
       // this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {

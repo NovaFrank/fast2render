@@ -145,7 +145,7 @@
     </avue-crud>
     <!-- 询价明细表单 -->
     <field-dialog
-      purchaseRequest
+      :purchaseRequest="purchaseRequest"
       :elsAccount="elsAccount"
       :dialogTitle="dialogTitle"
       :dialogOption="dialogOption"
@@ -256,7 +256,8 @@ export default {
       relationDialogVisable: false,
       currentEnquiryNumber: '',
       requestTypeDict: [],
-      configurations: []
+      configurations: [],
+      purchaseRequest: false
     };
   },
   async created() {

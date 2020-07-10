@@ -17,6 +17,7 @@
       @show-time-history="handleShowTimeHistory"
       @on-bid-price="handleBidPrice"
       @on-cancel-approval="handleCancelApproval"
+      @on-open-flow-dialog="handleOpenFlowDialog"
     ></form-header>
     <div class="avue-form-box">
       <avue-form ref="form" v-model="detailObj" :option="formOption">
@@ -920,6 +921,15 @@ export default {
       };
       window.parent.postMessage(event, '*');
     },
+    handleOpenFlowDialog() {
+      const event = {
+        name: 'openFlowDialog',
+        props: {
+          flowId: this.formOption.detailObj.flowCode
+        }
+      };
+      window.parent.postMessage(event, '*');
+    },
     handleSave() {
       this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
         return {
@@ -1150,6 +1160,13 @@ export default {
         }
 
         if (res.data.data.flowCode) {
+          this.headerButtons.push({
+            power: true,
+            text: '审批节点',
+            type: 'primary',
+            size: '',
+            action: 'on-open-flow-dialog'
+          });
           let content = {
             flowId: res.data.data.flowCode,
             businessType: 'bargainEnquiryAudit',

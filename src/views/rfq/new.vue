@@ -13,6 +13,7 @@
       @on-save="handleSaveForm"
       @on-audit-submit="handleSubmitAudit"
       @on-cancel-approval="handleCancelApproval"
+      @on-open-flow-dialog="handleOpenFlowDialog"
     ></form-header>
     <avue-form ref="form" v-model="form" :option="formOption">
       <template slot="enquiryNumber">
@@ -946,6 +947,15 @@ export default {
           });
       });
     },
+    handleOpenFlowDialog() {
+      const event = {
+        name: 'openFlowDialog',
+        props: {
+          flowId: this.form.flowCode
+        }
+      };
+      window.parent.postMessage(event, '*');
+    },
     // 是否立项 - 撤回
     handleCancelApproval() {
       this.$confirm('是否撤回审批？', '提示', {
@@ -1138,6 +1148,13 @@ export default {
         this.form = res.data.data;
 
         if (res.data.data.flowCode) {
+          this.headerButtons.push({
+            power: true,
+            text: '审批节点',
+            type: 'primary',
+            size: '',
+            action: 'on-open-flow-dialog'
+          });
           let content = {
             flowId: res.data.data.flowCode,
             businessType: 'editEnquiryAudit',

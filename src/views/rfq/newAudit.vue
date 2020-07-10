@@ -176,13 +176,7 @@ import { getUserInfo } from '@/util/utils.js';
 import { setStore } from '@/util/store.js';
 
 import { orgList, dataDicAPI, supplierMasterListAction, accountListAction } from '@/api/rfq/common';
-import {
-  purchaseEnquiryAction,
-  queryDetailAction,
-  submitAudit,
-  cancelAudit,
-  auditHisList
-} from '@/api/rfq';
+import { purchaseEnquiryAction, queryDetailAction, auditHisList } from '@/api/rfq';
 import { validatenull, validateNumber } from '@/util/validate';
 import { testSuppliers } from '@/api/rfq/index';
 

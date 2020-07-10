@@ -579,9 +579,20 @@ export default {
         // 头信息
         const fieldColumns = this.configurations[value].fieldColumns;
         fieldColumns.forEach((item) => {
+          console.log('item', item);
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
+            let rules = [];
+            if (item.isRequired) {
+              rules.push({
+                required: true,
+                message: '请填写' + item.label,
+                trigger: 'blur'
+              });
+            }
             this.formOption.column.push({
               span: item.span || 6,
+              rules,
+              disabled: item.isDisabled,
               ...item
             });
           }

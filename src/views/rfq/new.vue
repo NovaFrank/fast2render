@@ -1020,13 +1020,7 @@ export default {
                 }
 
                 const action = 'submit';
-                const itemList = this.inquiryListOption.data.map((item) => {
-                  const index = this.materialList.findIndex(
-                    (m) => m.materialNumber === item.materialNumber
-                  );
-                  item.queryUuid = this.materialList[index].uuid;
-                  return item;
-                });
+                const itemList = this.inquiryListOption.data;
                 const param = {
                   ...this.form,
                   enquiryNumber: this.currentEnquiryNumber,

@@ -220,7 +220,7 @@ export default {
         this.form.materialName = materialList[0].materialName;
         this.form.materialSpecifications = materialList[0].materialSpecifications;
         this.form.baseUnit = materialList[0].baseUnit;
-        this.form.queryUuid = materialList[0].queryUuid;
+        this.form.queryUuid = materialList[0].uuid;
       } else {
         this.$message.warning('请选择一条物料明细');
       }

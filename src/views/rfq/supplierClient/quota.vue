@@ -312,21 +312,7 @@ export default {
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
-        // {
-        //   type: 'date',
-        //   format: 'yyyy-MM-dd',
-        //   valueFormat: 'timestamp',
-        //   label: '要求交期',
-        //   prop: 'deliveryDate'
-        // },
         { label: '需求数量', prop: 'quantity' },
-        // {
-        //   type: 'date',
-        //   format: 'yyyy-MM-dd',
-        //   valueFormat: 'timestamp',
-        //   label: '交货日期',
-        //   prop: 'deliveryDate'
-        // },
         { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
         { slot: true, label: '成本模板', prop: 'costTemplate' },
         { slot: true, label: '含税价', prop: 'priceIncludingTax' },
@@ -454,7 +440,7 @@ export default {
             if (json.fieldJson.sale[item].display) {
               field.push({
                 prop: item,
-                ...json.fieldJson.purchase[item] // TODO: sale临时换purchase
+                ...json.fieldJson.sale[item]
               });
             }
           });

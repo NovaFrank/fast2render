@@ -213,6 +213,7 @@
             detailObj.auditStatus !== '0' &&
               detailObj.auditStatus !== '2' &&
               scope.row.itemStatus !== '1' &&
+              scope.row.itemStatus !== '3' &&
               detailObj.quoteEndTime < new Date().getTime() &&
               !showXPrice(scope.row)
           "

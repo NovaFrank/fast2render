@@ -279,25 +279,15 @@ export default {
   },
   watch: {
     purchaseRequest(newVal) {
-      if (newVal) {
-        this.inquiryListOption.option.menu = true;
-        this.headerButtons = [
-          { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
-          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
-          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-          { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
-          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
-        ];
-      } else {
-        this.inquiryListOption.option.menu = true;
-        this.headerButtons = [
-          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
-          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
-          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
-        ];
-      }
+      this.inquiryListOption.option.menu = true;
+      this.headerButtons = [
+        { power: newVal, text: '退回', type: 'primary', size: '', action: 'on-back' },
+        { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
+        { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+        { power: newVal, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+        { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+        { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
+      ];
     },
     form(newVal) {
       this.formOption.detail = newVal.auditStatus === '2';
@@ -512,7 +502,8 @@ export default {
     },
     handleEnquiryTypeChange(value) {
       if (this.configurations[value]) {
-        this.templateRule = this.configurations[value].rule;
+        const configuration = this.configurations[value];
+        this.templateRule = configuration.rule;
         this.initColumns();
         this.tabOption.option.column = [
           { label: '询价明细', prop: 'detail' },
@@ -543,7 +534,7 @@ export default {
         } else {
         }
         // 配置字段
-        const current = this.configurations[value].tableColumns.map((item) => {
+        const current = configuration.tableColumns.map((item) => {
           let result = {};
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
@@ -577,9 +568,8 @@ export default {
           }
         });
         // 头信息
-        const fieldColumns = this.configurations[value].fieldColumns;
+        const fieldColumns = configuration.fieldColumns;
         fieldColumns.forEach((item) => {
-          console.log('item', item);
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
             let rules = [];
             if (item.isRequired) {
@@ -597,6 +587,7 @@ export default {
             });
           }
         });
+        console.log('buttons', value, configuration.buttons);
       } else {
         this.initColumns();
       }

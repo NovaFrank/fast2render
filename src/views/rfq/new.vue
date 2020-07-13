@@ -227,6 +227,7 @@ export default {
       data: {},
       elsAccount: '',
       elsSubAccount: '',
+      configButtons: [],
       headerButtons: [{ power: true, text: '返回', type: '', size: '', action: 'on-cancel' }],
       formOption: formOption, // 表头 option
       tabOption: tabOption, // tab option
@@ -278,6 +279,14 @@ export default {
     }
   },
   watch: {
+    configButtons(newVal) {
+      this.headerButtons = this.headerButtons.map((item) => {
+        const index = newVal.findIndex((n) => n.name === item.action);
+        if (index === -1) return item;
+        item.power = newVal[index].display;
+        return item;
+      });
+    },
     purchaseRequest(newVal) {
       this.inquiryListOption.option.menu = true;
       this.headerButtons = [
@@ -334,6 +343,12 @@ export default {
           });
         }
       }
+      this.headerButtons = this.headerButtons.map((item) => {
+        const index = this.configButtons.findIndex((n) => n.name === item.action);
+        if (index === -1) return item;
+        item.power = this.configButtons[index].display;
+        return item;
+      });
       if (!validatenull(newVal.enquiryType) && this.configurations[newVal.enquiryType]) {
         this.handleEnquiryTypeChange(newVal.enquiryType);
         this.templateRule = this.configurations[newVal.enquiryType].rule;
@@ -587,7 +602,8 @@ export default {
             });
           }
         });
-        console.log('buttons', value, configuration.buttons);
+        this.configButtons = configuration.buttons;
+        console.log('buttons', this.configButtons);
       } else {
         this.initColumns();
       }
@@ -1141,8 +1157,6 @@ export default {
     initDetail() {
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
-        this.form = res.data.data;
-
         if (res.data.data.flowCode) {
           this.headerButtons.push({
             power: true,
@@ -1158,6 +1172,7 @@ export default {
           };
           setStore({ name: this.currentEnquiryNumber, content, type: true });
         }
+        this.form = res.data.data;
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;

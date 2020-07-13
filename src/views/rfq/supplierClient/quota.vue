@@ -472,6 +472,7 @@ export default {
       const current = JSON.parse(row.ladderPriceJson)[index - 1];
       const price = current[column];
       this.inquiryListOption.data[row.$index][column] = price || '';
+      this.inquiryListOption.data[row.$index].taxRate = current.taxRate || '0';
       return price;
     },
     getCostPriceIndex(row, column) {
@@ -555,6 +556,7 @@ export default {
       } else if (scope.row.quoteMethod === '1') {
         this.fieldDialogForm = {
           index: scope.index,
+          quantity: scope.row.quantity,
           taxRate: scope.row.taxRate,
           ladderPriceJson: scope.row.ladderPriceJson || null,
           remark: scope.row.remark || ''
@@ -718,7 +720,7 @@ export default {
             noQuoted: item.noQuoted || 'Y'
           };
         });
-        if (this.detailObj.quoteEndTime < new Date().getTime() && !this.quoteStatus) {
+        if (this.detailObj.quoteEndTime < new Date().getTime() || !this.quoteStatus) {
           this.headerButtons = [
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
             { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }

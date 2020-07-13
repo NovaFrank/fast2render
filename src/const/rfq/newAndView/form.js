@@ -35,11 +35,11 @@ export default {
       type: 'datetime',
       format: 'yyyy-MM-dd HH:mm:ss',
       valueFormat: 'timestamp',
-      label: '报价截止时间',
+      label: '提交截止时间',
       span: 6,
       prop: 'quoteEndTime',
       rules: [
-        { required: true, message: '请选择报价截止时间', trigger: 'change' },
+        { required: true, message: '请选择提交截止时间', trigger: 'change' },
         { trigger: 'change', validator: validateQuoteEndTime }
       ]
     },

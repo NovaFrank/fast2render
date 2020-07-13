@@ -209,9 +209,9 @@ export default {
         this.configurations = configurations;
       }
       // 报价方式 数据字典
-      dataDicAPI('quoteMethod').then((res) => {
-        this.quoteMethodData = res.data;
-      });
+      // dataDicAPI('quoteMethod').then((res) => {
+      //   this.quoteMethodData = res.data;
+      // });
       this.initDetail();
     },
     handleEnquiryTypeChange(value) {
@@ -219,17 +219,15 @@ export default {
         { label: '物料编号', prop: 'materialNumber' },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
-        // { label: '规格', prop: 'materialSpecifications' },
         {
           label: '单位',
           prop: 'baseUnit',
           span: 4
         },
         { label: '需求数量', prop: 'quantity' },
-        { slot: true, label: '报价方式', prop: 'quoteMethod' },
-        { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
-        { slot: true, label: '成本模板', prop: 'costTemplate' },
-        // { label: '供应商', prop: 'toElsAccount' },
+        // { slot: true, label: '报价方式', prop: 'quoteMethod' },
+        // { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
+        // { slot: true, label: '成本模板', prop: 'costTemplate' },
         { label: '供应商', prop: 'companyShortName' },
         {
           type: 'select',

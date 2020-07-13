@@ -30,22 +30,18 @@ export default {
         label: '供应商名称',
         prop: 'companyShortName'
       },
-      // {
-      //   label: '规格',
-      //   prop: 'materialSpecifications'
-      // },
       {
         label: '单位',
         prop: 'baseUnit',
         span: 4
       },
-      {
-        dicUrl: '/layout/dics/value/enquiryMethod',
-        dicMethod: 'get',
-        type: 'select',
-        label: '报价方式',
-        prop: 'quoteMethod'
-      },
+      // {
+      //   dicUrl: '/layout/dics/value/enquiryMethod',
+      //   dicMethod: 'get',
+      //   type: 'select',
+      //   label: '报价方式',
+      //   prop: 'quoteMethod'
+      // },
       {
         slot: true,
         label: '含税价',
@@ -65,7 +61,7 @@ export default {
         format: 'yyyy-MM-dd HH:mm:ss',
         valueFormat: 'timestamp',
         label: '报价时间',
-        prop: 'quoteDate' // createDate
+        prop: 'quoteDate'
       }
     ]
   }

@@ -26,7 +26,7 @@ export default {
       display: true,
       format: 'yyyy-MM-dd HH:mm:ss',
       valueFormat: 'timestamp',
-      label: '报价截止时间',
+      label: '提交截止时间',
       span: 6,
       prop: 'quoteEndTime',
       disabled: true

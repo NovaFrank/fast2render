@@ -353,11 +353,11 @@ export default {
           type: 'datetime',
           format: 'yyyy-MM-dd HH:mm:ss',
           valueFormat: 'timestamp',
-          label: '报价截止时间',
+          label: '提交截止时间',
           span: 6,
           prop: 'quoteEndTime',
           rules: [
-            { required: true, message: '请选择报价截止时间', trigger: 'change' },
+            { required: true, message: '请选择提交截止时间', trigger: 'change' },
             { trigger: 'change', validator: validateQuoteEndTime }
           ]
         },
@@ -394,10 +394,10 @@ export default {
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
-        { label: '供应商', prop: 'accountList' },
-        { slot: true, label: '报价方式', prop: 'quoteMethod' },
-        { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
-        { slot: true, label: '成本模板', prop: 'costTemplate' }
+        { label: '供应商', prop: 'accountList' }
+        // { slot: true, label: '报价方式', prop: 'quoteMethod' },
+        // { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
+        // { slot: true, label: '成本模板', prop: 'costTemplate' }
       ];
       this.inquiryListOption.option.column = baseColumn;
       this.dialogOption.column = [
@@ -433,14 +433,14 @@ export default {
           prop: 'taxRate',
           disabled: true
         },
-        {
-          dicUrl: '/layout/dics/value/quoteMethod',
-          dicMethod: 'get',
-          type: 'select',
-          label: '报价方式',
-          prop: 'quoteMethod',
-          rules: [{ required: true, message: '请选择报价方式', trigger: 'change' }]
-        },
+        // {
+        //   dicUrl: '/layout/dics/value/quoteMethod',
+        //   dicMethod: 'get',
+        //   type: 'select',
+        //   label: '报价方式',
+        //   prop: 'quoteMethod',
+        //   rules: [{ required: true, message: '请选择报价方式', trigger: 'change' }]
+        // },
         {
           span: 24,
           formslot: true,

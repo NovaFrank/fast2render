@@ -37,42 +37,28 @@ export default {
         prop: 'baseUnit',
         span: 4
       },
-      // {
-      //   type: 'date',
-      //   format: 'yyyy-MM-dd',
-      //   valueFormat: 'timestamp',
-      //   label: '要求交期',
-      //   prop: 'deliveryDate'
-      // },
       {
         label: '需求数量',
         prop: 'quantity'
       },
       // {
-      //   type: 'date',
-      //   format: 'yyyy-MM-dd',
-      //   valueFormat: 'timestamp',
-      //   label: '交货日期',
-      //   prop: 'deliveryDate'
+      //   // dicUrl: '/layout/dics/value/enquiryMethod',
+      //   // dicMethod: 'get',
+      //   // type: 'select',
+      //   slot: true,
+      //   label: '报价方式',
+      //   prop: 'quoteMethod'
       // },
-      {
-        // dicUrl: '/layout/dics/value/enquiryMethod',
-        // dicMethod: 'get',
-        // type: 'select',
-        slot: true,
-        label: '报价方式',
-        prop: 'quoteMethod'
-      },
-      {
-        slot: true,
-        label: '阶梯信息',
-        prop: 'quoteMethodInfo'
-      },
-      {
-        slot: true,
-        label: '成本模板',
-        prop: 'costTemplate'
-      },
+      // {
+      //   slot: true,
+      //   label: '阶梯信息',
+      //   prop: 'quoteMethodInfo'
+      // },
+      // {
+      //   slot: true,
+      //   label: '成本模板',
+      //   prop: 'costTemplate'
+      // },
       {
         slot: true,
         label: '含税价',

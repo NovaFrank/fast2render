@@ -31,41 +31,29 @@ export default {
         label: '物料描述',
         prop: 'materialDesc'
       },
-      // {
-      //   label: '规格',
-      //   prop: 'materialSpecifications'
-      // },
       {
         label: '单位',
         prop: 'baseUnit',
         span: 4
       },
-      // {
-      //   label: '要求交期',
-      //   prop: 'requireTime'
-      // },
       {
         label: '需求数量',
         prop: 'quantity'
       },
-      {
-        slot: true,
-        label: '报价方式',
-        prop: 'quoteMethod'
-      },
-      {
-        slot: true,
-        label: '阶梯信息',
-        prop: 'quoteMethodInfo'
-      },
-      {
-        slot: true,
-        label: '成本模板',
-        prop: 'costTemplate'
-      },
       // {
-      //   label: '供应商',
-      //   prop: 'toElsAccount'
+      //   slot: true,
+      //   label: '报价方式',
+      //   prop: 'quoteMethod'
+      // },
+      // {
+      //   slot: true,
+      //   label: '阶梯信息',
+      //   prop: 'quoteMethodInfo'
+      // },
+      // {
+      //   slot: true,
+      //   label: '成本模板',
+      //   prop: 'costTemplate'
       // },
       {
         label: '供应商',
@@ -101,12 +89,6 @@ export default {
         label: '税率',
         prop: 'taxRate'
       },
-      // {
-      //   width: 300,
-      //   slot: true,
-      //   label: '报价',
-      //   prop: 'priceIncludingTax'
-      // },
       {
         slot: true,
         label: '含税价',
@@ -117,13 +99,6 @@ export default {
         label: '不含税价',
         prop: 'priceExcludingTax'
       },
-      // {
-      //   type: 'date',
-      //   format: 'yyyy-MM-dd',
-      //   valueFormat: 'timestamp',
-      //   label: '交货日期',
-      //   prop: 'deliveryDate'
-      // },
       {
         slot: true,
         label: '操作',

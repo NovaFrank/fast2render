@@ -9,7 +9,7 @@
     >
       <avue-form ref="formField" :option="dialogOption" v-model="form" class="new-field">
         <template slot="materialNumber">
-          <el-input v-model="form.materialNumber" :disabled="purchaseRequest" :readonly="true">
+          <el-input v-model="form.materialNumber" :disabled="purchaseRequest">
             <i
               slot="suffix"
               class="el-input_icon el-icon-search pointer"

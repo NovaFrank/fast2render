@@ -29,7 +29,7 @@ module.exports = {
       '/apis/': {
         // 这里最好有一个/
         // https://cs.51qqt.com/ELSServer_XINLITAI/rest
-        target: 'http://cs.51qqt.com/ELSServer_XINLITAI/rest', // ELSServer_SRM 后台接口域名 https://uat.51qqt.com/ http://cs.51qqt.com/
+        target: 'http://cs.51qqt.com/ELSServer_SRM/rest', // ELSServer_SRM 后台接口域名 https://uat.51qqt.com/ http://cs.51qqt.com/
         secure: false, // 如果是https接口，需要配置这个参数
         changeOrigin: true, // 是否跨域
         pathRewrite: {

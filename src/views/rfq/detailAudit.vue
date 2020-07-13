@@ -528,10 +528,10 @@ export default {
           display: true,
           format: 'yyyy-MM-dd HH:mm:ss',
           valueFormat: 'timestamp',
-          label: '报价截止时间',
+          label: '提交截止时间',
           span: 6,
           prop: 'quoteEndTime',
-          rules: [{ required: true, message: '请选择报价截止时间', trigger: 'blur' }]
+          rules: [{ required: true, message: '请选择提交截止时间', trigger: 'blur' }]
         },
         { label: '负责人', span: 6, prop: 'createUser', disabled: true }
       ];
@@ -541,9 +541,9 @@ export default {
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
-        { slot: true, label: '报价方式', prop: 'quoteMethod' },
-        { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
-        { slot: true, label: '成本模板', prop: 'costTemplate' },
+        // { slot: true, label: '报价方式', prop: 'quoteMethod' },
+        // { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
+        // { slot: true, label: '成本模板', prop: 'costTemplate' },
         { label: '供应商', prop: 'companyShortName' },
         {
           type: 'select',
@@ -699,7 +699,7 @@ export default {
       });
     },
     handleAgainQuote(row) {
-      this.$confirm('确定要该供应商物料重报价（请更新报价截止时间）？', '提示', {
+      this.$confirm('确定要该供应商物料重报价（请更新提交截止时间）？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

@@ -300,7 +300,7 @@ export default {
           display: true,
           format: 'yyyy-MM-dd HH:mm:ss',
           valueFormat: 'timestamp',
-          label: '报价截止时间',
+          label: '提交截止时间',
           span: 6,
           prop: 'quoteEndTime',
           disabled: true
@@ -421,9 +421,9 @@ export default {
         });
       });
       // 报价方式 数据字典
-      dataDicAPI('quoteMethod').then((res) => {
-        this.quoteMethodData = res.data;
-      });
+      // dataDicAPI('quoteMethod').then((res) => {
+      //   this.quoteMethodData = res.data;
+      // });
       const res = await ElsTemplateConfigService.find({
         elsAccount: this.elsAccount || '307000',
         businessModule: 'enquiry',

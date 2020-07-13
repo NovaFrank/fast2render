@@ -37,13 +37,13 @@ export default {
         label: '物料描述',
         prop: 'materialDesc'
       },
-      {
-        dicUrl: '/layout/dics/value/enquiryMethod',
-        dicMethod: 'get',
-        type: 'select',
-        label: '报价方式',
-        prop: 'quoteMethod'
-      },
+      // {
+      //   dicUrl: '/layout/dics/value/enquiryMethod',
+      //   dicMethod: 'get',
+      //   type: 'select',
+      //   label: '报价方式',
+      //   prop: 'quoteMethod'
+      // },
       {
         label: '需求数量',
         prop: 'quantity'
@@ -63,7 +63,7 @@ export default {
         type: 'datetime',
         format: 'yyyy-MM-dd HH:mm:ss',
         valueFormat: 'timestamp',
-        label: '报价截止时间',
+        label: '提交截止时间',
         prop: 'quoteEndTime'
       },
       {

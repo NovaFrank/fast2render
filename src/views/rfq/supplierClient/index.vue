@@ -118,17 +118,17 @@ export default {
     },
     initDicData() {
       // 报价方式 数据字典（临时），最好写option dicUrl
-      dataDicAPI('quoteMethod').then((res) => {
-        this.tableOption.option.column = this.tableOption.option.column.map((item) => {
-          if (item.prop === 'quoteMethod') {
-            return {
-              ...item,
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
+      // dataDicAPI('quoteMethod').then((res) => {
+      //   this.tableOption.option.column = this.tableOption.option.column.map((item) => {
+      //     if (item.prop === 'quoteMethod') {
+      //       return {
+      //         ...item,
+      //         dicData: res.data
+      //       };
+      //     }
+      //     return item;
+      //   });
+      // });
     },
     sizeChange(val) {
       this.tableOption.page.pageSize = val;

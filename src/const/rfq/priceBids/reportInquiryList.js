@@ -22,9 +22,9 @@ export default {
       { label: '物料描述', prop: 'materialDesc' },
       { label: '单位', prop: 'baseUnit', span: 4 },
       { label: '需求数量', prop: 'quantity' },
-      { slot: true, label: '报价方式', prop: 'quoteMethod' },
-      { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
-      { slot: true, label: '成本模板', prop: 'costTemplate' },
+      // { slot: true, label: '报价方式', prop: 'quoteMethod' },
+      // { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
+      // { slot: true, label: '成本模板', prop: 'costTemplate' },
       { label: '供应商', prop: 'companyShortName' },
       {
         type: 'select',

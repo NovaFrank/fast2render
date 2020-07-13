@@ -430,11 +430,11 @@ export default {
           type: 'datetime',
           format: 'yyyy-MM-dd HH:mm:ss',
           valueFormat: 'timestamp',
-          label: '报价截止时间',
+          label: '提交截止时间',
           span: 6,
           prop: 'quoteEndTime',
           rules: [
-            { required: true, message: '请选择报价截止时间', trigger: 'change' },
+            { required: true, message: '请选择提交截止时间', trigger: 'change' },
             { trigger: 'change', validator: validateQuoteEndTime }
           ]
         },
@@ -466,34 +466,31 @@ export default {
         }
       ];
       const baseColumn = [
-        { label: '物料编号', prop: 'materialNumber', slot: true, width: 150 },
+        { label: '物料编号', prop: 'materialNumber', width: 150 },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
-        { label: '供应商', prop: 'accountList' },
-        { slot: true, label: '报价方式', prop: 'quoteMethod' },
-        { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
-        { slot: true, label: '成本模板', prop: 'costTemplate' }
+        { label: '供应商', prop: 'accountList' }
+        // { slot: true, label: '报价方式', prop: 'quoteMethod' },
+        // { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
+        // { slot: true, label: '成本模板', prop: 'costTemplate' }
       ];
       this.inquiryListOption.option.column = baseColumn;
       this.dialogOption.column = [
         {
-          type: 'tree',
           label: '物料编号',
           prop: 'materialNumber',
-          formslot: true,
           disabled: this.purchaseRequest,
-          rules: [{ required: true, message: '请选择物料编号' }]
+          formslot: true
         },
+        { label: '物料名称', prop: 'materialName' },
+        { label: '物料描述', prop: 'materialDesc' },
         {
           disabled: this.purchaseRequest,
           label: '需求数量',
-          prop: 'quantity',
-          rules: [
-            { required: true, message: '请填写需求数量', trigger: 'blur' },
-            { trigger: 'change', validator: validateQuantity }
-          ]
+          prop: 'quantity'
+          // rules: [{ required: false, validator: validateQuantity }]
         },
         {
           type: 'select',
@@ -510,14 +507,14 @@ export default {
           prop: 'taxRate',
           disabled: true
         },
-        {
-          dicUrl: '/layout/dics/value/quoteMethod',
-          dicMethod: 'get',
-          type: 'select',
-          label: '报价方式',
-          prop: 'quoteMethod',
-          rules: [{ required: true, message: '请选择报价方式', trigger: 'change' }]
-        },
+        // {
+        //   dicUrl: '/layout/dics/value/quoteMethod',
+        //   dicMethod: 'get',
+        //   type: 'select',
+        //   label: '报价方式',
+        //   prop: 'quoteMethod',
+        //   rules: [{ required: true, message: '请选择报价方式', trigger: 'change' }]
+        // },
         {
           span: 24,
           formslot: true,
@@ -924,19 +921,17 @@ export default {
         return r;
       }
       if (this.templateRule.enquiryPurchaserTax === true) {
-        let validate = this.inquiryListOption.data.filter(
-          (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
-        );
+        let validate = this.inquiryListOption.data.filter((item) => validatenull(item.taxRate));
         if (validate.length > 0) {
-          r = { result: false, message: '请完善报价方式或税码/税率' };
+          r = { result: false, message: '请完善或税码/税率' };
           return r;
         }
       } else if (this.templateRule.enquiryPurchaserTax !== true) {
-        let validate = this.inquiryListOption.data.filter((item) => validatenull(item.quoteMethod));
-        if (validate.length > 0) {
-          r = { result: false, message: '请完善报价方式' };
-          return r;
-        }
+        // let validate = this.inquiryListOption.data.filter((item) => validatenull(item.quoteMethod));
+        // if (validate.length > 0) {
+        //   r = { result: false, message: '请完善报价方式' };
+        //   return r;
+        // }
       }
       return r;
     },
@@ -961,7 +956,10 @@ export default {
             }
             this.$refs.form.validate((valid) => {
               if (valid) {
-                const itemList = this.inquiryListOption.data;
+                const itemList = this.inquiryListOption.data.map((item) => {
+                  item.quoteMethod = '0';
+                  return item;
+                });
                 let params = {
                   ...this.form,
                   enquiryNumber: this.currentEnquiryNumber,
@@ -1058,25 +1056,28 @@ export default {
                   return;
                 }
                 if (this.templateRule.enquiryPurchaserTax === true) {
-                  let validate = this.inquiryListOption.data.filter(
-                    (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+                  let validate = this.inquiryListOption.data.filter((item) =>
+                    validatenull(item.taxRate)
                   );
                   if (validate.length > 0) {
-                    this.$message.error('请完善报价方式或税码/税率');
+                    this.$message.error('请完善或税码/税率');
                     return;
                   }
                 } else if (this.templateRule.enquiryPurchaserTax !== true) {
-                  let validate = this.inquiryListOption.data.filter((item) =>
-                    validatenull(item.quoteMethod)
-                  );
-                  if (validate.length > 0) {
-                    this.$message.error('请完善报价方式');
-                    return;
-                  }
+                  // let validate = this.inquiryListOption.data.filter((item) =>
+                  //   validatenull(item.quoteMethod)
+                  // );
+                  // if (validate.length > 0) {
+                  //   this.$message.error('请完善报价方式');
+                  //   return;
+                  // }
                 }
 
                 const action = 'submit';
-                const itemList = this.inquiryListOption.data;
+                const itemList = this.inquiryListOption.data.map((item) => {
+                  item.quoteMethod = '0';
+                  return item;
+                });
                 const param = {
                   ...this.form,
                   enquiryNumber: this.currentEnquiryNumber,
@@ -1125,23 +1126,26 @@ export default {
               return;
             }
             if (this.templateRule.enquiryPurchaserTax === true) {
-              let validate = this.inquiryListOption.data.filter(
-                (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
+              let validate = this.inquiryListOption.data.filter((item) =>
+                validatenull(item.taxRate)
               );
               if (validate.length > 0) {
-                this.$message.error('请完善报价方式或税码/税率');
+                this.$message.error('请完善或税码/税率');
                 return;
               }
             } else if (this.templateRule.enquiryPurchaserTax !== true) {
-              let validate = this.inquiryListOption.data.filter((item) =>
-                validatenull(item.quoteMethod)
-              );
-              if (validate.length > 0) {
-                this.$message.error('请完善报价方式');
-                return;
-              }
+              // let validate = this.inquiryListOption.data.filter((item) =>
+              //   validatenull(item.quoteMethod)
+              // );
+              // if (validate.length > 0) {
+              //   this.$message.error('请完善报价方式');
+              //   return;
+              // }
             }
-            const itemList = this.inquiryListOption.data;
+            const itemList = this.inquiryListOption.data.map((item) => {
+              item.quoteMethod = '0';
+              return item;
+            });
             const params = {
               ...this.form,
               enquiryNumber: this.currentEnquiryNumber,

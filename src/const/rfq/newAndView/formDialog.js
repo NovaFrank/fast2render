@@ -32,14 +32,6 @@ export default {
       prop: 'materialNumber',
       rules: [{ required: true, message: '请选择物料编号' }]
     },
-    // {
-    //   type: 'date',
-    //   format: 'yyyy-MM-dd',
-    //   valueFormat: 'timestamp',
-    //   label: '要求交期',
-    //   prop: 'deliveryDate',
-    //   rules: [{ trigger: 'change', validator: validateDateTime }]
-    // },
     {
       label: '需求数量',
       prop: 'quantity',
@@ -48,14 +40,6 @@ export default {
         { trigger: 'change', validator: validateQuantity }
       ]
     },
-    // {
-    //   type: 'date',
-    //   format: 'yyyy-MM-dd',
-    //   valueFormat: 'timestamp',
-    //   label: '交货日期',
-    //   prop: 'canDeliveryDate',
-    //   rules: [{ trigger: 'change', validator: validateDateTime }]
-    // },
     {
       type: 'select',
       label: '税码',
@@ -68,20 +52,13 @@ export default {
       disabled: true
     },
     // {
-    //   dicUrl: '/layout/dics/value/currency',
+    //   dicUrl: '/layout/dics/value/quoteMethod',
     //   dicMethod: 'get',
     //   type: 'select',
-    //   label: '币别',
-    //   prop: 'currency'
+    //   label: '报价方式',
+    //   prop: 'quoteMethod',
+    //   rules: [{ required: true, message: '请选择报价方式', trigger: 'change' }]
     // },
-    {
-      dicUrl: '/layout/dics/value/quoteMethod',
-      dicMethod: 'get',
-      type: 'select',
-      label: '报价方式',
-      prop: 'quoteMethod',
-      rules: [{ required: true, message: '请选择报价方式', trigger: 'change' }]
-    },
     {
       span: 24,
       formslot: true,

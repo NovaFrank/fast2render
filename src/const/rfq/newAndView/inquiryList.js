@@ -53,36 +53,22 @@ export default {
       {
         label: '供应商',
         prop: 'accountList'
-      },
-      // {
-      //   type: 'date',
-      //   format: 'yyyy-MM-dd',
-      //   valueFormat: 'timestamp',
-      //   label: '要求交期',
-      //   prop: 'deliveryDate'
-      // },
-      // {
-      //   type: 'date',
-      //   format: 'yyyy-MM-dd',
-      //   valueFormat: 'timestamp',
-      //   label: '交货日期',
-      //   prop: 'canDeliveryDate'
-      // },
-      {
-        slot: true,
-        label: '报价方式',
-        prop: 'quoteMethod'
-      },
-      {
-        slot: true,
-        label: '阶梯信息',
-        prop: 'quoteMethodInfo'
-      },
-      {
-        slot: true,
-        label: '成本模板',
-        prop: 'costTemplate'
       }
+      // {
+      //   slot: true,
+      //   label: '报价方式',
+      //   prop: 'quoteMethod'
+      // },
+      // {
+      //   slot: true,
+      //   label: '阶梯信息',
+      //   prop: 'quoteMethodInfo'
+      // },
+      // {
+      //   slot: true,
+      //   label: '成本模板',
+      //   prop: 'costTemplate'
+      // }
     ]
   }
 };

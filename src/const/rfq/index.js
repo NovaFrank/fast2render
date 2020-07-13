@@ -39,6 +39,7 @@ export default {
         prop: 'companyShortName'
       },
       {
+        slot: true,
         label: '物料编码',
         prop: 'materialNumber'
       },

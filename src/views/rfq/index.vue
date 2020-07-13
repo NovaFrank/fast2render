@@ -20,6 +20,14 @@
           {{ scope.row.enquiryNumber }}
         </el-button>
       </template>
+      <template slot-scope="scope" slot="materialNumber">
+        <el-button
+          @click="handleClickMaterial(scope)"
+          class="el-button el-button--text el-button--small"
+        >
+          {{ scope.row.materialNumber }}
+        </el-button>
+      </template>
       <template
         v-if="['new', 'quoting', 'close'].includes(tabActive)"
         slot-scope="scope"
@@ -56,15 +64,6 @@
           }}
         </span>
       </template>
-      <!-- <template v-if="tabActive === 'new'" slot-scope="scope" slot="menu">
-        <el-button
-          @click.stop="handleEditRow(scope)"
-          class="el-button el-button--text el-button--small"
-        >
-          <i class="el-icon-edit"></i>
-          编辑
-        </el-button>
-      </template> -->
     </avue-crud>
   </basic-container>
 </template>
@@ -104,6 +103,17 @@ export default {
     }
   },
   methods: {
+    handleClickMaterial(scope) {
+      const router = {
+        name: `物料详情(${scope.row.materialNumber})`,
+        src: `/masterdata/material/#/view/${scope.row.materialNumber}_${scope.row.factory}`
+      };
+      const event = {
+        name: 'openNewTag',
+        props: router
+      };
+      window.parent.postMessage(event, '*');
+    },
     currentChange(val) {
       this.tableOption.page.currentPage = val;
       this.tableData({

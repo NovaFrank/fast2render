@@ -69,7 +69,7 @@
       :businessElsAccount="elsAccount"
       businessModule="enquiry"
       v-show="tabActive === 'files' && form.enquiryNumber"
-      :readonly="form.auditStatus === '2'"
+      :readonly="form.auditStatus === '2' || form.auditStatus === '0'"
       :passClient="false"
       :client="false"
       :clientTab="false"
@@ -290,9 +290,6 @@ export default {
       ];
     },
     form(newVal) {
-      this.formOption.detail = newVal.auditStatus === '2';
-      this.inquiryListOption.option.menu = newVal.auditStatus !== '2';
-      this.inquiryListOption.option.header = newVal.auditStatus !== '2';
       if (newVal.auditStatus === '2') {
         this.headerButtons = [
           {
@@ -333,6 +330,26 @@ export default {
             action: 'on-delete'
           });
         }
+      }
+      const editDis = newVal.auditStatus !== '2' && newVal.auditStatus !== '0';
+      this.formOption.detail = editDis;
+      this.inquiryListOption.option.menu = editDis;
+      this.inquiryListOption.option.header = editDis;
+
+      if (newVal.flowCode) {
+        this.headerButtons.push({
+          power: true,
+          text: '审批节点',
+          type: 'primary',
+          size: '',
+          action: 'on-open-flow-dialog'
+        });
+        let content = {
+          flowId: newVal.flowCode,
+          businessType: 'editEnquiryAudit',
+          auditStatus: newVal.auditStatus
+        };
+        setStore({ name: this.currentEnquiryNumber, content, type: true });
       }
       if (!validatenull(newVal.enquiryType) && this.configurations[newVal.enquiryType]) {
         this.handleEnquiryTypeChange(newVal.enquiryType);
@@ -867,36 +884,58 @@ export default {
     handleMaterialSelectChange(selection) {
       this.currentSelectionDetailItems = selection;
     },
-    // 发布/提交审批
-    handleRelease() {
+    checkSubmit() {
+      let r = { result: true, message: '' };
       if (this.templateRule.isMin3Supplier === true) {
         let result = false;
         this.inquiryListOption.data.forEach((item) => {
           if (item.toElsAccountList.split(',').length < 3) result = true;
         });
         if (result) {
-          this.$message.error('每个物料至少选择 3 个供应商参与报价');
-          return;
+          r = { result: false, message: '每个物料至少选择 3 个供应商参与报价' };
+          return r;
+        }
+      } else {
+        let result = false;
+        this.inquiryListOption.data.forEach((item) => {
+          if (
+            !item.toElsAccountList ||
+            (item.toElsAccountList && item.toElsAccountList.split(',').length === 0)
+          )
+            result = true;
+        });
+        if (result) {
+          r = { result: false, message: '请选择供应商' };
+          return r;
         }
       }
       if (this.inquiryListOption.data.length === 0) {
-        this.$message.error('请添加询价明细');
-        return;
+        r = { result: false, message: '请添加询价明细' };
+        return r;
       }
       if (this.templateRule.enquiryPurchaserTax === true) {
         let validate = this.inquiryListOption.data.filter(
           (item) => validatenull(item.quoteMethod) || validatenull(item.taxRate)
         );
         if (validate.length > 0) {
-          this.$message.error('请完善报价方式或税码/税率');
-          return;
+          r = { result: false, message: '请完善报价方式或税码/税率' };
+          return r;
         }
       } else if (this.templateRule.enquiryPurchaserTax !== true) {
         let validate = this.inquiryListOption.data.filter((item) => validatenull(item.quoteMethod));
         if (validate.length > 0) {
-          this.$message.error('请完善报价方式');
-          return;
+          r = { result: false, message: '请完善报价方式' };
+          return r;
         }
+      }
+      return r;
+    },
+    // 发布/提交审批
+    handleRelease() {
+      const result = this.checkSubmit();
+      if (!result.result) {
+        this.$message.error(result.message);
+        return;
       }
       this.$confirm('是否发布？', '提示', {
         confirmButtonText: '确定',
@@ -983,6 +1022,11 @@ export default {
     handleSubmitAudit() {
       if (validatenull(this.currentEnquiryNumber)) {
         this.$message.error('请保存后提交立项审批');
+        return;
+      }
+      const result = this.checkSubmit();
+      if (!result.result) {
+        this.$message.error(result.message);
         return;
       }
       this.$confirm('是否提交审批？', '提示', {
@@ -1142,22 +1186,6 @@ export default {
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.form = res.data.data;
-
-        if (res.data.data.flowCode) {
-          this.headerButtons.push({
-            power: true,
-            text: '审批节点',
-            type: 'primary',
-            size: '',
-            action: 'on-open-flow-dialog'
-          });
-          let content = {
-            flowId: res.data.data.flowCode,
-            businessType: 'editEnquiryAudit',
-            auditStatus: res.data.data.auditStatus
-          };
-          setStore({ name: this.currentEnquiryNumber, content, type: true });
-        }
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;

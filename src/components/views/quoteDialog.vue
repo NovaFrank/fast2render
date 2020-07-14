@@ -6,7 +6,7 @@
     :visible.sync="fieldDialogVisible"
     :before-close="closeDialog"
   >
-    <avue-form ref="form" :option="quoteFormOption.option" v-model="form" class="new-field">
+    <avue-form ref="form" :option="formOption" v-model="form" class="new-field">
       <template slot="priceIncludingTax">
         <el-input placeholder="请输入 含税价" v-model="form.priceIncludingTax"></el-input>
       </template>
@@ -37,6 +37,8 @@ export default {
   components: {},
   created: function() {},
   props: {
+    queryType: String,
+    quoteColumn: Array,
     enquiryPurchaserTax: Boolean,
     dialogWidth: String,
     dialogTitle: String,
@@ -61,6 +63,12 @@ export default {
     };
   },
   watch: {
+    // quoteColumn(newVal) {
+    //   newVal.forEach((item) => {
+    //     const f = this.quoteFormOption.option.column.filter((i) => i.prop === item.prop).length;
+    //     if (f === 0) this.quoteFormOption.option.column.push(item);
+    //   });
+    // },
     field(newVal) {
       this.form = newVal;
     },
@@ -81,6 +89,20 @@ export default {
       this.form.priceExcludingTax = Math.floor((result.num / result.den) * 100) / 100;
     }
   },
+  computed: {
+    formOption() {
+      if (this.queryType === 'RFQ') {
+        this.quoteColumn.forEach((item) => {
+          const f = this.quoteFormOption.option.column.filter((i) => i.prop === item.prop).length;
+          if (f === 0) this.quoteFormOption.option.column.push(item);
+        });
+        return this.quoteFormOption.option;
+      }
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      this.quoteFormOption.option.column = this.quoteColumn;
+      return this.quoteFormOption.option;
+    }
+  },
   methods: {
     closeDialog() {
       this.$emit('close-field-dialog');
@@ -89,7 +111,7 @@ export default {
       this.form.suppliers.splice(index, 1);
     },
     handleSubmit() {
-      if (validatenull(this.form.taxRate)) {
+      if (validatenull(this.form.taxRate) && this.queryType === 'RFQ') {
         this.$message.error('请填写税率');
         return;
       }

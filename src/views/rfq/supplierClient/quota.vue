@@ -144,6 +144,8 @@
     </avue-crud>
     <!-- 常规报价 -->
     <quote-dialog
+      :queryType="configurations[detailObj.enquiryType].name"
+      :quoteColumn="quoteColumn"
       :dialogTitle="dialogTitle"
       :field="fieldDialogForm"
       :fieldDialogVisible="quoteVisible"
@@ -206,7 +208,7 @@ import { getAction, postAction, queryQuote } from '@/api/rfq/supplierClient';
 import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
 import history from './history';
 import { validatenull } from '@/util/validate';
-import { dataDicAPI, orgList } from '@/api/rfq/common';
+import { dataDicAPI } from '@/api/rfq/common';
 import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 
 const execMathExpress = require('exec-mathexpress');
@@ -257,7 +259,8 @@ export default {
       ],
       currentEnquiryNumber: '',
       requestTypeDict: [],
-      configurations: {}
+      configurations: {},
+      quoteColumn: []
     };
   },
   async created() {
@@ -318,12 +321,20 @@ export default {
         { slot: true, label: '成本模板', prop: 'costTemplate' },
         { slot: true, label: '含税价', prop: 'priceIncludingTax' },
         { label: '税率', prop: 'taxRate' },
-        { slot: true, label: '不含税价', prop: 'priceExcludingTax' }
+        { slot: true, label: '不含税价', prop: 'priceExcludingTax' },
+        {
+          label: '报价时间',
+          type: 'datetime',
+          format: 'yyyy-MM-dd HH:mm:ss',
+          valueFormat: 'timestamp',
+          prop: 'quoteDate'
+        }
       ];
     },
     handleEnquiryTypeChange(value) {
       if (this.configurations[value]) {
         this.templateRule = this.configurations[value].rule;
+        this.quoteColumn = [];
         const current = this.configurations[value].tableColumns.map((item) => {
           let result = {};
           result.prop = item.prop;
@@ -334,6 +345,7 @@ export default {
           result.dicData = item.dicData;
           result.dicUrl = item.dicUrl;
           result.dicMethod = item.dicMethod;
+          if (item.saleEdit) this.quoteColumn.push(result);
           return result;
         });
         this.initColumns();
@@ -371,23 +383,23 @@ export default {
     },
     async tableData(data) {
       // 组织列表（公司）
-      orgList().then((res) => {
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'companyCode') {
-            return {
-              ...item,
-              dicData: res.data.pageData.rows.map((item) => {
-                return {
-                  ...item,
-                  value: item.orgId,
-                  label: item.orgId
-                };
-              })
-            };
-          }
-          return item;
-        });
-      });
+      // orgList().then((res) => {
+      //   this.dialogOption.column = this.dialogOption.column.map((item) => {
+      //     if (item.prop === 'companyCode') {
+      //       return {
+      //         ...item,
+      //         dicData: res.data.pageData.rows.map((item) => {
+      //           return {
+      //             ...item,
+      //             value: item.orgId,
+      //             label: item.orgId
+      //           };
+      //         })
+      //       };
+      //     }
+      //     return item;
+      //   });
+      // });
       // 公开方式 数据字典
       dataDicAPI('enquiryMethod').then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {
@@ -568,12 +580,13 @@ export default {
     handleQuoteRow(scope) {
       this.dialogTitle = `${scope.row.materialNumber}(${scope.row.materialName})物料报价弹框`;
       if (scope.row.quoteMethod === '0') {
-        this.quoteVisible = true;
         this.fieldDialogForm = {
+          ...scope.row,
           index: scope.index,
           taxRate: scope.row.taxRate,
           remark: scope.row.remark || ''
         };
+        this.quoteVisible = true;
       } else if (scope.row.quoteMethod === '1') {
         this.fieldDialogForm = {
           index: scope.index,
@@ -633,51 +646,53 @@ export default {
     handleSend() {
       let rateResult = true;
       let result = true;
-      this.inquiryListOption.data.forEach((item) => {
-        if (validatenull(item.taxRate)) {
-          rateResult = false;
-        }
-        if (
-          item.noQuoted !== 'N' &&
-          item.quoteMethod === '0' &&
-          (validatenull(item.priceIncludingTax) || validatenull(item.taxRate))
-        ) {
-          // 常规报价
-          result = false;
-        }
-        if (item.noQuoted !== 'N' && item.quoteMethod === '1') {
-          JSON.parse(item.ladderPriceJson).forEach((ladder) => {
-            if (validatenull(ladder.priceIncludingTax) || validatenull(ladder.taxRate)) {
-              result = false;
-            }
-          });
-        }
-        if (item.noQuoted !== 'N' && item.quoteMethod === '2') {
-          const costJson = JSON.parse(item.costConstituteJson);
-          const template = costJson.templateJson;
-          const tabPermission = costJson.permissionJson;
+      if (this.configurations[this.detailObj.enquiryType].name === 'RFQ') {
+        this.inquiryListOption.data.forEach((item) => {
+          if (validatenull(item.taxRate)) {
+            rateResult = false;
+          }
+          if (
+            item.noQuoted !== 'N' &&
+            item.quoteMethod === '0' &&
+            (validatenull(item.priceIncludingTax) || validatenull(item.taxRate))
+          ) {
+            // 常规报价
+            result = false;
+          }
+          if (item.noQuoted !== 'N' && item.quoteMethod === '1') {
+            JSON.parse(item.ladderPriceJson).forEach((ladder) => {
+              if (validatenull(ladder.priceIncludingTax) || validatenull(ladder.taxRate)) {
+                result = false;
+              }
+            });
+          }
+          if (item.noQuoted !== 'N' && item.quoteMethod === '2') {
+            const costJson = JSON.parse(item.costConstituteJson);
+            const template = costJson.templateJson;
+            const tabPermission = costJson.permissionJson;
 
-          let providerData = {};
-          template.forEach((element) => {
-            providerData[element.prop] = element.propData;
-          });
-          Object.keys(tabPermission).forEach((item) => {
-            if (providerData[item]) {
-              if (providerData[item].formData) {
-                Object.keys(providerData[item].formData).forEach((i) => {
-                  if (validatenull(providerData[item].formData[i])) {
+            let providerData = {};
+            template.forEach((element) => {
+              providerData[element.prop] = element.propData;
+            });
+            Object.keys(tabPermission).forEach((item) => {
+              if (providerData[item]) {
+                if (providerData[item].formData) {
+                  Object.keys(providerData[item].formData).forEach((i) => {
+                    if (validatenull(providerData[item].formData[i])) {
+                      result = false;
+                    }
+                  });
+                } else {
+                  if (providerData[item].tableData.length === 0) {
                     result = false;
                   }
-                });
-              } else {
-                if (providerData[item].tableData.length === 0) {
-                  result = false;
                 }
-              }
-            } else result = false;
-          });
-        }
-      });
+              } else result = false;
+            });
+          }
+        });
+      }
       if (!rateResult) {
         this.$message.error('税率不得为空');
         return;
@@ -759,18 +774,23 @@ export default {
     // 行信息 - 常规报价保存
     onSaveForm(form) {
       this.quoteVisible = false;
-      this.$set(
-        this.inquiryListOption.data[form.index],
-        'priceIncludingTax',
-        form.priceIncludingTax
-      );
-      this.$set(this.inquiryListOption.data[form.index], 'taxRate', form.taxRate);
-      this.$set(
-        this.inquiryListOption.data[form.index],
-        'priceExcludingTax',
-        form.priceExcludingTax
-      );
-      this.$set(this.inquiryListOption.data[form.index], 'remark', form.remark);
+      // this.inquiryListOption.data[form.index] = form;
+      Object.keys(form).map((item) => {
+        console.log('item', item, form[item]);
+        this.$set(this.inquiryListOption.data[form.index], item, form[item]);
+      });
+      // this.$set(
+      //   this.inquiryListOption.data[form.index],
+      //   'priceIncludingTax',
+      //   form.priceIncludingTax
+      // );
+      // this.$set(this.inquiryListOption.data[form.index], 'taxRate', form.taxRate);
+      // this.$set(
+      //   this.inquiryListOption.data[form.index],
+      //   'priceExcludingTax',
+      //   form.priceExcludingTax
+      // );
+      // this.$set(this.inquiryListOption.data[form.index], 'remark', form.remark);
     },
     // 行信息 - 阶梯报价保存
     onSaveLadderForm(form) {

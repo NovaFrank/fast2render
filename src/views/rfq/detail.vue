@@ -373,7 +373,7 @@ export default {
   watch: {
     configButtons(newVal) {
       this.headerButtons = this.headerButtons.map((item) => {
-        const index = newVal.findIndex((n) => n.name === item.action);
+        const index = newVal.findIndex((n) => n.name === item.action || n.label === item.text);
         if (index === -1) return item;
         item.power = newVal[index].display;
         return item;
@@ -485,12 +485,6 @@ export default {
           this.headerButtons.splice(index, 1);
         }
       }
-      this.headerButtons = this.headerButtons.map((item) => {
-        const index = this.configButtons.findIndex((n) => n.name === item.action);
-        if (index === -1) return item;
-        item.power = this.configButtons[index].display;
-        return item;
-      });
       if (!validatenull(newVal.enquiryType) && this.configurations[newVal.enquiryType]) {
         this.handleEnquiryTypeChange(newVal.enquiryType);
       }
@@ -563,7 +557,7 @@ export default {
       }
       // 组织列表（公司）
       orgList().then((res) => {
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
+        this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
           if (item.prop === 'companyCode') {
             return {
               ...item,
@@ -717,6 +711,13 @@ export default {
             { label: '已关闭', value: '6' }
           ]
         },
+        {
+          label: '报价时间',
+          type: 'datetime',
+          format: 'yyyy-MM-dd HH:mm:ss',
+          valueFormat: 'timestamp',
+          prop: 'quoteDate'
+        },
         { slot: true, label: '税率', prop: 'taxRate' },
         { slot: true, label: '含税价', prop: 'priceIncludingTax' },
         { slot: true, label: '不含税价', prop: 'priceExcludingTax' },
@@ -772,7 +773,15 @@ export default {
           }
         });
         this.configButtons = configuration.buttons;
-        console.log('buttons', this.configButtons);
+
+        this.headerButtons = this.headerButtons.map((item) => {
+          const index = this.configButtons.findIndex(
+            (n) => n.name === item.action || n.label === item.text
+          );
+          if (index === -1) return item;
+          item.power = this.configButtons[index].display;
+          return item;
+        });
       }
     },
     getPriceIndex(row, column) {

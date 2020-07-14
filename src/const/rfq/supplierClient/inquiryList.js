@@ -78,6 +78,13 @@ export default {
         label: '是否报价',
         type: 'switch',
         prop: 'quote'
+      },
+      {
+        label: '报价时间',
+        type: 'datetime',
+        format: 'yyyy-MM-dd HH:mm:ss',
+        valueFormat: 'timestamp',
+        prop: 'quoteDate'
       }
     ]
   }

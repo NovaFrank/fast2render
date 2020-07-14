@@ -117,7 +117,7 @@ import { validatenull } from '@/util/validate';
 
 import costTemplateDialog from '@/components/views/costTemplateDialog';
 import { ElsTemplateConfigService } from '@/api/templateConfig.js';
-import { dataDicAPI } from '@/api/rfq/common';
+// import { dataDicAPI } from '@/api/rfq/common';
 
 const execMathExpress = require('exec-mathexpress');
 

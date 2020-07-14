@@ -341,7 +341,7 @@ export default {
         }
       }
       const editDis = newVal.auditStatus !== '2' && newVal.auditStatus !== '0';
-      this.formOption.detail = editDis;
+      this.formOption.detail = newVal.auditStatus === '2' || newVal.auditStatus === '0';
       this.inquiryListOption.option.menu = editDis;
       this.inquiryListOption.option.header = editDis;
 

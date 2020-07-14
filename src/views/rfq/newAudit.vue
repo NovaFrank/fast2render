@@ -337,19 +337,6 @@ export default {
           prop: 'enquiryNumber'
         },
         {
-          type: 'input',
-          label: '询价名称',
-          span: 6,
-          prop: 'enquiryDesc'
-        },
-        {
-          type: 'tree',
-          label: '公司代码',
-          span: 6,
-          prop: 'companyCode',
-          valueDefault: ''
-        },
-        {
           type: 'datetime',
           format: 'yyyy-MM-dd HH:mm:ss',
           valueFormat: 'timestamp',

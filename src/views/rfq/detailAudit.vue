@@ -504,7 +504,6 @@ export default {
     initColumns() {
       this.formOption.column = [
         { label: '询价单号', span: 6, prop: 'enquiryNumber', disabled: true },
-        { label: '询价名称', span: 6, prop: 'enquiryDesc', disabled: true },
         {
           type: 'select',
           formslot: true,

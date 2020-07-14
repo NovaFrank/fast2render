@@ -205,7 +205,7 @@ import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 import { DIC } from '@/const/dic';
 
 const validateQuantity = (rule, value, callback) => {
-  if (!validateNumber(value)) {
+  if (!validatenull(value) && !validateNumber(value)) {
     callback(new Error('请输入大于0的小数或整数'));
   } else {
     callback();
@@ -405,19 +405,19 @@ export default {
           span: 6,
           prop: 'enquiryNumber'
         },
-        {
-          type: 'input',
-          label: '询价名称',
-          span: 6,
-          prop: 'enquiryDesc'
-        },
-        {
-          type: 'tree',
-          label: '公司代码',
-          span: 6,
-          prop: 'companyCode',
-          valueDefault: ''
-        },
+        // {
+        //   type: 'input',
+        //   label: '询价名称',
+        //   span: 6,
+        //   prop: 'enquiryDesc'
+        // },
+        // {
+        //   type: 'tree',
+        //   label: '公司代码',
+        //   span: 6,
+        //   prop: 'companyCode',
+        //   valueDefault: ''
+        // },
         {
           type: 'datetime',
           format: 'yyyy-MM-dd HH:mm:ss',
@@ -475,15 +475,15 @@ export default {
           label: '物料编号',
           prop: 'materialNumber',
           formslot: true,
-          disabled: this.purchaseRequest,
-          rules: [{ required: true, message: '请选择物料编号' }]
+          disabled: this.purchaseRequest
+          // rules: [{ required: true, message: '请选择物料编号' }]
         },
         {
           disabled: this.purchaseRequest,
           label: '需求数量',
           prop: 'quantity',
           rules: [
-            { required: true, message: '请填写需求数量', trigger: 'blur' },
+            // { required: true, message: '请填写需求数量', trigger: 'blur' },
             { trigger: 'change', validator: validateQuantity }
           ]
         },
@@ -491,11 +491,11 @@ export default {
           type: 'select',
           label: '税码',
           prop: 'taxCode',
-          disabled: this.templateRule.enquiryPurchaserTax !== true,
-          rules:
-            this.templateRule.enquiryPurchaserTax === true
-              ? [{ required: true, message: '请选择税码', trigger: 'blur' }]
-              : []
+          disabled: this.templateRule.enquiryPurchaserTax !== true
+          // rules:
+          //   this.templateRule.enquiryPurchaserTax === true
+          //     ? [{ required: true, message: '请选择税码', trigger: 'blur' }]
+          //     : []
         },
         {
           label: '税率',
@@ -507,8 +507,8 @@ export default {
           dicMethod: 'get',
           type: 'select',
           label: '报价方式',
-          prop: 'quoteMethod',
-          rules: [{ required: true, message: '请选择报价方式', trigger: 'change' }]
+          prop: 'quoteMethod'
+          // rules: [{ required: true, message: '请选择报价方式', trigger: 'change' }]
         },
         {
           span: 24,
@@ -566,6 +566,13 @@ export default {
             result.disabled = true;
           } else {
             result.disabled = !item.purchaseEdit;
+          }
+          const index = this.dialogOption.column.findIndex((d) => d.prop === result.prop);
+          if (index !== -1) {
+            result = {
+              ...this.dialogOption.column[index],
+              ...result
+            };
           }
           return result;
         });

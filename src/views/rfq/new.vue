@@ -1341,7 +1341,6 @@ export default {
           selectedSupplier.toString()
         );
         const suppliers = selectedSupplier.map((i) => {
-          console.log(i.split('_'));
           return i.split('_')[1];
         });
         this.$set(this.inquiryListOption.data[index], 'accountList', suppliers.toString());

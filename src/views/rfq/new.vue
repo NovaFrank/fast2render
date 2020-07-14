@@ -420,13 +420,6 @@ export default {
           prop: 'enquiryDesc'
         },
         {
-          type: 'tree',
-          label: '公司代码',
-          span: 6,
-          prop: 'companyCode',
-          valueDefault: ''
-        },
-        {
           type: 'datetime',
           format: 'yyyy-MM-dd HH:mm:ss',
           valueFormat: 'timestamp',
@@ -471,6 +464,13 @@ export default {
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
+        {
+          type: 'tree',
+          label: '公司代码',
+          span: 6,
+          prop: 'companyCode',
+          valueDefault: ''
+        },
         { label: '供应商', prop: 'accountList' }
         // { slot: true, label: '报价方式', prop: 'quoteMethod' },
         // { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
@@ -489,9 +489,10 @@ export default {
         {
           disabled: this.purchaseRequest,
           label: '需求数量',
-          prop: 'quantity'
-          // rules: [{ required: false, validator: validateQuantity }]
+          prop: 'quantity',
+          rules: [{ trigger: 'change', validator: validateQuantity }]
         },
+        { type: 'tree', label: '公司代码', prop: 'companyCode' },
         {
           type: 'select',
           label: '税码',
@@ -611,7 +612,6 @@ export default {
           }
         });
         this.configButtons = configuration.buttons;
-        console.log('buttons', this.configButtons);
       } else {
         this.initColumns();
       }
@@ -667,7 +667,7 @@ export default {
       }
       // 组织列表（公司）
       orgList().then((res) => {
-        this.formOption.column = this.formOption.column.map((item) => {
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
           if (item.prop === 'companyCode') {
             return {
               ...item,
@@ -747,6 +747,7 @@ export default {
                   value: `${item.elsAccount}_${item.name}`
                 };
               }),
+              type: 'tree',
               ...item
             };
           }
@@ -967,7 +968,7 @@ export default {
                   quoteEndTime: this.form.quoteEndTime,
                   enquiryType: this.form.enquiryType,
                   enquiryDesc: this.form.enquiryDesc,
-                  companyCode: this.form.companyCode,
+                  // companyCode: this.form.companyCode,
                   enquiryMethod: this.form.enquiryMethod,
                   canSeeRule: this.form.canSeeRule,
                   passWord: this.form.passWord,
@@ -1085,7 +1086,7 @@ export default {
                   quoteEndTime: this.form.quoteEndTime,
                   enquiryType: this.form.enquiryType,
                   enquiryDesc: this.form.enquiryDesc,
-                  companyCode: this.form.companyCode,
+                  // companyCode: this.form.companyCode,
                   enquiryMethod: this.form.enquiryMethod || '',
                   itemList
                 };
@@ -1153,7 +1154,7 @@ export default {
               quoteEndTime: this.form.quoteEndTime,
               enquiryType: this.form.enquiryType,
               enquiryDesc: this.form.enquiryDesc,
-              companyCode: this.form.companyCode,
+              // companyCode: this.form.companyCode,
               enquiryMethod: this.form.enquiryMethod,
               canSeeRule: this.form.canSeeRule,
               passWord: this.form.passWord,

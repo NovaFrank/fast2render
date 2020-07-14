@@ -285,7 +285,6 @@ import tabAuditOption from '@/const/rfq/newAndView/detailTabsAudit';
 import inquiryListOption from '@/const/rfq/newAndView/detailInquiryList';
 import auditListOption from '@/const/rfq/newAndView/auditListOption';
 import filesOption from '@/const/rfq/newAndView/fileList';
-
 import { getUserInfo, compare } from '@/util/utils.js';
 import {
   purchaseEnquiryAction,
@@ -295,7 +294,7 @@ import {
   openPassWord,
   auditHisList
 } from '@/api/rfq';
-import { dataDicAPI, supplierMasterListAction } from '@/api/rfq/common';
+import { orgList, dataDicAPI, supplierMasterListAction } from '@/api/rfq/common';
 import history from './history';
 import { validatenull } from '@/util/validate';
 import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
@@ -562,6 +561,24 @@ export default {
         }
         this.configurations = configurations;
       }
+      // 组织列表（公司）
+      orgList().then((res) => {
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
+          if (item.prop === 'companyCode') {
+            return {
+              ...item,
+              dicData: res.data.pageData.rows.map((item) => {
+                return {
+                  ...item,
+                  value: item.orgId,
+                  label: item.orgId
+                };
+              })
+            };
+          }
+          return item;
+        });
+      });
       // 公开方式 数据字典
       dataDicAPI('enquiryMethod').then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {
@@ -671,6 +688,7 @@ export default {
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
+        { type: 'tree', label: '公司代码', prop: 'companyCode' },
         // { slot: true, label: '报价方式', prop: 'quoteMethod' },
         // { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
         // { slot: true, label: '成本模板', prop: 'costTemplate' },
@@ -1059,7 +1077,7 @@ export default {
         quoteEndTime: this.detailObj.quoteEndTime,
         enquiryType: this.detailObj.enquiryType,
         enquiryDesc: this.detailObj.enquiryDesc,
-        companyCode: this.detailObj.companyCode,
+        // companyCode: this.detailObj.companyCode,
         enquiryMethod: this.detailObj.enquiryMethod || '',
         itemList: this.inquiryListOption.data
       };

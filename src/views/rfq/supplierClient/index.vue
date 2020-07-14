@@ -56,7 +56,7 @@ import tabOption from '@/const/rfq/supplierClient/navTabs';
 import tableOption from '@/const/rfq/supplierClient/index';
 import { postAction } from '@/api/rfq/supplierClient';
 import { getSupplierInfo } from '@/util/utils.js';
-import { dataDicAPI } from '@/api/rfq/common';
+// import { dataDicAPI } from '@/api/rfq/common';
 import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 
 export default {
@@ -186,7 +186,7 @@ export default {
       });
 
       ElsTemplateConfigService.find({
-        elsAccount: '307000',
+        elsAccount: '1150000',
         businessModule: 'enquiry',
         currentVersionFlag: 'Y'
       }).then((res) => {

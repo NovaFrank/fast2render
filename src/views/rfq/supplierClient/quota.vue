@@ -206,7 +206,7 @@ import { getAction, postAction, queryQuote } from '@/api/rfq/supplierClient';
 import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
 import history from './history';
 import { validatenull } from '@/util/validate';
-import { dataDicAPI } from '@/api/rfq/common';
+import { dataDicAPI, orgList } from '@/api/rfq/common';
 import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 
 const execMathExpress = require('exec-mathexpress');
@@ -313,6 +313,7 @@ export default {
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
+        { type: 'tree', label: '公司代码', prop: 'companyCode' },
         { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
         { slot: true, label: '成本模板', prop: 'costTemplate' },
         { slot: true, label: '含税价', prop: 'priceIncludingTax' },
@@ -350,6 +351,7 @@ export default {
         const fieldColumns = this.configurations[value].fieldColumns;
         fieldColumns.forEach((item) => {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
+            console.log('this.configurations[value]', item);
             this.formOption.column.push({
               span: item.span || 6,
               ...item,
@@ -368,6 +370,24 @@ export default {
       });
     },
     async tableData(data) {
+      // 组织列表（公司）
+      orgList().then((res) => {
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
+          if (item.prop === 'companyCode') {
+            return {
+              ...item,
+              dicData: res.data.pageData.rows.map((item) => {
+                return {
+                  ...item,
+                  value: item.orgId,
+                  label: item.orgId
+                };
+              })
+            };
+          }
+          return item;
+        });
+      });
       // 公开方式 数据字典
       dataDicAPI('enquiryMethod').then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {
@@ -425,7 +445,7 @@ export default {
       //   this.quoteMethodData = res.data;
       // });
       const res = await ElsTemplateConfigService.find({
-        elsAccount: this.elsAccount || '307000',
+        elsAccount: '1150000',
         businessModule: 'enquiry',
         currentVersionFlag: 'Y'
       });
@@ -440,6 +460,7 @@ export default {
             if (json.fieldJson.sale[item].display) {
               field.push({
                 prop: item,
+                label: json.fieldJson.sale[item].label || json.fieldJson.purchase[item].label,
                 ...json.fieldJson.sale[item]
               });
             }

@@ -198,7 +198,7 @@ export default {
       });
 
       ElsTemplateConfigService.find({
-        elsAccount: '307000',
+        elsAccount: this.elsAccount,
         businessModule: 'enquiry',
         currentVersionFlag: 'Y'
       }).then((res) => {

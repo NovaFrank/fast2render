@@ -21,6 +21,7 @@
       </template>
       <template slot="enquiryType">
         <el-select
+          :disabled="form.auditStatus === '2' || form.auditStatus === '0'"
           v-model="form.enquiryType"
           @change="handleEnquiryTypeChange"
           filterable
@@ -332,7 +333,7 @@ export default {
         }
       }
       const editDis = newVal.auditStatus !== '2' && newVal.auditStatus !== '0';
-      this.formOption.detail = editDis;
+      this.formOption.disabled = newVal.auditStatus === '2' || newVal.auditStatus === '0';
       this.inquiryListOption.option.menu = editDis;
       this.inquiryListOption.option.header = editDis;
 
@@ -604,7 +605,6 @@ export default {
             });
           }
         });
-        console.log('buttons', value, configuration.buttons);
       } else {
         this.initColumns();
       }

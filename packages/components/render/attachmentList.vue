@@ -61,6 +61,9 @@
                 </el-link>
               </div>
             </template>
+            <template slot="annexType" slot-scope="{ row }">
+              <span class="annexType" v-if="row.isRequired === 'Y'"></span>{{ row.annexType }}
+            </template>
           </avue-crud>
         </div>
       </template>
@@ -72,6 +75,7 @@
 import uploadApi from '../../lib/api/upload';
 import { formatDate } from '../../lib/utils'; // , renderSize
 import { validateNull } from '../../lib/validate';
+import { getUserInfo } from '../../lib/auth';
 
 export default {
   name: 'AttachmentList',
@@ -155,10 +159,27 @@ export default {
           delBtn: true,
           cancelBtn: false,
           showSummary: false,
+          rowKey: 'businessItemId',
           column: [
             {
               label: '文件',
               prop: 'fileAction',
+              slot: true
+            },
+            {
+              label: '是否启用有效期',
+              prop: 'isValidity',
+              hide: true
+            },
+            {
+              label: '文件类型',
+              prop: 'annexType',
+              type: 'select',
+              span: 8,
+              dicName: 'annex-type',
+              datatype: 'remoteDic',
+              orderIndex: 0,
+              order: 1,
               slot: true
             }
           ]
@@ -179,6 +200,22 @@ export default {
               label: '文件',
               prop: 'fileAction',
               slot: true
+            },
+            {
+              label: '是否启用有效期',
+              prop: 'isValidity',
+              hide: true
+            },
+            {
+              label: '文件类型',
+              prop: 'annexType',
+              type: 'select',
+              span: 8,
+              dicName: 'annex-type',
+              datatype: 'remoteDic',
+              orderIndex: 0,
+              order: 1,
+              slot: true
             }
           ]
         };
@@ -187,107 +224,19 @@ export default {
   },
   data() {
     return {
+      currentElsAccount: '',
       dome: '',
       showUpdate: true,
       uploadRow: null,
       fileList: [],
       businessId: '',
-      uploader: null,
-      fileTypeDic: [
-          {
-            label: '营业执照',
-
-            value: '营业执照'
-          },
-
-          {
-            label: '法人代表证明',
-
-            value: '法人代表证明'
-          },
-
-          {
-            label: '组织机构代码证',
-
-            value: '组织机构代码证'
-          },
-
-          {
-            label: '税务登记证',
-
-            value: '税务登记证'
-          },
-
-          {
-            label: '银行开户证明',
-
-            value: '银行开户证明'
-          },
-
-          {
-            label: '银行资信证明',
-
-            value: '银行资信证明'
-          },
-
-          {
-            label: '经营许可证',
-
-            value: '经营许可证'
-          },
-
-          {
-            label: '生产许可证',
-
-            value: '生产许可证'
-          },
-
-          {
-            label: '质量认证',
-
-            value: '质量认证'
-          },
-
-          {
-            label: '产品认证',
-
-            value: '产品认证'
-          },
-
-          {
-            label: '环境认证',
-
-            value: '环境认证'
-          },
-
-          {
-            label: '制造商授权书',
-
-            value: '制造商授权书'
-          },
-
-          {
-            label: '代理经销认证',
-
-            value: '代理经销认证'
-          },
-
-          {
-            label: '进出口企业资格证',
-
-            value: '进出口企业资格证'
-          },
-
-          {
-            label: '其他',
-
-            value: '其他'
-          }
-        ]
+      uploader: null
     };
   },
   created() {},
   mounted() {
+    const currentUserInfo = getUserInfo();
+    this.currentElsAccount = currentUserInfo.elsAccount;
     // this.initWebUpload();
     if (!validateNull(this.id)) {
       this.businessId = this.id;
@@ -310,6 +259,9 @@ export default {
     },
     attachmentTemplate() {
       this.initData();
+    },
+    fileList(newVal) {
+      console.log(newVal);
     }
   },
   methods: {
@@ -426,13 +378,13 @@ export default {
         const reader = new FileReader();
         let fileResult = '';
         reader.readAsDataURL(file); // 开始转
-        reader.onload = function() {
+        reader.onload = function () {
           fileResult = reader.result;
         }; // 转 失败
-        reader.onerror = function(error) {
+        reader.onerror = function (error) {
           reject(error);
         }; // 转 结束  咱就 resolve 出去
-        reader.onloadend = function() {
+        reader.onloadend = function () {
           resolve(fileResult);
         };
       });
@@ -471,18 +423,33 @@ export default {
         // businessItemId 根据该值判断 替换或直接push
         const itemIds = this.fileList.map((item) => item.businessItemId);
         this.attachmentTemplate.forEach((item) => {
+          // item.isValidity = true; // TODO:
           if (itemIds.includes(item.businessItemId)) {
             const index = this.fileList.findIndex(
               (file) => file.businessItemId === item.businessItemId
             );
+            const i = this.fileList[index];
+            item.isValidity === 'Y' && this.readonly === false
+              ? (i.$cellEdit = true)
+              : (i.$cellEdit = false);
+            i.isValidity = validateNull(item.isValidity) ? false : item.isValidity;
+            i.startValidity = validateNull(item.startValidity) ? '' : item.startValidity;
+            i.endValidity = validateNull(item.endValidity) ? '' : item.endValidity;
             this.fileList[index] = {
               ...item,
-              ...this.fileList[index]
+              ...i
             };
           } else {
+            item.isValidity === 'Y' && this.readonly === false
+              ? (item.$cellEdit = true)
+              : (item.$cellEdit = false);
+            // item.isValidity = validateNull(item.isValidity) ? false : item.isValidity;
+            item.startValidity = validateNull(item.startValidity) ? '' : item.startValidity;
+            item.endValidity = validateNull(item.endValidity) ? '' : item.endValidity;
             this.fileList.push(item);
           }
         });
+        console.log('this.fileList', this.fileList);
       });
     },
     handleDelete(row, index) {
@@ -661,3 +628,11 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.annexType::after {
+  content: '*';
+  color: #f56c6c;
+  margin-right: 4px;
+}
+</style>

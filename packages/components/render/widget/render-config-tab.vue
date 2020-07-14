@@ -9,7 +9,16 @@
             :name="subItem.prop"
             :key="subItem.prop"
           >
-            <slot :name="subItem.prop">
+            <slot
+              :name="subItem.prop + '-header'"
+              :dataSource="subItem.prop"
+              :permission="newPermission[subItem.prop]"
+            ></slot>
+            <slot
+              :name="subItem.prop"
+              :permission="newPermission[subItem.prop]"
+              :dataSource="subItem.prop"
+            >
               <fast2-block-provider
                 :option="subItem.option"
                 :version="subItem.option ? null : subItem.version"
@@ -31,9 +40,12 @@
                 </template>
               </fast2-block-provider>
             </slot>
+            <slot :name="subItem.prop + '-footer'" :dataSource="subItem.prop"></slot>
           </el-tab-pane>
           <el-tab-pane :label="subItem.label" v-else :name="subItem.prop" :key="subItem.prop">
+            <slot :name="subItem.prop + '-header'" :dataSource="subItem.prop"></slot>
             <slot :name="subItem.prop"></slot>
+            <slot :name="subItem.prop + '-footer'" :dataSource="subItem.prop"></slot>
           </el-tab-pane>
         </template>
       </el-tabs>
@@ -46,7 +58,8 @@
           v-if="newPermission && newPermission[subItem.prop]"
         >
           <h4 class="block-title">{{ subItem.label }}</h4>
-          <slot :name="subItem.prop">
+          <slot :name="subItem.prop + '-header'" :dataSource="subItem.prop"></slot>
+          <slot :name="subItem.prop" :dataSource="subItem.prop">
             <fast2-block-provider
               :option="subItem.option"
               :version="subItem.option ? null : subItem.version"
@@ -67,9 +80,12 @@
               </template>
             </fast2-block-provider>
           </slot>
+          <slot :name="subItem.prop + '-footer'" :dataSource="subItem.prop"></slot>
         </div>
         <div :label="subItem.label" v-else :name="subItem.prop" :key="subItem.prop">
-          <slot :name="subItem.prop"></slot>
+          <slot :name="subItem.prop + '-header'" :dataSource="subItem.prop"></slot>
+          <slot :name="subItem.prop" :dataSource="subItem.prop"></slot>
+          <slot :name="subItem.prop + '-footer'" :dataSource="subItem.prop"></slot>
         </div>
       </template>
     </template>
@@ -174,9 +190,7 @@ export default {
         });
         return showList;
       } else {
-        // 无权限配置 ，不展示任何tab
-        // return this.newList;
-        return []
+        return this.newList;
       }
     }
   },
@@ -184,6 +198,8 @@ export default {
     console.log('启动tab组件');
     if (this.debugger === 'true') {
       this.newList = zhunru;
+    }
+    if (this.debugger === 'true') {
       this.newPermission = permisssion;
     }
     this.checkInited();

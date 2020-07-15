@@ -612,11 +612,13 @@ export default {
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.purchaseShow;
+          result.hide = !item.purchaseShow;
           result.span = item.span;
           result.type = item.type;
           result.dicData = item.dicData;
           result.dicUrl = item.dicUrl;
           result.dicMethod = item.dicMethod;
+          console.log('result', result);
           return result;
         });
         current.forEach((item) => {

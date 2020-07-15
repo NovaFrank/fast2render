@@ -327,6 +327,7 @@ export default {
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.saleShow;
+          result.hide = !item.saleShow;
           result.span = item.span;
           result.type = item.type;
           result.dicData = item.dicData;
@@ -351,8 +352,8 @@ export default {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
             this.formOption.column.push({
               span: item.span || 6,
-              ...item,
-              disabled: true
+              disabled: item.isDisabled,
+              ...item
             });
           }
         });
@@ -597,6 +598,7 @@ export default {
         console.log(element.priceIncludingTax);
       });
       const params = {
+        ...this.detailObj,
         enquiryNumber: this.currentEnquiryNumber,
         saleItemList: this.inquiryListOption.data
       };
@@ -673,6 +675,7 @@ export default {
           .sendFiles()
           .then((res) => {
             const params = {
+              ...this.detailObj,
               quoteEndTime: this.detailObj.quoteEndTime,
               enquiryNumber: this.currentEnquiryNumber,
               toElsAccount: this.detailObj.toElsAccount,

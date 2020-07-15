@@ -1018,7 +1018,9 @@ export default {
         }).then((res) => {
           if (res.data.statusCode === '200') {
             this.$message.success('已撤回审批');
-            this.$router.go(0);
+            setTimeout(() => {
+              this.$router.go(0);
+            }, 1000);
             return;
           }
           this.$message.error('撤回审批失败');
@@ -1095,7 +1097,9 @@ export default {
                 submitAudit(action, params).then((res) => {
                   if (res.data.statusCode === '200') {
                     this.$message.success('提交审批成功');
-                    this.$router.go(0);
+                    setTimeout(() => {
+                      this.$router.go(0);
+                    }, 1000);
                     return;
                   }
                   this.$message.error('提交审批失败');
@@ -1159,7 +1163,9 @@ export default {
               }
               this.$message.success('保存成功');
               if (this.currentEnquiryNumber) {
-                this.$router.go(0);
+                setTimeout(() => {
+                  this.$router.go(0);
+                }, 1000);
                 return;
               }
               const enquiryNumber = res.data.data.enquiryNumber;

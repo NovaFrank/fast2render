@@ -17,6 +17,7 @@ export default {
     index: true,
     searchLabelWidth: 140,
     searchMenuSpan: 6,
+    searchShow: false,
     selectable: (row, index) => {
       console.log(row, index);
     },

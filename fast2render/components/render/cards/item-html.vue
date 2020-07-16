@@ -10,7 +10,7 @@ export default {
   props: {
     item: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           content: '<p>静态资源占位符号</p>'
         };

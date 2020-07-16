@@ -1075,9 +1075,8 @@ export default {
                   }
                 }
 
-                const action = 'submit';
                 const itemList = this.inquiryListOption.data;
-                const param = {
+                const paramsSave = {
                   ...this.form,
                   enquiryNumber: this.currentEnquiryNumber,
                   elsAccount: this.elsAccount,
@@ -1085,25 +1084,34 @@ export default {
                   enquiryType: this.form.enquiryType,
                   enquiryDesc: this.form.enquiryDesc,
                   companyCode: this.form.companyCode,
-                  enquiryMethod: this.form.enquiryMethod || '',
+                  enquiryMethod: this.form.enquiryMethod,
+                  canSeeRule: this.form.canSeeRule,
+                  passWord: this.form.passWord,
                   itemList
                 };
-                let params = {
-                  elsAccount: this.form.elsAccount,
-                  // toElsAccount: this.detailObj.toElsAccount,
-                  businessType: 'editEnquiryAudit',
-                  businessId: this.form.enquiryNumber,
-                  params: JSON.stringify(param)
-                };
-                submitAudit(action, params).then((res) => {
-                  if (res.data.statusCode === '200') {
-                    this.$message.success('提交审批成功');
-                    setTimeout(() => {
-                      this.$router.go(0);
-                    }, 1000);
+                purchaseEnquiryAction('save', paramsSave).then((res) => {
+                  if (res.data.statusCode !== '200') {
+                    this.$message.error('提交审批失败' + res.data.message);
                     return;
                   }
-                  this.$message.error('提交审批失败');
+
+                  const action = 'submit';
+                  let params = {
+                    elsAccount: this.form.elsAccount,
+                    businessType: 'editEnquiryAudit',
+                    businessId: this.form.enquiryNumber,
+                    params: JSON.stringify(paramsSave)
+                  };
+                  submitAudit(action, params).then((res) => {
+                    if (res.data.statusCode === '200') {
+                      this.$message.success('提交审批成功');
+                      setTimeout(() => {
+                        this.$router.go(0);
+                      }, 1000);
+                      return;
+                    }
+                    this.$message.error('提交审批失败');
+                  });
                 });
               }
             });

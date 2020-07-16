@@ -15,7 +15,7 @@ export default {
   props: {
     item: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           text: '<p>静态资源占位符号</p>',
           headerlevel: 'h1',

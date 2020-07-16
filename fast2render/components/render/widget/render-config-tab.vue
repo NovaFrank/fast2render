@@ -1,14 +1,65 @@
 <template>
   <div class="tabBox">
-    <template v-if="newList && newList.length && tabView">
+    <template v-if="showList && showList.length && tabView">
       <el-tabs v-model="active">
-        <template v-for="subItem in newList">
+        <template v-for="subItem in showList">
           <el-tab-pane
             :label="subItem.label"
-            v-if="newPermission && newPermission[subItem.prop]"
+            v-if="newPermission && subItem.prop && newPermission[subItem.prop]"
             :name="subItem.prop"
             :key="subItem.prop"
           >
+            <slot
+              :name="subItem.prop + '-header'"
+              :dataSource="subItem.prop"
+              :permission="newPermission[subItem.prop]"
+            ></slot>
+            <slot
+              :name="subItem.prop"
+              :permission="newPermission[subItem.prop]"
+              :dataSource="subItem.prop"
+            >
+              <fast2-block-provider
+                :option="subItem.option"
+                :version="subItem.option ? null : subItem.version"
+              >
+                <template v-slot="component">
+                  <div>
+                    <fast2-component-render
+                      :providerData="tabData[subItem.prop]"
+                      :list="component.list"
+                      :ref="subItem.prop"
+                      :readOnly="readOnly"
+                      :addInCell="addInCell"
+                      :inTab="true"
+                      :permission="newPermission[subItem.prop]"
+                      :dataSource="subItem.prop"
+                      v-on="$listeners"
+                    ></fast2-component-render>
+                  </div>
+                </template>
+              </fast2-block-provider>
+            </slot>
+            <slot :name="subItem.prop + '-footer'" :dataSource="subItem.prop"></slot>
+          </el-tab-pane>
+          <el-tab-pane :label="subItem.label" v-else :name="subItem.prop" :key="subItem.prop">
+            <slot :name="subItem.prop + '-header'" :dataSource="subItem.prop"></slot>
+            <slot :name="subItem.prop"></slot>
+            <slot :name="subItem.prop + '-footer'" :dataSource="subItem.prop"></slot>
+          </el-tab-pane>
+        </template>
+      </el-tabs>
+    </template>
+    <template v-if="showList && showList.length && !tabView">
+      <template v-for="subItem in showList">
+        <div
+          class="tab-block"
+          :key="subItem.prop"
+          v-if="newPermission && newPermission[subItem.prop]"
+        >
+          <h4 class="block-title">{{ subItem.label }}</h4>
+          <slot :name="subItem.prop + '-header'" :dataSource="subItem.prop"></slot>
+          <slot :name="subItem.prop" :dataSource="subItem.prop">
             <fast2-block-provider
               :option="subItem.option"
               :version="subItem.option ? null : subItem.version"
@@ -20,39 +71,21 @@
                     :list="component.list"
                     :ref="subItem.prop"
                     :readOnly="readOnly"
+                    :addInCell="addInCell"
                     :permission="newPermission[subItem.prop]"
                     :dataSource="subItem.prop"
                     v-on="$listeners"
-                  >
-                  </fast2-component-render></div></template
-            ></fast2-block-provider> </el-tab-pane></template
-      ></el-tabs>
-    </template>
-    <template v-if="newList && newList.length && !tabView">
-      <template v-for="subItem in newList">
-        <div
-          class="tab-block"
-          :key="subItem.prop"
-          v-if="newPermission && newPermission[subItem.prop]"
-        >
-          <h4 class="block-title">{{ subItem.label }}</h4>
-          <fast2-block-provider
-            :option="subItem.option"
-            :version="subItem.option ? null : subItem.version"
-          >
-            <template v-slot="component">
-              <div>
-                <fast2-component-render
-                  :providerData="tabData[subItem.prop]"
-                  :list="component.list"
-                  :ref="subItem.prop"
-                  :readOnly="readOnly"
-                  :permission="newPermission[subItem.prop]"
-                  :dataSource="subItem.prop"
-                  v-on="$listeners"
-                >
-                </fast2-component-render></div></template
-          ></fast2-block-provider>
+                  ></fast2-component-render>
+                </div>
+              </template>
+            </fast2-block-provider>
+          </slot>
+          <slot :name="subItem.prop + '-footer'" :dataSource="subItem.prop"></slot>
+        </div>
+        <div :label="subItem.label" v-else :name="subItem.prop" :key="subItem.prop">
+          <slot :name="subItem.prop + '-header'" :dataSource="subItem.prop"></slot>
+          <slot :name="subItem.prop" :dataSource="subItem.prop"></slot>
+          <slot :name="subItem.prop + '-footer'" :dataSource="subItem.prop"></slot>
         </div>
       </template>
     </template>
@@ -79,12 +112,16 @@ export default {
       }
     },
     debugger: {
-      type: String,
-      default: 'false'
+      type: Boolean,
+      default: false
     },
     readOnly: {
       type: Boolean,
       default: false
+    },
+    addInCell: {
+      type: Boolean,
+      default: true
     },
     tabView: {
       type: Boolean,
@@ -119,18 +156,14 @@ export default {
     list: {
       handler(val) {
         this.newList = val;
-        if (this.newList[0]) {
-          this.active = this.newList[0].prop;
-        }
-        // this.$emit('design-update', this.editData);
       },
       deep: true,
       immediate: true
     },
+
     tabPermission: {
       handler(val) {
         this.newPermission = val;
-        // this.$emit('design-update', this.editData);
       },
       deep: true,
       immediate: true
@@ -138,14 +171,27 @@ export default {
   },
   computed: {
     tabData() {
-      this.newList.map((item) => {
-        if (!this.providerData[item.prop]) {
-          this.providerData[item.prop] = {
-            tableData: []
-          };
-        }
-      });
+      if (!this.readOnly) {
+        this.newList.map((item) => {
+          if (!this.providerData[item.prop]) {
+            this.providerData[item.prop] = {
+              tableData: []
+            };
+          }
+        });
+      }
       return this.providerData;
+    },
+    showList() {
+      const list = Object.keys(this.newPermission);
+      if (this.newList.length && list.length) {
+        const showList = this.newList.filter((item) => {
+          return !!this.newPermission[item.prop];
+        });
+        return showList;
+      } else {
+        return this.newList;
+      }
     }
   },
   mounted() {
@@ -156,8 +202,22 @@ export default {
     if (this.debugger === 'true') {
       this.newPermission = permisssion;
     }
-    if (this.newList[0]) {
-      this.active = this.newList[0].prop;
+    this.checkInited();
+  },
+  methods: {
+    checkInited() {
+      setTimeout(() => {
+        const exist = this.showList.find((item) => {
+          return item.prop === this.active;
+        });
+        if (!exist) {
+          if (this.showList[0]) {
+            this.active = this.showList[0].prop;
+          } else {
+            this.checkInited();
+          }
+        }
+      }, 1000);
     }
   }
 };

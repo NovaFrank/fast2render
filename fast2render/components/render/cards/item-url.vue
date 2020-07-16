@@ -13,7 +13,7 @@ export default {
   props: {
     item: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           labelPosition: 'left',
           label: '标签',
@@ -25,7 +25,7 @@ export default {
     },
     data: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           value: '动态数值'
         };

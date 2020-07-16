@@ -1,6 +1,7 @@
 import axios from '../axios';
 import { getUserInfo } from '../auth';
-const baseUrl = '/apis';
+import { getApiPath } from '../utils';
+const baseUrl = getApiPath();
 const userInfo = getUserInfo();
 const elsAccount = userInfo.elsAccount;
 const elsSubAccount = userInfo.elsSubAccount;

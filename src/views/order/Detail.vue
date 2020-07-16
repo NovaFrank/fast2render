@@ -147,6 +147,38 @@ export default {
           size: 'small',
           action: 'on-cancel'
         }
+      ],
+      audit3: [
+        {
+          text: '返回',
+          size: 'small',
+          action: 'on-cancel'
+        },
+        {
+          text: '审批节点',
+          type: 'primary',
+          size: 'small',
+          action: 'on-open-flow-dialog'
+        }
+      ],
+      audit4: [
+        {
+          text: '返回',
+          size: 'small',
+          action: 'on-cancel'
+        },
+        {
+          text: '撤回',
+          size: 'small',
+          action: 'on-reset',
+          type: 'primary'
+        },
+        {
+          text: '审批节点',
+          type: 'primary',
+          size: 'small',
+          action: 'on-open-flow-dialog'
+        }
       ]
     };
   },
@@ -231,7 +263,9 @@ export default {
       this.auditStatus = resp.data.data.auditStatus;
       if (this.auditStatus === '2') {
         this.headerButtons = this.audit1;
-      } else if (this.auditStatus === '0') {
+      } else if (this.auditStatus === '0' || this.auditStatus === '3') {
+        this.headerButtons = this.audit2;
+      } else if (this.auditStatus === '1') {
         this.headerButtons = this.audit2;
       }
       this.formOption.obj = resp.data.data;
@@ -251,19 +285,11 @@ export default {
       sessionStorage.setItem('orderItemArr', JSON.stringify(orderItemArr));
       if (resp.data.data.flowId) {
         this.flowId = resp.data.data.flowId;
-        console.log('flowId', this.flowId);
-        this.audit1.push({
-          text: '审批节点',
-          type: 'primary',
-          size: 'small',
-          action: 'on-open-flow-dialog'
-        });
-        this.audit2.push({
-          text: '审批节点',
-          type: 'primary',
-          size: 'small',
-          action: 'on-open-flow-dialog'
-        });
+        if (this.auditStatus === '2') {
+          this.headerButtons = this.audit4;
+        } else if (this.auditStatus === '0') {
+          this.headerButtons = this.audit3;
+        }
         let content = {
           flowId: resp.data.data.flowId,
           businessType: 'orderAudit'

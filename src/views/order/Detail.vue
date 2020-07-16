@@ -7,6 +7,7 @@
       :buttons="headerButtons"
       @on-cancel="handleCancel"
       @on-reset="handleReset"
+      @on-open-flow-dialog="handleOpenFlowDialog"
     ></form-header>
     <!-- <avue-detail ref="form" v-model="formObj" :option="formOption"></avue-detail> -->
     <div class="avue-form-box">
@@ -126,6 +127,7 @@ export default {
       crudOption: {},
       headerButtons: [],
       rootProcessId: '',
+      flowId: '',
       audit1: [
         {
           text: '返回',
@@ -248,6 +250,20 @@ export default {
       });
       sessionStorage.setItem('orderItemArr', JSON.stringify(orderItemArr));
       if (resp.data.data.flowId) {
+        this.flowId = resp.data.data.flowId;
+        console.log('flowId', this.flowId);
+        this.audit1.push({
+          text: '审批节点',
+          type: 'primary',
+          size: 'small',
+          action: 'on-open-flow-dialog'
+        });
+        this.audit2.push({
+          text: '审批节点',
+          type: 'primary',
+          size: 'small',
+          action: 'on-open-flow-dialog'
+        });
         let content = {
           flowId: resp.data.data.flowId,
           businessType: 'orderAudit'
@@ -427,6 +443,15 @@ export default {
     },
     materialDialogOpen() {
       this.dialogVisible = true;
+    },
+    handleOpenFlowDialog() {
+      const event = {
+        name: 'openFlowDialog',
+        props: {
+          flowId: this.flowId
+        }
+      };
+      window.parent.postMessage(event, '*');
     },
     async materialDialogSave(selectColumns) {
       if (selectColumns.length !== 0) {

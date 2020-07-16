@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-input v-model="dialogValue" :readonly="true">
-      <i slot="suffix" class=" el-input_icon el-icon-search pointer" @click="dialogOpen"></i>
+      <i slot="suffix" class="el-input_icon el-icon-search pointer" @click="dialogOpen"></i>
     </el-input>
     <SelectDialogTable
       ref="selectDialog"

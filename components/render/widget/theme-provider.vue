@@ -1,15 +1,9 @@
 <template>
   <div>
     <div v-if="spanMethodData.prop">
-      <slot
-        :inited="inited"
-        :option="finalOption"
-        :data="myData"
-        :spanMethod="spanMethod"
-        :reload="reload"
-      ></slot>
+      <slot :option="finalOption" :data="myData" :spanMethod="spanMethod" :reload="reload"></slot>
     </div>
-    <div>
+    <div v-else>
       <slot :option="finalOption" :data="myData" :reload="reload"></slot>
     </div>
   </div>
@@ -22,6 +16,7 @@ import SmallFormTemplate from '../../../lib/form-small';
 import { mySpanMethod, zipLayout } from '../../../lib/utils.js';
 import { getStore, setStore } from '../../../lib/store.js';
 import { loadBlockConfig, handleColumn } from '../../../lib/blockHander.js';
+import { validateNull } from '../../../lib/validate';
 
 import _ from 'lodash';
 
@@ -48,15 +43,23 @@ export default {
       type: Boolean,
       default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
     },
+    addInCell: {
+      type: Boolean,
+      default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
+    },
+    inTab: {
+      type: Boolean,
+      default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
+    },
     rowPermission: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     },
     spanMethodData: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           row: [2, 3],
           prop: null,
@@ -66,13 +69,13 @@ export default {
     },
     option: {
       type: Object,
-      default: function() {
+      default: function () {
         return { column: [] };
       }
     },
     data: {
       type: Array,
-      default: function() {
+      default: function () {
         return [];
       }
     }
@@ -80,8 +83,14 @@ export default {
   data() {
     return {
       finalOption: {},
-      reload: false, // 是否重新加载完成
-      optionHash: ''
+      reload: false,
+      optionHash: '',
+      remoteApi: [
+        {
+          dicUrl: '',
+          dicMethon: ''
+        }
+      ]
     };
   },
   watch: {
@@ -95,27 +104,28 @@ export default {
     // 单点监测 ，避免多次触发
     hash: {
       handler(val) {
-        this.inited = false;
         this.finalOption = getStore(val);
+        this.finalOption = null;
         if (!this.finalOption) {
           this.handlerChange();
         } else {
           this.reload = true;
         }
-        console.log('参数变化');
       },
       immediate: true // 刷新加载 立马触发一次handler
     }
   },
   computed: {
-    hash: function() {
-      let { version, theme, type, optionHash, rowPermission } = this;
-      let fullText = zipLayout(JSON.stringify({ version, theme, type, optionHash, rowPermission }));
-      let str = fullText.substring(fullText.length - 32);
-      let obj = (version || 'local') + '-' + str;
+    hash: function () {
+      const { version, theme, type, optionHash, rowPermission } = this;
+      const fullText = zipLayout(
+        JSON.stringify({ version, theme, type, optionHash, rowPermission })
+      );
+      const str = fullText.substring(fullText.length - 32);
+      const obj = (version || 'local') + '-' + str;
       return obj;
     },
-    myData: function() {
+    myData: function () {
       if (this.spanMethodData.prop) {
         return Object.values(_.groupBy(this.data, this.spanMethodData.prop)).flat();
       }
@@ -128,34 +138,73 @@ export default {
       this.version ? this.mergeRemoteOption() : this.mergeLocalOption();
     },
     setFinalOption(option) {
-      // 最后统一规则
-      option.detail = this.readOnly;
-      if (this.type !== 'crud' && this.hasRowPermission) {
-        // option.menuBtn = !this.readOnly;
-        //  option.menu = !this.readOnly;
+      if (this.readOnly) {
+        option.detail = true;
+        option.menu = false;
       }
-
       if (this.hasRowPermission) {
         this.finalOption = this.filterColumWithRule(option, this.rowPermission);
       } else {
         this.finalOption = option;
       }
+      if (this.inTab && this.type !== 'crud') {
+        this.finalOption.menuBtn = false;
+        this.finalOption.menu = false;
+      }
+      if (this.addInCell && this.type === 'crud') {
+        this.finalOption.editBtn = false;
+        this.finalOption.cellBtn = true;
+        this.finalOption.saveBtn = true;
+      }
+      if (this.readOnly) {
+        this.finalOption.detail = true;
+        this.finalOption.menu = false;
+      }
       setStore({ name: this.hash, content: this.finalOption });
       this.reload = true;
-      console.log('输出配置', option);
     },
     filterColumWithRule(option, rowPermission) {
-      let newColumn = [];
+      const newColumn = [];
       option.column.map((item) => {
-        if (rowPermission[item.prop]) {
-          let isDisplay = rowPermission[item.prop].display === 'true';
-          console.log(rowPermission[item.prop], isDisplay);
-          if (isDisplay) {
-            item.readonly = rowPermission[item.prop].readonly;
+        const itemProp = rowPermission[item.prop];
+        if (itemProp) {
+          if (itemProp.display && itemProp.display !== false) {
+            let label = item.label;
+            if (itemProp.displayName) {
+              item.label = itemProp.displayName;
+              label = itemProp.displayName;
+            }
+            const isRequired = !!itemProp.isRequired;
+            if (isRequired) {
+              const rule = {
+                required: true,
+                message: '请输入' + label,
+                trigger: 'blur'
+              };
+              if (item.rules) {
+                item.rules.push(rule);
+              } else {
+                item.rules = [rule];
+              }
+            }
+            if (itemProp.isDisabled || itemProp.readonly) {
+              item.disabled = 'disabled';
+              item.cell = false;
+              item.rules = [];
+            } else {
+              item.cell = true;
+            }
+            item.display = true;
             newColumn.push(item);
           }
         } else {
-          // newColumn.push(item);
+          const isLocalDefine = this.option.column.find((subitem) => {
+            return subitem.prop === item.prop;
+          });
+
+          if (!validateNull(isLocalDefine)) {
+            newColumn.push(item);
+          }
         }
       });
       option.column = newColumn;
@@ -163,15 +212,15 @@ export default {
     },
     // 只有本地配置的处理方法
     mergeLocalOption() {
-      let localOption = this.getIntiOption();
+      const localOption = this.getInitOption();
       localOption.column = this.handlerColumn(localOption.column);
       this.setFinalOption(localOption);
       this.$forceUpdate();
     },
     // 使用远程配置的处理方法
-    mergeRemoteOption() {
-      let localOption = this.getIntiOption();
-      let remoteOption = loadBlockConfig(this.version, localOption, this.type);
+    async mergeRemoteOption() {
+      const localOption = this.getInitOption();
+      const remoteOption = await loadBlockConfig(this.version, localOption, this.type);
       if (remoteOption) {
         this.setFinalOption(remoteOption);
         this.$forceUpdate();
@@ -182,7 +231,7 @@ export default {
       }
     },
     // 先初始化 本地配置和默认配置
-    getIntiOption() {
+    getInitOption() {
       let localOption;
       if (this.type === 'crud') {
         localOption = this.handlerOption(this.option, this.theme === 'page');
@@ -196,14 +245,13 @@ export default {
       return handleColumn(column);
     },
     handlerOption(option, isBig) {
-      let newOption = JSON.parse(
-        JSON.stringify(Object.assign(isBig ? BigListTemplate : SmallListTemplate, option))
-      );
+      const bigTemp = JSON.parse(JSON.stringify(BigListTemplate));
+      const smallTemp = JSON.parse(JSON.stringify(SmallListTemplate));
+      const newOption = Object.assign(isBig ? bigTemp : smallTemp, option);
       // set option header
       if (!option.addBtn && !option.header) {
         option.header = false;
       }
-
       // set search menu span
       const column = option.column || [];
 
@@ -217,13 +265,13 @@ export default {
       return newOption;
     },
     handlerOptionForm(option, isBig) {
-      let newOption = JSON.parse(
-        JSON.stringify(Object.assign(isBig ? BigFormTemplate : SmallFormTemplate, option))
-      );
+      const bigTemp = JSON.parse(JSON.stringify(BigFormTemplate));
+      const smallTemp = JSON.parse(JSON.stringify(SmallFormTemplate));
+      const newOption = Object.assign(isBig ? bigTemp : smallTemp, option);
       return newOption;
     },
-    loadOption(slug) {
-      let option = loadBlockConfig(slug);
+    async loadOption(slug) {
+      const option = await loadBlockConfig(slug);
       if (option) {
         this.updateOption(option);
       } else {

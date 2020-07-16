@@ -70,14 +70,14 @@ export default {
   },
   methods: {
     getComponent(type, component) {
-      let KEY_COMPONENT_NAME = 'item-';
+      const KEY_COMPONENT_NAME = 'item-';
       let result = 'normal';
       if (!this.validatenull(component)) {
         result = component;
       }
 
       // 已定义组件列表
-      let existType = ['img', 'url', 'multi-line', 'html', 'header', 'divider', 'block'];
+      const existType = ['img', 'url', 'multi-line', 'html', 'header', 'divider', 'block'];
       if (existType.includes(type)) {
         result = type;
       }

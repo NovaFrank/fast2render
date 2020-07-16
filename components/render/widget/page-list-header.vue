@@ -31,8 +31,8 @@ export default {
     }
   },
   computed: {
-    showButtons: function() {
-      let buttons = [
+    showButtons: function () {
+      const buttons = [
         ...this.buttons,
         {
           name: 'btn-add',

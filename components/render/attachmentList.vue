@@ -9,8 +9,16 @@
         <div v-if="component.option && component.option.column && component.option.column.length">
           <avue-crud :data="fileList" :option="component.option" @row-del="handleDelete">
             <template v-slot:fileAction="scope">
-              <div v-if="!readonly && downloadClient">
-                <el-upload
+              <div v-show="!readonly && downloadClient">
+                <!-- web uploader -->
+                <div id="uploader">
+                  <div :id="scope.row.businessItemId">选择文件</div>
+                  <!-- <button id="ctlBtn" @click="uploadFile" class="btn btn-default">
+                    开始上传
+                  </button> -->
+                </div>
+                <!-- el upload -->
+                <!-- <el-upload
                   id="webpicker"
                   :show-file-list="false"
                   class="upload-box"
@@ -18,9 +26,6 @@
                   :http-request="uploadFile"
                   action="/"
                 >
-                  <!-- :before-upload="uploadFile" -->
-                  <!-- action="http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet"
-                  @on-success="handleSuccess" -->
                   <el-link
                     size="small"
                     slot="trigger"
@@ -29,37 +34,32 @@
                   >
                     上传
                   </el-link>
-                  <!--用来存放item-->
-                  <!-- <div id="uploader">
-                    <div id="picker">选择</div>
-                    <button id="ctlBtn" @click="uploadFile" class="btn btn-default">
-                      开始上传
-                    </button>
-                  </div> -->
                   <template v-if="scope.row.attachmentUrl">
                     /
                     <el-link
                       v-if="scope.row.attachmentUrl"
                       download
                       target="_blank"
-                      :href="`${dome}/opt/nfsshare/${scope.row.attachmentUrl}`"
+                      :href="`${dome}opt/nfsshare/${scope.row.attachmentUrl}`"
                     >
-                      <!-- @click.stop="handleDownload(scope.row)" -->
                       下载
                     </el-link>
                   </template>
-                </el-upload>
+                </el-upload> -->
               </div>
-              <div v-else-if="downloadClient">
+              <div v-else-show="downloadClient">
                 <el-link
                   v-if="scope.row.attachmentUrl"
                   download
                   target="_blank"
-                  :href="`${dome}/opt/nfsshare/${scope.row.attachmentUrl}`"
+                  :href="`${dome}opt/nfsshare/${scope.row.attachmentUrl}`"
                 >
                   下载
                 </el-link>
               </div>
+            </template>
+            <template slot="annexType" slot-scope="{ row }">
+              <span class="annexType" v-if="row.isRequired === 'Y'"></span>{{ row.annexType }}
             </template>
           </avue-crud>
         </div>
@@ -72,6 +72,11 @@
 import uploadApi from '../../lib/api/upload';
 import { formatDate } from '../../lib/utils'; // , renderSize
 import { validateNull } from '../../lib/validate';
+import { getUserInfo } from '../../lib/auth';
+// import $ from 'jquery';
+import WebUploader from 'webuploader';
+
+let uploader;
 
 export default {
   name: 'AttachmentList',
@@ -99,7 +104,13 @@ export default {
     version: {
       type: String,
       default: () => {
-        return 'attahcment-fiels_2_2';
+        return 'attahcment-fiels_4_3';
+      }
+    },
+    domain: {
+      type: String,
+      default: () => {
+        return null;
       }
     },
     readonly: {
@@ -147,11 +158,29 @@ export default {
           editBtn: false,
           addBtn: false,
           delBtn: true,
+          cancelBtn: false,
           showSummary: false,
+          rowKey: 'businessItemId',
           column: [
             {
               label: '文件',
               prop: 'fileAction',
+              slot: true
+            },
+            {
+              label: '是否启用有效期',
+              prop: 'isValidity',
+              hide: true
+            },
+            {
+              label: '文件类型',
+              prop: 'annexType',
+              type: 'select',
+              span: 8,
+              dicName: 'annex-type',
+              datatype: 'remoteDic',
+              orderIndex: 0,
+              order: 1,
               slot: true
             }
           ]
@@ -165,11 +194,28 @@ export default {
           editBtn: false,
           addBtn: false,
           delBtn: false,
+          cancelBtn: false,
           showSummary: false,
           column: [
             {
               label: '文件',
               prop: 'fileAction',
+              slot: true
+            },
+            {
+              label: '是否启用有效期',
+              prop: 'isValidity',
+              hide: true
+            },
+            {
+              label: '文件类型',
+              prop: 'annexType',
+              type: 'select',
+              span: 8,
+              dicName: 'annex-type',
+              datatype: 'remoteDic',
+              orderIndex: 0,
+              order: 1,
               slot: true
             }
           ]
@@ -179,131 +225,122 @@ export default {
   },
   data() {
     return {
-      dome: 'http://cs.51qqt.com',
+      currentElsAccount: '',
+      dome: '',
       showUpdate: true,
       uploadRow: null,
       fileList: [],
-      businessId: '',
-      uploader: null
+      businessId: ''
     };
   },
   created() {},
-  mounted() {
-    // this.initWebUpload();
-    if (!validateNull(this.id)) {
-      this.businessId = this.id;
-      this.initData();
-    }
-  },
   watch: {
     id(newValue) {
       this.businessId = newValue;
       this.initData();
     },
-    attachmentTemplate(newValue) {
-      console.log(newValue);
+    attachmentTemplate() {
       this.initData();
+    },
+    fileList(newVal) {
+      // console.log(newVal);
     }
   },
+  mounted() {
+    const currentUserInfo = getUserInfo();
+    this.currentElsAccount = currentUserInfo.elsAccount;
+
+    if (!validateNull(this.id)) {
+      this.businessId = this.id;
+      this.initData();
+    }
+    if (window.location.host.includes('uat')) {
+      this.dome = 'https://uat.51qqt.com/';
+    } else {
+      // uat 环境定位到 v4 版本
+      this.dome = 'http://cs.51qqt.com/';
+    }
+    if (this.domain) {
+      this.dome = this.domain;
+    }
+    // this.initWebUpload();
+  },
   methods: {
-    initData() {
-      this.showUpdate = !validateNull(this.id);
-      if (!validateNull(this.businessId)) {
-        this.option.delBtn = this.delBtn;
-        this.getList();
-        // let dic = this.$getDicItem('attachmentType');
-        // this.readOption.column.unshift({
-        //   label: '文件类型',
-        //   prop: 'attachmentType',
-        //   type: 'select',
-        //   order: 0,
-        //   dicData: dic
-        // });
-      }
-    },
-    initWebUpload() {
-      // setTimeout(() => {
-      //   // 方式3
-      //   // var state = 'pending'; // 上传文件初始化
-      //   this.uploader = WebUploader.create({
-      //     swf: './webuploader-0.1.5/Uploader.swf',
-      //     server: 'http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet',
-      //     pick: '#picker',
-      //     resize: false
-      //   });
-      //   this.uploader.on('fileQueued', function(file) {
-      //     console.log('fileQueued');
-      //     console.log(file);
-      //   });
-      //   this.uploader.on('uploadProgress', function(file, percentage) {
-      //     console.log('progress ==', percentage * 100 + '%');
-      //   });
-      //   this.uploader.on('uploadSuccess', function(file) {
-      //     console.log('uploadSuccess');
-      //   });
-      //   this.uploader.on('uploadError', function(file) {
-      //     console.log('uploadError');
-      //   });
-      //   this.uploader.on('uploadComplete', function(file) {
-      //     console.log('uploadComplete');
-      //   });
-      // });
-    },
-    sendFiles() {
-      const list = this.fileList.filter((item) => item.uuid); // 过滤掉未上传过的行数据
-      return new Promise((resolve, reject) => {
-        if (list.length > 0) {
-          const params = {
-            businessItemIds: list.map((item) => item.uuid).toString()
-          };
-          uploadApi
-            .sendFiles(params)
-            .then((res) => {
-              if (res.data.statusCode === '200') {
-                resolve({ result: true, statusCode: res.data.statusCode });
-              } else {
-                resolve({
-                  result: false,
-                  message: res.data.message,
-                  statusCode: res.data.statusCode
-                });
-              }
-            })
-            .catch((res) => {
-              reject(res);
-            });
-        } else {
-          resolve({ result: true, statusCode: '200' });
-          // eslint-disable-next-line prefer-promise-reject-errors
-          // 不需要强制上传
-          // reject({
-          //   result: false,
-          //   message: '请上传附件',
-          //   statusCode: '-100'
-          // });
-        }
+    initWebUpload(pickerId) {
+      console.log('pickerId', pickerId);
+      // 初始化 webuploader
+      uploader = WebUploader.create({
+        swf: './Uploader.swf',
+        server: 'http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet',
+        pick: '#' + pickerId,
+        resize: false
+      });
+      // var state = 'pending'; // 上传文件初始化
+      uploader.on('fileQueued', function(file) {
+        console.log('fileQueued');
+        console.log(file);
+      });
+      uploader.on('uploadProgress', function(file, percentage) {
+        console.log('progress ==', percentage * 100 + '%');
+      });
+      uploader.on('uploadSuccess', function(file) {
+        console.log('uploadSuccess');
+      });
+      uploader.on('uploadError', function(file) {
+        console.log('uploadError');
+      });
+      uploader.on('uploadComplete', function(file) {
+        console.log('uploadComplete');
       });
     },
     doAction(action, data) {
       this.$emit(action, data);
       // this.$message.success(action)
     },
-    // 如果存在模版数据，需要初始化
-    initList() {
-      // 先初始化待上传列表
-      this.attachmentTemplate.map((item) => {
-        this.listTempRowAdd(item);
-      });
-      //  有id 为读取模式， 没id 为模版预览模式
-      if (this.id) {
-        this.getList();
-        this.$forceUpdate();
+
+    handleDelete(row, index) {
+      if (!row.uuid) {
+        this.fileList.splice(index, 1);
+        return;
       }
+      this.$confirm('是否删除该附件？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const action = 'delete';
+        if (row.uuid) {
+          uploadApi.attachmentServer(action, { uuid: row.uuid }).then((res) => {
+            if (res.data.statusCode !== '200') {
+              this.$message.error(res.data.message);
+              return;
+            }
+            this.fileList.splice(index, 1);
+          });
+        }
+      });
     },
+
+    handleDownload(row) {
+      console.log(row);
+    },
+
+    handleSuccess(response, file, fileList) {
+      console.log(response, file, fileList);
+    },
+
+    download(blobUrl, fileName) {
+      const a = document.createElement('a');
+      a.download = fileName;
+      a.href = blobUrl;
+      a.click();
+      document.body.removeChild(a);
+    },
+
     // 可增加行方法
     downloadFile(row) {
       if (row.attachmentUrl) {
-        let params = {
+        const params = {
           elsAccount: row.elsAccount,
           elsSubAccount: row.elsSubAccount,
           filePath: `${this.dome}${row.attachmentUrl}`
@@ -315,9 +352,10 @@ export default {
         });
       }
     },
+
     async getBase64(file) {
       return new Promise((resolve, reject) => {
-        let reader = new FileReader();
+        const reader = new FileReader();
         let fileResult = '';
         reader.readAsDataURL(file); // 开始转
         reader.onload = function() {
@@ -331,9 +369,10 @@ export default {
         };
       });
     },
+
     getList() {
-      let action = 'findList';
-      let params = {
+      const action = 'findList';
+      const params = {
         businessElsAccount: this.businessElsAccount,
         businessModule: this.businessModule,
         businessId: this.businessId
@@ -365,88 +404,143 @@ export default {
         // businessItemId 根据该值判断 替换或直接push
         const itemIds = this.fileList.map((item) => item.businessItemId);
         this.attachmentTemplate.forEach((item) => {
+          // item.isValidity = true; // TODO:
           if (itemIds.includes(item.businessItemId)) {
             const index = this.fileList.findIndex(
               (file) => file.businessItemId === item.businessItemId
             );
+            const i = this.fileList[index];
+            item.isValidity === 'Y' && this.readonly === false
+              ? (i.$cellEdit = true)
+              : (i.$cellEdit = false);
+            i.isValidity = validateNull(item.isValidity) ? false : item.isValidity;
+            i.startValidity = validateNull(item.startValidity) ? '' : item.startValidity;
+            i.endValidity = validateNull(item.endValidity) ? '' : item.endValidity;
             this.fileList[index] = {
               ...item,
-              ...this.fileList[index]
+              ...i
             };
           } else {
+            item.isValidity === 'Y' && this.readonly === false
+              ? (item.$cellEdit = true)
+              : (item.$cellEdit = false);
+            // item.isValidity = validateNull(item.isValidity) ? false : item.isValidity;
+            item.startValidity = validateNull(item.startValidity) ? '' : item.startValidity;
+            item.endValidity = validateNull(item.endValidity) ? '' : item.endValidity;
             this.fileList.push(item);
           }
         });
+        console.log('this.fileList', this.fileList);
       });
     },
-    handleDelete(row, index) {
-      if (!row.uuid) {
-        this.fileList.splice(index, 1);
-        return;
+
+    initData() {
+      this.showUpdate = !validateNull(this.id);
+      if (!validateNull(this.businessId)) {
+        this.option.delBtn = this.delBtn;
+        this.getList();
+
+        /*
+        const dic = this.$getDicItem('attachmentType');
+        this.readOption.column.unshift({
+          label: '文件类型',
+          prop: 'attachmentType',
+          type: 'select',
+          order: 0,
+          dicData: dic
+        });
+        */
       }
-      this.$confirm('是否删除该附件？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        let action = 'delete';
-        if (row.uuid) {
-          uploadApi.attachmentServer(action, { uuid: row.uuid }).then((res) => {
-            if (res.data.statusCode !== '200') {
-              this.$message.error(res.data.message);
-              return;
-            }
-            this.fileList.splice(index, 1);
-          });
-        }
-      });
     },
+
+    // 如果存在模版数据，需要初始化
+    initList() {
+      // 先初始化待上传列表
+      this.attachmentTemplate.map((item) => {
+        this.listTempRowAdd(item);
+      });
+      //  有id 为读取模式， 没id 为模版预览模式
+      if (this.id) {
+        this.getList();
+        this.$forceUpdate();
+      }
+    },
+
     listRowAdd() {
-      let fileItem = {
+      const businessItemId = this.id + '_00' + (this.fileList.length + 1);
+      const fileItem = {
         elsAccount: this.elsAccount,
-        businessItemId: this.id + '_00' + (this.fileList.length + 1)
+        businessItemId
       };
       this.fileList.push(fileItem);
+      setTimeout(this.initWebUpload(businessItemId), 1000);
     },
+
     listTempRowAdd(item) {
       if (!item) {
         return;
       }
-      let type = item.attachmentType || item.fileType;
+      const type = item.attachmentType || item.fileType;
       if (!type) {
         return;
       }
-      let fileItem = {
+      const fileItem = {
         businessItemId: this.id + type + (this.fileList.length + 1),
         attachmentType: type
       };
       this.fileList.push(fileItem);
     },
-    // removeFile() {
-    //   let action = 'delete';
-    //   if (this.uploadRow.uuid) {
-    //     uploadApi.attachmentServer(action, { uuid: this.uploadRow.uuid });
-    //   }
-    // },
+
+    /*
+    removeFile() {
+      const action = 'delete';
+      if (this.uploadRow.uuid) {
+        uploadApi.attachmentServer(action, { uuid: this.uploadRow.uuid });
+      }
+    },
+    */
+
+    sendFiles() {
+      const list = this.fileList.filter((item) => item.uuid); // 过滤掉未上传过的行数据
+      return new Promise((resolve, reject) => {
+        if (list.length > 0) {
+          const params = {
+            businessItemIds: list.map((item) => item.uuid).toString()
+          };
+          uploadApi
+            .sendFiles(params)
+            .then((res) => {
+              if (res.data.statusCode === '200') {
+                resolve({ result: true, statusCode: res.data.statusCode });
+              } else {
+                resolve({
+                  result: false,
+                  message: res.data.message,
+                  statusCode: res.data.statusCode
+                });
+              }
+            })
+            .catch((res) => {
+              reject(res);
+            });
+        } else {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          resolve({ result: true, statusCode: '200' });
+          // reject({
+          //   result: false,
+          //   message: '请上传附件',
+          //   statusCode: '-100'
+          // });
+        }
+      });
+    },
+
     setUploadRow(row) {
       this.uploadRow = row;
     },
-    handleDownload(row) {
-      console.log(row);
-    },
-    download(blobUrl, fileName) {
-      const a = document.createElement('a');
-      a.download = fileName;
-      a.href = blobUrl;
-      a.click();
-      document.body.removeChild(a);
-    },
-    handleSuccess(response, file, fileList) {
-      console.log(response, file, fileList);
-    },
+
     async uploadFile(myfile) {
       // console.log('开始上传', this.uploader, myfile);
-
       // this.uploader.upload();
 
       // 方式2
@@ -457,7 +551,7 @@ export default {
         .then((res) => {
           console.log('上传结束', res);
           if (res.data.statusCode === '200') {
-            let data = res.data.data[0];
+            const data = res.data.data[0];
             const file = {
               fileSize: data.size,
               fileName: data.name,
@@ -473,45 +567,46 @@ export default {
         .catch(() => {
           this.$message.error('上传失败');
         });
-      // 方式2
 
-      // ------ 原有方式 ------
-      // let fileSize = renderSize(myfile.file.size);
-      // this.getBase64(myfile.file)
-      //   .then((resBase64) => {
-      //     let fileBase64 = resBase64.split(',')[1]; // 直接拿到base64信息
-      //     let params = {
-      //       file: myfile,
-      //       fileName: myfile.file.name,
-      //       fileType: myfile.file.name.split('.')[1],
-      //       fileData: fileBase64
-      //     };
-      //     console.log('params', params);
-      //     return uploadApi.uploadFile(params); // uploadFile
-      //   })
-      //   .then((res) => {
-      //     if (res.data.statusCode === '200') {
-      //       let data = res.data.data;
-      //       data.fileSize = fileSize;
-      //       this.$emit('upload-file', data);
-      //       this.updateFileList(data);
-      //     } else {
-      //       this.$message({
-      //         message: res.data.message,
-      //         type: 'error'
-      //       });
-      //     }
-      //   });
-      // ------ 原有方式 ------
+      /*
+      原有方式
+      const fileSize = renderSize(myfile.file.size);
+      this.getBase64(myfile.file)
+        .then((resBase64) => {
+          const fileBase64 = resBase64.split(',')[1]; // 直接拿到base64信息
+          const params = {
+            file: myfile,
+            fileName: myfile.file.name,
+            fileType: myfile.file.name.split('.')[1],
+            fileData: fileBase64
+          };
+          console.log('params', params);
+          return uploadApi.uploadFile(params); // uploadFile
+        })
+        .then((res) => {
+          if (res.data.statusCode === '200') {
+            const data = res.data.data;
+            data.fileSize = fileSize;
+            this.$emit('upload-file', data);
+            this.updateFileList(data);
+          } else {
+            this.$message({
+              message: res.data.message,
+              type: 'error'
+            });
+          }
+        });
+        */
     },
+
     updateFileList(file) {
       const _this = this;
-      let action = _this.uploadRow.attachmentName
+      const action = _this.uploadRow.attachmentName
         ? 'update'
         : _this.uploadRow.uuid
         ? 'update'
         : 'create';
-      let checkProp = 'businessItemId';
+      const checkProp = 'businessItemId';
       console.log('this.elsAccount', this.elsAccount);
       let itemRow = {
         ...this.uploadRow,
@@ -525,7 +620,7 @@ export default {
         businessElsAccount: this.businessElsAccount,
         businessId: this.businessId
       };
-      let uploadRow = {
+      const uploadRow = {
         ...this.uploadRow,
         elsAttachmentVOList: [itemRow]
       };
@@ -555,3 +650,11 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.annexType::after {
+  content: '*';
+  color: #f56c6c;
+  margin-right: 4px;
+}
+</style>

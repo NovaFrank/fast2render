@@ -16,7 +16,7 @@
     "echarts": "^4.6.0",
     "element-ui": "^2.13.0",
     "exec-mathexpress": "^1.0.15",
-    "fast2render": "^0.5.30",
+    "fast2render": "^0.5.31",
     "jquery": "^1.12.4",
     "js-md5": "^0.7.3",
     "krry-transfer": "^1.4.4",

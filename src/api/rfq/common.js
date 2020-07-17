@@ -3,6 +3,20 @@ import { getApiPath } from '@/util/utils.js';
 
 let prefix = getApiPath();
 
+export const uploadServlet = (formdata) => {
+  return request({
+    url: `${prefix}/servlet/UploadServlet`,
+    method: 'post',
+    data: formdata
+  });
+};
+export const importExcel = (url) => {
+  return request({
+    url: `${prefix}/inquiry/PurchaseEnquiryService/importExcel/${url}`,
+    method: 'get'
+  });
+};
+
 // 配置平台数据字典查询
 export const dataDicAPI = (code) =>
   request({

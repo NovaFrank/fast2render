@@ -215,13 +215,13 @@ export default {
       elsAccount: '',
       elsSubAccount: '',
       headerButtons: [
-        {
-          power: true,
-          text: '审批节点',
-          type: 'primary',
-          size: '',
-          action: 'on-open-flow-dialog'
-        }
+        // {
+        //   power: true,
+        //   text: '审批节点',
+        //   type: 'primary',
+        //   size: '',
+        //   action: 'on-open-flow-dialog'
+        // }
       ],
       formOption: formOption, // 表头 option
       tabOption: tabOption, // tab option
@@ -312,16 +312,16 @@ export default {
     }
   },
   methods: {
-    handleOpenFlowDialog() {
-      console.log('this.form.flowCode', this.form.flowCode);
-      const event = {
-        name: 'openFlowDialog',
-        props: {
-          flowId: this.form.flowCode
-        }
-      };
-      window.parent.postMessage(event, '*');
-    },
+    // handleOpenFlowDialog() {
+    //   console.log('this.form.flowCode', this.form.flowCode);
+    //   const event = {
+    //     name: 'openFlowDialog',
+    //     props: {
+    //       flowId: this.form.flowCode
+    //     }
+    //   };
+    //   window.parent.postMessage(event, '*');
+    // },
     initColumns() {
       const validateQuoteEndTime = (rule, value, callback) => {
         if (value && value < new Date().getTime()) {

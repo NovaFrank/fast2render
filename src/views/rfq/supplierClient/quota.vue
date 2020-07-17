@@ -224,6 +224,7 @@ export default {
   },
   data() {
     return {
+      quoteRetry: false,
       quoteStatus: false, // 是否为 未报价/重报价 状态，true 可保存、发送、附件操作，false 不可进行操作
       dic: [
         {
@@ -505,7 +506,7 @@ export default {
       const current = JSON.parse(row.ladderPriceJson)[index - 1];
       const price = current[column];
       this.inquiryListOption.data[row.$index][column] = price || '';
-      this.inquiryListOption.data[row.$index].taxRate = current.taxRate || '0';
+      this.inquiryListOption.data[row.$index].taxRate = row.taxRate || '0';
       return price;
     },
     getCostPriceIndex(row, column) {
@@ -649,7 +650,7 @@ export default {
       let result = true;
       if (this.configurations[this.detailObj.enquiryType].name === 'RFQ') {
         this.inquiryListOption.data.forEach((item) => {
-          if (validatenull(item.taxRate)) {
+          if (item.noQuoted !== 'N' && validatenull(item.taxRate)) {
             rateResult = false;
           }
           if (
@@ -752,6 +753,11 @@ export default {
         if (!this.initDetailError(res)) return;
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
           if (['1', '3'].includes(item.itemStatus)) this.quoteStatus = true;
+          if (
+            item.itemStatus === '3' ||
+            (item.itemStatus === '1' && this.detailObj.quoteEndTime > new Date().getTime())
+          )
+            this.quoteRetry = true;
           return {
             // $cellEdit: ['1', '3'].includes(item.itemStatus) && item.noQuoted === 'Y', // 重报价/报价中(未报价)，且报价 是
             ...item,
@@ -763,7 +769,8 @@ export default {
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
             { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
           ];
-        } else {
+        }
+        if (this.quoteRetry) {
           this.headerButtons = [
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
             { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },

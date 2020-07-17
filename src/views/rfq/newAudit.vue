@@ -1,6 +1,12 @@
 <template>
   <basic-container>
-    <form-header titleText="询价单"></form-header>
+    <form-header
+      showButton
+      :buttons="headerButtons"
+      :showHistoryButton="false"
+      titleText="询价单"
+      @on-open-flow-dialog="handleOpenFlowDialog"
+    ></form-header>
     <avue-form ref="form" v-model="form" :option="formOption">
       <template slot="enquiryNumber">
         <span>{{ currentEnquiryNumber || '待生成' }}</span>
@@ -11,6 +17,7 @@
           @change="handleEnquiryTypeChange"
           filterable
           clearable
+          disabled
           placeholder="请选择 询价类型"
         >
           <el-option
@@ -207,7 +214,15 @@ export default {
       data: {},
       elsAccount: '',
       elsSubAccount: '',
-      headerButtons: [{ power: true, text: '返回', type: '', size: '', action: 'on-cancel' }],
+      headerButtons: [
+        {
+          power: true,
+          text: '审批节点',
+          type: 'primary',
+          size: '',
+          action: 'on-open-flow-dialog'
+        }
+      ],
       formOption: formOption, // 表头 option
       tabOption: tabOption, // tab option
       inquiryListOption: inquiryListOption, // 询价明细（行信息）Option
@@ -257,32 +272,10 @@ export default {
     }
   },
   watch: {
-    purchaseRequest(newVal) {
-      if (newVal) {
-        this.inquiryListOption.option.menu = true;
-        this.headerButtons = [
-          { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
-          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
-          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-          { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
-          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
-        ];
-      } else {
-        this.inquiryListOption.option.menu = true;
-        this.headerButtons = [
-          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
-          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
-          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
-        ];
-      }
-    },
     form(newVal) {
-      this.formOption.detail = true;
+      this.formOption.disabled = true;
       this.inquiryListOption.option.menu = false;
       this.inquiryListOption.option.header = false;
-      this.headerButtons = [{ power: true, text: '返回', type: '', size: '', action: 'on-cancel' }];
       if (!validatenull(newVal.enquiryType) && this.configurations[newVal.enquiryType]) {
         this.handleEnquiryTypeChange(newVal.enquiryType);
         this.templateRule = this.configurations[newVal.enquiryType].rule;
@@ -319,6 +312,15 @@ export default {
     }
   },
   methods: {
+    handleOpenFlowDialog() {
+      const event = {
+        name: 'openFlowDialog',
+        props: {
+          flowId: this.form.flowCode
+        }
+      };
+      window.parent.postMessage(event, '*');
+    },
     initColumns() {
       const validateQuoteEndTime = (rule, value, callback) => {
         if (value && value < new Date().getTime()) {
@@ -457,16 +459,6 @@ export default {
               this.auditListOption.data = [];
             }
           });
-        }
-        if (this.templateRule.enquiryIsProjectApproval === true && this.form.auditStatus !== '0') {
-          this.headerButtons = this.headerButtons.map((item) => {
-            if (item.action === 'on-release') {
-              item.text = '提交审批';
-              item.action = 'on-audit-submit';
-            }
-            return item;
-          });
-        } else {
         }
         // 配置字段
         const current = this.configurations[value].tableColumns.map((item) => {

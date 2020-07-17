@@ -547,6 +547,7 @@ export default {
     handleEnquiryTypeChange(value) {
       if (this.configurations[value]) {
         const configuration = this.configurations[value];
+        console.log('configuration', configuration);
         this.templateRule = configuration.rule;
         this.initColumns();
         this.tabOption.option.column = [
@@ -681,7 +682,8 @@ export default {
           configurations[item.templateNumber] = {
             name: item.templateName, // 模板名称
             rule: json.rule, // 单规则
-            fieldColumns: field, // 头信息
+            // fieldColumns: field, // 头信息
+            fieldColumns: this.$util.handlerLocalRolePermission(json.field), // 头信息
             tableColumns: table, // 行信息
             buttons: json.buttonJson
           };

@@ -445,7 +445,8 @@ export default {
           configurations[item.templateNumber] = {
             name: item.templateName, // 模板名称
             rule: json.rule, // 单规则
-            fieldColumns: field, // 头信息
+            // fieldColumns: field, // 头信息
+            fieldColumns: this.$util.handlerLocalRolePermission(json.field), // 头信息
             tableColumns: table // 行信息
           };
         }

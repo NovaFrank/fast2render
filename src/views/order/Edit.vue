@@ -602,7 +602,7 @@ export default {
     },
     factoryGroupDialogSave(selectColumns) {
       if (selectColumns.length !== 0) {
-        this.formOption.obj.factory = selectColumns[0].orgId;
+        this.formOption.obj.purchaseFactory = selectColumns[0].orgId;
       }
     }
   }

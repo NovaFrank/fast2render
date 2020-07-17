@@ -618,7 +618,6 @@ export default {
           result.dicData = item.dicData;
           result.dicUrl = item.dicUrl;
           result.dicMethod = item.dicMethod;
-          console.log('result', result);
           return result;
         });
         current.forEach((item) => {

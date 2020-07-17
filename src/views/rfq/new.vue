@@ -3,7 +3,7 @@
     <form-header
       titleText="新建/编辑询价单"
       showButton
-      :buttons="headerButtons"
+      :buttons="buttons"
       @on-test="handleTest"
       @on-back="handleBack"
       @on-cancel="handleCancel"
@@ -278,6 +278,11 @@ export default {
       this.currentEnquiryNumber = '';
     }
   },
+  computed: {
+    buttons() {
+      return this.headerButtons;
+    }
+  },
   watch: {
     purchaseRequest(newVal) {
       this.inquiryListOption.option.menu = true;
@@ -289,6 +294,27 @@ export default {
         { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
         { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
       ];
+      if (this.templateRule.enquiryIsProjectApproval === true && this.form.auditStatus !== '0') {
+        this.headerButtons = this.headerButtons.map((item) => {
+          if (item.action === 'on-release') {
+            item.text = '提交审批';
+            item.action = 'on-audit-submit';
+          }
+          return item;
+        });
+      }
+      if (this.templateRule.enquiryIsProjectApproval === true && this.form.auditStatus === '2') {
+        this.headerButtons = [
+          {
+            power: true,
+            text: '撤回',
+            type: 'primary',
+            size: '',
+            action: 'on-cancel-approval'
+          },
+          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
+        ];
+      }
     },
     form(newVal) {
       if (newVal.auditStatus === '2') {
@@ -549,7 +575,6 @@ export default {
             }
             return item;
           });
-        } else {
         }
         // 配置字段
         const current = configuration.tableColumns.map((item) => {

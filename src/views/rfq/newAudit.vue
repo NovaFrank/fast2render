@@ -313,6 +313,7 @@ export default {
   },
   methods: {
     handleOpenFlowDialog() {
+      console.log('this.form.flowCode', this.form.flowCode);
       const event = {
         name: 'openFlowDialog',
         props: {

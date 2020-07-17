@@ -101,7 +101,7 @@ export default {
       },
       {
         label: '采购工厂',
-        prop: 'factory',
+        prop: 'purchaseFactory',
         span: 6,
         type: 'input',
         formslot: true

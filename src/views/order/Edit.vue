@@ -29,8 +29,8 @@
             ></i>
           </el-input>
         </template>
-        <template slot="factory">
-          <el-input v-model="formOption.obj.factory" :readonly="true">
+        <template slot="purchaseFactory">
+          <el-input v-model="formOption.obj.purchaseFactory" :readonly="true">
             <i
               slot="suffix"
               class=" el-input_icon el-icon-search pointer"

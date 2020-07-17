@@ -15,6 +15,9 @@ export default {
     border: true,
     highlightCurrentRow: true,
     index: true,
+    searchLabelWidth: 140,
+    searchMenuSpan: 6,
+    searchShow: false,
     selectable: (row, index) => {
       console.log(row, index);
     },
@@ -23,7 +26,8 @@ export default {
         slot: true,
         label: '询价单号',
         prop: 'enquiryNumber',
-        width: '140'
+        width: '140',
+        search: true
       },
       // {
       //   slot: true,
@@ -32,7 +36,8 @@ export default {
       // },
       {
         label: '供应商ELS账号',
-        prop: 'toElsAccount'
+        prop: 'toElsAccount',
+        search: true
       },
       {
         label: '供应商名称',
@@ -41,7 +46,8 @@ export default {
       {
         slot: true,
         label: '物料编码',
-        prop: 'materialNumber'
+        prop: 'materialNumber',
+        search: true
       },
       {
         label: '物料名称',

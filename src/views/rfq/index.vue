@@ -11,6 +11,9 @@
       @current-row-change="handleCurrentRowChange"
       @size-change="sizeChange"
       @current-change="currentChange"
+      :search="search"
+      @search-change="searchChange"
+      @search-reset="searchReset"
     >
       <template slot="enquiryNumber" slot-scope="scope">
         <el-button
@@ -83,6 +86,7 @@ export default {
       tableOption: tableOption,
       currentSelectRow: {},
       tabActive: 'all',
+      search: {},
       buttons: [
         {
           show: true,
@@ -95,14 +99,46 @@ export default {
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
+
+    ElsTemplateConfigService.find({
+      elsAccount: '307000',
+      businessModule: 'enquiry',
+      currentVersionFlag: 'Y'
+    }).then((res) => {
+      if (res.data && res.data.statusCode === '200' && res.data.pageData) {
+        const rows = res.data.pageData.rows || [];
+        this.tableOption.option.column = this.tableOption.option.column.map((item) => {
+          if (item.prop === 'enquiryType') {
+            item.dicData = rows.map((item) => {
+              return {
+                value: item.templateNumber,
+                label: item.templateName
+              };
+            });
+          }
+          return item;
+        });
+      }
+    });
     this.tableData();
   },
   watch: {
     tabActive() {
+      this.search = {};
       this.tableData();
     }
   },
   methods: {
+    searchReset() {
+      this.$refs.list.searchReset();
+      this.tableData();
+    },
+    searchChange(params, done) {
+      this.search = params;
+      this.tableOption.page = { pageSize: 10, currentPage: 1 };
+      this.tableData(params);
+      done();
+    },
     handleClickMaterial(scope) {
       const router = {
         name: `物料详情(${scope.row.materialNumber})`,
@@ -118,7 +154,8 @@ export default {
       this.tableOption.page.currentPage = val;
       this.tableData({
         currentPage: val,
-        pageSize: this.tableOption.page.pageSize
+        pageSize: this.tableOption.page.pageSize,
+        ...this.search
       });
     },
     handleCreate() {
@@ -149,6 +186,7 @@ export default {
       }
     },
     handleTabChange(value) {
+      this.$refs.list.searchReset();
       this.tabActive = value.prop;
       this.tableOption.page = {
         currentPage: 1,
@@ -160,7 +198,8 @@ export default {
       this.tableOption.page.pageSize = val;
       this.tableData({
         currentPage: 1,
-        pageSize: val
+        pageSize: val,
+        ...this.search
       });
     },
     tableData(data) {
@@ -195,28 +234,6 @@ export default {
         }
         this.tableOption.data = res.data.pageData.rows;
         this.tableOption.page.total = res.data.pageData.total;
-      });
-
-      ElsTemplateConfigService.find({
-        elsAccount: this.elsAccount,
-        businessModule: 'enquiry',
-        currentVersionFlag: 'Y'
-      }).then((res) => {
-        if (res.data && res.data.statusCode === '200' && res.data.pageData) {
-          const rows = res.data.pageData.rows || [];
-          console.log('rows', rows);
-          this.tableOption.option.column = this.tableOption.option.column.map((item) => {
-            if (item.prop === 'enquiryType') {
-              item.dicData = rows.map((item) => {
-                return {
-                  value: item.templateNumber,
-                  label: item.templateName
-                };
-              });
-            }
-            return item;
-          });
-        }
       });
     }
   }

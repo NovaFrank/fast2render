@@ -64,9 +64,9 @@ export default {
   computed: {
     myOption() {
       if (this.setting && this.setting.data && this.setting.data.fieldData) {
-        let setting = this.setting.data.fieldData;
-        let addBtn = !(!setting.addable || setting.addable === 'false');
-        let option = this.option;
+        const setting = this.setting.data.fieldData;
+        const addBtn = !(!setting.addable || setting.addable === 'false');
+        const option = this.option;
         option.addBtn = addBtn;
         option.delBtn = addBtn;
         return option;

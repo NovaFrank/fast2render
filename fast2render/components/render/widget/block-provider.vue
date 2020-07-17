@@ -7,6 +7,7 @@
 import { getStore } from '../../../lib/store';
 import { mergeColumn, vaildData, loadJson, loadDic } from '../../../lib/utils';
 import { handleColumn } from '../../../lib/blockHander';
+import dayjs from 'dayjs';
 export default {
   name: 'BlockProvider',
   inheritAttrs: false,
@@ -29,7 +30,7 @@ export default {
     },
     option: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     }
@@ -54,7 +55,7 @@ export default {
     console.log('load dic file');
   },
   mounted() {
-    let configFilePath = localStorage.getItem('configFilePath');
+    const configFilePath = localStorage.getItem('configFilePath');
     if (configFilePath && configFilePath !== '') {
       this.filePath = configFilePath;
     }
@@ -70,17 +71,20 @@ export default {
   },
   methods: {
     onLoad(slug = this.version) {
-      const url = `${this.filePath}${this.fileType}/${slug}.json`;
-      let list = getStore({ name: slug, timer: 1200 });
+      const dataStr = dayjs().format('YYYY-MM-DD');
+      const url = `${this.filePath}${this.fileType}/${slug}.json?time=${dataStr}`;
+      const list = getStore({ name: slug, timer: 600 });
       if (list) {
         this.handlerLayoutData(list);
       } else {
         loadJson(url, slug);
-        setTimeout(this.onLoad, 1000);
+        setTimeout(() => {
+          this.onLoad(slug);
+        }, 800);
       }
     },
     checkDic() {
-      let dic = getStore({ name: 'commondic', timer: 1200 });
+      const dic = getStore({ name: 'commondic', timer: 1200 });
       if (dic) {
         this.dics = dic;
       } else {
@@ -92,20 +96,21 @@ export default {
         return;
       }
       this.list = list;
-      let finaloption = vaildData(this.option, { column: [] });
-      let findStr = {
+      const finaloption = vaildData(this.option, { column: [] });
+      const findStr = {
         crud: 'listLayout',
         form: 'detailLayout',
         detail: 'detailLayout'
       };
-      let options = list.filter((item) => {
+      const options = list.filter((item) => {
         return item.id === findStr[this.type];
       });
       let option = options[0] || {};
       option = vaildData(option, { data: { column: [] } });
-      let column = mergeColumn(finaloption.column, option.data.column);
+      const column = mergeColumn(finaloption.column, option.data.column);
       this.finaloption = JSON.parse(JSON.stringify(finaloption));
       this.finaloption.column = handleColumn(column);
+      this.$forceUpdate();
     }
   }
 };

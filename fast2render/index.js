@@ -15,7 +15,11 @@ import PageListHeader from './components/render/widget/page-list-header';
 import PageDetailHeader from './components/render/widget/page-detail-header';
 import BusinessRuleConfig from './components/render/widget/render-rule-config';
 import AttachmentList from './components/render/attachmentList';
-
+import auth from './lib/auth';
+import SelectDialog from './components/render/selectDialog/selectDialog';
+import SelectDialogTable from './components/render/selectDialog/selectDialogTable';
+import Tree from './components/render/tree/index';
+import { getStore, setStore } from './lib/store';
 import util, {
   loadDic,
   getDicItem,
@@ -26,11 +30,9 @@ import util, {
   getFormulaList,
   getBlockItem,
   getBlockFieldItem,
-  getTableList
+  getTableList,
+  getDicNow
 } from './lib/utils';
-import auth from './lib/auth';
-import SelectDialog from './components/render/selectDialog/selectDialog';
-import SelectDialogTable from './components/render/selectDialog/selectDialogTable';
 
 export default {
   install(Vue) {
@@ -53,6 +55,7 @@ export default {
     Vue.component(AttachmentList.name, AttachmentList);
     Vue.prototype.$loadDic = loadDic;
     Vue.prototype.$getDicItem = getDicItem;
+    Vue.prototype.$getDicNow = getDicNow;
     Vue.prototype.$getTableItem = getTableItem;
     Vue.prototype.$getTableList = getTableList;
     Vue.prototype.$getTemplateItem = getTemplateItem;
@@ -62,9 +65,14 @@ export default {
     Vue.prototype.$getBlockItem = getBlockItem;
     Vue.prototype.$getBlockFieldItem = getBlockFieldItem;
     Vue.prototype.$util = util;
+    Vue.prototype.$util.loadDic = loadDic;
+    Vue.prototype.$util.getDicNow = getDicNow;
+    Vue.prototype.$util.setStore = setStore;
+    Vue.prototype.$util.getStore = getStore;
     Vue.prototype.$auth = auth;
     Vue.component(BusinessRuleConfig.name, BusinessRuleConfig);
     Vue.component(SelectDialog.name, SelectDialog);
     Vue.component(SelectDialogTable.name, SelectDialogTable);
+    Vue.component(Tree.name, Tree);
   }
 };

@@ -89,16 +89,16 @@ export default {
     // this.handleList();
   },
   watch: {
-    page: function(newValue) {
+    page: function (newValue) {
       this.crudPage = newValue;
     },
-    column: function(newValue) {
+    column: function (newValue) {
       this.crudOption.column = newValue;
     },
-    visable: function(newValue) {
+    visable: function (newValue) {
       this.$emit('update:dialogVisible', newValue);
     },
-    dialogVisible: function(newValue) {
+    dialogVisible: function (newValue) {
       this.visable = newValue;
     }
   },
@@ -108,7 +108,7 @@ export default {
         this.$message.error('请配置接口地址');
         return;
       }
-      let listParams = deepClone(this.crudQueryParam);
+      const listParams = deepClone(this.crudQueryParam);
       Object.assign(listParams, this.crudPageParam);
       listParams.elsAccount = this.elsAccount;
       this.getCrudData(this.crudData, listParams);
@@ -117,7 +117,7 @@ export default {
       this.$emit('getData', param);
     },
     crudSave() {
-      let selectItems = this.selectColumns;
+      const selectItems = this.selectColumns;
       this.selectColumns = [];
       this.$refs.crud.selectClear();
       this.$emit('save', selectItems);
@@ -130,7 +130,7 @@ export default {
     },
     currentRowChange(row) {
       if (!this.crudMultiple) {
-        let list = [];
+        const list = [];
         list.push(row);
         this.selectColumns = list;
       }

@@ -13,7 +13,7 @@ import { getAccount } from './utils';
 
 axios.defaults.timeout = 10000;
 // 返回其他状态吗
-axios.defaults.validateStatus = function(status) {
+axios.defaults.validateStatus = function (status) {
   return status >= 200 && status <= 500; // 默认的
 };
 // 跨域请求，允许保存cookie
@@ -26,9 +26,9 @@ NProgress.configure({
 axios.interceptors.request.use(
   (config) => {
     NProgress.start(); // start progress bar
-    let userAccount = getAccount();
-    config.headers['token'] = userAccount.token;
-    config.headers['account'] = `${userAccount.elsAccount}_${userAccount.elsSubAccount}`;
+    const userAccount = getAccount();
+    config.headers.token = userAccount.token;
+    config.headers.account = `${userAccount.elsAccount}_${userAccount.elsSubAccount}`;
     return config;
   },
   (error) => {

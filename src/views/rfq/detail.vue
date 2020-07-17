@@ -645,7 +645,6 @@ export default {
     initColumns() {
       this.formOption.column = [
         { label: '询价单号', span: 6, prop: 'enquiryNumber', disabled: true },
-        { label: '询价名称', span: 6, prop: 'enquiryDesc', disabled: true },
         {
           type: 'select',
           formslot: true,
@@ -744,11 +743,13 @@ export default {
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.purchaseShow;
+          result.hide = !item.purchaseShow;
           result.span = item.span;
           result.type = item.type;
           result.dicData = item.dicData;
           result.dicUrl = item.dicUrl;
           result.dicMethod = item.dicMethod;
+          console.log('result', result);
           return result;
         });
         current.forEach((item) => {
@@ -874,7 +875,9 @@ export default {
             return;
           }
           this.$message.success('重报价成功');
-          this.$router.go(0);
+          setTimeout(() => {
+            this.$router.go(0);
+          }, 1000);
         });
       });
     },
@@ -921,7 +924,9 @@ export default {
     handleNewSupplier() {
       if (new Date().getTime() > this.detailObj.quoteEndTime) {
         this.$message.error('报价已截止');
-        this.$router.go(0);
+        setTimeout(() => {
+          this.$router.go(0);
+        }, 1000);
         return;
       }
       this.$confirm('是否发布新供应商？', '提示', {
@@ -997,7 +1002,9 @@ export default {
         (res) => {
           if (res.data.statusCode === '200') {
             this.openDialogVisible = false;
-            this.$router.go(0);
+            setTimeout(() => {
+              this.$router.go(0);
+            }, 1000);
           } else {
             this.$message.warning('请输入正确开启密码');
           }
@@ -1045,7 +1052,9 @@ export default {
         }).then((res) => {
           if (res.data.statusCode === '200') {
             this.$message.success('已撤回审批');
-            this.$router.go(0);
+            setTimeout(() => {
+              this.$router.go(0);
+            }, 1000);
             return;
           }
           this.$message.error('撤回审批失败');
@@ -1093,7 +1102,9 @@ export default {
       purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
         if (res.data.statusCode === '200') {
           this.$message.success('保存成功');
-          this.$router.go(0);
+          setTimeout(() => {
+            this.$router.go(0);
+          }, 1000);
         } else {
           this.$message.error(res.data.message);
         }
@@ -1229,7 +1240,9 @@ export default {
             return;
           }
           this.$message.success('更新截止时间成功');
-          this.$router.go(0);
+          setTimeout(() => {
+            this.$router.go(0);
+          }, 1000);
         });
       });
     },

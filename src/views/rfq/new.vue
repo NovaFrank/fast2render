@@ -21,6 +21,7 @@
       </template>
       <template slot="enquiryType">
         <el-select
+          :disabled="form.auditStatus === '2' || form.auditStatus === '0'"
           v-model="form.enquiryType"
           @change="handleEnquiryTypeChange"
           filterable
@@ -204,7 +205,7 @@ import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 import { DIC } from '@/const/dic';
 
 const validateQuantity = (rule, value, callback) => {
-  if (!validateNumber(value)) {
+  if (!validatenull(value) && !validateNumber(value)) {
     callback(new Error('请输入大于0的小数或整数'));
   } else {
     callback();
@@ -497,11 +498,11 @@ export default {
           type: 'select',
           label: '税码',
           prop: 'taxCode',
-          disabled: this.templateRule.enquiryPurchaserTax !== true,
-          rules:
-            this.templateRule.enquiryPurchaserTax === true
-              ? [{ required: true, message: '请选择税码', trigger: 'blur' }]
-              : []
+          disabled: this.templateRule.enquiryPurchaserTax !== true
+          // rules:
+          //   this.templateRule.enquiryPurchaserTax === true
+          //     ? [{ required: true, message: '请选择税码', trigger: 'blur' }]
+          //     : []
         },
         {
           label: '税率',
@@ -563,6 +564,7 @@ export default {
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.purchaseShow;
+          result.hide = !item.purchaseShow;
           result.span = item.span;
           result.type = item.type;
           result.dicData = item.dicData;
@@ -572,6 +574,13 @@ export default {
             result.disabled = true;
           } else {
             result.disabled = !item.purchaseEdit;
+          }
+          const index = this.dialogOption.column.findIndex((d) => d.prop === result.prop);
+          if (index !== -1) {
+            result = {
+              ...this.dialogOption.column[index],
+              ...result
+            };
           }
           return result;
         });
@@ -1020,7 +1029,9 @@ export default {
         }).then((res) => {
           if (res.data.statusCode === '200') {
             this.$message.success('已撤回审批');
-            this.$router.go(0);
+            setTimeout(() => {
+              this.$router.go(0);
+            }, 1000);
             return;
           }
           this.$message.error('撤回审批失败');
@@ -1074,36 +1085,43 @@ export default {
                   // }
                 }
 
-                const action = 'submit';
-                const itemList = this.inquiryListOption.data.map((item) => {
-                  item.quoteMethod = '0';
-                  return item;
-                });
-                const param = {
+                const itemList = this.inquiryListOption.data;
+                const paramsSave = {
                   ...this.form,
                   enquiryNumber: this.currentEnquiryNumber,
                   elsAccount: this.elsAccount,
                   quoteEndTime: this.form.quoteEndTime,
                   enquiryType: this.form.enquiryType,
                   enquiryDesc: this.form.enquiryDesc,
-                  // companyCode: this.form.companyCode,
-                  enquiryMethod: this.form.enquiryMethod || '',
+                  companyCode: this.form.companyCode,
+                  enquiryMethod: this.form.enquiryMethod,
+                  canSeeRule: this.form.canSeeRule,
+                  passWord: this.form.passWord,
                   itemList
                 };
-                let params = {
-                  elsAccount: this.form.elsAccount,
-                  // toElsAccount: this.detailObj.toElsAccount,
-                  businessType: 'editEnquiryAudit',
-                  businessId: this.form.enquiryNumber,
-                  params: JSON.stringify(param)
-                };
-                submitAudit(action, params).then((res) => {
-                  if (res.data.statusCode === '200') {
-                    this.$message.success('提交审批成功');
-                    this.$router.go(0);
+                purchaseEnquiryAction('save', paramsSave).then((res) => {
+                  if (res.data.statusCode !== '200') {
+                    this.$message.error('提交审批失败' + res.data.message);
                     return;
                   }
-                  this.$message.error('提交审批失败');
+
+                  const action = 'submit';
+                  let params = {
+                    elsAccount: this.form.elsAccount,
+                    businessType: 'editEnquiryAudit',
+                    businessId: this.form.enquiryNumber,
+                    params: JSON.stringify(paramsSave)
+                  };
+                  submitAudit(action, params).then((res) => {
+                    if (res.data.statusCode === '200') {
+                      this.$message.success('提交审批成功');
+                      setTimeout(() => {
+                        this.$router.go(0);
+                      }, 1000);
+                      return;
+                    }
+                    this.$message.error('提交审批失败');
+                  });
                 });
               }
             });
@@ -1167,7 +1185,9 @@ export default {
               }
               this.$message.success('保存成功');
               if (this.currentEnquiryNumber) {
-                this.$router.go(0);
+                setTimeout(() => {
+                  this.$router.go(0);
+                }, 1000);
                 return;
               }
               const enquiryNumber = res.data.data.enquiryNumber;
@@ -1349,7 +1369,6 @@ export default {
           selectedSupplier.toString()
         );
         const suppliers = selectedSupplier.map((i) => {
-          console.log(i.split('_'));
           return i.split('_')[1];
         });
         this.$set(this.inquiryListOption.data[index], 'accountList', suppliers.toString());

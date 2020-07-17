@@ -278,7 +278,6 @@ export default {
     initColumns() {
       this.formOption.column = [
         { label: '询价单号', span: 6, prop: 'enquiryNumber', disabled: true },
-        { label: '询价名称', span: 6, prop: 'enquiryDesc', disabled: true },
         {
           type: 'select',
           dicUrl: '/layout/dics/value/enquiryType',
@@ -340,6 +339,7 @@ export default {
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.saleShow;
+          result.hide = !item.saleShow;
           result.span = item.span;
           result.type = item.type;
           result.dicData = item.dicData;
@@ -366,8 +366,8 @@ export default {
             console.log('this.configurations[value]', item);
             this.formOption.column.push({
               span: item.span || 6,
-              ...item,
-              disabled: true
+              disabled: item.isDisabled,
+              ...item
             });
           }
         });
@@ -632,6 +632,7 @@ export default {
         console.log(element.priceIncludingTax);
       });
       const params = {
+        ...this.detailObj,
         enquiryNumber: this.currentEnquiryNumber,
         saleItemList: this.inquiryListOption.data
       };
@@ -710,6 +711,7 @@ export default {
           .sendFiles()
           .then((res) => {
             const params = {
+              ...this.detailObj,
               quoteEndTime: this.detailObj.quoteEndTime,
               enquiryNumber: this.currentEnquiryNumber,
               toElsAccount: this.detailObj.toElsAccount,

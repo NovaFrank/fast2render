@@ -3,6 +3,19 @@ import _ from 'lodash';
 import { setStore, getStore } from './store';
 import Formula from '@hapi/formula';
 
+export const getApiPath = () => {
+  let projectPath;
+  if (top.location.pathname) {
+    projectPath = top.location.pathname.split('/')[1];
+  }
+
+  if (projectPath) {
+    return '/' + projectPath + '/apis';
+  } else {
+    return '/apis';
+  }
+};
+
 /**
  * 验证表单
  *
@@ -16,14 +29,20 @@ export const vaildForm = (form) => {
   return flag;
 };
 
+/**
+ * 序列化请求数据
+ */
 export const serialize = (data) => {
-  let list = [];
+  const list = [];
   Object.keys(data).forEach((ele) => {
     list.push(`${ele}=${data[ele]}`);
   });
   return list.join('&');
 };
 
+/**
+ *获取对象类型
+ */
 export const getObjType = (obj) => {
   var toString = Object.prototype.toString;
   var map = {
@@ -46,9 +65,14 @@ export const getObjType = (obj) => {
   return map[toString.call(obj)];
 };
 
+/**
+ *
+ * @param {*} data  要处理的数据
+ * @param {*} expect 默认数据，数据类型不一致将返回默认数据
+ */
 export const formatObject = (data, expect) => {
-  let type = getObjType(data);
-  let expectType = getObjType(expect);
+  const type = getObjType(data);
+  const expectType = getObjType(expect);
   if (type === 'null' || type === 'undefined') {
     return expect;
   }
@@ -63,7 +87,7 @@ export const formatObject = (data, expect) => {
       console.log('非base64');
       newData = null;
     }
-    let newType = getObjType(newData);
+    const newType = getObjType(newData);
     if (newType === expectType) {
       return newData;
     }
@@ -172,6 +196,11 @@ export const findSlug = (url, index = 2) => {
   return array[index];
 };
 
+export const uniqBy = (arr, prop) => {
+  const newArr = _.uniqBy(arr, prop);
+  return newArr;
+};
+
 /**
  * @param stringOfObj 查找对象的路径 从子级开始， 以点区隔
  * @param obj 被查找的对象
@@ -187,10 +216,10 @@ export const getObjValue = (stringOfObj, obj) => {
   if (validateNull(array)) {
     return null;
   }
-  let tempObj = obj;
-  let value = array.reduce(function(prev, cur) {
-    let currentObj = getObjType(prev) === 'object' ? prev : getItemChildrenProp(prev, tempObj);
-    let newObj = getItemChildrenProp(cur, currentObj);
+  const tempObj = obj;
+  const value = array.reduce(function (prev, cur) {
+    const currentObj = getObjType(prev) === 'object' ? prev : getItemChildrenProp(prev, tempObj);
+    const newObj = getItemChildrenProp(cur, currentObj);
     // console.log(newObj, currentObj, 'current level obj');
     return newObj;
   });
@@ -208,6 +237,41 @@ export const detailDataType = (value, type) => {
 };
 
 /**
+ *
+ * @param {*} Formulas 要执行的公式， 可多个
+ * @param {*} obj 要被计算的对象
+ */
+export const doCalc = (Formulas, obj) => {
+  if (getObjType(Formulas) === 'string') {
+    const Formula = getFormulaItem(Formulas);
+    const newObj = getFormulaValue(Formula, obj);
+    return newObj;
+  } else if (getObjType(Formulas) === 'array') {
+    let newObj = obj;
+    Formulas.map(async (item) => {
+      newObj = doCalc(item, newObj);
+    });
+    return newObj;
+  }
+};
+
+/**
+ *
+ * @param {*} Formulas 要执行的公式， 可为数组 [‘formula1’, ‘formula2’] 或者为 字符串 ‘formula1’
+ * @param {*} list 要被计算的列表
+ */
+export const doListCalc = (Formulas, list) => {
+  if (getObjType(list) === 'array') {
+    const newList = list.map((item) => {
+      const res = doCalc(Formulas, item);
+      return res;
+    });
+    return newList;
+  }
+  return list;
+};
+
+/**
  * 根据字段数组排序
  */
 
@@ -218,28 +282,51 @@ export const vaildData = (val, dafult) => {
   return !validateNull(val) ? val : dafult;
 };
 
+/**
+ *
+ * @param {*} formulaItem   计算公式
+ * @param {*} obj   要处理的数据对象
+ */
 export const getFormulaValue = (formulaItem, obj = {}) => {
-  const reference = function(name) {
-    return (context) => context[name];
+  const reference = function (name) {
+    return (context) => getNum(context[name]);
+  };
+  const checkNum = (n) => {
+    if (getObjType(n) === 'number' && n > 0) {
+      return true;
+    }
+    return false;
+  };
+  const getNum = function (value) {
+    let n = 0;
+    // 如果是字符串转数字
+    if (getObjType(value) === 'string') {
+      n = parseFloat(value);
+    }
+    // 结果为数字 直接返回数字 否则 返回 0
+    if (checkNum(n)) {
+      return n;
+    }
+    return 0;
   };
   const functions = {
-    x: (value) => value.toFixed(2)
+    r: (value) => value.toFixed(2)
   };
   if (!formulaItem || !formulaItem.formulaElementJson || !formulaItem.content) {
     obj.formulaVauleResult = false;
     return obj;
   }
-  let content = formulaItem.content.split('=')[0];
-  let result = formulaItem.content.split('=')[1] || 'r';
-  let type = getObjType(formulaItem.formulaElementJson);
+  const fullContent = formulaItem.content || '';
+  const content = fullContent.split('=')[0];
+  const result = fullContent.split('=')[1] || 'r';
+  const type = getObjType(formulaItem.formulaElementJson);
 
-  let list =
+  const list =
     type === 'array' ? formulaItem.formulaElementJson : JSON.parse(formulaItem.formulaElementJson);
-  let calcObj = {};
+  const calcObj = {};
   let resultField = 'price';
-
   list.map((item) => {
-    calcObj[item.elementId] = obj[item.fieldName] * 1;
+    calcObj[item.elementId] = obj[item.fieldName];
     if (item.elementId === result) {
       resultField = item.fieldName;
     }
@@ -249,14 +336,25 @@ export const getFormulaValue = (formulaItem, obj = {}) => {
     reference,
     functions
   });
-  let real = formula.evaluate(calcObj);
-  obj[resultField] = real;
-  obj.formulaVauleResult = true;
+  const real = formula.evaluate(calcObj);
+  if (checkNum(real)) {
+    obj[resultField] = real.toFixed(2);
+    obj.formulaVauleResult = true;
+  } else {
+    obj.formulaVauleResult = false;
+    obj.formulaVauleMessage = '数值异常,请检查输入';
+  }
+  console.log(real, '最终计算结果');
   return obj;
 };
 
+/**
+ *
+ * @param {*} list 用来排序的数组
+ * @param {*} prop 排序对比属性
+ */
 export const sortArrys = (list, prop) => {
-  list.sort(function(a, b) {
+  list.sort(function (a, b) {
     if (a[prop] > b[prop]) {
       return -1;
     }
@@ -269,7 +367,7 @@ export const sortArrys = (list, prop) => {
 };
 
 /**
- * @param stringOfObj 查找对象的路径 从子级开始， 以点区隔
+ * @param stringOfObj 查找对象的路径 从子级开始， 以点区隔  this.arr[0].item
  * @param obj 被查找的对象
  */
 export const checkObjExist = (stringOfObj, obj) => {
@@ -283,15 +381,20 @@ export const checkObjExist = (stringOfObj, obj) => {
   if (validateNull(array)) {
     return false;
   }
-  let tempObj = obj;
-  let value = array.reduce(function(prev, cur) {
-    let currentObj = getObjType(prev) === 'object' ? prev : getItemChildrenProp(prev, tempObj);
-    let newObj = getItemChildrenProp(cur, currentObj);
+  const tempObj = obj;
+  const value = array.reduce(function (prev, cur) {
+    const currentObj = getObjType(prev) === 'object' ? prev : getItemChildrenProp(prev, tempObj);
+    const newObj = getItemChildrenProp(cur, currentObj);
     return newObj;
   });
   return !!value;
 };
 
+/**
+ *
+ * @param {*} str 获取子级数据
+ * @param {*} obj 要获取的对象
+ */
 const getItemChildrenProp = (str, obj) => {
   if (validateNull(str)) {
     return null;
@@ -307,10 +410,18 @@ const getItemChildrenProp = (str, obj) => {
   }
 };
 
+/**
+ *
+ * @param {*} jsonObj 把对象转换为 base64
+ */
 export const zipLayout = (jsonObj) => {
   return btoa(unescape(encodeURIComponent(JSON.stringify(jsonObj))));
 };
 
+/**
+ *
+ * @param {*} jsonObjStr  把 base64 转换为对象
+ */
 export const unzipLayout = (jsonObjStr) => {
   let _atob = '';
   try {
@@ -318,24 +429,33 @@ export const unzipLayout = (jsonObjStr) => {
   } catch (e) {
     _atob = jsonObjStr;
   }
-  const projectObj = JSON.parse(_atob);
+  const projectObj = isJSON(_atob);
   console.log(projectObj, '解压缩数据');
   return projectObj;
 };
 
+/**
+ *
+ * @param {*} str  带数组定义字符串  list[0]
+ * @param {*} obj  要取值的对象
+ */
 export const getItemFormArrayStr = (str, obj) => {
   if (validateNull(obj)) {
     return null;
   }
-  let array = str.split('[');
-  let index = parseInt(array[1]);
-  let newObj = obj[array[0]];
+  const array = str.split('[');
+  const index = parseInt(array[1]);
+  const newObj = obj[array[0]];
   if (validateNull(newObj)) {
     return null;
   }
   return newObj[index];
 };
 
+/**
+ *
+ * @param {*} str  判断是否json 数据
+ */
 export function isJSON(str) {
   if (getObjType(str) !== 'string') {
     return false;
@@ -349,38 +469,61 @@ export function isJSON(str) {
   }
 }
 
-export const getDicItem = (action) => {
-  let dicLib = getStore({ name: 'commondic' });
-  if (dicLib && getObjType(dicLib) !== 'object') {
-    dicLib = JSON.parse(dicLib);
+export const getParseJson = (str) => {
+  const isJson = isJSON(str);
+  if (isJson) {
+    return JSON.parse(str);
   }
-  if (dicLib) {
-    let dic = dicLib[action];
-    if (dic) {
-      return dic;
-    }
-  } else {
+  return null;
+};
+
+/**
+ *
+ * @param {*} action  获取字典条目
+ */
+export const getDicItem = async (action, dic = 'commondic') => {
+  let item = getItemFormMap(action, dic);
+  if (!item) {
+    await loadDic();
+    item = getItemFormMap(action, dic);
+  }
+  return item;
+};
+
+export const getDicNow = (action, dic = 'commondic') => {
+  const item = getItemFormMap(action, dic);
+  if (!item) {
     loadDic();
   }
-  return [];
+  return item;
 };
 
-export const getFormulaItem = (action) => {
-  let lib = getStore({ name: 'commonFormula' });
-  if (lib && getObjType(lib) !== 'object') {
-    lib = JSON.parse(lib);
-  }
-  if (lib) {
-    let item = lib[action];
-    if (item) {
-      return item;
-    }
-  } else {
+/**
+ *
+ * @param {*} action  获取字典条目
+ */
+export const getDicList = async (action, dic = 'commondic') => {
+  const list = getListFormMap(action, dic);
+  return list;
+};
+
+/**
+ *
+ * @param {*} action 公式名称
+ * TODO 如果未找到 尝试刷新公式列表
+ */
+export const getFormulaItem = (action, dic = 'commonFormula') => {
+  let item = getItemFormMap(action, dic);
+  if (!item) {
     loadFormula();
+    item = getItemFormMap(action, dic);
   }
-  return [];
+  return item;
 };
 
+/**
+ * 初始化所有公式
+ */
 export const getFormulaList = async () => {
   let lib = getStore({ name: 'commonFormula' });
   if (lib && getObjType(lib) !== 'object') {
@@ -388,10 +531,9 @@ export const getFormulaList = async () => {
   } else {
     loadFormula();
   }
-
-  let list = [];
+  const list = [];
   Object.keys(lib).map((item) => {
-    let newItem = {
+    const newItem = {
       name: lib[item].name,
       value: item
     };
@@ -399,58 +541,93 @@ export const getFormulaList = async () => {
   });
   return list;
 };
-export const getTableItem = (action) => {
-  let lib = getStore({ name: 'allTableColumn' });
-  if (lib && getObjType(lib) !== 'object') {
-    lib = JSON.parse(lib);
+
+/**
+ *
+ * @param {*} action  获取数据库导出字段用来进行字段配置
+ */
+export const getTableItem = async (action) => {
+  let item = getItemFormMap(action, 'allTableColumn');
+  if (!item) {
+    await loadAllTable();
+    item = getItemFormMap(action, 'allTableColumn');
   }
+  return item;
+};
+
+const getItemFormMap = (action, storeName) => {
+  const lib = getStore({ name: storeName });
   if (lib) {
-    let item = lib[action];
+    const item = lib[action];
     if (item) {
       return item;
     }
-  } else {
-    loadAllTable();
   }
-  return [];
+  return null;
 };
 
-export const getTableList = () => {
-  let lib = getStore({ name: 'allTableColumn' });
-  if (lib && getObjType(lib) !== 'object') {
-    lib = JSON.parse(lib);
-  }
+const getListFormMap = (action, storeName) => {
+  const lib = getStore({ name: storeName });
+  const list = [];
   if (lib) {
-    let list = [];
     Object.keys(lib).map((item) => {
-      let newItem = {
+      list.push({
+        label: lib[item].name,
+        value: item
+      });
+    });
+    return list;
+  }
+  return null;
+};
+/**
+ * 获取所有数据库字段
+ */
+export const getTableList = () => {
+  let lib = parseTableList();
+  let list = [];
+  if (!validateNull(lib)) {
+    lib = loadAllTable();
+    list = parseTableList();
+  }
+  return list;
+};
+
+const parseTableList = () => {
+  const lib = getStore({ name: 'allTableColumn', timer: 240 });
+  const list = [];
+  if (lib) {
+    Object.keys(lib).map((item) => {
+      const newItem = {
         name: item,
         value: item
       };
       list.push(newItem);
     });
     return list;
-  } else {
-    loadAllTable();
   }
-  return [];
 };
-
+/**
+ *
+ * @param {*} type 获取指定模版定义
+ */
 export const getTemplateItem = async (type) => {
-  let template = getStore({ name: type });
-  if (template && getObjType(template) !== 'object') {
-    template = JSON.parse(template);
-  }
-  if (template) {
-    return template;
+  let item = getParseJson(getStore({ name: type, timer: 300 }));
+  if (item) {
+    return item;
   } else {
-    template = await loadTemplate(type);
-    return template;
+    item = await loadTemplate(type);
+    console.log(item);
+    return item;
   }
 };
 
+/**
+ *
+ * @param {*} type 获取指定组件定义
+ */
 export const getBlockItem = async (type) => {
-  let item = getStore({ name: type });
+  let item = getStore({ name: type, timer: 300 });
   if (item) {
     return item;
   } else {
@@ -460,7 +637,7 @@ export const getBlockItem = async (type) => {
 };
 
 export const getBlockFieldItem = async (type) => {
-  let fieldType = 'field_' + type;
+  const fieldType = 'field_' + type;
   let item = getStore({ name: fieldType });
   if (item && getObjType(item) !== 'object' && getObjType(item) !== 'array') {
     item = JSON.parse(item);
@@ -473,34 +650,57 @@ export const getBlockFieldItem = async (type) => {
   }
 };
 
-export const loadFormula = () => {
-  let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
-  let url = `${filePath}formula/index.json`;
-  loadJson(url, 'commonFormula');
+/**
+ * 加载公式
+ */
+
+export const loadFormula = async () => {
+  const filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
+  const url = `${filePath}formula/index.json`;
+  const item = await loadJson(url, 'commonFormula');
+  return item;
 };
 
-export const loadDic = () => {
-  let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
-  let url = `${filePath}dic/index.json`;
-  loadJson(url, 'commondic');
+/**
+ * 加载词典
+ */
+export const loadDic = async () => {
+  const filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
+  const url = `${filePath}dic/index.json`;
+  const item = await loadJson(url, 'commondic');
+  return item;
 };
 
-export const loadAllTable = () => {
-  let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
-  let url = `${filePath}allTableColumn.json`;
-  loadJson(url, 'allTableColumn');
+/**
+ * 加载字段
+ */
+export const loadAllTable = async () => {
+  const filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
+  const url = `${filePath}allTableColumn.json`;
+  const item = await loadJson(url, 'allTableColumn');
+  return item;
 };
 
-export const loadTemplate = (type) => {
-  let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/template/';
-  let url = `${filePath}${type}.json`;
-  loadJson(url, type);
+/**
+ *
+ * @param {*} type  加载指定模版
+ */
+export const loadTemplate = async (type) => {
+  const filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/template/';
+  const url = `${filePath}${type}.json`;
+  const item = await loadJson(url, type);
+  return item;
 };
+
+/**
+ *
+ * @param {*} type  加载组件
+ */
 
 export const loadBlock = async (type) => {
-  let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/block/';
-  let url = `${filePath}${type}.json`;
-  let block = await loadJson(url, type);
+  const filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/block/';
+  const url = `${filePath}${type}.json`;
+  const block = await loadJson(url, type);
   return block;
 };
 
@@ -511,11 +711,11 @@ export const initJson = () => {
 };
 
 export const loadJson = (url, name) => {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const xhr = new XMLHttpRequest();
     xhr.open('get', url, true);
     xhr.responseType = 'json';
-    xhr.onload = function() {
+    xhr.onload = function () {
       if (xhr.status === 200) {
         console.log('获取文件', url);
         setStore({ name, content: xhr.response });
@@ -531,7 +731,7 @@ export const loadJson = (url, name) => {
 };
 
 export const makeBlockOutputJson = (page) => {
-  let outputJson = util._initComponentsList(page, page);
+  const outputJson = util._initComponentsList(page, page);
   const base64 = zipLayout(outputJson);
   return base64;
 };
@@ -552,7 +752,7 @@ export const mergeColumn = (remoteColumn = [], localColum = []) => {
       }
       return newSubItem;
     });
-    let isExist = newColumn.find((subitem) => {
+    const isExist = newColumn.find((subitem) => {
       return subitem.prop === item.prop;
     });
     if (!isExist) {
@@ -574,7 +774,7 @@ export const mergeColumn = (remoteColumn = [], localColum = []) => {
 export function mySpanMethod(data, arr, filed, id, columnIndex, row) {
   // 通过lodash中的groupBy方法将数据处理成，需要合并的排在一起。
 
-  let itemArr = []; // 需要合并的数组。
+  const itemArr = []; // 需要合并的数组。
   data.forEach((item) => {
     if (item[filed] === row[filed]) {
       itemArr.push(item);
@@ -583,10 +783,10 @@ export function mySpanMethod(data, arr, filed, id, columnIndex, row) {
   for (let i = 0; i < arr.length; i++) {
     if (columnIndex === arr[i]) {
       // itemArr第一项需要向下合并，其它的不需要。
-      let rowFiled = row[filed];
-      let itemFiled = itemArr[0][filed];
-      let rid = row[id];
-      let itemId = itemArr[0][id];
+      const rowFiled = row[filed];
+      const itemFiled = itemArr[0][filed];
+      const rid = row[id];
+      const itemId = itemArr[0][id];
       if (rowFiled === itemFiled && rid === itemId) {
         return {
           rowspan: itemArr.length,
@@ -606,16 +806,16 @@ export const formatDate = (date, fmt) => {
   if (/(y+)/.test(fmt)) {
     fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
   }
-  let o = {
+  const o = {
     'M+': date.getMonth() + 1,
     'd+': date.getDate(),
     'h+': date.getHours(),
     'm+': date.getMinutes(),
     's+': date.getSeconds()
   };
-  for (let k in o) {
+  for (const k in o) {
     if (new RegExp(`(${k})`).test(fmt)) {
-      let str = o[k] + '';
+      const str = o[k] + '';
       fmt = fmt.replace(RegExp.$1, RegExp.$1.length === 1 ? str : padLeftZero(str));
     }
   }
@@ -642,7 +842,7 @@ export const renderSize = (filesize) => {
 };
 
 export const getAccount = () => {
-  let userInfo = getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
+  const userInfo = getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
   if (userInfo && userInfo.elsAccount) {
     return userInfo;
   }
@@ -666,7 +866,16 @@ const util = {
   unzipLayout,
   makeBlockOutputJson,
   mySpanMethod,
-  renderSize
+  renderSize,
+  getTemplateItem,
+  getDicItem,
+  getFormulaItem,
+  getBlockItem,
+  doCalc,
+  doListCalc,
+  uniqBy,
+  initJson,
+  getDicList
 };
 
 export default util;

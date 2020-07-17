@@ -113,7 +113,7 @@ export const getLocalToken = (supplier) => {
   const params = {
     elsAccount: supplier ? '307214' : '307000',
     elsSubAccount: '1001',
-    elsSubAccountPassword: md5('123456')
+    elsSubAccountPassword: md5('123')
   };
   login(params).then((res) => {
     setToken(res.data.data.token);

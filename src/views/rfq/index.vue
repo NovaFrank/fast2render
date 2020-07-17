@@ -8,7 +8,6 @@
       :option="tableOption.option"
       :page.sync="tableOption.page"
       v-model="tableOption.obj"
-      @current-row-change="handleCurrentRowChange"
       @size-change="sizeChange"
       @current-change="currentChange"
       :search="search"
@@ -84,7 +83,6 @@ export default {
     return {
       tabOption: tabOption,
       tableOption: tableOption,
-      currentSelectRow: {},
       tabActive: 'all',
       search: {},
       buttons: [
@@ -160,11 +158,6 @@ export default {
     },
     handleCreate() {
       this.$router.push({ path: '/new' });
-    },
-    handleCurrentRowChange(val) {
-      this.currentSelectRow = val;
-      this.$refs.list.selectClear();
-      this.$refs.list.toggleSelection([val]);
     },
     handleDelete(row) {
       this.$confirm('确定删除？', '提示').then(() => {});

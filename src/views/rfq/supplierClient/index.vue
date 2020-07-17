@@ -7,9 +7,11 @@
       :option="tableOption.option"
       :page.sync="tableOption.page"
       v-model="tableOption.obj"
-      @current-row-change="handleCurrentRowChange"
       @size-change="sizeChange"
       @current-change="currentChange"
+      :search="search"
+      @search-change="searchChange"
+      @search-reset="searchReset"
     >
       <template slot="enquiryNumber" slot-scope="scope">
         <el-button
@@ -65,9 +67,9 @@ export default {
     return {
       tabOption: tabOption,
       tableOption: tableOption,
-      currentSelectRow: {},
       tabActive: 'all',
       elsAccount: '',
+      search: {},
       elsSubAccount: ''
     };
   },
@@ -75,29 +77,58 @@ export default {
     const userInfo = getSupplierInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
+
+    ElsTemplateConfigService.find({
+      elsAccount: '307000',
+      businessModule: 'enquiry',
+      currentVersionFlag: 'Y'
+    }).then((res) => {
+      if (res.data && res.data.statusCode === '200' && res.data.pageData) {
+        const rows = res.data.pageData.rows || [];
+        console.log('rows', rows);
+        this.tableOption.option.column = this.tableOption.option.column.map((item) => {
+          if (item.prop === 'enquiryType') {
+            item.dicData = rows.map((item) => {
+              return {
+                value: item.templateNumber,
+                label: item.templateName
+              };
+            });
+          }
+          return item;
+        });
+      }
+    });
     this.initDicData();
     this.tableData();
   },
   watch: {
     tabActive() {
+      this.search = {};
       this.tableData();
     }
   },
   methods: {
+    searchReset() {
+      this.$refs.list.searchReset();
+      this.tableData();
+    },
+    searchChange(params, done) {
+      this.search = params;
+      this.tableOption.page = { pageSize: 10, currentPage: 1 };
+      this.tableData(params);
+      done();
+    },
     currentChange(val) {
       this.tableOption.page.currentPage = val;
       this.tableData({
         currentPage: val,
-        pageSize: this.tableOption.page.pageSize
+        pageSize: this.tableOption.page.pageSize,
+        ...this.search
       });
     },
     handleCreate() {
       this.$router.push({ path: '/new' });
-    },
-    handleCurrentRowChange(val) {
-      this.currentSelectRow = val;
-      this.$refs.list.selectClear();
-      this.$refs.list.toggleSelection([val]);
     },
     handleDelete(row) {
       this.$confirm('确定删除？', '提示').then(() => {});
@@ -109,6 +140,7 @@ export default {
       this.$router.push({ path: `/client/quota/${row.enquiryNumber}` });
     },
     handleTabChange(value) {
+      this.$refs.list.searchReset();
       this.tabActive = value.prop;
       this.tableOption.page = {
         currentPage: 1,
@@ -134,7 +166,8 @@ export default {
       this.tableOption.page.pageSize = val;
       this.tableData({
         currentPage: 1,
-        pageSize: val
+        pageSize: val,
+        ...this.search
       });
     },
     tableData(data) {
@@ -183,28 +216,6 @@ export default {
         }
         this.tableOption.data = res.data.pageData.rows;
         this.tableOption.page.total = res.data.pageData.total;
-      });
-
-      ElsTemplateConfigService.find({
-        elsAccount: '307000',
-        businessModule: 'enquiry',
-        currentVersionFlag: 'Y'
-      }).then((res) => {
-        if (res.data && res.data.statusCode === '200' && res.data.pageData) {
-          const rows = res.data.pageData.rows || [];
-          console.log('rows', rows);
-          this.tableOption.option.column = this.tableOption.option.column.map((item) => {
-            if (item.prop === 'enquiryType') {
-              item.dicData = rows.map((item) => {
-                return {
-                  value: item.templateNumber,
-                  label: item.templateName
-                };
-              });
-            }
-            return item;
-          });
-        }
       });
     }
   }

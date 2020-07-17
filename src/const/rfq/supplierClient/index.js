@@ -15,6 +15,9 @@ export default {
     border: true,
     highlightCurrentRow: true,
     index: true,
+    searchLabelWidth: 140,
+    searchMenuSpan: 6,
+    searchShow: false,
     selectable: (row, index) => {
       console.log(row, index);
     },
@@ -23,11 +26,13 @@ export default {
         slot: true,
         label: '询价单号',
         prop: 'enquiryNumber',
-        width: '140'
+        width: '140',
+        search: true
       },
       {
         label: '物料编号',
-        prop: 'materialNumber'
+        prop: 'materialNumber',
+        search: true
       },
       {
         label: '物料名称',
@@ -42,7 +47,8 @@ export default {
         dicMethod: 'get',
         type: 'select',
         label: '报价方式',
-        prop: 'quoteMethod'
+        prop: 'quoteMethod',
+        search: true
       },
       {
         label: '需求数量',
@@ -51,7 +57,8 @@ export default {
       {
         type: 'select',
         label: '询价类型',
-        prop: 'enquiryType'
+        prop: 'enquiryType',
+        search: true
       },
       {
         type: 'date',

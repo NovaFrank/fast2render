@@ -29,6 +29,15 @@
             ></i>
           </el-input>
         </template>
+        <template slot="factory">
+          <el-input v-model="formOption.obj.factory" :readonly="true">
+            <i
+              slot="suffix"
+              class=" el-input_icon el-icon-search pointer"
+              @click="factoryGroupDialogOpen"
+            ></i>
+          </el-input>
+        </template>
         <template slot="purchaseGroup">
           <el-input v-model="formOption.obj.purchaseGroup" :readonly="true">
             <i
@@ -130,6 +139,15 @@
       actionPath="findPageList"
       @save="purchaseGroupDialogSave"
     ></selectDialog4>
+    <selectDialog5
+      ref="factoryGroupDialog"
+      :dialogVisible.sync="dialogFactoryGroupVisible"
+      :title="'添加工厂'"
+      :column="factoryGroupOption.option.column"
+      :elsAccount="elsAccount"
+      actionPath="findPageList"
+      @save="factoryGroupDialogSave"
+    ></selectDialog5>
   </basic-container>
 </template>
 
@@ -144,11 +162,13 @@ import materialOption from '@/const/order/materiaList';
 import supplierOption from '@/const/order/supplierList';
 import purchaseOption from '@/const/order/purchaseList';
 import purchaseGroupOption from '@/const/order/purchaseGroupList';
+import factoryGroupOption from '@/const/order/factoryGroupList';
 import planListOption from '@/const/order/planList';
 import selectDialog from '@/common/selectDialog';
 import selectDialog2 from '@/common/selectDialog2';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
+import selectDialog5 from '@/common/selectDialog5';
 import { getUserInfo } from '@/util/utils.js';
 import {
   createOrder,
@@ -165,7 +185,8 @@ export default {
     selectDialog,
     selectDialog2,
     selectDialog3,
-    selectDialog4
+    selectDialog4,
+    selectDialog5
   },
   name: 'Detail',
   props: {},
@@ -178,6 +199,7 @@ export default {
       dialogSupplierVisible: false,
       dialogPurchaseVisible: false,
       dialogPurchaseGroupVisible: false,
+      dialogFactoryGroupVisible: false,
       tabOption: tabOption4Create,
       fileOption: fileOption,
       purchaseGroupOption: purchaseGroupOption,
@@ -202,6 +224,7 @@ export default {
       supplierOption: supplierOption,
       purchaseOption: purchaseOption,
       planListOption: planListOption,
+      factoryGroupOption: factoryGroupOption,
       crudObj: {},
       crudOption: {},
       headerButtons: [
@@ -600,6 +623,14 @@ export default {
     purchaseGroupDialogSave(selectColumns) {
       if (selectColumns.length !== 0) {
         this.formOption.obj.purchaseGroup = selectColumns[0].orgCategoryDesc;
+      }
+    },
+    factoryGroupDialogOpen() {
+      this.dialogFactoryGroupVisible = true;
+    },
+    factoryGroupDialogSave(selectColumns) {
+      if (selectColumns.length !== 0) {
+        this.formOption.obj.factory = selectColumns[0].orgId;
       }
     },
     handleDeliveryDate(val) {

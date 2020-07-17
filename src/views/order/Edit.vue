@@ -29,6 +29,15 @@
             ></i>
           </el-input>
         </template>
+        <template slot="factory">
+          <el-input v-model="formOption.obj.factory" :readonly="true">
+            <i
+              slot="suffix"
+              class=" el-input_icon el-icon-search pointer"
+              @click="factoryGroupDialogOpen"
+            ></i>
+          </el-input>
+        </template>
       </avue-form>
     </div>
     <div class="clear" style="margin-bottom: 30px;"></div>
@@ -105,6 +114,15 @@
       actionPath="findPageList"
       @save="purchaseGroupDialogSave"
     ></selectDialog4>
+    <selectDialog5
+      ref="factoryGroupDialog"
+      :dialogVisible.sync="dialogFactoryGroupVisible"
+      :title="'添加工厂'"
+      :column="factoryGroupOption.option.column"
+      :elsAccount="elsAccount"
+      actionPath="findPageList"
+      @save="factoryGroupDialogSave"
+    ></selectDialog5>
   </basic-container>
 </template>
 
@@ -118,17 +136,20 @@ import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielLIstDemand';
 import purchaseGroupOption from '@/const/order/purchaseGroupList';
+import factoryGroupOption from '@/const/order/factoryGroupList';
 import { getOrderList, createOrder, submitAudit, getPriceDetail } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
+import selectDialog5 from '@/common/selectDialog5';
 import { getUserInfo } from '@/util/utils.js';
 export default {
   components: {
     FormHeader,
     selectDialog,
     selectDialog3,
-    selectDialog4
+    selectDialog4,
+    selectDialog5
   },
   name: 'Detail',
   props: {},
@@ -159,8 +180,10 @@ export default {
       dialogVisible: false,
       dialogPurchaseVisible: false,
       dialogPurchaseGroupVisible: false,
+      dialogFactoryGroupVisible: false,
       materialOption: materialOption,
       purchaseOption: purchaseOption,
+      factoryGroupOption: factoryGroupOption,
       formOption: formOption,
       planListOption: planListOption,
       crudObj: {},
@@ -572,6 +595,14 @@ export default {
     purchaseGroupDialogSave(selectColumns) {
       if (selectColumns.length !== 0) {
         this.formOption.obj.purchaseGroup = selectColumns[0].orgCategoryDesc;
+      }
+    },
+    factoryGroupDialogOpen() {
+      this.dialogFactoryGroupVisible = true;
+    },
+    factoryGroupDialogSave(selectColumns) {
+      if (selectColumns.length !== 0) {
+        this.formOption.obj.factory = selectColumns[0].orgId;
       }
     }
   }

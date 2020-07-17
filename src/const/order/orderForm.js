@@ -100,6 +100,13 @@ export default {
         ]
       },
       {
+        label: '采购工厂',
+        prop: 'factory',
+        span: 6,
+        type: 'input',
+        formslot: true
+      },
+      {
         label: '订单状态',
         prop: 'orderStatus',
         span: 6,

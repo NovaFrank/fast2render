@@ -68,6 +68,12 @@ export default {
         type: 'input'
       },
       {
+        label: '采购工厂',
+        prop: 'factory',
+        span: 6,
+        type: 'input'
+      },
+      {
         label: '订单状态',
         prop: 'orderStatus',
         span: 6,

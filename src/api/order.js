@@ -121,3 +121,13 @@ export const uploadServlet = (formdata) => {
     data: formdata
   });
 };
+// 获取采购组/工厂列表
+export const getFactoryGroup = (action, params) => {
+  return axios({
+    url: `${baseUrl}/ElsOrgInfoService/${action}`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};

@@ -38,7 +38,7 @@
             filterable
             clearable
             disabled
-            placeholder="请选择 成本模板"
+            placeholder="请选择 询价类型"
           >
             <el-option
               v-for="item in requestTypeDict"
@@ -548,7 +548,8 @@ export default {
           configurations[item.templateNumber] = {
             name: item.templateName, // 模板名称
             rule: json.rule, // 单规则
-            fieldColumns: field, // 头信息
+            // fieldColumns: field, // 头信息
+            fieldColumns: this.$util.handlerLocalRolePermission(json.field), // 头信息
             tableColumns: table, // 行信息
             buttons: json.buttonJson
           };
@@ -763,6 +764,7 @@ export default {
         });
         // this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
         const fieldColumns = configuration.fieldColumns;
+        console.log('fieldColumns', fieldColumns);
         fieldColumns.forEach((item) => {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
             this.formOption.column.push({
@@ -1110,6 +1112,56 @@ export default {
       });
     },
     handleSubmitApproval() {
+      let status = true;
+      let result = false;
+      this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
+        return {
+          ...item,
+          itemStatus: item.itemStatusCopy
+        };
+      });
+      this.inquiryListOption.data.forEach((item) => {
+        if (item.itemStatus === '4') {
+          // 必须有接受的报价才能够提交审批
+          status = false;
+        }
+        if (item.itemStatus === '4') {
+          let quote = 0;
+          this.inquiryListOption.data
+            .filter(
+              (itemF) => itemF.materialNumber === item.materialNumber && item.itemStatus === '4'
+            )
+            .forEach((itemQuota) => {
+              quote += Number(itemQuota.quota);
+            });
+          // 相同物料 已报价 分配的配额必须相加为100（且 规则为配额是）
+          if (
+            Number(quote) !== 100 &&
+            this.templateRule.enquiryIsQuota === true &&
+            this.templateRule.enquiryQuotaType !== 'number'
+          ) {
+            result = true;
+          } else if (
+            Number(quote) !== Number(item.quantity) &&
+            this.templateRule.enquiryIsQuota === true &&
+            this.templateRule.enquiryQuotaType === 'number'
+          ) {
+            result = true;
+          }
+        }
+      });
+      if (status) {
+        this.$message.error('必须有接受状态的报价才能够提交审批');
+        return;
+      }
+      if (result) {
+        this.$message.error(
+          `物料配额必须等于${
+            this.templateRule.enquiryQuotaType === 'percentage' ? '100' : '需求数量'
+          }`
+        );
+        return;
+      }
       // 保存后跳转到比价报告页面
       this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
         return {
@@ -1135,56 +1187,6 @@ export default {
           this.$message.error(res.data.message);
         }
       });
-      // let status = true;
-      // let result = false;
-      // this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
-      //   return {
-      //     ...item,
-      //     itemStatus: item.itemStatusCopy
-      //   };
-      // });
-      // this.inquiryListOption.data.forEach((item) => {
-      //   if (item.itemStatus === '4') {
-      //     // 必须有接受的报价才能够提交审批
-      //     status = false;
-      //   }
-      //   if (item.itemStatus === '4') {
-      //     let quote = 0;
-      //     this.inquiryListOption.data
-      //       .filter(
-      //         (itemF) => itemF.materialNumber === item.materialNumber && item.itemStatus === '4'
-      //       )
-      //       .forEach((itemQuota) => {
-      //         quote += Number(itemQuota.quota);
-      //       });
-      //     // 相同物料 已报价 分配的配额必须相加为100（且 规则为配额是）
-      //     if (
-      //       Number(quote) !== 100 &&
-      //       this.templateRule.enquiryIsQuota === true &&
-      //       this.templateRule.enquiryQuotaType !== 'number'
-      //     ) {
-      //       result = true;
-      //     } else if (
-      //       Number(quote) !== Number(item.quantity) &&
-      //       this.templateRule.enquiryIsQuota === true &&
-      //       this.templateRule.enquiryQuotaType === 'number'
-      //     ) {
-      //       result = true;
-      //     }
-      //   }
-      // });
-      // if (status) {
-      //   this.$message.error('必须有接受状态的报价才能够提交审批');
-      //   return;
-      // }
-      // if (result) {
-      //   this.$message.error(
-      //     `物料配额必须等于${
-      //       this.templateRule.enquiryQuotaType === 'percentage' ? '100' : '需求数量'
-      //     }`
-      //   );
-      //   return;
-      // }
       // this.$confirm('是否提交审批？', '提示', {
       //   confirmButtonText: '确定',
       //   cancelButtonText: '取消',

@@ -117,6 +117,21 @@
           {{ JSON.parse(scope.row.costConstituteJson).templateName }}
         </span>
       </template>
+      <!-- <template slot="menuLeft" v-if="!purchaseRequest">
+        <el-upload
+          id="webpicker"
+          :show-file-list="false"
+          class="upload-box"
+          style="display: contents;"
+          ref="uploadBox"
+          :http-request="uploadFile"
+          action="/"
+        >
+          <el-button size="small" slot="trigger" type="primary">
+            导入
+          </el-button>
+        </el-upload>
+      </template> -->
       <template slot="menuLeft" v-if="!purchaseRequest">
         <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>
       </template>
@@ -190,7 +205,14 @@ import auditListOption from '@/const/rfq/newAndView/auditListOption';
 import { getUserInfo } from '@/util/utils.js';
 import { setStore } from '@/util/store.js';
 
-import { orgList, dataDicAPI, supplierMasterListAction, accountListAction } from '@/api/rfq/common';
+import {
+  orgList,
+  dataDicAPI,
+  supplierMasterListAction,
+  accountListAction,
+  uploadServlet,
+  importExcel
+} from '@/api/rfq/common';
 import {
   purchaseEnquiryAction,
   queryDetailAction,
@@ -423,6 +445,34 @@ export default {
     }
   },
   methods: {
+    async uploadFile(myfile) {
+      const formdata = new FormData();
+      formdata.append('file', myfile.file);
+      uploadServlet(formdata)
+        .then((res) => {
+          console.log('上传结束', res);
+          if (res.data.statusCode === '200') {
+            const url = res.data.data[0].url;
+            importExcel(url).then((result) => {
+              console.log(result);
+            });
+            // const data = res.data.data[0];
+            // const file = {
+            //   fileSize: data.size,
+            //   fileName: data.name,
+            //   fileType: data.type,
+            //   filePath: data.url
+            // };
+            // this.$emit('upload-file', file);
+            // this.updateFileList(file);
+          } else {
+            this.$message.error('上传失败');
+          }
+        })
+        .catch(() => {
+          this.$message.error('上传失败');
+        });
+    },
     initColumns() {
       const validateQuoteEndTime = (rule, value, callback) => {
         if (value && value < new Date().getTime()) {
@@ -554,6 +604,7 @@ export default {
     handleEnquiryTypeChange(value) {
       if (this.configurations[value]) {
         const configuration = this.configurations[value];
+        console.log('configuration', configuration);
         this.templateRule = configuration.rule;
         this.initColumns();
         this.tabOption.option.column = [
@@ -640,8 +691,8 @@ export default {
             this.formOption.column.push({
               span: item.span || 6,
               rules,
-              disabled: item.isDisabled,
-              ...item
+              ...item,
+              disabled: !item.purchaseEdit
             });
           }
         });
@@ -689,7 +740,8 @@ export default {
           configurations[item.templateNumber] = {
             name: item.templateName, // 模板名称
             rule: json.rule, // 单规则
-            fieldColumns: field, // 头信息
+            // fieldColumns: field, // 头信息
+            fieldColumns: this.$util.handlerLocalRolePermission(json.field), // 头信息
             tableColumns: table, // 行信息
             buttons: json.buttonJson
           };

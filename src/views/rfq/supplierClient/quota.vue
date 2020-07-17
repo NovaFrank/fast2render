@@ -17,7 +17,7 @@
           filterable
           clearable
           disabled
-          placeholder="请选择 成本模板"
+          placeholder="请选择 询价类型"
         >
           <el-option
             v-for="item in requestTypeDict"
@@ -59,11 +59,13 @@
     ></fast2-attachment-list>
     <!-- 询价明细 -->
     <avue-crud
+      ref="detail"
       v-show="tabActive === 'detail'"
       :data="inquiryListOption.data"
       :option="inquiryListOption.option"
       :page.sync="inquiryListOption.page"
       v-model="inquiryListOption.obj"
+      @row-update="handleRowUpdate"
       @size-change="sizeChange"
       @current-change="currentChange"
     >
@@ -127,19 +129,29 @@
         ></avue-radio>
       </template>
       <template slot-scope="scope" slot="menu">
-        <el-button
+        <div
           v-if="
             (scope.row.noQuoted !== 'N' &&
               scope.row.itemStatus === '1' &&
               detailObj.quoteEndTime > new Date().getTime()) ||
               scope.row.itemStatus === '3'
           "
-          @click.stop="handleQuoteRow(scope)"
-          class="el-button el-button--text el-button--small"
         >
-          <i class="el-icon-edit"></i>
-          报价
-        </el-button>
+          <el-button
+            @click.stop="handleQuoteRow(scope)"
+            class="el-button el-button--text el-button--small"
+          >
+            <i class="el-icon-edit"></i>
+            报价
+          </el-button>
+          <!-- <el-button
+            @click.stop="handleEditRow(scope)"
+            class="el-button el-button--text el-button--small"
+          >
+            <i class="el-icon-edit"></i>
+            编辑
+          </el-button> -->
+        </div>
       </template>
     </avue-crud>
     <!-- 常规报价 -->
@@ -311,23 +323,24 @@ export default {
         { label: '负责人', span: 6, prop: 'createUser', disabled: true }
       ];
       this.inquiryListOption.option.column = [
-        { label: '物料编号', prop: 'materialNumber' },
-        { label: '物料名称', prop: 'materialName' },
-        { label: '物料描述', prop: 'materialDesc' },
-        { label: '单位', prop: 'baseUnit', span: 4 },
-        { label: '需求数量', prop: 'quantity' },
-        { type: 'tree', label: '公司代码', prop: 'companyCode' },
-        { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
-        { slot: true, label: '成本模板', prop: 'costTemplate' },
-        { slot: true, label: '含税价', prop: 'priceIncludingTax' },
-        { label: '税率', prop: 'taxRate' },
-        { slot: true, label: '不含税价', prop: 'priceExcludingTax' },
+        { label: '物料编号', prop: 'materialNumber', editDisabled: true },
+        { label: '物料名称', prop: 'materialName', editDisabled: true },
+        { label: '物料描述', prop: 'materialDesc', editDisabled: true },
+        { label: '单位', prop: 'baseUnit', span: 4, editDisabled: true },
+        { label: '需求数量', prop: 'quantity', editDisabled: true },
+        { type: 'tree', label: '公司代码', prop: 'companyCode', editDisabled: true },
+        { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo', editDisabled: true },
+        { slot: true, label: '成本模板', prop: 'costTemplate', editDisabled: true },
+        { slot: true, label: '含税价', prop: 'priceIncludingTax', editDisabled: true },
+        { label: '税率', prop: 'taxRate', editDisabled: true },
+        { slot: true, label: '不含税价', prop: 'priceExcludingTax', editDisabled: true },
         {
           label: '报价时间',
           type: 'datetime',
           format: 'yyyy-MM-dd HH:mm:ss',
           valueFormat: 'timestamp',
-          prop: 'quoteDate'
+          prop: 'quoteDate',
+          editDisabled: true
         }
       ];
     },
@@ -341,11 +354,14 @@ export default {
           result.label = item.fbk1 || item.label;
           result.display = item.saleShow;
           result.hide = !item.saleShow;
+          result.editDisabled = !item.saleEdit;
           result.span = item.span;
           result.type = item.type;
           result.dicData = item.dicData;
           result.dicUrl = item.dicUrl;
           result.dicMethod = item.dicMethod;
+          result.valueFormat = 'timestamp';
+          result.format = item.format;
           if (item.saleEdit) this.quoteColumn.push(result);
           return result;
         });
@@ -355,20 +371,19 @@ export default {
             this.inquiryListOption.option.column.filter((i) => i.prop === item.prop).length === 0
           ) {
             this.inquiryListOption.option.column.push({
-              span: item.span || 6,
+              span: item.span,
               ...item
             });
           }
         });
-        // this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
         const fieldColumns = this.configurations[value].fieldColumns;
         fieldColumns.forEach((item) => {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
             console.log('this.configurations[value]', item);
             this.formOption.column.push({
-              span: item.span || 6,
-              disabled: item.isDisabled,
-              ...item
+              span: item.span,
+              ...item,
+              disabled: !item.saleEdit
             });
           }
         });
@@ -377,6 +392,7 @@ export default {
       }
       this.inquiryListOption.option.column.push({
         slot: true,
+        editDisplay: false,
         label: '是否报价',
         type: 'switch',
         prop: 'quote'
@@ -485,7 +501,8 @@ export default {
           configurations[item.templateNumber] = {
             name: item.templateName, // 模板名称
             rule: json.rule, // 单规则
-            fieldColumns: field, // 头信息
+            // fieldColumns: field, // 头信息
+            fieldColumns: this.$util.handlerLocalRolePermission(json.field, 'sales'), // 头信息
             tableColumns: table // 行信息
           };
         }
@@ -576,6 +593,13 @@ export default {
         this.providerData[element.prop] = element.propData;
       });
       this.costDialogVisible = true;
+    },
+    handleRowUpdate(row, index, done) {
+      this.inquiryListOption.data.splice(index, 1, row);
+      done();
+    },
+    handleEditRow(scope) {
+      this.$refs.detail.rowEdit(scope.row);
     },
     // 显示报价弹窗
     handleQuoteRow(scope) {

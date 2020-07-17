@@ -437,7 +437,6 @@ export default {
   },
   methods: {
     async uploadFile(myfile) {
-      console.log('myfile', myfile);
       const formdata = new FormData();
       formdata.append('file', myfile.file);
       uploadServlet(formdata)
@@ -685,8 +684,8 @@ export default {
             this.formOption.column.push({
               span: item.span || 6,
               rules,
-              disabled: item.isDisabled,
-              ...item
+              ...item,
+              disabled: !item.purchaseEdit
             });
           }
         });

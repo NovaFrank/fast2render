@@ -355,7 +355,6 @@ export default {
           result.format = item.format;
           return result;
         });
-        console.log(current, this.configurations[value].tableColumns);
         this.initColumns();
         current.forEach((item) => {
           if (
@@ -372,8 +371,8 @@ export default {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
             this.formOption.column.push({
               span: item.span,
-              disabled: item.isDisabled,
-              ...item
+              ...item,
+              disabled: !item.saleEdit
             });
           }
         });

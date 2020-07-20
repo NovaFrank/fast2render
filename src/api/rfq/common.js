@@ -12,8 +12,11 @@ export const uploadServlet = (formdata) => {
 };
 export const importExcel = (url) => {
   return request({
-    url: `${prefix}/inquiry/PurchaseEnquiryService/importExcel/${url}`,
-    method: 'get'
+    url: `${prefix}/inquiry/PurchaseEnquiryService/importExcel`,
+    method: 'post',
+    data: {
+      queryStr: url
+    }
   });
 };
 

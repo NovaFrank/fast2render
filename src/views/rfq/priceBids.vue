@@ -687,24 +687,24 @@ export default {
     handleDateCheckChange(value) {
       this.dateChecked = value;
       if (value === '年') {
-        this.historyChartData(this.yearValue);
+        this.historyChartData('findPageListHisPriceY', this.yearValue);
       } else {
-        this.historyChartData(this.monthValue);
+        this.historyChartData('findPageListHisPriceM', this.monthValue);
       }
     },
     handleMonthChange(value) {
-      this.historyChartData(value);
+      this.historyChartData('findPageListHisPriceM', value);
     },
     handleYearChange(value) {
-      this.historyChartData(value);
+      this.historyChartData('findPageListHisPriceY', value);
     },
-    historyChartData(dateStr) {
+    historyChartData(action, dateStr) {
       const params = {
         elsAccount: this.detailObj.elsAccount,
         dateStr: dateStr || this.yearValue,
         materialNumber: this.currentMaterial.materialNumber // 'A2020052200014'
       };
-      historyAction('findPageListHisPriceY', params).then((res) => {
+      historyAction(action || 'findPageListHisPriceY', params).then((res) => {
         if (res.data.statusCode === '200') {
           const data = res.data.data;
           this.historyChartOption.xAxis.data =

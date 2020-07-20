@@ -598,6 +598,8 @@ export default {
           result.dicData = item.dicData;
           result.dicUrl = item.dicUrl;
           result.dicMethod = item.dicMethod;
+          result.valueFormat = 'timestamp';
+          result.format = item.format;
           return result;
         });
         current.forEach((item) => {

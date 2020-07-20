@@ -401,6 +401,7 @@ export default {
           });
         }
       } else {
+        this.inquiryListOption.option.header = true;
         this.headerButtons = [
           { power: true, text: '返回', type: '', size: '', action: 'on-back' },
           { power: true, text: '更新时间', type: 'primary', size: '', action: 'on-update-end' },

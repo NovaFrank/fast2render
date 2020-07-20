@@ -713,7 +713,7 @@ export default {
             if (item.isRequired) {
               rules.push({
                 required: true,
-                message: '请填写' + item.label,
+                message: '请填写' + item.fbk1 || item.label,
                 trigger: 'blur'
               });
             }
@@ -721,6 +721,7 @@ export default {
               span: item.span || 6,
               rules,
               ...item,
+              label: item.fbk1 || item.label,
               disabled: !item.purchaseEdit
             });
           }

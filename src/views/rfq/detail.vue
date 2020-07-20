@@ -768,13 +768,13 @@ export default {
         });
         // this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
         const fieldColumns = configuration.fieldColumns;
-        console.log('fieldColumns', fieldColumns);
         fieldColumns.forEach((item) => {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
             this.formOption.column.push({
               span: item.span || 6,
               ...item,
-              disabled: true
+              disabled: true,
+              label: item.fbk1 || item.label
             });
           }
         });

@@ -619,7 +619,8 @@ export default {
             this.formOption.column.push({
               span: item.span || 6,
               ...item,
-              disabled: true
+              disabled: true,
+              label: item.fbk1 || item.label
             });
           }
         });

@@ -483,15 +483,6 @@ export default {
               }
               this.$message.error('导入失败');
             });
-            // const data = res.data.data[0];
-            // const file = {
-            //   fileSize: data.size,
-            //   fileName: data.name,
-            //   fileType: data.type,
-            //   filePath: data.url
-            // };
-            // this.$emit('upload-file', file);
-            // this.updateFileList(file);
           } else {
             this.$message.error('上传失败');
           }

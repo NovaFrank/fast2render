@@ -714,7 +714,8 @@ export default {
               span: item.span || 6,
               rules,
               ...item,
-              disabled: !item.purchaseEdit
+              disabled: !item.purchaseEdit,
+              label: item.fbk1 || item.label
             });
           }
         });

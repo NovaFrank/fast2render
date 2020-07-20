@@ -503,7 +503,8 @@ export default {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
             this.formOption.column.push({
               span: item.span || 6,
-              ...item
+              ...item,
+              label: item.fbk1 || item.label
             });
           }
         });

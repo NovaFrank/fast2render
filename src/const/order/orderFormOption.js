@@ -21,8 +21,8 @@ export default {
     menuAlign: 'center',
     menuWidth: '130',
     searchBtn: true,
-    searchShow: true,
     searchMenuSpan: 6,
+    searchShow: false,
     columnBtn: false,
     column: [
       {

@@ -615,7 +615,7 @@ export default {
     },
     purchaseGroupDialogSave(selectColumns) {
       if (selectColumns.length !== 0) {
-        this.formOption.obj.purchaseGroup = selectColumns[0].orgCategoryDesc;
+        this.formOption.obj.purchaseGroup = selectColumns[0].orgId;
       }
     },
     factoryGroupDialogOpen() {

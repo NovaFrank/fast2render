@@ -28,12 +28,12 @@ export default {
     column: [
       {
         label: '采购组编码',
-        prop: 'orgCategoryId',
+        prop: 'orgId',
         overHidden: true
       },
       {
         label: '采购组描述',
-        prop: 'orgCategoryDesc',
+        prop: 'orgDesc',
         overHidden: true
       }
     ]

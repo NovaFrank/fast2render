@@ -118,6 +118,7 @@ export default {
       let listParams = {};
       listParams.elsAccount = this.elsAccount;
       // listParams.toElsAccout = '307001';
+      listParams.orgCategoryId = 'purchaseGroup';
       listParams.currentPage = this.crudPage.currentPage;
       listParams.pageSize = this.crudPage.pageSize;
       getPurchaseGroup(this.actionPath, listParams).then((res) => {

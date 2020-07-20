@@ -698,7 +698,7 @@ export default {
       });
     },
     handleAgainQuote(row) {
-      this.$confirm('确定要该供应商物料重报价（请更新报价截止时间）？', '提示', {
+      this.$confirm('确定要该供应商物料重报价？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

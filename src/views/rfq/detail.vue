@@ -336,6 +336,7 @@ export default {
       formOption: formOption,
       tabOption: tabOption,
       tabAuditOption: tabAuditOption,
+      oldInquiryData: [],
       inquiryListOption: inquiryListOption,
       auditListOption: auditListOption,
       quoteListOption: quoteListOption,
@@ -719,7 +720,7 @@ export default {
       });
     },
     handleAgainQuote(row) {
-      this.$confirm('确定要该供应商物料重报价（请更新报价截止时间）？', '提示', {
+      this.$confirm('确定要该供应商物料重报价？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -788,6 +789,11 @@ export default {
         }, 1000);
         return;
       }
+      let result = this.inquiryListOption.data.length === this.oldInquiryData.length;
+      if (result) {
+        this.$message.error('请添加新供应商再发布');
+        return;
+      }
       this.$confirm('是否发布新供应商？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -825,6 +831,7 @@ export default {
             return;
           }
           this.$message.success('新供应商发布成功');
+          this.oldInquiryData = this.inquiryListOption.data;
         });
       });
     },
@@ -947,6 +954,7 @@ export default {
           itemStatus: item.itemStatusCopy
         };
       });
+      this.oldInquiryData = this.inquiryListOption.data;
       const param = {
         ...this.detailObj,
         enquiryNumber: this.currentEnquiryNumber,
@@ -970,7 +978,8 @@ export default {
       });
     },
     handleSubmitApproval() {
-      let status = true;
+      // 78253 要求去掉
+      // let status = true;
       let result = false;
       this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
         return {
@@ -978,11 +987,12 @@ export default {
           itemStatus: item.itemStatusCopy
         };
       });
+      this.oldInquiryData = this.inquiryListOption.data;
       this.inquiryListOption.data.forEach((item) => {
-        if (item.itemStatus === '4') {
-          // 必须有接受的报价才能够提交审批
-          status = false;
-        }
+        // if (item.itemStatus === '4') {
+        //   // 必须有接受的报价才能够提交审批
+        //   status = false;
+        // }
         if (item.itemStatus === '4') {
           let quote = 0;
           this.inquiryListOption.data
@@ -1008,10 +1018,10 @@ export default {
           }
         }
       });
-      if (status) {
-        this.$message.error('必须有接受状态的报价才能够提交审批');
-        return;
-      }
+      // if (status) {
+      //   this.$message.error('必须有接受状态的报价才能够提交审批');
+      //   return;
+      // }
       if (result) {
         this.$message.error(
           `物料配额必须等于${
@@ -1027,6 +1037,7 @@ export default {
           itemStatus: item.itemStatusCopy
         };
       });
+      this.oldInquiryData = this.inquiryListOption.data;
       const param = {
         ...this.detailObj,
         enquiryNumber: this.currentEnquiryNumber,
@@ -1125,6 +1136,7 @@ export default {
     initDetail() {
       this.detailObj = {};
       this.inquiryListOption.data = [];
+      this.oldInquiryData = [];
       queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
         this.detailObj = res.data.data;
@@ -1231,15 +1243,17 @@ export default {
             id: item.uuid,
             // toElsAccountName: item.toElsAccount.split('_')[1],
             $cellEdit:
-              item.itemStatus === '4' &&
-              this.detailObj.auditStatus !== '0' &&
-              this.detailObj.auditStatus !== '2',
-            itemStatusCopy: item.itemStatus,
+              item.itemStatus === '2' ||
+              (item.itemStatus === '4' &&
+                this.detailObj.auditStatus !== '0' &&
+                this.detailObj.auditStatus !== '2'),
+            itemStatusCopy: item.itemStatus === '2' ? '4' : item.itemStatus,
             ...item
           };
         });
 
         this.inquiryListOption.data = this.inquiryListOption.data.sort(compare('materialNumber'));
+        this.oldInquiryData = this.inquiryListOption.data;
       });
     },
     sizeChange(val) {

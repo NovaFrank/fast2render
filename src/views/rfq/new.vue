@@ -445,7 +445,43 @@ export default {
           if (res.data.statusCode === '200') {
             const url = res.data.data[0].url;
             importExcel(url).then((result) => {
-              console.log(result);
+              if (result.data.statusCode === '200') {
+                result.data.data.forEach((item) => {
+                  const index = this.inquiryListOption.data.findIndex(
+                    (i) => i.materialNumber === item.materialNumber
+                  );
+                  const accountList = item.toElsAccountList
+                    ? item.toElsAccountList
+                        .split(',')
+                        .map((i) => {
+                          return i.split('_')[1];
+                        })
+                        .toString()
+                    : '';
+                  item.accountList = accountList;
+                  if (index === -1) {
+                    this.inquiryListOption.data.push(item);
+                  } else {
+                    this.inquiryListOption.data.splice(index, 1, item);
+                  }
+                });
+                //   this.inquiryListOption.data = this.inquiryListOption.data
+                //     .concat(result.data.data)
+                //     .map((item) => {
+                //       const accountList = item.toElsAccountList
+                //         ? item.toElsAccountList
+                //             .split(',')
+                //             .map((i) => {
+                //               return i.split('_')[1];
+                //             })
+                //             .toString()
+                //         : '';
+                //       item.accountList = accountList;
+                //       return item;
+                //     });
+                return;
+              }
+              this.$message.error('导入失败');
             });
             // const data = res.data.data[0];
             // const file = {

@@ -78,6 +78,15 @@
       >
       </avue-crud>
     </span>
+    <span v-if="tabActive.prop === 'audits'">
+      <avue-crud
+        :data="auditListOption.data"
+        :option="auditListOption.option"
+        v-model="auditListOption.planObj"
+        :page.sync="auditListOption.page"
+      >
+      </avue-crud>
+    </span>
     <fast2-attachment-list
       ref="attachment"
       :id="formOption.obj.orderNumber"
@@ -144,8 +153,9 @@ import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielList';
 import purchaseGroupOption from '@/const/order/purchaseGroupList';
+import auditListOption from '@/const/order/audits';
 import factoryGroupOption from '@/const/order/factoryGroupList';
-import { getOrderList, createOrder, submitAudit, getPriceDetail } from '@/api/order.js';
+import { getOrderList, createOrder, submitAudit, getPriceDetail, getAudit } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import selectDialog3 from '@/common/selectDialog3';
 import selectDialog4 from '@/common/selectDialog4';
@@ -169,6 +179,7 @@ export default {
       tabOption: tabOption,
       tabActive: {},
       fileOption: fileOption,
+      auditListOption: auditListOption,
       purchaseGroupOption: purchaseGroupOption,
       filesForm: {},
       materielListOption: materielListOption,
@@ -292,6 +303,7 @@ export default {
       const action = 'findOrderHeadVO';
       const action2 = 'findOrderItemList';
       const action3 = 'findDeliveryPlanList';
+      const action4 = 'auditHislist';
       const params = {
         elsAccount: this.elsAccount,
         orderStatus: '',
@@ -310,9 +322,16 @@ export default {
         orderNumber: this.$route.params.orderNumber,
         ...data
       };
+      const params4 = {
+        elsAccount: this.elsAccount,
+        businessId: this.$route.params.orderNumber,
+        ...data
+      };
       const resp = await getOrderList(action, params);
       const resp2 = await getOrderList(action2, params2);
       const resp3 = await getOrderList(action3, params3);
+      const resp4 = await getAudit(action4, params4);
+      this.auditListOption.data = resp4.data.pageData.rows;
       this.formOption.obj = resp.data.data;
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;

@@ -50,6 +50,15 @@
       >
       </avue-crud>
     </span>
+    <span v-if="tabActive.prop === 'audits'">
+      <avue-crud
+        :data="auditListOption.data"
+        :option="auditListOption.option"
+        v-model="auditListOption.planObj"
+        :page.sync="auditListOption.page"
+      >
+      </avue-crud>
+    </span>
     <fast2-attachment-list
       ref="attachment"
       :readonly="fileReadOnly"
@@ -76,10 +85,11 @@ import FormHeader from '@/components/formHeader';
 import tabOption from '@/const/order/tabs';
 import formOption from '@/const/order/detail';
 import fileOption from '@/const/order/files';
+import auditListOption from '@/const/order/audits';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
 import materielListOption from '@/const/order/materielList';
-import { getOrderList, createOrder, submitAudit, getPriceDetail } from '@/api/order.js';
+import { getOrderList, createOrder, submitAudit, getPriceDetail, getAudit } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import { getUserInfo } from '@/util/utils.js';
 import { setStore } from '@/util/store.js';
@@ -102,6 +112,7 @@ export default {
       },
       tabOption: tabOption,
       tabActive: {},
+      auditListOption: auditListOption,
       fileOption: fileOption,
       filesForm: {},
       materielListOption: materielListOption,
@@ -238,6 +249,7 @@ export default {
       const action = 'findOrderHeadVO';
       const action2 = 'findOrderItemList';
       const action3 = 'findDeliveryPlanList';
+      const action4 = 'auditHislist';
       const params = {
         elsAccount: this.elsAccount,
         orderStatus: '',
@@ -256,9 +268,16 @@ export default {
         orderNumber: this.$route.params.orderNumber,
         ...data
       };
+      const params4 = {
+        elsAccount: this.elsAccount,
+        businessId: this.$route.params.orderNumber,
+        ...data
+      };
       const resp = await getOrderList(action, params);
       const resp2 = await getOrderList(action2, params2);
       const resp3 = await getOrderList(action3, params3);
+      const resp4 = await getAudit(action4, params4);
+      this.auditListOption.data = resp4.data.pageData.rows;
       // auditStatus: 0, "审批通过", 1, "未审批", 2, "审批中", 3, "审批拒绝"
       this.auditStatus = resp.data.data.auditStatus;
       if (this.auditStatus === '2') {

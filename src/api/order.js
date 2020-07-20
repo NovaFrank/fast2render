@@ -29,6 +29,16 @@ export const getPriceData = (action, params) => {
     }
   });
 };
+// 获取审批记录
+export const getAudit = (action, params) => {
+  return axios({
+    url: `${baseUrl}/CommonAuditService/${action}`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};
 // 获取价格主数据 -- 获取详情
 export const getPriceDetail = (action, params) => {
   return axios({

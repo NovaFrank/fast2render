@@ -46,6 +46,15 @@
       >
       </avue-crud>
     </span>
+    <span v-if="tabActive.prop === 'audits'">
+      <avue-crud
+        :data="auditListOption.data"
+        :option="auditListOption.option"
+        v-model="auditListOption.planObj"
+        :page.sync="auditListOption.page"
+      >
+      </avue-crud>
+    </span>
     <fast2-attachment-list
       ref="attachment"
       :readonly="fileReadOnly"
@@ -74,8 +83,9 @@ import formOption from '@/const/order/detail';
 import fileOption from '@/const/order/files';
 import planListOption from '@/const/order/planList';
 import materialOption from '@/const/order/materiaList';
+import auditListOption from '@/const/order/audits';
 import materielListOption from '@/const/order/materielList';
-import { getOrderList, createOrder } from '@/api/order.js';
+import { getOrderList, createOrder, getAudit } from '@/api/order.js';
 import selectDialog from '@/common/selectDialog';
 import { getUserInfo } from '@/util/utils.js';
 import { setStore } from '@/util/store.js';
@@ -96,6 +106,7 @@ export default {
         itemList: []
       },
       tabOption: tabOption,
+      auditListOption: auditListOption,
       tabActive: {},
       fileOption: fileOption,
       filesForm: {},
@@ -178,6 +189,7 @@ export default {
       const action = 'findOrderHeadVO';
       const action2 = 'findOrderItemList';
       const action3 = 'findDeliveryPlanList';
+      const action4 = 'auditHislist';
       const params = {
         elsAccount: this.elsAccount,
         orderStatus: '',
@@ -196,9 +208,16 @@ export default {
         orderNumber: this.$route.params.orderNumber,
         ...data
       };
+      const params4 = {
+        elsAccount: this.elsAccount,
+        businessId: this.$route.params.orderNumber,
+        ...data
+      };
       const resp = await getOrderList(action, params);
       const resp2 = await getOrderList(action2, params2);
       const resp3 = await getOrderList(action3, params3);
+      const resp4 = await getAudit(action4, params4);
+      this.auditListOption.data = resp4.data.pageData.rows;
       this.formOption.obj = resp.data.data;
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;

@@ -12,6 +12,10 @@ export default {
       {
         label: '附件',
         prop: 'files'
+      },
+      {
+        label: '审批记录',
+        prop: 'audits'
       }
     ]
   }

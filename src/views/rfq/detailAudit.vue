@@ -442,6 +442,17 @@ export default {
               dicData: res.data
             };
           }
+          if (item.prop === 'auditStatus') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: [
+                { value: '0', label: '通过' },
+                { value: '2', label: '审批中' },
+                { value: '3', label: '拒绝' }
+              ]
+            };
+          }
           return item;
         });
       });

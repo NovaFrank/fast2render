@@ -666,6 +666,8 @@ export default {
           result.dicData = item.dicData;
           result.dicUrl = item.dicUrl;
           result.dicMethod = item.dicMethod;
+          result.valueFormat = 'timestamp';
+          result.format = item.format;
           if (['materialDesc', 'materialName', 'materialSpecifications'].includes(item.prop)) {
             result.disabled = true;
           } else {

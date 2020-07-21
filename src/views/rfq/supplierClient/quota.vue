@@ -347,6 +347,9 @@ export default {
     handleEnquiryTypeChange(value) {
       if (this.configurations[value]) {
         this.templateRule = this.configurations[value].rule;
+        if (this.configurations[value].name === 'RFI') {
+          this.inquiryListOption.option.column.splice(0, 5);
+        }
         this.quoteColumn = [];
         const current = this.configurations[value].tableColumns.map((item) => {
           let result = {};
@@ -379,10 +382,10 @@ export default {
         const fieldColumns = this.configurations[value].fieldColumns;
         fieldColumns.forEach((item) => {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
-            console.log('this.configurations[value]', item);
             this.formOption.column.push({
               span: item.span,
               ...item,
+              label: item.fbk1 || item.label,
               disabled: !item.saleEdit
             });
           }

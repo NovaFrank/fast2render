@@ -425,6 +425,11 @@ export default {
         this.detailObj = res.data.data;
         this.inquiryListOption.option.header = false;
         this.reasonObj.reason = this.detailObj.reason;
+        const current = this.configurations[this.detailObj.enquiryType];
+        if (current.rule) this.templateRule = current.rule;
+        else this.templateRule = {};
+        if (this.templateRule.enquiryIsQuota === true)
+          this.inquiryListOption.option.column.push({ label: '配额', prop: 'quota', cell: true });
 
         if (res.data.data.flowCode) {
           let content = {

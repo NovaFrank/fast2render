@@ -578,6 +578,7 @@ export default {
       });
       // 公开方式 数据字典
       dataDicAPI('enquiryMethod').then((res) => {
+        console.log('this.formOption.column', this.formOption.column);
         this.formOption.column = this.formOption.column.map((item) => {
           if (item.prop === 'enquiryMethod') {
             return {
@@ -592,6 +593,7 @@ export default {
               type: 'select',
               dicData: [
                 { value: '0', label: '通过' },
+                { value: '1', label: '新建' },
                 { value: '2', label: '审批中' },
                 { value: '3', label: '拒绝' }
               ]
@@ -752,6 +754,9 @@ export default {
       this.initColumns();
       if (this.configurations[value]) {
         const configuration = this.configurations[value];
+        if (this.configurations[value].name === 'RFI') {
+          this.inquiryListOption.option.column.splice(0, 5);
+        }
         const current = configuration.tableColumns.map((item) => {
           let result = {};
           result.prop = item.prop;
@@ -1134,8 +1139,8 @@ export default {
       });
     },
     handleSubmitApproval() {
-      // 78253 要求去掉
-      // let status = true;
+      // 78253 要求去掉 78402 要求改回来
+      let status = true;
       let result = false;
       this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
         return {
@@ -1145,10 +1150,10 @@ export default {
       });
       this.oldInquiryData = this.inquiryListOption.data;
       this.inquiryListOption.data.forEach((item) => {
-        // if (item.itemStatus === '4') {
-        //   // 必须有接受的报价才能够提交审批
-        //   status = false;
-        // }
+        if (item.itemStatus === '4') {
+          // 必须有接受的报价才能够提交审批
+          status = false;
+        }
         if (item.itemStatus === '4') {
           let quote = 0;
           this.inquiryListOption.data
@@ -1174,10 +1179,10 @@ export default {
           }
         }
       });
-      // if (status) {
-      //   this.$message.error('必须有接受状态的报价才能够提交审批');
-      //   return;
-      // }
+      if (status) {
+        this.$message.error('必须有接受状态的报价才能够提交审批');
+        return;
+      }
       if (result) {
         this.$message.error(
           `物料配额必须等于${
@@ -1366,7 +1371,7 @@ export default {
           costJson.templateJson = template;
           this.currentDetailItem.costConstituteJson = JSON.stringify(costJson);
         }
-        return {
+        let result = {
           id: `${index}`,
           materialNumber: this.currentDetailItem.materialNumber,
           materialName: this.currentDetailItem.materialName,
@@ -1385,12 +1390,22 @@ export default {
           itemStatus: '1',
           taxCode: this.currentDetailItem.taxCode,
           taxRate: this.currentDetailItem.taxRate,
+          priceExcludingTax: '',
           priceIncludingTax: '',
           quota: '',
           ladderPriceJson: this.currentDetailItem.ladderPriceJson || null,
           costConstituteJson: this.currentDetailItem.costConstituteJson || null,
           $cellEdit: false
         };
+        let columns = {};
+        this.inquiryListOption.option.column.forEach((item) => {
+          columns[item.prop] = this.currentDetailItem[item.prop];
+        });
+        result = {
+          ...columns,
+          ...result
+        };
+        return result;
       });
       this.inquiryListOption.data = this.inquiryListOption.data
         .concat(itemList)

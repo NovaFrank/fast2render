@@ -264,15 +264,7 @@ export default {
         },
         { slot: true, label: '税率', prop: 'taxRate' },
         { slot: true, label: '含税价', prop: 'priceIncludingTax' },
-        { slot: true, label: '不含税价', prop: 'priceExcludingTax' },
-        // {
-        //   type: 'date',
-        //   format: 'yyyy-MM-dd',
-        //   valueFormat: 'timestamp',
-        //   label: '交货日期',
-        //   prop: 'deliveryDate'
-        // },
-        { label: '配额', prop: 'quota' }
+        { slot: true, label: '不含税价', prop: 'priceExcludingTax' }
       ];
       if (!validatenull(this.configurations)) {
         const current = this.configurations[value].tableColumns.map((item) => {
@@ -284,6 +276,8 @@ export default {
           return result;
         });
         this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+        if (this.templateRule.enquiryIsQuota === true)
+          this.inquiryListOption.option.column.push({ label: '配额', prop: 'quota', cell: true });
       }
     },
     getPriceIndex(row, column) {
@@ -362,12 +356,12 @@ export default {
     handleSubmitApproval() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          // let status = true;
+          let status = true;
           let result = false;
           this.inquiryListOption.data.forEach((item) => {
-            // if (item.itemStatus === '4') {
-            //   status = false; // 必须有接受的报价才能够提交审批
-            // }
+            if (item.itemStatus === '4') {
+              status = false; // 必须有接受的报价才能够提交审批
+            }
             if (item.itemStatus === '4') {
               let quote = 0;
               this.inquiryListOption.data
@@ -393,10 +387,10 @@ export default {
               // if (Number(quote) !== 100) result = true; // 相同物料 已报价 分配的配额必须相加为100
             }
           });
-          // if (status) {
-          //   this.$message.error('必须有接受状态的报价才能够提交审批');
-          //   return;
-          // }
+          if (status) {
+            this.$message.error('必须有接受状态的报价才能够提交审批');
+            return;
+          }
           if (result) {
             this.$message.error('物料配额必须等于100');
             return;
@@ -454,6 +448,8 @@ export default {
         const current = this.configurations[this.detailObj.enquiryType];
         if (current.rule) this.templateRule = current.rule;
         else this.templateRule = {};
+        if (this.templateRule.enquiryIsQuota === true)
+          this.inquiryListOption.option.column.push({ label: '配额', prop: 'quota', cell: true });
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;

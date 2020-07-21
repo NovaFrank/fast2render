@@ -90,9 +90,9 @@
             </template>
           </avue-crud>
         </el-tab-pane>
-        <el-tab-pane label="成本比价" name="costChart">
+        <!-- <el-tab-pane label="成本比价" name="costChart">
           <cost-bids :materialData="costMaterialData" :costPriceData="costPriceData"></cost-bids>
-        </el-tab-pane>
+        </el-tab-pane> -->
         <el-tab-pane label="历史价格" name="historyChart">
           <div>
             <div class="date-picker">
@@ -215,10 +215,10 @@ export default {
             label: '比价',
             prop: 'bidChart'
           },
-          {
-            label: '成本比价',
-            prop: 'costChart'
-          },
+          // {
+          //   label: '成本比价',
+          //   prop: 'costChart'
+          // },
           {
             label: '历史价格趋势',
             prop: 'historyChart'

@@ -599,6 +599,9 @@ export default {
     handleEnquiryTypeChange(value) {
       this.initColumns();
       if (this.configurations[value]) {
+        if (this.configurations[value].name === 'RFI') {
+          this.inquiryListOption.option.column.splice(0, 5);
+        }
         const current = this.configurations[value].tableColumns.map((item) => {
           let result = {};
           result.prop = item.prop;

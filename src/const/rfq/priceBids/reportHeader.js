@@ -14,11 +14,11 @@ export default {
       span: 6,
       prop: 'createUser'
     },
-    {
-      label: '提交部门',
-      span: 6,
-      prop: 'submitDepartment'
-    },
+    // {
+    //   label: '提交部门',
+    //   span: 6,
+    //   prop: 'submitDepartment'
+    // },
     {
       type: 'date',
       format: 'yyyy-MM-dd HH:mm:ss',

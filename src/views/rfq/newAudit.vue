@@ -448,6 +448,9 @@ export default {
           { label: '表单文件', prop: 'files' },
           { label: '询价规则', prop: 'rules' }
         ];
+        if (this.configurations[value].name === 'RFI') {
+          this.inquiryListOption.option.column.splice(0, 5);
+        }
         if (this.templateRule.enquiryIsProjectApproval === true && this.form.flowCode) {
           this.tabOption.option.column.push({ label: '审批记录', prop: 'auditHistory' });
           auditHisList({

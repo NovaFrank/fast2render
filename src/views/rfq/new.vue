@@ -474,20 +474,6 @@ export default {
                     this.inquiryListOption.data.splice(index, 1, item);
                   }
                 });
-                //   this.inquiryListOption.data = this.inquiryListOption.data
-                //     .concat(result.data.data)
-                //     .map((item) => {
-                //       const accountList = item.toElsAccountList
-                //         ? item.toElsAccountList
-                //             .split(',')
-                //             .map((i) => {
-                //               return i.split('_')[1];
-                //             })
-                //             .toString()
-                //         : '';
-                //       item.accountList = accountList;
-                //       return item;
-                //     });
                 return;
               }
               this.$message.error('导入失败');
@@ -576,9 +562,6 @@ export default {
           valueDefault: ''
         },
         { label: '供应商', prop: 'accountList' }
-        // { slot: true, label: '报价方式', prop: 'quoteMethod' },
-        // { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
-        // { slot: true, label: '成本模板', prop: 'costTemplate' }
       ];
       this.inquiryListOption.option.column = baseColumn;
       this.dialogOption.column = [
@@ -602,24 +585,12 @@ export default {
           label: '税码',
           prop: 'taxCode',
           disabled: this.templateRule.enquiryPurchaserTax !== true
-          // rules:
-          //   this.templateRule.enquiryPurchaserTax === true
-          //     ? [{ required: true, message: '请选择税码', trigger: 'blur' }]
-          //     : []
         },
         {
           label: '税率',
           prop: 'taxRate',
           disabled: true
         },
-        // {
-        //   dicUrl: '/layout/dics/value/quoteMethod',
-        //   dicMethod: 'get',
-        //   type: 'select',
-        //   label: '报价方式',
-        //   prop: 'quoteMethod',
-        //   rules: [{ required: true, message: '请选择报价方式', trigger: 'change' }]
-        // },
         {
           span: 24,
           formslot: true,
@@ -631,9 +602,11 @@ export default {
     handleEnquiryTypeChange(value) {
       if (this.configurations[value]) {
         const configuration = this.configurations[value];
-        console.log('configuration', configuration);
         this.templateRule = configuration.rule;
         this.initColumns();
+        if (configuration.name === 'RFI') {
+          this.inquiryListOption.option.column.splice(0, 5);
+        }
         this.tabOption.option.column = [
           { label: '询价明细', prop: 'detail' },
           { label: '表单文件', prop: 'files' },
@@ -736,9 +709,6 @@ export default {
       this.fieldDialogForm = title === '添加' ? {} : row;
       this.dialogTitle = `${title}询价明细`;
       this.fieldDialogVisible = true;
-      this.$nextTick(() => {
-        if (this.$refs.formField) this.$refs.formField.resetFields(); // 等弹窗里的form表单的dom渲染完在执行this.$refs.staffForm.resetFields()，去除验证
-      });
     },
     async tableData(data) {
       const res = await ElsTemplateConfigService.find({

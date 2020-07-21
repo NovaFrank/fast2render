@@ -255,7 +255,7 @@ export default {
         },
         { slot: true, label: '税率', prop: 'taxRate' },
         { slot: true, label: '含税价', prop: 'priceIncludingTax' },
-        { slot: true, label: '不含税价', prop: 'priceExcludingTax' },
+        { slot: true, label: '不含税价', prop: 'priceExcludingTax' }
         // {
         //   type: 'date',
         //   format: 'yyyy-MM-dd',
@@ -263,7 +263,7 @@ export default {
         //   label: '交货日期',
         //   prop: 'deliveryDate'
         // },
-        { label: '配额', prop: 'quota' }
+        // { label: '配额', prop: 'quota' }
       ];
       if (!validatenull(this.configurations)) {
         const current = this.configurations[value].tableColumns.map((item) => {
@@ -275,6 +275,8 @@ export default {
           return result;
         });
         this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+        if (this.templateRule.enquiryIsQuota === true)
+          this.inquiryListOption.option.column.push({ label: '配额', prop: 'quota', cell: true });
       }
     },
     getPriceIndex(row, column) {

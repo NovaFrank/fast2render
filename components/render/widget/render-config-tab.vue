@@ -4,7 +4,7 @@
       <el-tabs v-model="active">
         <template v-for="subItem in showList">
           <el-tab-pane
-            :label="subItem.label"
+            :label="subItem.displayName || subItem.label"
             v-if="newPermission && subItem.prop && newPermission[subItem.prop]"
             :name="subItem.prop"
             :key="subItem.prop"
@@ -57,7 +57,7 @@
           :key="subItem.prop"
           v-if="newPermission && newPermission[subItem.prop]"
         >
-          <h4 class="block-title">{{ subItem.label }}</h4>
+          <h4 class="block-title">{{ subItem.displayName || subItem.label }}</h4>
           <slot :name="subItem.prop + '-header'" :dataSource="subItem.prop"></slot>
           <slot :name="subItem.prop" :dataSource="subItem.prop">
             <fast2-block-provider
@@ -72,10 +72,12 @@
                     :ref="subItem.prop"
                     :readOnly="readOnly"
                     :addInCell="addInCell"
+                    :itemLinkList="itemLinkList"
                     :permission="newPermission[subItem.prop]"
                     :dataSource="subItem.prop"
                     v-on="$listeners"
-                  ></fast2-component-render>
+                  >
+                  </fast2-component-render>
                 </div>
               </template>
             </fast2-block-provider>
@@ -111,6 +113,12 @@ export default {
         return [];
       }
     },
+    tabs: {
+      type: Array,
+      default: () => {
+        return [];
+      }
+    },
     debugger: {
       type: Boolean,
       default: false
@@ -126,6 +134,16 @@ export default {
     tabView: {
       type: Boolean,
       default: true
+    },
+    itemLinkList: {
+      type: Array,
+      default: function () {
+        return [
+          { name: '验厂单', prop: 'inspectionAccess', link: '/adminission/#/' },
+          { name: '资质准入', prop: 'aptitudesAccess', link: '/adminission/#/' },
+          { name: '样品准入', prop: 'aptitudesAccess', link: '/adminission/#/' }
+        ];
+      }
     },
     tabPermission: {
       type: Object,
@@ -184,14 +202,20 @@ export default {
     },
     showList() {
       const list = Object.keys(this.newPermission);
+      const myTabs = this.tabs;
       if (this.newList.length && list.length) {
         const showList = this.newList.filter((item) => {
+          const existItem = myTabs.find((eitem) => {
+            return eitem.prop === item.prop;
+          });
+          if (existItem) {
+            item.displayName = existItem.displayName;
+          }
           return !!this.newPermission[item.prop];
         });
         return showList;
-      } else {
-        return this.newList;
       }
+      return [];
     }
   },
   mounted() {

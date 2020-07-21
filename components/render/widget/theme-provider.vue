@@ -13,12 +13,12 @@ import BigListTemplate from '../../../lib/crud-biglist';
 import SmallListTemplate from '../../../lib/crud-small';
 import BigFormTemplate from '../../../lib/form-big';
 import SmallFormTemplate from '../../../lib/form-small';
-import { mySpanMethod, zipLayout } from '../../../lib/utils.js';
-import { getStore, setStore } from '../../../lib/store.js';
+import { mySpanMethod, zipLayout, getApiPath } from '../../../lib/utils.js';
 import { loadBlockConfig, handleColumn } from '../../../lib/blockHander.js';
 import { validateNull } from '../../../lib/validate';
 
 import _ from 'lodash';
+const baseUrl = getApiPath();
 
 export default {
   name: 'ThemeProvider',
@@ -39,6 +39,12 @@ export default {
       type: Boolean,
       default: false // 是否只读模式
     },
+    itemLinkList: {
+      type: Array,
+      default: function () {
+        return [];
+      }
+    },
     hasRowPermission: {
       type: Boolean,
       default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
@@ -46,6 +52,10 @@ export default {
     addInCell: {
       type: Boolean,
       default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
+    },
+    col: {
+      type: Number,
+      default: 0
     },
     inTab: {
       type: Boolean,
@@ -84,13 +94,7 @@ export default {
     return {
       finalOption: {},
       reload: false,
-      optionHash: '',
-      remoteApi: [
-        {
-          dicUrl: '',
-          dicMethon: ''
-        }
-      ]
+      optionHash: ''
     };
   },
   watch: {
@@ -103,8 +107,7 @@ export default {
     },
     // 单点监测 ，避免多次触发
     hash: {
-      handler(val) {
-        this.finalOption = getStore(val);
+      handler() {
         this.finalOption = null;
         if (!this.finalOption) {
           this.handlerChange();
@@ -160,7 +163,11 @@ export default {
         this.finalOption.detail = true;
         this.finalOption.menu = false;
       }
-      setStore({ name: this.hash, content: this.finalOption });
+      if (this.col > 0) {
+        this.finalOption.column.map((item) => {
+          item.span = this.col;
+        });
+      }
       this.reload = true;
     },
     filterColumWithRule(option, rowPermission) {
@@ -186,6 +193,13 @@ export default {
               } else {
                 item.rules = [rule];
               }
+            }
+            if (!validateNull(itemProp.bizDic)) {
+              delete item.dicData;
+              delete item.dicMethod;
+              delete item.props;
+              item.type = 'select';
+              item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${itemProp.bizDic}`;
             }
             if (itemProp.isDisabled || itemProp.readonly) {
               item.disabled = 'disabled';

@@ -45,10 +45,10 @@
             :hasRowPermission="hasRowPermission"
             :rowPermission="getRowPromession(permission.tableJson)"
             :addInCell="addInCell"
+            :itemLinkList="itemLinkList"
             type="crud"
             :formulas="permission.formulas"
             theme="block"
-            ref="themebox"
           >
             <template v-slot="component">
               <slot name="crud-header">
@@ -66,7 +66,15 @@
                 v-model="tableData"
                 ref="table"
               >
-                <slot name="crud-slot"></slot>
+                <template v-for="item in itemLinkList" :slot="item.prop" slot-scope="scope">
+                  <el-tag
+                    :key="item.prop"
+                    v-if="scope.row[item.prop]"
+                    @click.stop="go(item, scope.row)"
+                  >
+                    {{ scope.row[item.prop] }}</el-tag
+                  >
+                </template>
               </avue-crud>
               <slot name="crud-footer"></slot>
             </template>
@@ -101,7 +109,7 @@
  * block 内含一组组件
  */
 import itemAttachment from './cards/item-attachment';
-import { getObjType } from '../../lib/utils';
+import { getRowPromession } from '../../lib/utils';
 import { validateNull } from '../../lib/validate';
 import ThemeProvider from './widget/theme-provider';
 
@@ -136,6 +144,20 @@ export default {
     readOnly: {
       type: Boolean,
       default: false
+    },
+    itemLinkList: {
+      type: Array,
+      default: function () {
+        return [
+          {
+            label: '验厂单',
+            prop: 'inspectionAccess',
+            url: '/admission/#/inspectTableAudit/detail/'
+          },
+          { label: '资质准入', prop: 'aptitudesAccess', url: '/admission/#/sampleAudit/view/' },
+          { label: '样品准入', prop: 'auditAccess', url: '/admission/#/auditAdmission/view/' }
+        ];
+      }
     },
     addInCell: {
       type: Boolean,
@@ -214,6 +236,34 @@ export default {
         return item;
       });
       this.inited = true;
+      this.$nextTick(() => {
+        if (!this.$refs.table || !this.$refs.table[0]) {
+          return false;
+        }
+        const list = this.$refs.table[0].option?.column;
+        this.itemLinkList.map((item) => {
+          const linkItem = this.findObject(list, item.prop);
+          if (linkItem) {
+            linkItem.slot = true;
+          }
+        });
+      });
+    },
+    go(item, row) {
+      if (window?.parent) {
+        const router = {
+          name: item.label,
+          src: item.url + row[item.prop]
+        };
+        const event = {
+          name: 'openNewTag',
+          props: router
+        };
+        console.log('测试跳转事件', event);
+        window.parent.postMessage(event, '*');
+      } else {
+        window.location.href = item.url;
+      }
     },
     listRowUpdate(row, index, done, loading) {
       // 行修改
@@ -229,8 +279,8 @@ export default {
       this.updateRootTable(this.providerData.tableData);
       done();
     },
-    listRowDel(payload) {
-      this.providerData.tableData.splice(payload.index, 1);
+    listRowDel(payload, index) {
+      this.providerData.tableData.splice(index, 1);
       this.updateRootTable(this.providerData.tableData);
     },
     checkFormulas(data = this.providerData.tableData) {
@@ -274,22 +324,7 @@ export default {
       this.$root.$emit('change-table', data);
     },
     getRowPromession(data) {
-      let newData = {};
-      if (getObjType(data) === 'array') {
-        data.map((item) => {
-          // 进行真假字符串识别转换
-          if (item.display === 'true') {
-            item.display = true;
-          } else if (item.display === 'false') {
-            item.display = false;
-          }
-          newData[item.prop] = item;
-        });
-      } else if (getObjType(data) === 'object') {
-        newData = data;
-      }
-      // console.log('End Peromession data', newData);
-      return newData;
+      return getRowPromession(data);
     },
     getComponent(type, component) {
       const KEY_COMPONENT_NAME = 'item-';

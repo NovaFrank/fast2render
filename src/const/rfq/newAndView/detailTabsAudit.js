@@ -12,11 +12,11 @@ export default {
       {
         label: '供货方文件',
         prop: 'filesSupplier'
-      },
-      {
-        label: '审批记录',
-        prop: 'auditHistory'
       }
+      // {
+      //   label: '审批记录',
+      //   prop: 'auditHistory'
+      // }
     ]
   }
 };

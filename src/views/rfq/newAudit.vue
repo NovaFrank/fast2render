@@ -445,14 +445,14 @@ export default {
         this.initColumns();
         this.tabOption.option.column = [
           { label: '询价明细', prop: 'detail' },
-          { label: '表单文件', prop: 'files' },
-          { label: '询价规则', prop: 'rules' }
+          { label: '表单文件', prop: 'files' }
+          // { label: '询价规则', prop: 'rules' }
         ];
         if (this.configurations[value].name === 'RFI') {
           this.inquiryListOption.option.column.splice(0, 5);
         }
         if (this.templateRule.enquiryIsProjectApproval === true && this.form.flowCode) {
-          this.tabOption.option.column.push({ label: '审批记录', prop: 'auditHistory' });
+          // this.tabOption.option.column.push({ label: '审批记录', prop: 'auditHistory' });
           auditHisList({
             rootProcessInstanceId: this.form.flowCode,
             businessId: this.form.enquiryNumber

@@ -372,16 +372,16 @@ export default {
         this.tabOption.option.column = [
           { label: '询价明细', prop: 'detail' },
           { label: '采购方文件', prop: 'files' },
-          { label: '供货方文件', prop: 'filesSupplier' },
-          { label: '询价规则', prop: 'rules' }
+          { label: '供货方文件', prop: 'filesSupplier' }
+          // { label: '询价规则', prop: 'rules' }
         ];
       } else {
         this.tabOption.option.column = [
           { label: '询价明细', prop: 'detail' },
           { label: '采购方文件', prop: 'files' },
-          { label: '供货方文件', prop: 'filesSupplier' },
-          { label: '审批记录', prop: 'auditHistory' },
-          { label: '询价规则', prop: 'rules' }
+          { label: '供货方文件', prop: 'filesSupplier' }
+          // { label: '审批记录', prop: 'auditHistory' },
+          // { label: '询价规则', prop: 'rules' }
         ];
       }
       this.$forceUpdate();

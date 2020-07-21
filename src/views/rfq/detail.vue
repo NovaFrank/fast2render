@@ -981,8 +981,8 @@ export default {
       });
     },
     handleSubmitApproval() {
-      // 78253 要求去掉
-      // let status = true;
+      // 78253 要求去掉 78402 要求改回来
+      let status = true;
       let result = false;
       this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
         return {
@@ -992,10 +992,10 @@ export default {
       });
       this.oldInquiryData = this.inquiryListOption.data;
       this.inquiryListOption.data.forEach((item) => {
-        // if (item.itemStatus === '4') {
-        //   // 必须有接受的报价才能够提交审批
-        //   status = false;
-        // }
+        if (item.itemStatus === '4') {
+          // 必须有接受的报价才能够提交审批
+          status = false;
+        }
         if (item.itemStatus === '4') {
           let quote = 0;
           this.inquiryListOption.data
@@ -1021,10 +1021,10 @@ export default {
           }
         }
       });
-      // if (status) {
-      //   this.$message.error('必须有接受状态的报价才能够提交审批');
-      //   return;
-      // }
+      if (status) {
+        this.$message.error('必须有接受状态的报价才能够提交审批');
+        return;
+      }
       if (result) {
         this.$message.error(
           `物料配额必须等于${

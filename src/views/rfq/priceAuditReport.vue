@@ -362,12 +362,12 @@ export default {
     handleSubmitApproval() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          // let status = true;
+          let status = true;
           let result = false;
           this.inquiryListOption.data.forEach((item) => {
-            // if (item.itemStatus === '4') {
-            //   status = false; // 必须有接受的报价才能够提交审批
-            // }
+            if (item.itemStatus === '4') {
+              status = false; // 必须有接受的报价才能够提交审批
+            }
             if (item.itemStatus === '4') {
               let quote = 0;
               this.inquiryListOption.data
@@ -393,10 +393,10 @@ export default {
               // if (Number(quote) !== 100) result = true; // 相同物料 已报价 分配的配额必须相加为100
             }
           });
-          // if (status) {
-          //   this.$message.error('必须有接受状态的报价才能够提交审批');
-          //   return;
-          // }
+          if (status) {
+            this.$message.error('必须有接受状态的报价才能够提交审批');
+            return;
+          }
           if (result) {
             this.$message.error('物料配额必须等于100');
             return;

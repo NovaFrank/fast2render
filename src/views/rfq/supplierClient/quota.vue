@@ -329,8 +329,6 @@ export default {
         { label: '单位', prop: 'baseUnit', span: 4, editDisabled: true },
         { label: '需求数量', prop: 'quantity', editDisabled: true },
         { type: 'tree', label: '公司代码', prop: 'companyCode', editDisabled: true },
-        { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo', editDisabled: true },
-        { slot: true, label: '成本模板', prop: 'costTemplate', editDisabled: true },
         { slot: true, label: '含税价', prop: 'priceIncludingTax', editDisabled: true },
         { label: '税率', prop: 'taxRate', editDisabled: true },
         { slot: true, label: '不含税价', prop: 'priceExcludingTax', editDisabled: true },
@@ -389,6 +387,15 @@ export default {
               disabled: !item.saleEdit
             });
           }
+        });
+        this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
+          if (
+            ['taxRate', 'priceIncludingTax', 'priceExcludingTax'].includes(item.prop) &&
+            this.configurations[value].name === 'RFP'
+          ) {
+            item.hide = true;
+          }
+          return item;
         });
       } else {
         this.initColumns();

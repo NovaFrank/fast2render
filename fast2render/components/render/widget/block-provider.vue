@@ -108,6 +108,9 @@ export default {
       let option = options[0] || {};
       option = vaildData(option, { data: { column: [] } });
       const column = mergeColumn(finaloption.column, option.data.column);
+      if (!column || !column.length) {
+        return false;
+      }
       this.finaloption = JSON.parse(JSON.stringify(finaloption));
       this.finaloption.column = handleColumn(column);
       this.$forceUpdate();

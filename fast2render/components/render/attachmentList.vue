@@ -4,21 +4,18 @@
       <i class="el-icon-link"></i> <span v-if="!readonly">附件</span><span v-else>上传附件</span>
       <el-button size="mini" v-if="addBtn && !readonly" @click="listRowAdd">新增行</el-button>
     </h4>
-    <fast2-theme-provider :option="readonly ? readOption : option" theme="block" :version="version">
+    <fast2-theme-provider
+      :option="!readonly ? option : readOption"
+      theme="block"
+      :version="version"
+    >
       <template v-slot="component">
         <div v-if="component.option && component.option.column && component.option.column.length">
+          {{ component.option }}
           <avue-crud :data="fileList" :option="component.option" @row-del="handleDelete">
             <template v-slot:fileAction="scope">
-              <div v-show="!readonly && downloadClient">
-                <!-- web uploader -->
-                <div id="uploader">
-                  <div :id="scope.row.businessItemId">选择文件</div>
-                  <!-- <button id="ctlBtn" @click="uploadFile" class="btn btn-default">
-                    开始上传
-                  </button> -->
-                </div>
-                <!-- el upload -->
-                <!-- <el-upload
+              <div v-if="!readonly && downloadClient">
+                <el-upload
                   id="webpicker"
                   :show-file-list="false"
                   class="upload-box"
@@ -26,6 +23,9 @@
                   :http-request="uploadFile"
                   action="/"
                 >
+                  <!-- :before-upload="uploadFile" -->
+                  <!-- action="http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet"
+                  @on-success="handleSuccess" -->
                   <el-link
                     size="small"
                     slot="trigger"
@@ -34,6 +34,13 @@
                   >
                     上传
                   </el-link>
+                  <!--用来存放item-->
+                  <!-- <div id="uploader">
+                    <div id="picker">选择</div>
+                    <button id="ctlBtn" @click="uploadFile" class="btn btn-default">
+                      开始上传
+                    </button>
+                  </div> -->
                   <template v-if="scope.row.attachmentUrl">
                     /
                     <el-link
@@ -42,12 +49,13 @@
                       target="_blank"
                       :href="`${dome}opt/nfsshare/${scope.row.attachmentUrl}`"
                     >
+                      <!-- @click.stop="handleDownload(scope.row)" -->
                       下载
                     </el-link>
                   </template>
-                </el-upload> -->
+                </el-upload>
               </div>
-              <div v-else-show="downloadClient">
+              <div v-else-if="downloadClient">
                 <el-link
                   v-if="scope.row.attachmentUrl"
                   download
@@ -73,10 +81,6 @@ import uploadApi from '../../lib/api/upload';
 import { formatDate } from '../../lib/utils'; // , renderSize
 import { validateNull } from '../../lib/validate';
 import { getUserInfo } from '../../lib/auth';
-// import $ from 'jquery';
-import WebUploader from 'webuploader';
-
-let uploader;
 
 export default {
   name: 'AttachmentList',
@@ -230,26 +234,16 @@ export default {
       showUpdate: true,
       uploadRow: null,
       fileList: [],
-      businessId: ''
+      businessId: '',
+      uploader: null
     };
   },
   created() {},
-  watch: {
-    id(newValue) {
-      this.businessId = newValue;
-      this.initData();
-    },
-    attachmentTemplate() {
-      this.initData();
-    },
-    fileList(newVal) {
-      // console.log(newVal);
-    }
-  },
   mounted() {
     const currentUserInfo = getUserInfo();
     this.currentElsAccount = currentUserInfo.elsAccount;
 
+    // this.initWebUpload();
     if (!validateNull(this.id)) {
       this.businessId = this.id;
       this.initData();
@@ -263,36 +257,20 @@ export default {
     if (this.domain) {
       this.dome = this.domain;
     }
-    // this.initWebUpload();
+  },
+  watch: {
+    id(newValue) {
+      this.businessId = newValue;
+      this.initData();
+    },
+    attachmentTemplate() {
+      this.initData();
+    },
+    fileList(newVal) {
+      console.log(newVal);
+    }
   },
   methods: {
-    initWebUpload(pickerId) {
-      console.log('pickerId', pickerId);
-      // 初始化 webuploader
-      uploader = WebUploader.create({
-        swf: './Uploader.swf',
-        server: 'http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet',
-        pick: '#' + pickerId,
-        resize: false
-      });
-      // var state = 'pending'; // 上传文件初始化
-      uploader.on('fileQueued', function(file) {
-        console.log('fileQueued');
-        console.log(file);
-      });
-      uploader.on('uploadProgress', function(file, percentage) {
-        console.log('progress ==', percentage * 100 + '%');
-      });
-      uploader.on('uploadSuccess', function(file) {
-        console.log('uploadSuccess');
-      });
-      uploader.on('uploadError', function(file) {
-        console.log('uploadError');
-      });
-      uploader.on('uploadComplete', function(file) {
-        console.log('uploadComplete');
-      });
-    },
     doAction(action, data) {
       this.$emit(action, data);
       // this.$message.success(action)
@@ -466,14 +444,43 @@ export default {
       }
     },
 
+    initWebUpload() {
+      /*
+      setTimeout(() => {
+        // 方式3
+        // var state = 'pending'; // 上传文件初始化
+        this.uploader = WebUploader.create({
+          swf: './webuploader-0.1.5/Uploader.swf',
+          server: 'http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet',
+          pick: '#picker',
+          resize: false
+        });
+        this.uploader.on('fileQueued', function (file) {
+          console.log('fileQueued');
+          console.log(file);
+        });
+        this.uploader.on('uploadProgress', function (file, percentage) {
+          console.log('progress ==', percentage * 100 + '%');
+        });
+        this.uploader.on('uploadSuccess', function (file) {
+          console.log('uploadSuccess');
+        });
+        this.uploader.on('uploadError', function (file) {
+          console.log('uploadError');
+        });
+        this.uploader.on('uploadComplete', function (file) {
+          console.log('uploadComplete');
+        });
+      });
+      */
+    },
+
     listRowAdd() {
-      const businessItemId = this.id + '_00' + (this.fileList.length + 1);
       const fileItem = {
         elsAccount: this.elsAccount,
-        businessItemId
+        businessItemId: this.id + '_00' + (this.fileList.length + 1)
       };
       this.fileList.push(fileItem);
-      setTimeout(this.initWebUpload(businessItemId), 1000);
     },
 
     listTempRowAdd(item) {

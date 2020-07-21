@@ -226,7 +226,6 @@ export default {
         { label: '物料编号', prop: 'materialNumber' },
         { label: '物料名称', prop: 'materialName' },
         { label: '物料描述', prop: 'materialDesc' },
-        // { label: '规格', prop: 'materialSpecifications' },
         {
           label: '单位',
           prop: 'baseUnit',
@@ -234,9 +233,6 @@ export default {
         },
         { label: '需求数量', prop: 'quantity' },
         { slot: true, label: '报价方式', prop: 'quoteMethod' },
-        { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
-        { slot: true, label: '成本模板', prop: 'costTemplate' },
-        // { label: '供应商', prop: 'toElsAccount' },
         { label: '供应商', prop: 'companyShortName' },
         {
           type: 'select',

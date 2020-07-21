@@ -31,7 +31,11 @@ import util, {
   getBlockItem,
   getBlockFieldItem,
   getTableList,
-  getDicNow
+  getDicNow,
+  getApiPath,
+  getRowPromession,
+  handlerLocalPermission,
+  handlerLocalRolePermission
 } from './lib/utils';
 
 export default {
@@ -69,6 +73,11 @@ export default {
     Vue.prototype.$util.getDicNow = getDicNow;
     Vue.prototype.$util.setStore = setStore;
     Vue.prototype.$util.getStore = getStore;
+    Vue.prototype.$util.getApiPath = getApiPath;
+    Vue.prototype.$util.getRowPromession = getRowPromession;
+    Vue.prototype.$util.handlerLocalPermission = handlerLocalPermission;
+    Vue.prototype.$util.handlerLocalRolePermission = handlerLocalRolePermission;
+
     Vue.prototype.$auth = auth;
     Vue.component(BusinessRuleConfig.name, BusinessRuleConfig);
     Vue.component(SelectDialog.name, SelectDialog);

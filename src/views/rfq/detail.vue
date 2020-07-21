@@ -360,7 +360,8 @@ export default {
       currentEnquiryNumber: '',
       requestTypeDict: [],
       configurations: {},
-      interval: null
+      interval: null,
+      iSrfp: false
     };
   },
   async created() {
@@ -434,13 +435,20 @@ export default {
 
       if (newVal.quoteEndTime < new Date().getTime()) {
         this.inquiryListOption.option.header = false;
-        this.headerButtons.push({
-          power: true,
-          text: '比价',
-          type: 'primary',
-          size: '',
-          action: 'on-bid-price'
-        });
+        const type = this.configurations[this.detailObj.enquiryType].name;
+
+        if (type === 'RFP') {
+          this.iSrfp = true;
+        } else {
+          this.iSrfp = false;
+          this.headerButtons.push({
+            power: true,
+            text: '比价',
+            type: 'primary',
+            size: '',
+            action: 'on-bid-price'
+          });
+        }
 
         if (newVal.canSeeRule === '1' && newVal.showQuoteInfo !== 'Y') {
           this.headerButtons.push({
@@ -720,9 +728,9 @@ export default {
           valueFormat: 'timestamp',
           prop: 'quoteDate'
         },
-        { slot: true, label: '税率', prop: 'taxRate' },
-        { slot: true, label: '含税价', prop: 'priceIncludingTax' },
-        { slot: true, label: '不含税价', prop: 'priceExcludingTax' },
+        { slot: true, label: '税率', prop: 'taxRate', display: !this.iSrfp },
+        { slot: true, label: '含税价', prop: 'priceIncludingTax', display: !this.iSrfp },
+        { slot: true, label: '不含税价', prop: 'priceExcludingTax', display: !this.iSrfp },
         // {
         //   type: 'date',
         //   format: 'yyyy-MM-dd',
@@ -769,7 +777,15 @@ export default {
             });
           }
         });
-        // this.inquiryListOption.option.column = this.inquiryListOption.option.column.concat(current);
+        this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
+          if (
+            ['taxRate', 'priceIncludingTax', 'priceExcludingTax', 'option'].includes(item.prop) &&
+            this.iSrfp
+          ) {
+            item.hide = true;
+          }
+          return item;
+        });
         const fieldColumns = configuration.fieldColumns;
         fieldColumns.forEach((item) => {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
@@ -782,6 +798,7 @@ export default {
           }
         });
         this.configButtons = configuration.buttons;
+        const type = this.configurations[this.detailObj.enquiryType].name;
 
         this.headerButtons = this.headerButtons.map((item) => {
           const index = this.configButtons.findIndex(
@@ -789,6 +806,16 @@ export default {
           );
           if (index === -1) return item;
           item.power = this.configButtons[index].display;
+          if (
+            item.text === '比价' &&
+            type === 'RFP' &&
+            this.detailObj.quoteEndTime < new Date().getTime()
+          ) {
+            this.iSrfp = true;
+            item.power = false;
+          } else {
+            this.iSrfp = false;
+          }
           return item;
         });
 

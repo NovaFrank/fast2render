@@ -578,25 +578,12 @@ export default {
       });
       // 公开方式 数据字典
       dataDicAPI('enquiryMethod').then((res) => {
-        console.log('this.formOption.column', this.formOption.column);
         this.formOption.column = this.formOption.column.map((item) => {
           if (item.prop === 'enquiryMethod') {
             return {
               ...item,
               type: 'select',
               dicData: res.data
-            };
-          }
-          if (item.prop === 'auditStatus') {
-            return {
-              ...item,
-              type: 'select',
-              dicData: [
-                { value: '0', label: '通过' },
-                { value: '1', label: '新建' },
-                { value: '2', label: '审批中' },
-                { value: '3', label: '拒绝' }
-              ]
             };
           }
           return item;
@@ -802,6 +789,22 @@ export default {
           );
           if (index === -1) return item;
           item.power = this.configButtons[index].display;
+          return item;
+        });
+
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'auditStatus') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: [
+                { value: '0', label: '通过' },
+                { value: '1', label: '新建' },
+                { value: '2', label: '审批中' },
+                { value: '3', label: '拒绝' }
+              ]
+            };
+          }
           return item;
         });
       }

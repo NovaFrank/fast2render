@@ -1309,11 +1309,10 @@ export default {
             id: item.uuid,
             // toElsAccountName: item.toElsAccount.split('_')[1],
             $cellEdit:
-              item.itemStatus === '2' ||
-              (item.itemStatus === '4' &&
-                this.detailObj.auditStatus !== '0' &&
-                this.detailObj.auditStatus !== '2'),
-            itemStatusCopy: item.itemStatus === '2' ? '4' : item.itemStatus,
+              item.itemStatus === '4' &&
+              this.detailObj.auditStatus !== '0' &&
+              this.detailObj.auditStatus !== '2',
+            itemStatusCopy: item.itemStatus,
             ...item
           };
         });

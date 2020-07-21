@@ -219,11 +219,13 @@ export default {
     },
     selectedMaterails(materialList) {
       if (materialList.length > 0) {
+        console.log(materialList[0]);
         this.form.materialNumber = materialList[0].materialNumber;
         this.form.materialDesc = materialList[0].materialDesc;
         this.form.materialName = materialList[0].materialName;
         this.form.materialSpecifications = materialList[0].materialSpecifications;
         this.form.baseUnit = materialList[0].baseUnit;
+        this.form.orderUnit = materialList[0].orderUnit;
         this.form.queryUuid = materialList[0].uuid;
       } else {
         this.$message.warning('请选择一条物料明细');

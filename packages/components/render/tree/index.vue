@@ -126,7 +126,7 @@ export default create({
       return this.option.lazy;
     },
     addText() {
-      return this.addFlag ? '1' : '2';
+      return this.addFlag ? '保存' : '保存';
     },
     addFlag() {
       return this.type === 'add' || this.type === 'parentAdd';

@@ -1,18 +1,11 @@
-import { getStore } from "../lib/store";
-import {
-  vaildData,
-  loadJson,
-  loadDic,
-  getObjType,
-  sortArrys,
-  isJSON
-} from "../lib/utils";
-import _ from "lodash";
+import { getStore } from '../lib/store';
+import { vaildData, loadJson, loadDic, getObjType, sortArrys, isJSON } from '../lib/utils';
+import _ from 'lodash';
 
-let filePath = "https://config-static.oss-cn-hangzhou.aliyuncs.com/common/";
-const fileType = "block";
+let filePath = 'https://config-static.oss-cn-hangzhou.aliyuncs.com/common/';
+const fileType = 'block';
 
-const customFilePath = getStore({ name: "customFilePath" });
+const customFilePath = getStore({ name: 'customFilePath' });
 if (customFilePath) {
   filePath = customFilePath;
 }
@@ -34,7 +27,7 @@ export const loadBlockConfig = async (slug, option, type) => {
 };
 
 export const checkDic = () => {
-  const dic = getStore({ name: "commondic", timer: 1200 });
+  const dic = getStore({ name: 'commondic', timer: 1200 });
   if (!dic) {
     loadDic();
   } else {
@@ -42,16 +35,16 @@ export const checkDic = () => {
   }
 };
 export const mergeOption = (list, option, type) => {
-  if (getObjType(list) !== "array") {
+  if (getObjType(list) !== 'array') {
     return;
   }
   let finalOption = vaildData(option, { column: [] });
   const findStr = {
-    crud: "listLayout",
-    form: "detailLayout",
-    detail: "detailLayout"
+    crud: 'listLayout',
+    form: 'detailLayout',
+    detail: 'detailLayout'
   };
-  const options = list.filter(item => {
+  const options = list.filter((item) => {
     return item.id === findStr[type];
   });
   const newOption = options[0] || {};
@@ -62,11 +55,14 @@ export const mergeOption = (list, option, type) => {
   return finalOption;
 };
 
-export const handleColumn = column => {
-  let newColumn = column.map(item => {
+export const handleColumn = (column) => {
+  if (!column || !column.length) {
+    return [];
+  }
+  let newColumn = column.map((item) => {
     return fixColumn(item);
   });
-  newColumn = sortArrys(newColumn, "order");
+  newColumn = sortArrys(newColumn, 'order');
   return newColumn;
 };
 
@@ -92,7 +88,7 @@ export const mergeColumn = (remoteColumns = [], localColumns = []) => {
       remoteItems[prop] = remoteColumn;
     } else {
       // 存在重复的，合并属性，先观察下
-      console.log("remoteItems duplicate", prop, remoteColumn);
+      console.log('remoteItems duplicate', prop, remoteColumn);
 
       const newSubItem = _.merge(remoteItems[prop], remoteColumn);
       remoteItems[prop] = newSubItem;
@@ -107,7 +103,7 @@ export const mergeColumn = (remoteColumns = [], localColumns = []) => {
       localItems[prop] = localColumn;
     } else {
       // 存在重复的，合并属性，先观察下
-      console.log("localItems duplicate", prop, localColumn);
+      console.log('localItems duplicate', prop, localColumn);
 
       const newSubItem = _.merge(localItems[prop], localColumn);
       localItems[prop] = newSubItem;
@@ -166,23 +162,23 @@ export const mergeColumn = (remoteColumns = [], localColumns = []) => {
   // newItems.forEach((item) => {
   //   console.log(item.prop, item);
   // });
-  console.log("merged columns", newItems);
+  console.log('merged columns', newItems);
 
   return newItems;
 };
 
-export const replaceLocalDic = config => {
+export const replaceLocalDic = (config) => {
   const dics = checkDic();
 
-  if (!config.dicUrl.includes("layout/dics") && config.dicUrl.includes("/")) {
+  if (!config.dicUrl.includes('layout/dics') && config.dicUrl.includes('/')) {
     return config;
   }
   // 老的方法 字典 值为  layout/dics/value/
-  let slug = config.dicUrl.includes("layout/dics")
-    ? config.dicUrl.split("layout/dics/value/")[1]
+  let slug = config.dicUrl.includes('layout/dics')
+    ? config.dicUrl.split('layout/dics/value/')[1]
     : config.dicUrl;
   // 针对新定义的表格字典类型，直接获取slug
-  if (config.dicOption === "static" || config.dicOption === "remoteDic") {
+  if (config.dicOption === 'static' || config.dicOption === 'remoteDic') {
     slug = config.dicUrl;
   }
   // 新增加属性避免 dicUrl 执行无效请求
@@ -199,7 +195,7 @@ export const replaceLocalDic = config => {
     if (dictRange.length > 0) {
       const dropdownListRange = [];
 
-      dictList.forEach(item => {
+      dictList.forEach((item) => {
         if (dictRange.indexOf(item.value) > -1) {
           dropdownListRange.push(item);
         }
@@ -210,21 +206,21 @@ export const replaceLocalDic = config => {
       config.dicData = dictList;
     }
 
-    console.log("使用本地词典", config.dicData);
+    console.log('使用本地词典', config.dicData);
   }
   return config;
 };
-export const fixRemoteDic = config => {
-  config.type = "select";
-  const path = config.res ? config.res : "list";
-  config.dicFormatter = res => {
+export const fixRemoteDic = (config) => {
+  config.type = 'select';
+  const path = config.res ? config.res : 'list';
+  config.dicFormatter = (res) => {
     return res.data[path];
   };
   config.props = {
     label: config.dicLabel,
     value: config.dicValue
   };
-  if (config.dicQueryStr && config.dicMethod === "post") {
+  if (config.dicQueryStr && config.dicMethod === 'post') {
     try {
       const query = JSON.parse(config.dicQueryStr);
       config.dicQuery = query;
@@ -235,10 +231,10 @@ export const fixRemoteDic = config => {
   return config;
 };
 
-export const fixColumn = config => {
+export const fixColumn = (config) => {
   const type = getObjType(config.order);
 
-  if (type !== "number") {
+  if (type !== 'number') {
     config.order = 1;
   }
 
@@ -247,15 +243,15 @@ export const fixColumn = config => {
   }
 
   // 如果是关联子选择框，去掉自动拉取
-  if (config.dicUrl.includes("{{key}}")) {
+  if (config.dicUrl.includes('{{key}}')) {
     config.dicFlag = false;
     return config;
   }
 
-  config.type = "select";
+  config.type = 'select';
   config = replaceLocalDic(config);
 
-  if (config.datatype === "apiDic") {
+  if (config.datatype === 'apiDic') {
     config = fixRemoteDic(config);
   }
 

@@ -9,8 +9,14 @@
         <div v-if="component.option && component.option.column && component.option.column.length">
           <avue-crud :data="fileList" :option="component.option" @row-del="handleDelete">
             <template v-slot:fileAction="scope">
+           
               <div v-if="!readonly && downloadClient">
-                <el-upload
+	         <fast2-upload
+                @file-success="fileSuccess"
+                @file-progress="onFileProgress"
+                @file-error="onFileError"
+              ></fast2-upload>
+                <!-- <el-upload
                   id="webpicker"
                   :show-file-list="false"
                   class="upload-box"
@@ -19,24 +25,25 @@
                   action="/"
                 >
                   <!-- :before-upload="uploadFile" -->
-                  <!-- action="http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet"
+                <!-- action="http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet"
                   @on-success="handleSuccess" -->
-                  <el-link
+                <!-- <el-link
                     size="small"
                     slot="trigger"
                     type="primary"
                     @click="setUploadRow(scope.row)"
                   >
                     上传
-                  </el-link>
-                  <!--用来存放item-->
-                  <!-- <div id="uploader">
+                  </el-link> -->
+
+                <!--用来存放item-->
+                <!-- <div id="uploader">
                     <div id="picker">选择</div>
                     <button id="ctlBtn" @click="uploadFile" class="btn btn-default">
                       开始上传
                     </button>
                   </div> -->
-                  <template v-if="scope.row.attachmentUrl">
+                <!-- <template v-if="scope.row.attachmentUrl">
                     /
                     <el-link
                       v-if="scope.row.attachmentUrl"
@@ -44,11 +51,11 @@
                       target="_blank"
                       :href="`${dome}opt/nfsshare/${scope.row.attachmentUrl}`"
                     >
-                      <!-- @click.stop="handleDownload(scope.row)" -->
+                      <!-- @click.stop="handleDownload(scope.row)"
                       下载
                     </el-link>
                   </template>
-                </el-upload>
+                </el-upload> -->
               </div>
               <div v-else-if="downloadClient">
                 <el-link
@@ -76,6 +83,7 @@ import uploadApi from '../../lib/api/upload';
 import { formatDate } from '../../lib/utils'; // , renderSize
 import { validateNull } from '../../lib/validate';
 import { getUserInfo } from '../../lib/auth';
+import Uploader from './uploader';
 
 export default {
   name: 'AttachmentList',
@@ -130,7 +138,7 @@ export default {
     },
     attachmentTemplate: {
       type: Array,
-      default: function() {
+      default: function () {
         return [];
       }
     },
@@ -265,99 +273,50 @@ export default {
     }
   },
   methods: {
-    initData() {
-      this.showUpdate = !validateNull(this.id);
-      if (!validateNull(this.businessId)) {
-        this.option.delBtn = this.delBtn;
-        this.getList();
-        // let dic = this.$getDicItem('attachmentType');
-        // this.readOption.column.unshift({
-        //   label: '文件类型',
-        //   prop: 'attachmentType',
-        //   type: 'select',
-        //   order: 0,
-        //   dicData: dic
-        // });
-      }
-    },
-    initWebUpload() {
-      // setTimeout(() => {
-      //   // 方式3
-      //   // var state = 'pending'; // 上传文件初始化
-      //   this.uploader = WebUploader.create({
-      //     swf: './webuploader-0.1.5/Uploader.swf',
-      //     server: 'http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet',
-      //     pick: '#picker',
-      //     resize: false
-      //   });
-      //   this.uploader.on('fileQueued', function(file) {
-      //     console.log('fileQueued');
-      //     console.log(file);
-      //   });
-      //   this.uploader.on('uploadProgress', function(file, percentage) {
-      //     console.log('progress ==', percentage * 100 + '%');
-      //   });
-      //   this.uploader.on('uploadSuccess', function(file) {
-      //     console.log('uploadSuccess');
-      //   });
-      //   this.uploader.on('uploadError', function(file) {
-      //     console.log('uploadError');
-      //   });
-      //   this.uploader.on('uploadComplete', function(file) {
-      //     console.log('uploadComplete');
-      //   });
-      // });
-    },
-    sendFiles() {
-      const list = this.fileList.filter((item) => item.uuid); // 过滤掉未上传过的行数据
-      return new Promise((resolve, reject) => {
-        if (list.length > 0) {
-          const params = {
-            businessItemIds: list.map((item) => item.uuid).toString()
-          };
-          uploadApi
-            .sendFiles(params)
-            .then((res) => {
-              if (res.data.statusCode === '200') {
-                resolve({ result: true, statusCode: res.data.statusCode });
-              } else {
-                resolve({
-                  result: false,
-                  message: res.data.message,
-                  statusCode: res.data.statusCode
-                });
-              }
-            })
-            .catch((res) => {
-              reject(res);
-            });
-        } else {
-          // eslint-disable-next-line prefer-promise-reject-errors
-           resolve({ result: true, statusCode: '200' });
-          // reject({
-          //   result: false,
-          //   message: '请上传附件',
-          //   statusCode: '-100'
-          // });
-        }
-      });
-    },
     doAction(action, data) {
       this.$emit(action, data);
       // this.$message.success(action)
     },
-    // 如果存在模版数据，需要初始化
-    initList() {
-      // 先初始化待上传列表
-      this.attachmentTemplate.map((item) => {
-        this.listTempRowAdd(item);
-      });
-      //  有id 为读取模式， 没id 为模版预览模式
-      if (this.id) {
-        this.getList();
-        this.$forceUpdate();
+
+    handleDelete(row, index) {
+      if (!row.uuid) {
+        this.fileList.splice(index, 1);
+        return;
       }
+      this.$confirm('是否删除该附件？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const action = 'delete';
+        if (row.uuid) {
+          uploadApi.attachmentServer(action, { uuid: row.uuid }).then((res) => {
+            if (res.data.statusCode !== '200') {
+              this.$message.error(res.data.message);
+              return;
+            }
+            this.fileList.splice(index, 1);
+          });
+        }
+      });
     },
+
+    handleDownload(row) {
+      console.log(row);
+    },
+
+    handleSuccess(response, file, fileList) {
+      console.log(response, file, fileList);
+    },
+
+    download(blobUrl, fileName) {
+      const a = document.createElement('a');
+      a.download = fileName;
+      a.href = blobUrl;
+      a.click();
+      document.body.removeChild(a);
+    },
+
     // 可增加行方法
     downloadFile(row) {
       if (row.attachmentUrl) {
@@ -373,6 +332,7 @@ export default {
         });
       }
     },
+
     async getBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -389,6 +349,7 @@ export default {
         };
       });
     },
+
     getList() {
       const action = 'findList';
       const params = {
@@ -452,28 +413,70 @@ export default {
         console.log('this.fileList', this.fileList);
       });
     },
-    handleDelete(row, index) {
-      if (!row.uuid) {
-        this.fileList.splice(index, 1);
-        return;
+
+    initData() {
+      this.showUpdate = !validateNull(this.id);
+      if (!validateNull(this.businessId)) {
+        this.option.delBtn = this.delBtn;
+        this.getList();
+
+        /*
+        const dic = this.$getDicItem('attachmentType');
+        this.readOption.column.unshift({
+          label: '文件类型',
+          prop: 'attachmentType',
+          type: 'select',
+          order: 0,
+          dicData: dic
+        });
+        */
       }
-      this.$confirm('是否删除该附件？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        const action = 'delete';
-        if (row.uuid) {
-          uploadApi.attachmentServer(action, { uuid: row.uuid }).then((res) => {
-            if (res.data.statusCode !== '200') {
-              this.$message.error(res.data.message);
-              return;
-            }
-            this.fileList.splice(index, 1);
-          });
-        }
-      });
     },
+
+    // 如果存在模版数据，需要初始化
+    initList() {
+      // 先初始化待上传列表
+      this.attachmentTemplate.map((item) => {
+        this.listTempRowAdd(item);
+      });
+      //  有id 为读取模式， 没id 为模版预览模式
+      if (this.id) {
+        this.getList();
+        this.$forceUpdate();
+      }
+    },
+
+    initWebUpload() {
+      /*
+      setTimeout(() => {
+        // 方式3
+        // var state = 'pending'; // 上传文件初始化
+        this.uploader = WebUploader.create({
+          swf: './webuploader-0.1.5/Uploader.swf',
+          server: 'http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet',
+          pick: '#picker',
+          resize: false
+        });
+        this.uploader.on('fileQueued', function (file) {
+          console.log('fileQueued');
+          console.log(file);
+        });
+        this.uploader.on('uploadProgress', function (file, percentage) {
+          console.log('progress ==', percentage * 100 + '%');
+        });
+        this.uploader.on('uploadSuccess', function (file) {
+          console.log('uploadSuccess');
+        });
+        this.uploader.on('uploadError', function (file) {
+          console.log('uploadError');
+        });
+        this.uploader.on('uploadComplete', function (file) {
+          console.log('uploadComplete');
+        });
+      });
+      */
+    },
+
     listRowAdd() {
       const fileItem = {
         elsAccount: this.elsAccount,
@@ -481,6 +484,7 @@ export default {
       };
       this.fileList.push(fileItem);
     },
+
     listTempRowAdd(item) {
       if (!item) {
         return;
@@ -495,87 +499,72 @@ export default {
       };
       this.fileList.push(fileItem);
     },
-    // removeFile() {
-    //   let action = 'delete';
-    //   if (this.uploadRow.uuid) {
-    //     uploadApi.attachmentServer(action, { uuid: this.uploadRow.uuid });
-    //   }
-    // },
+
+    /*
+    removeFile() {
+      const action = 'delete';
+      if (this.uploadRow.uuid) {
+        uploadApi.attachmentServer(action, { uuid: this.uploadRow.uuid });
+      }
+    },
+    */
+
+    sendFiles() {
+      const list = this.fileList.filter((item) => item.uuid); // 过滤掉未上传过的行数据
+      return new Promise((resolve, reject) => {
+        if (list.length > 0) {
+          const params = {
+            businessItemIds: list.map((item) => item.uuid).toString()
+          };
+          uploadApi
+            .sendFiles(params)
+            .then((res) => {
+              if (res.data.statusCode === '200') {
+                resolve({ result: true, statusCode: res.data.statusCode });
+              } else {
+                resolve({
+                  result: false,
+                  message: res.data.message,
+                  statusCode: res.data.statusCode
+                });
+              }
+            })
+            .catch((res) => {
+              reject(res);
+            });
+        } else {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          resolve({ result: true, statusCode: '200' });
+          // reject({
+          //   result: false,
+          //   message: '请上传附件',
+          //   statusCode: '-100'
+          // });
+        }
+      });
+    },
+
     setUploadRow(row) {
       this.uploadRow = row;
     },
-    handleDownload(row) {
-      console.log(row);
+    fileSuccess(rootFile, file, message, chunk) {
+      console.log(message);
+      const data = JSON.parse(message)?.data;
+      //将面试邀请code和文件路径去保存到数据库中
+      const fileData = {
+        fileSize: data.size,
+        fileName: data.name,
+        fileType: data.type,
+        filePath: data.url
+      };
+      this.$emit('upload-file', fileData);
+      this.updateFileList(fileData);
     },
-    download(blobUrl, fileName) {
-      const a = document.createElement('a');
-      a.download = fileName;
-      a.href = blobUrl;
-      a.click();
-      document.body.removeChild(a);
+    onFileProgress() {
+      console.log('文件上传中');
     },
-    handleSuccess(response, file, fileList) {
-      console.log(response, file, fileList);
-    },
-    async uploadFile(myfile) {
-      // console.log('开始上传', this.uploader, myfile);
-
-      // this.uploader.upload();
-
-      // 方式2
-      const formdata = new FormData();
-      formdata.append('file', myfile.file);
-      uploadApi
-        .uploadServlet(formdata)
-        .then((res) => {
-          console.log('上传结束', res);
-          if (res.data.statusCode === '200') {
-            const data = res.data.data[0];
-            const file = {
-              fileSize: data.size,
-              fileName: data.name,
-              fileType: data.type,
-              filePath: data.url
-            };
-            this.$emit('upload-file', file);
-            this.updateFileList(file);
-          } else {
-            this.$message.error('上传失败');
-          }
-        })
-        .catch(() => {
-          this.$message.error('上传失败');
-        });
-      // 方式2
-
-      // ------ 原有方式 ------
-      // let fileSize = renderSize(myfile.file.size);
-      // this.getBase64(myfile.file)
-      //   .then((resBase64) => {
-      //     let fileBase64 = resBase64.split(',')[1]; // 直接拿到base64信息
-      //     let params = {
-      //       file: myfile,
-      //       fileName: myfile.file.name,
-      //       fileType: myfile.file.name.split('.')[1],
-      //       fileData: fileBase64
-      //     };
-      //     console.log('params', params);
-      //     return uploadApi.uploadFile(params); // uploadFile
-      //   })
-      //   .then((res) => {
-      //     if (res.data.statusCode === '200') {
-      //       let data = res.data.data;
-      //       data.fileSize = fileSize;
-      //       this.$emit('upload-file', data);
-      //       this.updateFileList(data);
-      //     } else {
-      //       this.$message({
-      //         message: res.data.message,
-      //         type: 'error'
-      //       });
-      //     }
-      //   });
-      // ------ 原有方式 ------
+    onFileError() {
+      this.$message.error('上传失败，请重新尝试');
     },
     updateFileList(file) {
       const _this = this;

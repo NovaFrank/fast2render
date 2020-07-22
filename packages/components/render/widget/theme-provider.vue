@@ -13,11 +13,12 @@ import BigListTemplate from '../../../lib/crud-biglist';
 import SmallListTemplate from '../../../lib/crud-small';
 import BigFormTemplate from '../../../lib/form-big';
 import SmallFormTemplate from '../../../lib/form-small';
-import { mySpanMethod, zipLayout } from '../../../lib/utils.js';
+import { mySpanMethod, zipLayout, getApiPath } from '../../../lib/utils.js';
 import { loadBlockConfig, handleColumn } from '../../../lib/blockHander.js';
 import { validateNull } from '../../../lib/validate';
 
 import _ from 'lodash';
+const baseUrl = getApiPath();
 
 export default {
   name: 'ThemeProvider',
@@ -48,7 +49,7 @@ export default {
     },
     col:{
       type: Number,
-      default: 0,
+      default: 0
     },
     inTab: {
       type: Boolean,
@@ -156,10 +157,10 @@ export default {
          this.finalOption.detail = true;
          this.finalOption.menu = false;
       }
-      if(this.col>0){
-        this.finalOption.column.map(item=>{
-          item.span = this.col
-        })
+      if (this.col > 0) {
+        this.finalOption.column.map((item) => {
+          item.span = this.col;
+        });
       }
       this.reload = true;
     },
@@ -169,10 +170,10 @@ export default {
         const itemProp = rowPermission[item.prop];
         if (itemProp) {
           if (itemProp.display && itemProp.display !== false) {
-            let label = item.label
+            let label = item.label;
             if (itemProp.displayName) {
               item.label = itemProp.displayName;
-              label = itemProp.displayName
+              label = itemProp.displayName;
             }
             const isRequired = !!itemProp.isRequired;
             if (isRequired) {
@@ -186,6 +187,13 @@ export default {
               } else {
                 item.rules = [rule];
               }
+            }
+            if (!validateNull(itemProp.bizDic)) {
+              delete item.dicData;
+              delete item.dicMethod;
+              delete item.props;
+              item.type = 'select';
+              item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${itemProp.bizDic}`;
             }
             if (itemProp.isDisabled || itemProp.readonly) {
               item.disabled = 'disabled';

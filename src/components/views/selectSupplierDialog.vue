@@ -3,11 +3,12 @@
     <avue-form class="select-supplier" :option="formOption" v-model="form" ref="form">
       <template slot="suppliers">
         <!-- <el-transfer filterable v-model="form.selectedSupplier" :data="data"></el-transfer> -->
-        <!-- :dataList="data" -->
         <kr-paging
           :selectedData="form.selectedSupplier"
-          async
+          :async="true"
+          :filterable="true"
           :pageSize="10"
+          :getSearchData="getSearchData"
           :getPageData="getPageData"
           @onChange="onChange"
         ></kr-paging>
@@ -87,11 +88,11 @@ export default {
     closeDialog() {
       this.visable = false;
     },
-    async getPageData(pageIndex, pageSize) {
-      // this.$emit('supplier-page-data', { pageIndex, pageSize });
+    async getData(pageIndex = 1, pageSize = 1, keyword = '') {
       const res = await supplierMasterListAction({
         elsAccount: this.elsAccount,
         pageSize: pageSize,
+        supplierName: keyword,
         currentPage: pageIndex
       });
       const supplierList = res.data.pageData.rows.map((item, index) => {
@@ -102,6 +103,14 @@ export default {
         };
       });
       return supplierList;
+    },
+    async getSearchData(keyword) {
+      const data = await this.getData(keyword);
+      return data;
+    },
+    async getPageData(pageIndex, pageSize) {
+      const data = await this.getData(pageIndex, pageSize);
+      return data;
     },
     handleSubmit() {
       console.log('this.selectColumns', this.selectColumns);

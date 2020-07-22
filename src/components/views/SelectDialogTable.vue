@@ -176,6 +176,7 @@ export default {
       this.$emit('handleList', this.queryParam, this.page);
     },
     searchChange(params, done) {
+      this.queryParam = params;
       this.page.currentPage = 1;
       Object.assign(this.crudQueryParam, params);
       this.$emit('handleList', this.queryParam, this.page);

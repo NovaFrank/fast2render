@@ -6,12 +6,14 @@ export default {
         label: '物料编码',
         prop: 'materialNumber',
         editDisplay: false,
+        searchSpan: 12,
         search: true
       },
       {
         label: '物料描述',
         prop: 'materialDesc',
         editDisplay: false,
+        searchSpan: 12,
         search: true
       },
       {
@@ -36,7 +38,6 @@ export default {
     submitText: '保存',
     menuPosition: 'center',
     highlightCurrentRow: true,
-    searchMenuSpan: 6,
     multiple: false
   },
   page: { total: 0, currentPage: 1, pageSize: 10 }

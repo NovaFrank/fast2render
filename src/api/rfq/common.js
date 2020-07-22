@@ -44,7 +44,7 @@ export const materialListAction = (param) =>
 // 供应商查询-/supplier/SupplierMasterDataService/findPageList
 export const supplierMasterListAction = (param) =>
   request({
-    url: `${prefix}/supplier/SupplierMasterDataService/findList`,
+    url: `${prefix}/supplier/SupplierMasterDataService/findPageList`,
     method: 'post',
     data: { ...param }
   });

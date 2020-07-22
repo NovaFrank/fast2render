@@ -856,7 +856,7 @@ export default {
       dataDicAPI('quoteMethod').then((res) => {
         this.quoteMethodData = res.data;
       });
-      // 供应商列表 supplierMasterListAction
+      // 供应商列表
       this.getSupplierPageData(1, 10);
       // 税率
       dataDicAPI('taxRate').then((res) => {
@@ -876,34 +876,33 @@ export default {
         });
       });
     },
-    getSupplierPageData(pageIndex, pageSize) {
-      supplierMasterListAction({
+    async getSupplierPageData(pageIndex, pageSize) {
+      const res = await supplierMasterListAction({
         elsAccount: this.elsAccount,
         pageSize: pageSize,
         currentPage: pageIndex
-      }).then((res) => {
-        this.supplierList = res.data.pageData.rows;
-        this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
+      });
+      this.supplierList = res.data.pageData.rows;
+      this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
+        return {
+          label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
+          key: item.toElsAccount,
+          id: item.toElsAccount
+        };
+      });
+      this.dialogOption.column = this.dialogOption.column.map((item) => {
+        if (item.prop === 'toElsAccountList') {
           return {
-            label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
-            key: item.toElsAccount,
-            id: item.toElsAccount
+            dicData: this.supplierList.map((item) => {
+              return {
+                label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
+                value: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`
+              };
+            }),
+            ...item
           };
-        });
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'toElsAccountList') {
-            return {
-              dicData: this.supplierList.map((item) => {
-                return {
-                  label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
-                  value: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`
-                };
-              }),
-              ...item
-            };
-          }
-          return item;
-        });
+        }
+        return item;
       });
     },
     closeFieldDialog() {

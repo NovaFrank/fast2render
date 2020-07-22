@@ -866,7 +866,31 @@ export default {
         this.quoteMethodData = res.data;
       });
       // 供应商列表 supplierMasterListAction
-      supplierMasterListAction({ elsAccount: this.elsAccount, pageSize: 10000 }).then((res) => {
+      this.getSupplierPageData(1, 10);
+      // 税率
+      dataDicAPI('taxRate').then((res) => {
+        this.dialogOption.column = this.dialogOption.column.map((item) => {
+          if (item.prop === 'taxCode') {
+            return {
+              ...item,
+              dicData: res.data.map((item) => {
+                return {
+                  label: `${item.value}`,
+                  value: `${item.label}_${item.value}`
+                };
+              })
+            };
+          }
+          return item;
+        });
+      });
+    },
+    getSupplierPageData(pageIndex, pageSize) {
+      supplierMasterListAction({
+        elsAccount: this.elsAccount,
+        pageSize: pageSize,
+        currentPage: pageIndex
+      }).then((res) => {
         this.supplierList = res.data.pageData.rows;
         this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
           return {
@@ -885,23 +909,6 @@ export default {
                 };
               }),
               ...item
-            };
-          }
-          return item;
-        });
-      });
-      // 税率
-      dataDicAPI('taxRate').then((res) => {
-        this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'taxCode') {
-            return {
-              ...item,
-              dicData: res.data.map((item) => {
-                return {
-                  label: `${item.value}`,
-                  value: `${item.label}_${item.value}`
-                };
-              })
             };
           }
           return item;

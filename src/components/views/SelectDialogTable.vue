@@ -7,11 +7,12 @@
         v-model="crudObj"
         :data.sync="crudData"
         :option.sync="crudOption"
-        :page.sync="crudPage"
+        :page.sync="page"
         @selection-change="selectionChange"
         @search-change="searchChange"
         @refresh-change="refreshChange"
         @current-change="currentChange"
+        @search-reset="searchReset"
         @size-change="sizeChange"
         @current-row-change="currentRowChange"
       >
@@ -166,7 +167,14 @@ export default {
         this.multipleSelection = list;
       }
     },
-
+    searchReset() {
+      this.$refs.crud.searchReset();
+      this.queryParam = {};
+      this.crudQueryParam = {};
+      this.page.currentPage = 1;
+      Object.assign(this.crudQueryParam, this.queryParam);
+      this.$emit('handleList', this.queryParam, this.page);
+    },
     searchChange(params, done) {
       this.page.currentPage = 1;
       Object.assign(this.crudQueryParam, params);

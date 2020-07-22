@@ -5,12 +5,14 @@ export default {
       {
         label: '物料编码',
         prop: 'materialNumber',
-        editDisplay: false
+        editDisplay: false,
+        search: true
       },
       {
         label: '物料描述',
         prop: 'materialDesc',
-        editDisplay: false
+        editDisplay: false,
+        search: true
       },
       {
         label: '规格',
@@ -34,6 +36,7 @@ export default {
     submitText: '保存',
     menuPosition: 'center',
     highlightCurrentRow: true,
+    searchMenuSpan: 6,
     multiple: false
   },
   page: { total: 0, currentPage: 1, pageSize: 10 }

@@ -253,6 +253,10 @@ export default {
           const pageData = res.data.pageData;
           this.materialsDialogOption.data = pageData.rows || [];
           this.materialsDialogOption.page.total = pageData.total;
+          this.materialsDialogOption.page.pageSize = pageData.pageSize;
+          this.materialsDialogOption.page.currentPage = pageData.currentPage;
+          this.materialsDialogQueryParam = queryCondition;
+          this.materialsDialogPageParam = pagination;
         } else {
           this.$message.error('查询采物料数据失败, ' + res.data.message || '');
         }

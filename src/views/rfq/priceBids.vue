@@ -153,7 +153,6 @@ import { historyAction } from '@/api/rfq/priceBids';
 import { compare, getUserInfo } from '@/util/utils.js';
 import FormHeader from '@/components/views/formHeader';
 import { formatDate } from '@/util/date';
-import costBids from './priceCostBids';
 import { validatenull } from '@/util/validate';
 import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 
@@ -165,7 +164,7 @@ require('echarts/lib/chart/bar');
 require('echarts/lib/chart/line');
 
 export default {
-  components: { FormHeader, costBids },
+  components: { FormHeader },
   data() {
     return {
       templateRule: {
@@ -362,7 +361,7 @@ export default {
         return {
           width: '150',
           slot: true,
-          label: item.toElsAccount,
+          label: item.companyShortName,
           prop: item.toElsAccount
         };
       });

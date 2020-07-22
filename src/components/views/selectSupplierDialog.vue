@@ -7,7 +7,8 @@
           filterable
           :dataList="data"
           :selectedData="form.selectedSupplier"
-          :pageSize="100"
+          :pageSize="10"
+          @getPageData="getPageData"
           @onChange="onChange"
         ></kr-paging>
       </template>
@@ -80,6 +81,9 @@ export default {
   methods: {
     closeDialog() {
       this.visable = false;
+    },
+    getPageData(pageIndex, pageSize) {
+      this.$emit('supplier-page-data', { pageIndex, pageSize });
     },
     handleSubmit() {
       console.log('this.selectColumns', this.selectColumns);

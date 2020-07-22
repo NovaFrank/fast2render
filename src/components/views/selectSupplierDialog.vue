@@ -4,11 +4,12 @@
       <template slot="suppliers">
         <!-- <el-transfer filterable v-model="form.selectedSupplier" :data="data"></el-transfer> -->
         <kr-paging
-          filterable
-          :dataList="data"
           :selectedData="form.selectedSupplier"
+          :async="true"
+          :filterable="true"
           :pageSize="10"
-          @getPageData="getPageData"
+          :getSearchData="getSearchData"
+          :getPageData="getPageData"
           @onChange="onChange"
         ></kr-paging>
       </template>
@@ -20,6 +21,8 @@
   </el-dialog>
 </template>
 <script>
+import { supplierMasterListAction } from '@/api/rfq/common';
+import { getUserInfo } from '@/util/utils.js';
 export default {
   name: 'select-supplier-dialog',
   props: {
@@ -46,6 +49,7 @@ export default {
       visable: this.dialogVisible,
       form: {},
       selectColumns: [],
+      elsAccount: '',
       formOption: {
         menuPosition: 'center',
         labelWidth: 0,
@@ -66,6 +70,8 @@ export default {
     this.crudQueryParam = this.queryParam;
     this.crudPageParam = this.pageParam;
     this.crudMultiple = this.multiple;
+    const userInfo = getUserInfo();
+    this.elsAccount = userInfo.elsAccount;
   },
   watch: {
     crudObj: function(newValue) {
@@ -82,8 +88,29 @@ export default {
     closeDialog() {
       this.visable = false;
     },
-    getPageData(pageIndex, pageSize) {
-      this.$emit('supplier-page-data', { pageIndex, pageSize });
+    async getData(pageIndex = 1, pageSize = 1, keyword = '') {
+      const res = await supplierMasterListAction({
+        elsAccount: this.elsAccount,
+        pageSize: pageSize,
+        supplierName: keyword,
+        currentPage: pageIndex
+      });
+      const supplierList = res.data.pageData.rows.map((item, index) => {
+        return {
+          label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
+          key: item.toElsAccount,
+          id: item.toElsAccount
+        };
+      });
+      return supplierList;
+    },
+    async getSearchData(keyword) {
+      const data = await this.getData(keyword);
+      return data;
+    },
+    async getPageData(pageIndex, pageSize) {
+      const data = await this.getData(pageIndex, pageSize);
+      return data;
     },
     handleSubmit() {
       console.log('this.selectColumns', this.selectColumns);

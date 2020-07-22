@@ -23,7 +23,7 @@ export default {
     searchBtn: true,
     searchMenuSpan: 6,
     searchShow: false,
-    columnBtn: false,
+    columnBtn: true,
     column: [
       {
         label: '订单号',

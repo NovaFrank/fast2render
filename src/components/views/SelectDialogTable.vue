@@ -14,7 +14,7 @@
         @current-change="currentChange"
         @search-reset="searchReset"
         @size-change="sizeChange"
-        @current-row-change="currentRowChange"
+        @row-click="currentRowChange"
       >
         <template slot="menuLeft">
           <el-button type="primary" size="small" plain @click.stop="doAction()">
@@ -119,7 +119,6 @@ export default {
       this.crudData = newValue;
     },
     page: function(newValue) {
-      console.log('dialog page', newValue);
       this.crudPage = newValue;
     },
     column: function(newValue) {

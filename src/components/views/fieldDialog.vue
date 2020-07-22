@@ -9,7 +9,7 @@
     >
       <avue-form ref="formField" :option="dialogOption" v-model="form" class="new-field">
         <template slot="materialNumber">
-          <el-input v-model="form.materialNumber" :disabled="purchaseRequest" :readonly="true">
+          <el-input v-model="form.materialNumber" :disabled="purchaseRequest">
             <i
               slot="suffix"
               class="el-input_icon el-icon-search pointer"
@@ -165,6 +165,10 @@ export default {
   watch: {
     field(newVal) {
       this.form = newVal;
+      if (validateNull(this.form.$index))
+        this.$nextTick(() => {
+          if (this.$refs.formField) this.$refs.formField.resetFields(); // 等弹窗里的form表单的dom渲染完在执行this.$refs.staffForm.resetFields()，去除验证
+        });
       this.ladderOption.data = newVal.ladderPriceJson ? JSON.parse(newVal.ladderPriceJson) : [];
       if (this.form.quoteMethod === '2' && this.dialogTitle === '修改询价明细') {
         const costJson = JSON.parse(newVal.costConstituteJson);
@@ -215,11 +219,13 @@ export default {
     },
     selectedMaterails(materialList) {
       if (materialList.length > 0) {
+        console.log(materialList[0]);
         this.form.materialNumber = materialList[0].materialNumber;
         this.form.materialDesc = materialList[0].materialDesc;
         this.form.materialName = materialList[0].materialName;
         this.form.materialSpecifications = materialList[0].materialSpecifications;
         this.form.baseUnit = materialList[0].baseUnit;
+        this.form.orderUnit = materialList[0].orderUnit;
         this.form.queryUuid = materialList[0].uuid;
       } else {
         this.$message.warning('请选择一条物料明细');
@@ -247,6 +253,10 @@ export default {
           const pageData = res.data.pageData;
           this.materialsDialogOption.data = pageData.rows || [];
           this.materialsDialogOption.page.total = pageData.total;
+          this.materialsDialogOption.page.pageSize = pageData.pageSize;
+          this.materialsDialogOption.page.currentPage = pageData.currentPage;
+          this.materialsDialogQueryParam = queryCondition;
+          this.materialsDialogPageParam = pagination;
         } else {
           this.$message.error('查询采物料数据失败, ' + res.data.message || '');
         }

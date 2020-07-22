@@ -5,12 +5,14 @@ export default {
       {
         label: '物料编码',
         prop: 'materialNumber',
-        editDisplay: false
+        editDisplay: false,
+        search: true
       },
       {
         label: '物料描述',
         prop: 'materialDesc',
-        editDisplay: false
+        editDisplay: false,
+        search: true
       },
       {
         label: '规格',

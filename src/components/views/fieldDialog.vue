@@ -223,13 +223,16 @@ export default {
     },
     selectedMaterails(materialList) {
       if (materialList.length > 0) {
-        this.form.materialNumber = materialList[0].materialNumber;
-        this.form.materialDesc = materialList[0].materialDesc;
-        this.form.materialName = materialList[0].materialName;
-        this.form.materialSpecifications = materialList[0].materialSpecifications;
-        this.form.baseUnit = materialList[0].baseUnit;
-        this.form.orderUnit = materialList[0].orderUnit;
+        // this.form.materialNumber = materialList[0].materialNumber;
+        // this.form.materialDesc = materialList[0].materialDesc;
+        // this.form.materialName = materialList[0].materialName;
+        // this.form.materialSpecifications = materialList[0].materialSpecifications;
+        // this.form.baseUnit = materialList[0].baseUnit;
+        // this.form.orderUnit = materialList[0].orderUnit;
+        // this.form.queryUuid = materialList[0].uuid;
+        Object.assign(this.form, materialList[0]);
         this.form.queryUuid = materialList[0].uuid;
+        console.log('selectedMaterails this.form', this.form);
       } else {
         this.$message.warning('请选择一条物料明细');
       }
@@ -322,9 +325,13 @@ export default {
         const costConstituteJson = JSON.stringify(obj);
         this.form.costConstituteJson = costConstituteJson;
       }
+      console.log('handleSubmit this.form', this.form);
       this.$refs.formField.validate((valid) => {
         if (valid) {
           this.$emit('on-save-form', this.form);
+          this.$nextTick(() => {
+            if (this.$refs.formField) this.$refs.formField.resetFields(); // 等弹窗里的form表单的dom渲染完在执行this.$refs.staffForm.resetFields()，去除验证
+          });
         }
       });
     },

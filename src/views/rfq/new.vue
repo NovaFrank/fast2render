@@ -708,6 +708,7 @@ export default {
     },
     handleAddShow(title, row) {
       this.fieldDialogForm = title === '添加' ? {} : row;
+      console.log('this.fieldDialogForm', this.fieldDialogForm);
       this.dialogTitle = `${title}询价明细`;
       this.fieldDialogVisible = true;
     },

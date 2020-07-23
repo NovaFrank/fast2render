@@ -163,13 +163,17 @@ export default {
     };
   },
   watch: {
-    field(newVal) {
-      this.form = newVal;
-      console.log(this.dialogTitle === '添加询价明细', validateNull(this.form.materialNumber));
-      if (this.dialogTitle === '添加询价明细' && validateNull(this.form.materialNumber))
+    fieldDialogVisible(newVal) {
+      console.log('newVal', newVal);
+      console.log('添加询价明细', this.dialogTitle === '添加询价明细');
+      if (newVal && this.dialogTitle === '添加询价明细') {
         this.$nextTick(() => {
           if (this.$refs.formField) this.$refs.formField.resetFields(); // 等弹窗里的form表单的dom渲染完在执行this.$refs.staffForm.resetFields()，去除验证
         });
+      }
+    },
+    field(newVal) {
+      this.form = newVal;
       this.ladderOption.data = newVal.ladderPriceJson ? JSON.parse(newVal.ladderPriceJson) : [];
       if (this.form.quoteMethod === '2' && this.dialogTitle === '修改询价明细') {
         const costJson = JSON.parse(newVal.costConstituteJson);

@@ -164,9 +164,8 @@ export default {
   },
   watch: {
     fieldDialogVisible(newVal) {
-      console.log('newVal', newVal);
       console.log('添加询价明细', this.dialogTitle === '添加询价明细');
-      if (newVal && this.dialogTitle === '添加询价明细') {
+      if (this.dialogTitle === '添加询价明细') {
         this.$nextTick(() => {
           if (this.$refs.formField) this.$refs.formField.resetFields(); // 等弹窗里的form表单的dom渲染完在执行this.$refs.staffForm.resetFields()，去除验证
         });

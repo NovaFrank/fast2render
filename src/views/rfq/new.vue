@@ -354,7 +354,7 @@ export default {
         this.inquiryListOption.option.menu = true;
         this.headerButtons = [
           {
-            power: !this.purchaseRequest,
+            power: !this.purchaseRequest && !validatenull(newVal.enquiryNumber),
             text: '退回',
             type: 'primary',
             size: '',
@@ -363,7 +363,7 @@ export default {
           { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
           { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
           {
-            power: !this.purchaseRequest,
+            power: !this.purchaseRequest && !validatenull(newVal.enquiryNumber),
             text: '关闭',
             type: 'primary',
             size: '',
@@ -1291,9 +1291,10 @@ export default {
               }
               this.$message.success('保存成功');
               if (this.currentEnquiryNumber) {
-                setTimeout(() => {
-                  this.$router.go(0);
-                }, 1000);
+                // setTimeout(() => {
+                //   this.$router.go(0);
+                // }, 1000);
+                this.initDetail();
                 return;
               }
               const enquiryNumber = res.data.data.enquiryNumber;

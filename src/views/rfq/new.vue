@@ -371,7 +371,13 @@ export default {
             size: '',
             action: 'on-back'
           },
-          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
+          {
+            power: !validatenull(newVal.enquiryNumber),
+            text: '风险检测',
+            type: 'primary',
+            size: '',
+            action: 'on-test'
+          },
           { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
           {
             power: !this.purchaseRequest && !validatenull(newVal.enquiryNumber),

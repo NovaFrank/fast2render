@@ -309,10 +309,10 @@ export default {
     purchaseRequest(newVal) {
       this.inquiryListOption.option.menu = true;
       this.headerButtons = [
-        { power: newVal, text: '退回', type: 'primary', size: '', action: 'on-back' },
+        { power: !newVal, text: '退回', type: 'primary', size: '', action: 'on-back' },
         { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
         { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-        { power: newVal, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+        { power: !newVal, text: '关闭', type: 'primary', size: '', action: 'on-close' },
         { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
         { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
       ];
@@ -351,25 +351,27 @@ export default {
           { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
         ];
       } else {
-        if (this.purchaseRequest) {
-          this.inquiryListOption.option.menu = true;
-          this.headerButtons = [
-            { power: true, text: '退回', type: 'primary', size: '', action: 'on-back' },
-            { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
-            { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-            { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-            { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
-            { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
-          ];
-        } else {
-          this.inquiryListOption.option.menu = true;
-          this.headerButtons = [
-            { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
-            { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
-            { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
-            { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
-          ];
-        }
+        this.inquiryListOption.option.menu = true;
+        this.headerButtons = [
+          {
+            power: !this.purchaseRequest,
+            text: '退回',
+            type: 'primary',
+            size: '',
+            action: 'on-back'
+          },
+          { power: true, text: '风险检测', type: 'primary', size: '', action: 'on-test' },
+          { power: true, text: '发布', type: 'primary', size: '', action: 'on-release' },
+          {
+            power: !this.purchaseRequest,
+            text: '关闭',
+            type: 'primary',
+            size: '',
+            action: 'on-close'
+          },
+          { power: true, text: '保存', type: 'primary', size: '', action: 'on-save' },
+          { power: true, text: '返回', type: '', size: '', action: 'on-cancel' }
+        ];
         if (newVal.enquiryNumber) {
           this.headerButtons.push({
             power: true,

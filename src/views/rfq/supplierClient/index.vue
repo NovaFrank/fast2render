@@ -1,28 +1,30 @@
 <template>
   <basic-container>
     <avue-tabs :option="tabOption.option" @change="handleTabChange"></avue-tabs>
-    <avue-crud
-      ref="list"
-      :data="tableOption.data"
-      :option="tableOption.option"
-      :page.sync="tableOption.page"
-      v-model="tableOption.obj"
-      @size-change="sizeChange"
-      @current-change="currentChange"
-      :search="search"
-      @search-change="searchChange"
-      @search-reset="searchReset"
-    >
-      <template slot="enquiryNumber" slot-scope="scope">
-        <el-button
-          @click.stop="handleRowClick(scope.row)"
-          class="el-button el-button--text el-button--small"
+    <fast2-theme-provider theme="block">
+      <template>
+        <avue-crud
+          ref="list"
+          :data="tableOption.data"
+          :option="tableOption.option"
+          :page.sync="tableOption.page"
+          v-model="tableOption.obj"
+          @size-change="sizeChange"
+          @current-change="currentChange"
+          :search="search"
+          @search-change="searchChange"
+          @search-reset="searchReset"
         >
-          {{ scope.row.enquiryNumber }}
-        </el-button>
-      </template>
-      <template slot-scope="scope" slot="itemStatus">
-        <!-- 
+          <template slot="enquiryNumber" slot-scope="scope">
+            <el-button
+              @click.stop="handleRowClick(scope.row)"
+              class="el-button el-button--text el-button--small"
+            >
+              {{ scope.row.enquiryNumber }}
+            </el-button>
+          </template>
+          <template slot-scope="scope" slot="itemStatus">
+            <!-- 
       // new itemStatus 0
       // quoted itemStatus 1
       // price itemStatus 4
@@ -33,23 +35,25 @@
       // 重报价   itemStatus:3
       // 定价      itemStatus:4
       // 关闭      itemStatusList:[5,6] -->
-        <span>
-          {{
-            scope.row.itemStatus === '1'
-              ? '未报价'
-              : scope.row.itemStatus === '2'
-              ? '已报价'
-              : scope.row.itemStatus === '3'
-              ? '重定价'
-              : scope.row.itemStatus === '4'
-              ? '定价'
-              : ['6', '5'].includes(scope.row.itemStatus)
-              ? '已关闭'
-              : ''
-          }}
-        </span>
+            <span>
+              {{
+                scope.row.itemStatus === '1'
+                  ? '未报价'
+                  : scope.row.itemStatus === '2'
+                  ? '已报价'
+                  : scope.row.itemStatus === '3'
+                  ? '重定价'
+                  : scope.row.itemStatus === '4'
+                  ? '定价'
+                  : ['6', '5'].includes(scope.row.itemStatus)
+                  ? '已关闭'
+                  : ''
+              }}
+            </span>
+          </template>
+        </avue-crud>
       </template>
-    </avue-crud>
+    </fast2-theme-provider>
   </basic-container>
 </template>
 

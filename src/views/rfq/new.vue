@@ -309,12 +309,13 @@ export default {
   },
   watch: {
     configButtons(newVal) {
-      this.headerButtons = this.headerButtons.map((item) => {
-        const index = newVal.findIndex((n) => n.name === item.action);
-        if (index === -1) return item;
-        item.power = newVal[index].display;
-        return item;
-      });
+      if (!validatenull(newVal))
+        this.headerButtons = this.headerButtons.map((item) => {
+          const index = newVal.findIndex((n) => n.name === item.action);
+          if (index === -1) return item;
+          item.power = newVal[index].display;
+          return item;
+        });
     },
     purchaseRequest(newVal) {
       this.inquiryListOption.option.menu = true;

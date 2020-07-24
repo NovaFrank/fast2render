@@ -712,6 +712,8 @@ export default {
                 trigger: 'blur'
               });
             }
+            delete item.disabled;
+            delete item.readonly;
             this.formOption.column.push({
               span: item.span || 6,
               rules,
@@ -721,6 +723,7 @@ export default {
             });
           }
         });
+        console.log('this.formOption.column', this.formOption.column);
       } else {
         this.initColumns();
       }

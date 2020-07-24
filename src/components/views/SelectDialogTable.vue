@@ -129,6 +129,12 @@ export default {
     },
     dialogVisible: function(newValue) {
       this.visable = newValue;
+      this.page = {
+        ...this.page,
+        currentPage: 1,
+        pageSize: 10
+      };
+      if (this.visable) this.$emit('handleList', this.queryParam, this.page);
     }
     // // TODO:直接修改对象中的属性不会触发此事件，而父对象传入的参数也会对应改变
     // crudQueryParam: function(newValue) {

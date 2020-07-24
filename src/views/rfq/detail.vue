@@ -1104,7 +1104,8 @@ export default {
         type: 'warning'
       }).then(() => {
         const params = {
-          ...this.detailObj,
+          // ...this.detailObj,
+          enquiryNumber: this.detailObj.enquiryNumber,
           quoteEndTime: this.quoteEndTimeChange
         };
         purchaseEnquiryAction('updateQuoteEndTime', params).then((res) => {
@@ -1113,9 +1114,10 @@ export default {
             return;
           }
           this.$message.success('更新截止时间成功');
-          setTimeout(() => {
-            this.$router.go(0);
-          }, 1000);
+          this.initDetail();
+          // setTimeout(() => {
+          //   this.$router.go(0);
+          // }, 1000);
         });
       });
     },

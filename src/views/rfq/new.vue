@@ -693,6 +693,8 @@ export default {
                 trigger: 'blur'
               });
             }
+            delete item.disabled;
+            delete item.readonly;
             this.formOption.column.push({
               span: item.span || 6,
               rules,

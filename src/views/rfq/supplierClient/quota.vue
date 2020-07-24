@@ -609,7 +609,7 @@ export default {
       done();
     },
     handleEditRow(scope) {
-      this.$refs.detail.rowEdit(scope.row);
+      this.$refs.detail.rowEdit(scope.row, scope.row.$index);
     },
     // 显示报价弹窗
     handleQuoteRow(scope) {

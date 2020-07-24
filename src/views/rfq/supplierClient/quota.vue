@@ -489,6 +489,9 @@ export default {
         return Number(item.ladderQuantity);
       });
       quantityList.push(quantity);
+      quantityList.sort(function(a, b) {
+        return a - b;
+      });
       const index = quantityList.findIndex((item) => item === Number(quantity));
       const current = JSON.parse(row.ladderPriceJson)[index - 1];
       const price = current[column];

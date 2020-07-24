@@ -853,6 +853,9 @@ export default {
           })
         : [];
       quantityList.push(quantity);
+      quantityList.sort(function(a, b) {
+        return a - b;
+      });
       const index = quantityList.findIndex((item) => item === Number(quantity));
       return JSON.parse(row.ladderPriceJson)[index - 1][column];
     },

@@ -129,14 +129,13 @@
         ></avue-radio>
       </template>
       <template slot-scope="scope" slot="menu">
-        <div
-          v-if="
+        <!-- v-if="
             (scope.row.noQuoted !== 'N' &&
               scope.row.itemStatus === '1' &&
               detailObj.quoteEndTime > new Date().getTime()) ||
               scope.row.itemStatus === '3'
-          "
-        >
+          " -->
+        <div>
           <el-button
             @click.stop="handleQuoteRow(scope)"
             class="el-button el-button--text el-button--small"
@@ -569,7 +568,7 @@ export default {
       done();
     },
     handleEditRow(scope) {
-      this.$refs.detail.rowEdit(scope.row);
+      this.$refs.detail.rowEdit(scope.row, scope.row.$index);
     },
     // 显示报价弹窗
     handleQuoteRow(scope) {

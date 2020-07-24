@@ -10,13 +10,12 @@ export default {
     align: 'center',
     addBtn: false,
     menu: false,
-    menuAlign: 'left',
+    menuAlign: 'rigth',
     indexLabel: '序号',
     border: true,
     highlightCurrentRow: true,
     index: true,
     searchLabelWidth: 140,
-    searchMenuSpan: 6,
     searchShow: false,
     selectable: (row, index) => {
       console.log(row, index);

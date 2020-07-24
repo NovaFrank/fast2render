@@ -695,8 +695,8 @@ export default {
               span: item.span || 6,
               rules,
               ...item,
-              label: item.fbk1 || item.label,
-              disabled: !item.purchaseEdit
+              disabled: !item.purchaseEdit,
+              label: item.fbk1 || item.label
             });
           }
         });
@@ -857,7 +857,7 @@ export default {
       dataDicAPI('quoteMethod').then((res) => {
         this.quoteMethodData = res.data;
       });
-      // 供应商列表
+      // 供应商列表 supplierMasterListAction
       this.getSupplierPageData(1, 10);
       // 税率
       dataDicAPI('taxRate').then((res) => {

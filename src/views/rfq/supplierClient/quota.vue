@@ -129,13 +129,14 @@
         ></avue-radio>
       </template>
       <template slot-scope="scope" slot="menu">
-        <!-- v-if="
+        <div
+          v-if="
             (scope.row.noQuoted !== 'N' &&
               scope.row.itemStatus === '1' &&
               detailObj.quoteEndTime > new Date().getTime()) ||
               scope.row.itemStatus === '3'
-          " -->
-        <div>
+          "
+        >
           <el-button
             @click.stop="handleQuoteRow(scope)"
             class="el-button el-button--text el-button--small"

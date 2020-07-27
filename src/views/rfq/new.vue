@@ -309,11 +309,17 @@ export default {
   },
   watch: {
     configButtons(newVal) {
+      console.log('newVal', newVal);
       if (!validatenull(newVal))
         this.headerButtons = this.headerButtons.map((item) => {
           const index = newVal.findIndex((n) => n.name === item.action);
           if (index === -1) return item;
           item.power = newVal[index].display;
+          if (
+            (item.text === '退回' || item.text === '关闭') &&
+            validatenull(this.form.enquiryNumber)
+          )
+            item.power = false;
           return item;
         });
     },
@@ -894,6 +900,7 @@ export default {
         pageSize: pageSize,
         currentPage: pageIndex
       });
+      if (res.data.statusCode !== '200') return;
       this.supplierList = res.data.pageData.rows;
       this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
         return {

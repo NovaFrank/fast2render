@@ -240,6 +240,7 @@ export default {
       } else {
         this.$message.warning('请选择一条物料明细');
       }
+      this.$forceUpdate();
     },
     materialsHandleList(queryCondition = {}, pagination) {
       const params = {
@@ -329,7 +330,6 @@ export default {
         const costConstituteJson = JSON.stringify(obj);
         this.form.costConstituteJson = costConstituteJson;
       }
-      console.log('handleSubmit this.form', this.form);
       this.$refs.formField.validate((valid) => {
         if (valid) {
           this.$emit('on-save-form', this.form);

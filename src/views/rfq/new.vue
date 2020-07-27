@@ -309,7 +309,6 @@ export default {
   },
   watch: {
     configButtons(newVal) {
-      console.log('newVal', newVal);
       if (!validatenull(newVal))
         this.headerButtons = this.headerButtons.map((item) => {
           const index = newVal.findIndex((n) => n.name === item.action);
@@ -1428,6 +1427,7 @@ export default {
       }
       this.fieldDialogVisible = false;
       this.$message.success('保存成功');
+      this.$forceUpdate();
     },
     sizeChange(val) {
       this.inquiryListOption.page.pageSize = val;

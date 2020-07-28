@@ -11,11 +11,19 @@
         <el-input placeholder="请输入 含税价" v-model="form.priceIncludingTax"></el-input>
       </template>
       <template slot="taxRate">
-        <el-input
+        <el-select
           :disabled="enquiryPurchaserTax === true"
           placeholder="请输入 税率"
           v-model="form.taxRate"
-        ></el-input>
+        >
+          <el-option
+            v-for="item in dicData"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
       </template>
       <template slot="menuForm">
         <el-button @click="closeDialog">取消</el-button>
@@ -28,6 +36,7 @@
 <script>
 import quoteFormOption from '@/const/rfq/supplierClient/quoteForm';
 import { validatenull } from '@/util/validate';
+import { dataDicAPI } from '@/api/rfq/common';
 
 const execMathExpress = require('exec-mathexpress');
 
@@ -35,7 +44,11 @@ const execMathExpress = require('exec-mathexpress');
 export default {
   name: 'quote-dialog',
   components: {},
-  created: function() {},
+  created: function() {
+    dataDicAPI('taxRateNo').then((res) => {
+      this.dicData = res.data;
+    });
+  },
   props: {
     queryType: String,
     quoteColumn: Array,

@@ -330,7 +330,7 @@ export default {
         { label: '需求数量', prop: 'quantity', editDisabled: true },
         { type: 'tree', label: '公司代码', prop: 'companyCode', editDisabled: true },
         { slot: true, label: '含税价', prop: 'priceIncludingTax', editDisabled: true },
-        { label: '税率', prop: 'taxRate', editDisabled: true },
+        { label: '税率', prop: 'taxRate', editDisabled: true, type: 'select' },
         { slot: true, label: '不含税价', prop: 'priceExcludingTax', editDisabled: true },
         {
           label: '报价时间',
@@ -427,6 +427,18 @@ export default {
       //     return item;
       //   });
       // });
+      dataDicAPI('taxRateNo').then((res) => {
+        this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
+          if (item.prop === 'taxRate') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
+            };
+          }
+          return item;
+        });
+      });
       // 公开方式 数据字典
       dataDicAPI('enquiryMethod').then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {

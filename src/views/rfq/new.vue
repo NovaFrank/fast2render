@@ -207,6 +207,7 @@ import { getUserInfo } from '@/util/utils.js';
 import { setStore } from '@/util/store.js';
 
 import {
+  cateService,
   orgList,
   dataDicAPI,
   supplierMasterListAction,
@@ -695,6 +696,7 @@ export default {
         });
         // 头信息
         const fieldColumns = configuration.fieldColumns;
+        console.log('fieldColumns', fieldColumns);
         fieldColumns.forEach((item) => {
           if (this.formOption.column.filter((i) => i.prop === item.prop).length === 0) {
             let rules = [];
@@ -769,8 +771,27 @@ export default {
         this.requestTypeDict = [];
         this.$message.error('查找采购申请配置数据失败, ' + res.data.message || '');
       }
+      // fbk3 品类
+      cateService({ elsAccount: this.elsAccount }).then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'fbk3' || item.label === '品类') {
+            return {
+              ...item,
+              type: 'tree',
+              dicData: res.data.pageData.rows.map((item) => {
+                return {
+                  ...item,
+                  value: item.cateCode,
+                  label: item.cateName
+                };
+              })
+            };
+          }
+          return item;
+        });
+      });
       // 组织列表（公司）
-      orgList().then((res) => {
+      orgList({ elsAccount: this.elsAccount }).then((res) => {
         this.dialogOption.column = this.dialogOption.column.map((item) => {
           if (item.prop === 'companyCode') {
             return {

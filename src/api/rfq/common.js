@@ -63,3 +63,11 @@ export const orgList = (param) =>
     method: 'post',
     data: { pageSize: 100, ...param }
   });
+export const cateService = (params) => {
+  params.pageSize = 20000;
+  return request({
+    url: `${prefix}/MaterialCateService/findPageList`,
+    method: 'post',
+    data: params
+  });
+};

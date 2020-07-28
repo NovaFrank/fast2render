@@ -182,7 +182,13 @@ import auditListOption from '@/const/rfq/newAndView/auditListOption';
 import { getUserInfo } from '@/util/utils.js';
 import { setStore } from '@/util/store.js';
 
-import { orgList, dataDicAPI, supplierMasterListAction, accountListAction } from '@/api/rfq/common';
+import {
+  cateService,
+  orgList,
+  dataDicAPI,
+  supplierMasterListAction,
+  accountListAction
+} from '@/api/rfq/common';
 import { purchaseEnquiryAction, queryDetailAction, auditHisList } from '@/api/rfq';
 import { validatenull, validateNumber } from '@/util/validate';
 import { testSuppliers } from '@/api/rfq/index';
@@ -564,8 +570,27 @@ export default {
         this.requestTypeDict = [];
         this.$message.error('查找采购申请配置数据失败, ' + res.data.message || '');
       }
+      // fbk3 品类
+      cateService({ elsAccount: this.elsAccount }).then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'fbk3' || item.label === '品类') {
+            return {
+              ...item,
+              type: 'tree',
+              dicData: res.data.pageData.rows.map((item) => {
+                return {
+                  ...item,
+                  value: item.cateCode,
+                  label: item.cateName
+                };
+              })
+            };
+          }
+          return item;
+        });
+      });
       // 组织列表（公司）
-      orgList().then((res) => {
+      orgList({ elsAccount: this.elsAccount }).then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {
           if (item.prop === 'companyCode') {
             return {

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visable" width="70%">
+  <el-dialog :title="title" :visible.sync="visable" width="80%">
     <avue-form class="select-supplier" :option="formOption" v-model="form" ref="form">
       <template slot="suppliers">
         <!-- <el-transfer filterable v-model="form.selectedSupplier" :data="data"></el-transfer> -->
@@ -127,12 +127,12 @@ export default {
 
 <style scope>
 .district-panel {
-  width: 430px !important;
-  min-width: 200px;
+  width: 350px !important;
+  min-width: 150px;
 }
 .el-transfer-panel .district-panel {
-  width: 430px !important;
-  min-width: 200px;
+  width: 350px !important;
+  min-width: 150px;
 }
 .el-dialog__body .select-supplier .el-col-sm-12 {
   width: 100%;

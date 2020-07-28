@@ -285,7 +285,7 @@ import {
   openPassWord,
   auditHisList
 } from '@/api/rfq';
-import { dataDicAPI, supplierMasterListAction } from '@/api/rfq/common';
+import { cateService, orgList, dataDicAPI, supplierMasterListAction } from '@/api/rfq/common';
 import history from './history';
 import { validatenull } from '@/util/validate';
 import supplierSelectDialog from '@/const/rfq/newAndView/supplierSelectDialog';
@@ -432,6 +432,43 @@ export default {
         }
         this.configurations = configurations;
       }
+      // fbk3 品类
+      cateService({ elsAccount: this.elsAccount }).then((res) => {
+        this.formOption.column = this.formOption.column.map((item) => {
+          if (item.prop === 'fbk3' || item.label === '品类') {
+            return {
+              ...item,
+              type: 'tree',
+              dicData: res.data.pageData.rows.map((item) => {
+                return {
+                  ...item,
+                  value: item.cateCode,
+                  label: item.cateName
+                };
+              })
+            };
+          }
+          return item;
+        });
+      });
+      // 组织列表（公司）
+      orgList({ elsAccount: this.elsAccount }).then((res) => {
+        this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
+          if (item.prop === 'companyCode') {
+            return {
+              ...item,
+              dicData: res.data.pageData.rows.map((item) => {
+                return {
+                  ...item,
+                  value: item.orgId,
+                  label: item.orgId
+                };
+              })
+            };
+          }
+          return item;
+        });
+      });
       // 公开方式 数据字典
       dataDicAPI('enquiryMethod').then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {

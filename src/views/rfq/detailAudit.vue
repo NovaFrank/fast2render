@@ -433,12 +433,12 @@ export default {
         this.configurations = configurations;
       }
       // fbk3 品类
-      cateService({ elsAccount: this.elsAccount }).then((res) => {
+      cateService({ elsAccount: this.elsAccount, cateLevelCode: '1' }).then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {
           if (item.prop === 'fbk3' || item.label === '品类') {
             return {
               ...item,
-              type: 'tree',
+              type: 'select',
               dicData: res.data.pageData.rows.map((item) => {
                 return {
                   ...item,
@@ -452,7 +452,7 @@ export default {
         });
       });
       // 组织列表（公司）
-      orgList({ elsAccount: this.elsAccount }).then((res) => {
+      orgList({ elsAccount: this.elsAccount, orgCategoryId: 'factory' }).then((res) => {
         this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
           if (item.prop === 'companyCode') {
             return {

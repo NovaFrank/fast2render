@@ -63,10 +63,12 @@ export const orgList = (param) =>
     method: 'post',
     data: { pageSize: 100, ...param }
   });
+
+// 4大类
 export const cateService = (params) => {
   params.pageSize = 20000;
   return request({
-    url: `${prefix}/MaterialCateService/findPageList`,
+    url: `${prefix}/MaterialCateService/findListByLevel`,
     method: 'post',
     data: params
   });

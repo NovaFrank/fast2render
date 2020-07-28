@@ -410,7 +410,7 @@ export default {
     },
     async tableData(data) {
       // 组织列表（公司）
-      // orgList({ elsAccount: this.elsAccount }).then((res) => {
+      // orgList({ elsAccount: this.elsAccount, orgCategoryId: 'factory' }).then((res) => {
       //   this.dialogOption.column = this.dialogOption.column.map((item) => {
       //     if (item.prop === 'companyCode') {
       //       return {

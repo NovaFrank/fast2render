@@ -117,6 +117,11 @@
           {{ JSON.parse(scope.row.costConstituteJson).templateName }}
         </span>
       </template>
+      <!-- <template slot="menuLeft" v-if="!purchaseRequest">
+        <el-button size="small">
+          <el-link download target="_blank" :href="`opt/nfsshare/`">下载模板</el-link>
+        </el-button>
+      </template> -->
       <template slot="menuLeft" v-if="!purchaseRequest">
         <el-upload
           id="webpicker"

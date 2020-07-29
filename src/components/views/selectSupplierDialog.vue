@@ -98,8 +98,8 @@ export default {
       const supplierList = res.data.pageData.rows.map((item, index) => {
         return {
           label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
-          key: item.toElsAccount,
-          id: item.toElsAccount
+          key: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
+          id: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`
         };
       });
       return supplierList;

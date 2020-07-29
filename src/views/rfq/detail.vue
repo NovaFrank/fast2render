@@ -515,8 +515,8 @@ export default {
         this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
           return {
             label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
-            key: item.toElsAccount,
-            id: item.toElsAccount
+            key: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
+            id: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`
           };
         });
       });
@@ -1287,10 +1287,11 @@ export default {
         (item) => !this.currentDetailItemSelected.map((item) => item.id).includes(item)
       );
       const itemList = newSuppliers.map((item, index) => {
-        const supplierIndex = this.suppliersDialogOptionColumn.data.findIndex(
-          (supplier) => supplier.label.indexOf(item) !== -1
-        );
-        const supplier = this.suppliersDialogOptionColumn.data[supplierIndex].label.split('_');
+        // const supplierIndex = this.suppliersDialogOptionColumn.data.findIndex(
+        //   (supplier) => supplier.label.indexOf(item) !== -1
+        // );
+        // const supplier = this.suppliersDialogOptionColumn.data[supplierIndex].label.split('_');
+        const supplier = item.split('_');
         if (this.currentDetailItem.quoteMethod === '1') {
           if (validatenull(this.currentDetailItem.ladderPriceJson)) {
             const filterList = this.inquiryListOption.data.filter(
@@ -1323,7 +1324,7 @@ export default {
           deliveryDate: this.currentDetailItem.deliveryDate,
           quantity: this.currentDetailItem.quantity,
           elsAccount: this.currentDetailItem.elsAccount,
-          toElsAccount: item,
+          toElsAccount: supplier[0],
           companyShortName: supplier[1],
           supplierName: supplier[1],
           supplierType: supplier[2],

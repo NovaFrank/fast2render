@@ -905,8 +905,8 @@ export default {
         this.suppliersDialogOptionColumn.data = this.supplierList.map((item, index) => {
           return {
             label: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
-            key: item.toElsAccount,
-            id: item.toElsAccount
+            key: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`,
+            id: `${item.toElsAccount}_${item.supplierName}_${item.firstType || ''}`
           };
         });
         this.dialogOption.column = this.dialogOption.column.map((item) => {
@@ -1457,9 +1457,9 @@ export default {
       this.relationDialogVisable = true;
     },
     suppliersDialogSaveTransfer(selectedSupplier) {
-      selectedSupplier = this.suppliersDialogOptionColumn.data
-        .filter((item) => selectedSupplier.includes(item.key))
-        .map((item) => item.label);
+      // selectedSupplier = this.suppliersDialogOptionColumn.data
+      //   .filter((item) => selectedSupplier.includes(item.key))
+      //   .map((item) => item.label);
       if (this.currentSelectionDetailItems.length > 0) {
         this.currentSelectionDetailItems.forEach((item) => {
           const index = item.$index;

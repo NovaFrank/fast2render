@@ -25,11 +25,11 @@ export default {
         label: '单位',
         prop: 'baseUnit',
         editDisplay: false
+      },
+      {
+        label: '工厂编号',
+        prop: 'factory'
       }
-      // {
-      //   label: '预估单价',
-      //   prop: 'budgetPrice'
-      // }
     ],
     menuBtn: true,
     emptyBtn: false,

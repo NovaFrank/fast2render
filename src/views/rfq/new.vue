@@ -800,7 +800,7 @@ export default {
                 return {
                   ...item,
                   value: item.orgId,
-                  label: item.orgId
+                  label: `${item.orgId}_${item.orgDesc}`
                 };
               })
             };

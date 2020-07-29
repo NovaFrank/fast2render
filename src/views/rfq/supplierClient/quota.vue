@@ -279,6 +279,7 @@ export default {
   async created() {
     this.currentEnquiryNumber = this.$route.params.enquiryNumber;
     await this.tableData();
+    this.initDetail();
   },
   watch: {
     detailObj(newVal) {
@@ -407,6 +408,7 @@ export default {
         type: 'switch',
         prop: 'quote'
       });
+      this.tableData();
     },
     async tableData(data) {
       // 组织列表（公司）
@@ -430,6 +432,7 @@ export default {
       dataDicAPI('taxRateNo').then((res) => {
         this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
           if (item.prop === 'taxRate') {
+            console.log('item.prop', res.data);
             return {
               ...item,
               type: 'select',
@@ -530,7 +533,6 @@ export default {
         }
         this.configurations = configurations;
       }
-      this.initDetail();
     },
     getPriceIndex(row, column) {
       if (column === 'priceIncludingTax' && row.priceIncludingTax) return row.priceIncludingTax;

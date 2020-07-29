@@ -154,9 +154,6 @@
           }}
         </el-link>
       </template>
-      <!-- <template slot="taxRate" slot-scope="scope">
-        {{ scope.row.taxRate }}
-      </template> -->
       <!-- 含税 -->
       <template slot-scope="scope" slot="priceIncludingTax">
         <span v-if="scope.row.quoteMethod === '0'">
@@ -359,13 +356,13 @@ export default {
       iSrfp: false
     };
   },
-  created() {
+  async created() {
     this.isAudit = this.$route.query.isAudit || false;
     const userInfo = getUserInfo();
     this.elsAccount = userInfo.elsAccount;
     this.elsSubAccount = userInfo.elsSubAccount;
     this.currentEnquiryNumber = this.$route.params.enquiryNumber;
-    this.initDetail();
+    await this.tableData();
   },
   watch: {
     configButtons(newVal) {
@@ -526,6 +523,41 @@ export default {
       return result;
     },
     async tableData(data) {
+      const res = await ElsTemplateConfigService.find({
+        elsAccount: this.elsAccount,
+        businessModule: 'enquiry',
+        currentVersionFlag: 'Y'
+      });
+      if (res.data && res.data.statusCode === '200' && res.data.pageData) {
+        let configurations = [];
+        const rows = res.data.pageData.rows || [];
+        for (const item of rows) {
+          const json = JSON.parse(item.configJson);
+          const table = json.table;
+          let field = [];
+          Object.keys(json.fieldJson.purchase).forEach((item) => {
+            if (json.fieldJson.purchase[item].display) {
+              field.push({
+                prop: item,
+                ...json.fieldJson.purchase[item]
+              });
+            }
+          });
+          this.requestTypeDict.push({
+            value: item.templateNumber,
+            label: item.templateName
+          });
+          configurations[item.templateNumber] = {
+            name: item.templateName, // 模板名称
+            rule: json.rule, // 单规则
+            // fieldColumns: field, // 头信息
+            fieldColumns: this.$util.handlerLocalRolePermission(json.field), // 头信息
+            tableColumns: table, // 行信息
+            buttons: json.buttonJson
+          };
+        }
+        this.configurations = configurations;
+      }
       // fbk3 品类
       cateService({ elsAccount: this.elsAccount, cateLevelCode: '1' }).then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {
@@ -558,6 +590,19 @@ export default {
                   label: item.orgId
                 };
               })
+            };
+          }
+          return item;
+        });
+      });
+      // 税率 数据字典
+      dataDicAPI('taxRateNo').then((res) => {
+        this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
+          if (item.prop === 'taxRate') {
+            return {
+              ...item,
+              type: 'select',
+              dicData: res.data
             };
           }
           return item;
@@ -615,19 +660,6 @@ export default {
           return item;
         });
       });
-      dataDicAPI('taxRateNo').then((res) => {
-        this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
-          if (item.prop === 'taxRate') {
-            console.log('item.prop', res.data);
-            return {
-              ...item,
-              type: 'select',
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
       // 报价方式 数据字典
       dataDicAPI('quoteMethod').then((res) => {
         this.quoteMethodData = res.data;
@@ -643,6 +675,7 @@ export default {
           };
         });
       });
+      this.initDetail();
     },
     initColumns() {
       this.formOption.column = [
@@ -719,7 +752,14 @@ export default {
           valueFormat: 'timestamp',
           prop: 'quoteDate'
         },
-        { label: '税率', prop: 'taxRate', display: !this.iSrfp },
+        {
+          dicUrl: '/layout/dics/value/taxRateNo',
+          dicMethod: 'get',
+          type: 'select',
+          label: '税率',
+          prop: 'taxRate',
+          display: !this.iSrfp
+        },
         { slot: true, label: '含税价', prop: 'priceIncludingTax', display: !this.iSrfp },
         { slot: true, label: '不含税价', prop: 'priceExcludingTax', display: !this.iSrfp },
         // {
@@ -826,7 +866,6 @@ export default {
           return item;
         });
       }
-      this.tableData();
     },
     getPriceIndex(row, column) {
       if (
@@ -880,6 +919,7 @@ export default {
           });
           price = Math.floor((result.num / result.den) * 100) / 100;
         }
+        console.log(row.toElsAccount, price);
         return price || '';
       }
       return '';
@@ -1241,6 +1281,39 @@ export default {
           this.$message.error(res.data.message);
         }
       });
+      // this.$confirm('是否提交审批？', '提示', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // }).then(() => {
+      //   const action = 'submit';
+      //   const param = {
+      //     ...this.detailObj,
+      //     enquiryNumber: this.currentEnquiryNumber,
+      //     elsAccount: this.elsAccount,
+      //     quoteEndTime: this.detailObj.quoteEndTime,
+      //     enquiryType: this.detailObj.enquiryType,
+      //     enquiryDesc: this.detailObj.enquiryDesc,
+      //     companyCode: this.detailObj.companyCode,
+      //     enquiryMethod: this.detailObj.enquiryMethod || '',
+      //     itemList: this.inquiryListOption.data
+      //   };
+      //   let params = {
+      //     elsAccount: this.detailObj.elsAccount,
+      //     // toElsAccount: this.detailObj.toElsAccount,
+      //     businessType: 'bargainEnquiryAudit',
+      //     businessId: this.detailObj.enquiryNumber,
+      //     params: JSON.stringify(param)
+      //   };
+      //   submitAudit(action, params).then((res) => {
+      //     if (res.data.statusCode === '200') {
+      //       this.$message.success('提交审批成功');
+      //       this.$router.go(0);
+      //       return;
+      //     }
+      //     this.$message.error('提交审批失败');
+      //   });
+      // });
     },
     handleUpdateQuoteEndTime() {
       if (this.quoteEndTimeChange < new Date().getTime()) {
@@ -1287,42 +1360,7 @@ export default {
         }, 5000);
       }
     },
-    async initDetail() {
-      const res = await ElsTemplateConfigService.find({
-        elsAccount: this.elsAccount,
-        businessModule: 'enquiry',
-        currentVersionFlag: 'Y'
-      });
-      if (res.data && res.data.statusCode === '200' && res.data.pageData) {
-        let configurations = [];
-        const rows = res.data.pageData.rows || [];
-        for (const item of rows) {
-          const json = JSON.parse(item.configJson);
-          const table = json.table;
-          let field = [];
-          Object.keys(json.fieldJson.purchase).forEach((item) => {
-            if (json.fieldJson.purchase[item].display) {
-              field.push({
-                prop: item,
-                ...json.fieldJson.purchase[item]
-              });
-            }
-          });
-          this.requestTypeDict.push({
-            value: item.templateNumber,
-            label: item.templateName
-          });
-          configurations[item.templateNumber] = {
-            name: item.templateName, // 模板名称
-            rule: json.rule, // 单规则
-            // fieldColumns: field, // 头信息
-            fieldColumns: this.$util.handlerLocalRolePermission(json.field), // 头信息
-            tableColumns: table, // 行信息
-            buttons: json.buttonJson
-          };
-        }
-        this.configurations = configurations;
-      }
+    initDetail() {
       this.detailObj = {};
       this.inquiryListOption.data = [];
       this.oldInquiryData = [];

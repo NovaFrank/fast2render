@@ -48,6 +48,9 @@ export default {
         prop: 'priceIncludingTax'
       },
       {
+        dicUrl: '/layout/dics/value/taxRateNo',
+        dicMethod: 'get',
+        type: 'select',
         label: '税率',
         prop: 'taxRate'
       },

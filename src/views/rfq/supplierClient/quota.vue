@@ -279,7 +279,6 @@ export default {
   async created() {
     this.currentEnquiryNumber = this.$route.params.enquiryNumber;
     await this.tableData();
-    this.initDetail();
   },
   watch: {
     detailObj(newVal) {
@@ -331,7 +330,14 @@ export default {
         { label: '需求数量', prop: 'quantity', editDisabled: true },
         { type: 'tree', label: '公司代码', prop: 'companyCode', editDisabled: true },
         { slot: true, label: '含税价', prop: 'priceIncludingTax', editDisabled: true },
-        { label: '税率', prop: 'taxRate', editDisabled: true, type: 'select' },
+        {
+          label: '税率',
+          prop: 'taxRate',
+          editDisabled: true,
+          dicUrl: '/layout/dics/value/taxRateNo',
+          dicMethod: 'get',
+          type: 'select'
+        },
         { slot: true, label: '不含税价', prop: 'priceExcludingTax', editDisabled: true },
         {
           label: '报价时间',
@@ -408,7 +414,6 @@ export default {
         type: 'switch',
         prop: 'quote'
       });
-      this.tableData();
     },
     async tableData(data) {
       // 组织列表（公司）
@@ -429,19 +434,6 @@ export default {
       //     return item;
       //   });
       // });
-      dataDicAPI('taxRateNo').then((res) => {
-        this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
-          if (item.prop === 'taxRate') {
-            console.log('item.prop', res.data);
-            return {
-              ...item,
-              type: 'select',
-              dicData: res.data
-            };
-          }
-          return item;
-        });
-      });
       // 公开方式 数据字典
       dataDicAPI('enquiryMethod').then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {
@@ -533,6 +525,7 @@ export default {
         }
         this.configurations = configurations;
       }
+      this.initDetail();
     },
     getPriceIndex(row, column) {
       if (column === 'priceIncludingTax' && row.priceIncludingTax) return row.priceIncludingTax;

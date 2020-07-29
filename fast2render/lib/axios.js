@@ -7,8 +7,6 @@
  */
 import axios from 'axios';
 // import { Message } from 'element-ui';
-import NProgress from 'nprogress'; // progress bar
-import 'nprogress/nprogress.css'; // progress bar style
 import { getAccount } from './utils';
 
 axios.defaults.timeout = 10000;
@@ -18,14 +16,9 @@ axios.defaults.validateStatus = function(status) {
 };
 // 跨域请求，允许保存cookie
 axios.defaults.withCredentials = true;
-// NProgress Configuration
-NProgress.configure({
-  showSpinner: false
-});
 // HTTPrequest拦截
 axios.interceptors.request.use(
   (config) => {
-    NProgress.start(); // start progress bar
     const userAccount = getAccount();
     config.headers.token = userAccount.token;
     config.headers.account = `${userAccount.elsAccount}_${userAccount.elsSubAccount}`;
@@ -35,26 +28,5 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-// // HTTPresponse拦截
-// axios.interceptors.response.use(
-//   (res) => {
-//     NProgress.done();
-//     const status = res.data.code || 200;
-//     const message = res.data.msg || '未知错误';
-//     // 如果请求为非200否者默认统一处理
-//     if (status !== 200) {
-//       Message({
-//         message: message,
-//         type: 'error'
-//       });
-//       return Promise.reject(new Error(message));
-//     }
-//     return res;
-//   },
-//   (error) => {
-//     NProgress.done();
-//     return Promise.reject(new Error(error));
-//   }
-// );
 
 export default axios;

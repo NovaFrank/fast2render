@@ -1182,9 +1182,9 @@ export default {
       purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
         if (res.data.statusCode === '200') {
           this.$message.success('保存成功');
-          // setTimeout(() => {
-          //   this.$router.go(0);
-          // }, 1000);
+          setTimeout(() => {
+            this.$router.go(0);
+          }, 1000);
         } else {
           this.$message.error(res.data.message);
         }

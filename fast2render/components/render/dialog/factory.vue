@@ -144,7 +144,7 @@ export default {
       const selectItems = this.selectColumns;
       this.selectColumns = [];
       this.$refs.crud.selectClear();
-      this.$emit('save', selectItems);
+      this.$emit('selectDone', selectItems);
       this.visable = false;
     },
     selectionChange(list) {

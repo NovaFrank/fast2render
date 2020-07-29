@@ -140,7 +140,7 @@ export default {
             url: '/masterdata/material/#/masterdata/view/',
             component: 'fast2-select-employee',
             func: 'saveSelected',
-            params: ['purchasePerson', 'purchasePersonName', 'toElsAccount', 'toElsAccountName']
+            params: ['purchasePerson', 'purchasePersonName', 'subElsAccount', 'name']
           },
           {
             label: '采购工厂',

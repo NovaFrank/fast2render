@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div class="selectBox">
+    <el-input v-model="seleted" size="small" v-if="!multiple" :readonly="true">
+      <i slot="suffix" class="el-input_icon el-icon-search pointer" @click="visable = true"></i>
+    </el-input>
     <el-dialog :title="title" :visible.sync="visable">
       <avue-crud
         ref="crud"
@@ -25,7 +28,6 @@
 </template>
 <script>
 import { ElsAccountService } from '../../../lib/api/materials';
-// import { deepClone } from '@/util/utils';
 export default {
   name: 'SelectEmployee',
   props: {
@@ -40,7 +42,18 @@ export default {
     column: {
       type: Array,
       default: () => {
-        return [];
+        return [
+          {
+            label: '子账号',
+            prop: 'elsSubAccount',
+            overHidden: true
+          },
+          {
+            label: '姓名',
+            prop: 'name',
+            overHidden: true
+          }
+        ];
       }
     },
     // 表格的分页配置
@@ -136,7 +149,7 @@ export default {
       let selectItems = this.selectColumns;
       this.selectColumns = [];
       this.$refs.crud.selectClear();
-      this.$emit('save', selectItems);
+      this.$emit('selectDone', selectItems);
       this.visable = false;
     },
     selectionChange(list) {

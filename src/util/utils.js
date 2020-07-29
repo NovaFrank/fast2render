@@ -69,6 +69,7 @@ export const getLocalToken = (supplier) => {
       content: {
         elsAccount: params.elsAccount,
         elsSubAccount: params.elsSubAccount,
+        infoVO: res.data.data.infoVO,
         token: res.data.data.token
       }
     };

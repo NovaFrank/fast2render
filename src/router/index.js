@@ -19,6 +19,11 @@ const routes = [
     name: 'Create'
   },
   {
+    path: '/new/create',
+    component: () => import('@/views/orderNew/Create'),
+    name: 'Create'
+  },
+  {
     path: '/edit/:orderNumber',
     component: () => import('@/views/order/Edit'),
     name: 'edit'

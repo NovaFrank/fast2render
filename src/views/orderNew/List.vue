@@ -1,0 +1,465 @@
+<template>
+  <basic-container>
+    <el-button type="primary" size="small" @click="itemAdd">
+      新建
+    </el-button>
+    <avue-tabs :option="tabOption.option" @change="handleClick"></avue-tabs>
+    <avue-crud
+      v-if="formOption.option.column"
+      :data="formOption.data"
+      :option="formOption.option"
+      v-model="crudObj"
+      :page.sync="formOption.page"
+      @row-update="rowUpdate"
+      @on-load="tableData"
+      @size-change="sizeChange"
+      @current-change="currentChange"
+      @search-change="search"
+      ref="crud"
+    >
+      <template slot-scope="{ row, index }" slot="menu">
+        <button
+          v-if="row.sendStatus === '0' && row.auditStatus === '1'"
+          @click.stop="changePurchasePerson(row, index)"
+          type="button"
+          class="el-button el-button--text el-button--small"
+        >
+          <i class="el-icon-connection"></i><span>移 管</span>
+        </button>
+        <button
+          v-if="row.sendStatus === '0' && row.auditStatus === '1'"
+          @click="deleteRow(row)"
+          type="button"
+          class="el-button el-button--text el-button--small"
+        >
+          <i class="el-icon-delete"></i><span>删 除</span>
+        </button>
+      </template>
+      <template slot-scope="{}" slot="purchasePersonForm">
+        <el-input v-model="listOption.purchasePerson">
+          <i
+            slot="suffix"
+            class=" el-input_icon el-icon-search pointer"
+            @click="purchaseDialogOpen"
+          ></i>
+        </el-input>
+      </template>
+      <template
+        v-if="
+          [
+            'All',
+            'ProviderChanged',
+            'ProviderChanged2',
+            'ProviderApproval',
+            'ChangeApproval'
+          ].includes(tabActive)
+        "
+        slot-scope="scope"
+        slot="status"
+      >
+        <span>
+          {{
+            scope.row.orderStatus === ''
+              ? '全部'
+              : scope.row.orderStatus === '2'
+              ? '供方变更'
+              : scope.row.orderStatus === '5'
+              ? '变更退回'
+              : scope.row.orderStatus === '1'
+              ? '供方已确认'
+              : '变更已确认'
+          }}
+        </span>
+      </template>
+      <template
+        v-else-if="['Create', 'Pending', 'Approval', 'Reject'].includes(tabActive)"
+        slot-scope="scope"
+        slot="status"
+      >
+        <span>
+          {{
+            scope.row.auditStatus === '2'
+              ? '审批中'
+              : scope.row.auditStatus === '0'
+              ? '审批通过'
+              : scope.row.auditStatus === '3'
+              ? '审批驳回'
+              : '未提交'
+          }}
+        </span>
+      </template>
+      <template
+        v-else-if="['ProviderPending', 'changeProviderPending'].includes(tabActive)"
+        slot-scope="scope"
+        slot="status"
+      >
+        <span>
+          {{ scope.row.sendStatus === '1' ? '已发送' : '3' }}
+        </span>
+      </template>
+
+      <!-- orderStatus: "0":"对方未确认","1":"对方已确认","2":"对方已退回","3":"变更对方未确认","4":"变更对方确认","5":"对方变更退回" -->
+      <!-- sendStatus: "0":"未发送","1":"已发送", "2":"变更未发送","3":"变更已发送" -->
+      <!-- auditStatus: 0, "审批通过", 1, "未审批", 2, "审批中", 3, "审批拒绝" -->
+      <template slot-scope="{ row }" slot="orderNumber">
+        <!--back 供方退回 需求池过来不可更改任何东西   -->
+        <!-- <router-link
+          v-if="row.orderStatus === '2' && row.sendStatus === '0'"
+          :to="`back/${row.orderNumber}_${row.uuid}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link> -->
+        <router-link
+          v-if="
+            row.sourceType === 'request' &&
+              row.orderStatus === '0' &&
+              row.sendStatus === '0' &&
+              row.auditStatus === '1'
+          "
+          :to="`edit/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <!--detail 详情 不可修改 只有返回  -->
+        <router-link
+          v-if="row.orderStatus === '0' && row.sendStatus === '1'"
+          :to="`detail/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '3' && row.sendStatus === '3'"
+          :to="`detail/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '4' && row.sendStatus === '3'"
+          :to="`detail/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '2' && row.sendStatus === '1'"
+          :to="`detail/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+
+        <router-link
+          v-if="row.orderStatus === '3' && row.sendStatus === '1'"
+          :to="`detail/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link v-if="row.auditStatus === '2'" :to="`detail/${row.orderNumber}`">
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '1' && row.sendStatus === '1' && row.auditStatus === '0'"
+          :to="`detail/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <!--edit 保存未发送 可编辑修改 -->
+        <router-link
+          v-if="
+            row.orderStatus === '0' &&
+              row.sendStatus === '0' &&
+              row.auditStatus === '1' &&
+              row.sourceType === null
+          "
+          :to="`edits/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="
+            row.orderStatus === '3' &&
+              row.sendStatus === '2' &&
+              row.auditStatus === '1' &&
+              row.sourceType === null
+          "
+          :to="`edits/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link v-if="row.auditStatus === '3'" :to="`edits/${row.orderNumber}`">
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+
+        <!--view 可修改行数据  -->
+        <router-link
+          v-if="
+            row.orderStatus === '2' &&
+              row.sendStatus === '0' &&
+              row.auditStatus === '1' &&
+              row.sourceType === null
+          "
+          :to="`view/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="
+            row.orderStatus === '5' &&
+              row.sendStatus === '0' &&
+              row.auditStatus === '1' &&
+              row.sourceType === null
+          "
+          :to="`view/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="
+            row.orderStatus === '2' &&
+              row.sendStatus === '0' &&
+              row.auditStatus === '1' &&
+              row.sourceType === 'request'
+          "
+          :to="`views/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <!--sendtoprovider-->
+        <router-link
+          v-if="row.orderStatus === '0' && row.sendStatus === '0' && row.auditStatus === '0'"
+          :to="`sendToProvider/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '2' && row.sendStatus === '0' && row.auditStatus === '0'"
+          :to="`sendToProvider/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '3' && row.sendStatus === '2' && row.auditStatus === '0'"
+          :to="`sendToProvider/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <router-link
+          v-if="row.orderStatus === '5' && row.sendStatus === '0' && row.auditStatus === '0'"
+          :to="`sendToProvider/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+        <!--send 供方确认 发送货通知单  -->
+        <router-link
+          v-if="row.orderStatus === '1' && row.orderStatus === '4'"
+          :to="`send/${row.orderNumber}`"
+        >
+          <el-tag>{{ row.orderNumber }}</el-tag>
+        </router-link>
+      </template>
+    </avue-crud>
+    <selectDialog3
+      ref="purchaseDialog"
+      :dialogVisible.sync="dialogPurchaseVisible"
+      :title="'选择采购方负责人'"
+      :column="purchaseOption.option.column"
+      :elsAccount="elsAccount"
+      actionPath="findPageList"
+      @save="purchaseDialogSave"
+    ></selectDialog3>
+  </basic-container>
+</template>
+
+<script>
+import tabOption from '@/const/order/navTabs';
+import formOption from '@/const/order/orderFormOption';
+import { getUserInfo } from '@/util/utils.js';
+import { getOrderList, createOrder } from '@/api/order.js';
+import purchaseOption from '@/const/order/purchaseList';
+import selectDialog3 from '@/common/selectDialog3';
+export default {
+  watch: {
+    tabActive() {
+      this.tableData();
+    }
+  },
+  components: {
+    selectDialog3
+  },
+  data() {
+    return {
+      tabOption: tabOption,
+      tabActive: 'all',
+      crudObj: {},
+      formOption: formOption,
+      dialogPurchaseVisible: false,
+      purchaseOption: purchaseOption,
+      searchParams: {},
+      listOption: {
+        purchasePerson: ''
+      }
+    };
+  },
+  created() {
+    const userInfo = getUserInfo();
+    this.elsAccount = userInfo.elsAccount;
+    this.elsSubAccount = userInfo.elsSubAccount;
+    this.tableData();
+  },
+  methods: {
+    // 切换表格
+    handleClick(tab) {
+      this.tabActive = tab.prop;
+      this.tab = tab;
+    },
+    async tableData(data, searchParams = {}) {
+      const action = 'findPageList';
+      let params = {
+        elsAccount: this.elsAccount,
+        currentPage: this.formOption.page.currentPage,
+        pageSize: this.formOption.page.pageSize,
+        ...data
+      }; // orderStatus: "0":"对方未确认","1":"对方已确认","2":"对方已退回","3":"变更对方未确认","4":"变更对方确认","5":"对方变更退回"
+      if (
+        [
+          'All',
+          'ProviderChanged',
+          'ProviderChanged2',
+          'ProviderApproval',
+          'ChangeApproval'
+        ].includes(this.tabActive)
+      ) {
+        params = {
+          ...params,
+          orderStatus:
+            this.tabActive === 'All'
+              ? ''
+              : this.tabActive === 'ProviderChanged'
+              ? '2'
+              : this.tabActive === 'ProviderChanged2'
+              ? '5'
+              : this.tabActive === 'ProviderApproval'
+              ? '1'
+              : '4'
+        };
+      } else if (['Create', 'Pending', 'Approval', 'Reject'].includes(this.tabActive)) {
+        params = {
+          ...params,
+          auditStatus:
+            this.tabActive === 'Pending'
+              ? '2'
+              : this.tabActive === 'Approval'
+              ? '0'
+              : this.tabActive === 'Reject'
+              ? '3'
+              : '1'
+        };
+      } else if (['ProviderPending', 'changeProviderPending'].includes(this.tabActive)) {
+        params = {
+          ...params,
+          sendStatus: this.tabActive === 'ProviderPending' ? '1' : '3'
+        };
+      }
+      const resp = await getOrderList(action, params);
+      this.formOption.data = resp.data.pageData.rows;
+      this.formOption.page.total = resp.data.pageData.total;
+    },
+    async deleteRow(row) {
+      this.$confirm('确定将选择的订单删除?', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const action = 'delete';
+        let params = {
+          elsAccount: this.elsAccount,
+          toElsAccount: row.toElsAccount,
+          orderNumber: row.orderNumber,
+          uuid: row.uuid
+        };
+        await createOrder(action, params);
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        });
+        this.tableData();
+      });
+    },
+    itemAdd() {
+      this.$router.push({ path: '/create' });
+    },
+    // 移管
+    changePurchasePerson(row, index) {
+      this.$refs.crud.rowEdit(row, index);
+    },
+    purchaseDialogOpen() {
+      this.dialogPurchaseVisible = true;
+    },
+    purchaseDialogSave(selectColumns) {
+      if (selectColumns.length !== 0) {
+        this.listOption.purchasePerson =
+          selectColumns[0].elsSubAccount + '_' + selectColumns[0].name;
+      }
+    },
+
+    async rowUpdate(row, index, done, loading) {
+      loading();
+      if (!this.listOption.purchasePerson) {
+        this.$message({
+          type: 'error',
+          message: '请选择采购负责人!'
+        });
+        return false;
+      }
+      this.$confirm('确定将此数据移管吗?', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const action = 'updatePerson';
+        let params = {
+          elsAccount: this.elsAccount,
+          toElsAccount: row.toElsAccount,
+          orderNumber: row.orderNumber,
+          purchasePerson: this.listOption.purchasePerson
+        };
+        // console.log('params: ' + JSON.stringify(params));
+        await createOrder(action, params);
+        this.$message({
+          type: 'success',
+          message: '移管成功!'
+        });
+        this.tableData();
+      });
+
+      done();
+    },
+    search(params, done) {
+      console.log(params);
+      // 搜索
+      this.tableData(params);
+      done();
+    },
+    // 分页
+    currentChange(val) {
+      this.formOption.page.currentPage = val;
+      this.tableData({
+        currentPage: val,
+        pageSize: this.formOption.page.pageSize
+      });
+    },
+    sizeChange(val) {
+      this.formOption.page.pageSize = val;
+      this.tableData({
+        currentPage: 1,
+        pageSize: val
+      });
+    }
+  }
+};
+</script>
+
+<style>
+.latent-btn {
+  color: #409eff;
+  cursor: pointer;
+}
+</style>

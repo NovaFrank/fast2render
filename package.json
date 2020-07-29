@@ -10,11 +10,11 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "@smallwei/avue": "^2.5.2",
+    "@smallwei/avue": "^2.6.14",
     "axios": "^0.19.0",
     "core-js": "^3.4.4",
     "element-ui": "^2.13.0",
-    "fast2render": "^0.6.3",
+    "fast2render": "^0.7.2",
     "js-cookie": "^2.2.1",
     "js-md5": "^0.7.3",
     "mathjs": "^7.0.0",

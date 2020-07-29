@@ -985,7 +985,7 @@ export default {
         .filter((item) => item.materialNumber === row.materialNumber)
         .map((item) => {
           return {
-            id: item.toElsAccount,
+            id: `${item.toElsAccount}_${item.companyShortName}_${item.supplierType}`,
             label: `${item.toElsAccount}_${item.companyShortName}_${item.supplierType}`
           };
         });
@@ -1182,9 +1182,9 @@ export default {
       purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
         if (res.data.statusCode === '200') {
           this.$message.success('保存成功');
-          setTimeout(() => {
-            this.$router.go(0);
-          }, 1000);
+          // setTimeout(() => {
+          //   this.$router.go(0);
+          // }, 1000);
         } else {
           this.$message.error(res.data.message);
         }
@@ -1394,14 +1394,17 @@ export default {
     },
     // 保存供应商选项
     suppliersDialogSaveTransfer(selectedSupplier) {
+      console.log('selectedSupplier', selectedSupplier);
       const newSuppliers = selectedSupplier.filter(
         (item) => !this.currentDetailItemSelected.map((item) => item.id).includes(item)
       );
       const itemList = newSuppliers.map((item, index) => {
-        const supplierIndex = this.suppliersDialogOptionColumn.data.findIndex(
-          (supplier) => supplier.label.indexOf(item) !== -1
-        );
-        const supplier = this.suppliersDialogOptionColumn.data[supplierIndex].label.split('_');
+        // const supplierIndex = this.suppliersDialogOptionColumn.data.findIndex(
+        //   (supplier) => supplier.label.indexOf(item) !== -1
+        // );
+        // const supplier = this.suppliersDialogOptionColumn.data[supplierIndex].label.split('_');
+        const supplier = item.split('_');
+        console.log('supplier', supplier);
         if (this.currentDetailItem.quoteMethod === '1') {
           if (validatenull(this.currentDetailItem.ladderPriceJson)) {
             const filterList = this.inquiryListOption.data.filter(
@@ -1434,7 +1437,7 @@ export default {
           deliveryDate: this.currentDetailItem.deliveryDate,
           quantity: this.currentDetailItem.quantity,
           elsAccount: this.currentDetailItem.elsAccount,
-          toElsAccount: item,
+          toElsAccount: supplier[0],
           companyShortName: supplier[1],
           supplierName: supplier[1],
           supplierType: supplier[2],

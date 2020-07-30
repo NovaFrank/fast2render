@@ -362,6 +362,7 @@ export default {
           item.valueFormat = 'timestamp';
           break;
         case 'datetime':
+        case 'datatime':
           item.type = 'datetime';
           item.format = 'yyyy-MM-dd HH:mm:ss';
           item.valueFormat = 'timestamp';

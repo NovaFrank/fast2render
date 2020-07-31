@@ -8,6 +8,28 @@ const routes = [
     path: '/',
     redirect: '/list'
   },
+
+  {
+    path: '/orderV2',
+    name: 'orderListV2',
+    component: () => import('@/views/purchaseV2/List.vue')
+  },
+  {
+    path: '/orderV2/new',
+    name: 'orderNewV2',
+    component: () => import('@/views/purchaseV2/New.vue')
+  },
+  {
+    path: '/orderV2/edit/:orderNumber',
+    name: 'orderEditV2',
+    component: () => import('@/views/purchaseV2/Edit.vue')
+  },
+  {
+    path: '/orderV2/detail/:orderNumber',
+    name: 'orderDetailV2',
+    component: () => import('@/views/purchaseV2/Detail.vue')
+  },
+
   {
     path: '/list',
     name: 'list',

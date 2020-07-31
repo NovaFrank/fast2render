@@ -1,6 +1,25 @@
 import axios from './request';
 import { getApiPath } from '@/util/utils';
-const baseUrl = getApiPath();
+
+const apiRootURL = getApiPath();
+const baseUrl = apiRootURL;
+
+const orderApiUrl = `${apiRootURL}/order`;
+const baseServerName = 'PurchaseOrderService';
+
+/**
+ * list purchase order
+ * @param {*} params
+ * @returns
+ */
+export const list = (params, serverName = baseServerName) => {
+  debugger;
+  return axios({
+    url: `${orderApiUrl}/${serverName}/findPageList`,
+    method: 'post',
+    data: params
+  });
+};
 
 // 配置平台数据字典查询
 export const dataDicAPI = (code) => {
@@ -140,4 +159,43 @@ export const getFactoryGroup = (action, params) => {
       ...params
     }
   });
+};
+
+export const findOrderHeadVO = (params) => {
+  return axios({
+    url: `${orderApiUrl}/PurchaseOrderService/findOrderHeadVO`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};
+
+export const findOrderItemList = (params) => {
+  return axios({
+    url: `${orderApiUrl}/PurchaseOrderService/findOrderItemList`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};
+
+// 修改订单
+export const updateOrder = (params) => {
+  return axios({
+    url: `${orderApiUrl}/PurchaseOrderService/updateOrder`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};
+
+export const PurchaseOrderService = {
+  create: createOrder,
+  detailPrimaryTable: findOrderHeadVO,
+  detailTable: findOrderItemList,
+  list,
+  update: updateOrder
 };

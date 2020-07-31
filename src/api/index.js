@@ -1,10 +1,20 @@
 import axios from './request';
 import { getUserInfo, getApiPath } from '@/util/utils';
+
 const baseUrl = getApiPath();
 const layout = '/layout';
+
 const userInfo = getUserInfo();
 const elsAccount = userInfo ? userInfo.elsAccount : '307000';
 const elsSubAccount = userInfo ? userInfo.elsSubAccount : '1001';
+
+export const findCrudOption = (block, param) => {
+  return axios({
+    url: `${layout}/blocks/slug/${block}`,
+    method: 'get',
+    data: param
+  });
+};
 
 export const dicLayoutServer = (action) => {
   return axios({

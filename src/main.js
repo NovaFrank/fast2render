@@ -9,9 +9,11 @@ import Avue from '@smallwei/avue';
 import './styles/common.scss';
 import 'element-ui/lib/theme-chalk/index.css';
 import '@smallwei/avue/lib/index.css';
-import Fast2Render from 'fast2render';
+import Fast2Render from '../fast2render';
+import 'fast2render/lib/index.css';
 import basicContainer from './components/basic-container/main';
 import { getCommonRes } from '@/util/commonRes';
+import crudCommon from '@/mixins/crud';
 
 Vue.use(Fast2Render);
 
@@ -22,6 +24,9 @@ Vue.use(Avue);
 Vue.component('basicContainer', basicContainer);
 Vue.prototype.$GetCommon = getCommonRes;
 Vue.config.productionTip = false;
+
+// 公共crud 方法
+window.$crudCommon = crudCommon;
 
 let router = null;
 let instance = null;

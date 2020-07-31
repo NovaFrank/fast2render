@@ -267,7 +267,7 @@ export default {
 
               const json = JSON.parse(configJson);
 
-              const field = json.field;
+              const fields = json.field;
               const fieldJson = json.fieldJson || {};
 
               const table = json.table;
@@ -285,9 +285,21 @@ export default {
                 label: item.templateName
               });
 
+              // 由于与 businessType 重复, 如存在则删除 businessTypeProperty 对应的属性
+              let fieldIndex = 0;
+
+              for (const fieldItem of fields) {
+                if (fieldItem.prop === this.businessTypeProperty) {
+                  fields.splice(fieldIndex, 1);
+                  break;
+                }
+
+                fieldIndex = fieldIndex + 1;
+              }
+
               configurations[item.templateNumber] = {
                 name: item.templateName,
-                fieldColumns: field,
+                fieldColumns: fields,
                 fieldPermission: fieldPermission,
                 tableColumns: table,
                 tablePermission: tablePermission

@@ -118,6 +118,14 @@
         </span>
       </template>
       <!-- <template slot="menuLeft" v-if="!purchaseRequest">
+<<<<<<< HEAD
+=======
+        <el-button size="small">
+          <el-link download target="_blank" :href="`opt/nfsshare/`">下载模板</el-link>
+        </el-button>
+      </template> -->
+      <template slot="menuLeft" v-if="!purchaseRequest">
+        >>>>>>> dev
         <el-upload
           id="webpicker"
           :show-file-list="false"
@@ -131,7 +139,8 @@
             导入
           </el-button>
         </el-upload>
-      </template> -->
+      </template>
+      -->
       <template slot="menuLeft" v-if="!purchaseRequest">
         <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>
       </template>
@@ -970,6 +979,7 @@ export default {
             return;
           }
           this.$message.success('关闭成功');
+          this.$router.go(-1);
         });
       });
     },
@@ -1481,10 +1491,6 @@ export default {
       this.relationDialogVisable = true;
     },
     suppliersDialogSaveTransfer(selectedSupplier) {
-      // console.log('selectedSupplier', selectedSupplier);
-      // selectedSupplier = this.suppliersDialogOptionColumn.data
-      //   .filter((item) => selectedSupplier.includes(item.key))
-      //   .map((item) => item.label);
       if (this.currentSelectionDetailItems.length > 0) {
         this.currentSelectionDetailItems.forEach((item) => {
           const index = item.$index;

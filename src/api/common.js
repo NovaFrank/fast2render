@@ -1,4 +1,4 @@
-import axios from '@/router/axios';
+import axios from '@/api/axios';
 import { getUserInfo } from '@/util/auth';
 import { getApiPath } from '@/util/utils.js';
 

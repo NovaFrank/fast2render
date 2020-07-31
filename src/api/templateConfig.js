@@ -1,4 +1,4 @@
-import axios from '@/router/axios';
+import axios from '@/api/axios';
 import { getApiPath } from '@/util/utils.js';
 const baseUrl = getApiPath();
 

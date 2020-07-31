@@ -1,4 +1,4 @@
-import request from '@/router/axios';
+import request from '@/api/axios';
 const prefix = '/apis';
 
 // 获取登录信息 开发使用

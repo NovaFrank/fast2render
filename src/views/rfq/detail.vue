@@ -586,8 +586,8 @@ export default {
               dicData: res.data.pageData.rows.map((item) => {
                 return {
                   ...item,
-                  value: item.orgId,
-                  label: item.orgId
+                  value: `${item.orgId}_${item.orgDesc}`,
+                  label: `${item.orgId}_${item.orgDesc}`
                 };
               })
             };
@@ -1271,7 +1271,7 @@ export default {
         quoteEndTime: this.detailObj.quoteEndTime,
         enquiryType: this.detailObj.enquiryType,
         enquiryDesc: this.detailObj.enquiryDesc,
-        companyCode: this.detailObj.companyCode,
+        // companyCode: this.detailObj.companyCode,
         enquiryMethod: this.detailObj.enquiryMethod || '',
         itemList: this.inquiryListOption.data
       };

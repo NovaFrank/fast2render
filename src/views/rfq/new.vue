@@ -117,30 +117,6 @@
           {{ JSON.parse(scope.row.costConstituteJson).templateName }}
         </span>
       </template>
-      <!-- <template slot="menuLeft" v-if="!purchaseRequest">
-<<<<<<< HEAD
-=======
-        <el-button size="small">
-          <el-link download target="_blank" :href="`opt/nfsshare/`">下载模板</el-link>
-        </el-button>
-      </template> -->
-      <template slot="menuLeft" v-if="!purchaseRequest">
-        >>>>>>> dev
-        <el-upload
-          id="webpicker"
-          :show-file-list="false"
-          class="upload-box"
-          style="display: contents;"
-          ref="uploadBox"
-          :http-request="uploadFile"
-          action="/"
-        >
-          <el-button size="small" slot="trigger" type="primary">
-            导入
-          </el-button>
-        </el-upload>
-      </template>
-      -->
       <template slot="menuLeft" v-if="!purchaseRequest">
         <el-button size="small" @click.stop="handleAddShow('添加', {})">添加行</el-button>
       </template>
@@ -808,8 +784,8 @@ export default {
               dicData: res.data.pageData.rows.map((item) => {
                 return {
                   ...item,
-                  value: item.orgId,
-                  label: item.orgId
+                  value: `${item.orgId}_${item.orgDesc}`,
+                  label: `${item.orgId}_${item.orgDesc}`
                 };
               })
             };
@@ -1237,7 +1213,7 @@ export default {
                   quoteEndTime: this.form.quoteEndTime,
                   enquiryType: this.form.enquiryType,
                   enquiryDesc: this.form.enquiryDesc,
-                  companyCode: this.form.companyCode,
+                  // companyCode: this.form.companyCode,
                   enquiryMethod: this.form.enquiryMethod,
                   canSeeRule: this.form.canSeeRule,
                   passWord: this.form.passWord,

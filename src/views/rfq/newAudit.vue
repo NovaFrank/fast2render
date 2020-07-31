@@ -598,8 +598,8 @@ export default {
               dicData: res.data.pageData.rows.map((item) => {
                 return {
                   ...item,
-                  value: item.orgId,
-                  label: item.orgId
+                  value: `${item.orgId}_${item.orgDesc}`,
+                  label: `${item.orgId}_${item.orgDesc}`
                 };
               })
             };

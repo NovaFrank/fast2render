@@ -2,7 +2,7 @@
   <!-- 物料明细弹窗 -->
   <div class="materialBox">
     <el-input v-model="seleted" size="small" v-if="!multiple" :readonly="true">
-      <i slot="suffix" class="el-input_icon el-icon-search pointer" @click="openFieldDialog"></i>
+      <el-button slot="append" icon="el-icon-search" @click="openFieldDialog"></el-button>
     </el-input>
     <el-button v-else @click="openFieldDialog">{{ addBtnText }}</el-button>
     <SelectDialogTable

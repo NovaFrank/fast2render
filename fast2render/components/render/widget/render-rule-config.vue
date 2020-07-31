@@ -16,7 +16,7 @@ export default {
     };
   },
   computed: {
-    finalOption: function() {
+    finalOption: function () {
       const option = { column: [], menuBtn: false, labelWidth: '300px' };
       if (this.readonly) {
         option.detail = true;

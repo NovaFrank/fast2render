@@ -8,7 +8,7 @@ export default {
   props: {
     item: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           lable: 'lable',
           position: 'left'

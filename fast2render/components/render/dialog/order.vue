@@ -1,13 +1,16 @@
 <template>
-  <div>
-    <el-dialog :title="title" :visible.sync="visable" :append-to-body="true">
+  <div class="selectBox">
+    <el-input v-model="seleted" size="small" v-if="!multiple" :readonly="true">
+      <el-button slot="append" icon="el-icon-search" @click="visable = true"></el-button>
+    </el-input>
+    <el-button v-else @click="visable = true">{{ addBtnText }}</el-button>
+    <el-dialog :title="title" :visible.sync="visable" append-to-body>
       <avue-crud
         ref="crud"
-        class="listSelect"
         v-model="crudObj"
         :data.sync="crudData"
-        :option.sync="crudOption"
-        :page.sync="crudPage"
+        :option.sync="selectOrderDlg"
+        :page.sync="selectOrderDlg.pagination"
         @selection-change="selectionChange"
         @search-change="searchChange"
         @refresh-change="refreshChange"
@@ -25,9 +28,11 @@
   </div>
 </template>
 <script>
-import { deepClone } from '../../../lib/utils';
+import { PurchaseDeliveryNoteService } from '../../../lib/api/materials';
+import DialogOption from './const/purchaseOrgList';
+import { getUserInfo } from '../../../lib/auth';
 export default {
-  name: 'selectDialogTable',
+  name: 'SelectOrder',
   props: {
     elsAccount: { type: String, default: '' }, // elsAccount
     elsSubAccount: { type: String, default: '' }, // elsSubAccount
@@ -35,11 +40,27 @@ export default {
     title: { type: String, default: '' }, // dialog标题
     dialogVisible: { type: Boolean, default: false }, // dialog显隐
     multiple: { type: Boolean, default: false }, // 是否多选
-    // 表格的列配置
-    column: {
-      type: Array,
+    actionPath: { type: String, default: 'findPageList' }, // 数据接口地址
+    seleted: { type: String, default: '' },
+    addBtnText: { type: String, default: '选择工厂' },
+    selectOrderDlg: {
+      visable: false,
+      title: '选择订单',
+      pagination: { total: 0, currentPage: 1, pageSize: 10 },
+      multiple: true,
+      column: [
+        { label: '订单号', prop: 'orderNumber' },
+        { label: '订单行号', prop: 'orderItemNumber' },
+        { label: '物料编码', prop: 'materialNumber' },
+        { label: '物料名称', prop: 'materialDesc' },
+        { label: '订单数量', prop: 'quantity' },
+        { label: '已发送货通知单数量', prop: 'sendDeliveryNoteQuantity' }
+      ]
+    },
+    api: {
+      type: Function,
       default: () => {
-        return [];
+        return PurchaseDeliveryNoteService;
       }
     },
     // 表格的分页配置
@@ -57,15 +78,25 @@ export default {
       crudObj: {},
       crudData: [],
       crudOption: {
-        highlightCurrentRow: true,
-        selection: false,
-        addBtn: false,
-        columnBtn: false,
-        refreshBtn: false,
-        menu: false,
-        index: true,
         indexLabel: '序号',
+        indexFixed: false,
+        searchShow: false,
+        searchBtn: false,
+        columnBtn: false,
+        align: 'center',
+        menu: false,
         border: true,
+        highlightCurrentRow: true,
+        selection: true,
+        stripe: true,
+        page: true,
+        addBtn: false,
+        editBtn: false,
+        delBtn: false,
+        index: true,
+        sortable: true,
+        tip: false,
+        indeterminate: true,
         column: []
       },
       crudPage: {
@@ -73,22 +104,20 @@ export default {
         currentPage: 1, // 当前页数
         pageSize: 10 // 每页显示多少条
       },
-      crudQueryParam: {},
       crudPageParam: {
         currentPage: 1,
         pageSize: 10
       },
-      crudMultiple: true,
-      currentRow: null
+      crudMultiple: true
     };
   },
   created() {
-    this.crudOption.column = this.column;
+    this.crudOption.column = DialogOption.option.column;
     this.crudPage = this.page;
     this.crudMultiple = this.multiple;
     this.crudOption.selection = this.multiple;
     this.crudOption.highlightCurrentRow = !this.multiple;
-    // this.handleList();
+    this.handleList();
   },
   watch: {
     page: function (newValue) {
@@ -106,27 +135,27 @@ export default {
   },
   methods: {
     handleList() {
-      if (this.actionPath === null) {
-        this.$message.error('请配置接口地址');
-        return;
-      }
-      const listParams = deepClone(this.crudQueryParam);
-      Object.assign(listParams, this.crudPageParam);
-      listParams.elsAccount = this.elsAccount;
-      this.getCrudData(this.crudData, listParams);
-    },
-    getCrudData(param) {
-      this.$emit('getData', param);
+      const listParams = {};
+      listParams.elsAccount = getUserInfo().elsAccount;
+      listParams.currentPage = this.crudPage.currentPage;
+      listParams.pageSize = this.crudPage.pageSize;
+      PurchaseDeliveryNoteService.list(this.actionPath, listParams).then((res) => {
+        const data = res.data;
+        if (data.statusCode !== '200') {
+          this.$message.error(data.message);
+          return;
+        }
+        this.crudData = data.pageData.rows;
+        this.crudPage.total = data.pageData.total;
+        this.crudPage.currentPage = this.crudPageParam.currentPage;
+        this.crudPage.pageSize = this.crudPageParam.pageSize;
+      });
     },
     crudSave() {
-      this.checkSelectedItem();
-    },
-    ok() {
-      const selectItems = this.crudMultiple ? this.selectColumns : [this.currentRow];
+      const selectItems = this.selectColumns;
       this.selectColumns = [];
-      this.currentRow = null;
       this.$refs.crud.selectClear();
-      this.$emit('ok', selectItems);
+      this.$emit('selectDone', selectItems);
       this.visable = false;
     },
     selectionChange(list) {
@@ -134,41 +163,16 @@ export default {
         this.selectColumns = list;
       }
     },
-    checkSelectedItem() {
-      const selectedItem = this.crudMultiple ? this.selectColumns.length : this.currentRow;
-
-      if (selectedItem) {
-        this.ok();
-      } else {
-        this.$message('请选择数据!');
-      }
-    },
     currentRowChange(row) {
       if (!this.crudMultiple) {
-        if (row) {
-          this.currentRow = row;
-        } else if (this.crudData && this.crudData[0]) {
-          const defaultRow = this.crudData[0];
-
-          if (this.currentRow) {
-            if (
-              defaultRow &&
-              this.rowKey &&
-              this.currentRow[this.rowKey] !== defaultRow[this.rowKey]
-            ) {
-              this.currentRow = defaultRow;
-            }
-          } else {
-            this.currentRow = defaultRow;
-          }
-        } else {
-          this.currentRow = null;
-        }
+        const list = [];
+        list.push(row);
+        this.selectColumns = list;
       }
     },
     searchChange(params, done) {
       this.crudPageParam.currentPage = 1;
-      Object.assign(this.crudQueryParam, params);
+      // Object.assign(this.crudQueryParam, params);
       this.handleList();
       done();
     },
@@ -189,14 +193,8 @@ export default {
 };
 </script>
 <style>
-.listSelect .el-collapse-item__header {
-  display: none;
-}
-.listSelect .el-dialog__body {
-  padding-top: 5px;
-}
-.listSelect .el-collapse {
-  border-top: 0;
-  border-bottom: 0;
+.selectBox .el-table--striped .el-table__body tr.el-table__row--striped.current-row td {
+  background-color: lightslategray !important;
+  color: #fff;
 }
 </style>

@@ -33,7 +33,7 @@
   </div>
 </template>
 <script>
-import { getApiPath, generateRandomString } from '../../../lib/utils.js';
+import { getApiPath } from '../../../lib/utils.js';
 import { validateNull } from '../../../lib/validate';
 import { format, chain, bignumber } from 'mathjs';
 import popList from '../../../lib/popList';
@@ -202,9 +202,7 @@ export default {
       for (const prop in showColumnProps) {
         // for (const prop in this.existColumnProps) {
         item[prop] = '';
-        item.id = `${new Date().valueOf()}${generateRandomString(6)}`;
       }
-
       this.data.push(item);
     },
     addEmptyMaterail() {
@@ -214,9 +212,7 @@ export default {
       for (const prop in showColumnProps) {
         // for (const prop in this.existColumnProps) {
         item[prop] = '';
-        item.id = `${new Date().valueOf()}${generateRandomString(6)}`;
       }
-
       this.data.push(item);
     },
     checkForm(callback, failback) {
@@ -232,7 +228,7 @@ export default {
 
     rowUpdate(row, index, done, loading) {
       const data = this.data[index];
-      debugger;
+
       if (row.queryUuid) {
         data.queryUuid = row.queryUuid;
       }
@@ -265,7 +261,6 @@ export default {
       return refs;
     },
     selectedRowMaterails(row, materialList) {
-      debugger;
       if (materialList.length > 0) {
         const result = this.checkAddedMaterials(materialList);
         const refs = this.getSelectRefs('materialNumber');
@@ -396,14 +391,12 @@ export default {
                 message: '请输入' + label,
                 trigger: 'blur'
               };
-
               if (item.rules) {
                 item.rules.push(rule);
               } else {
                 item.rules = [rule];
               }
             }
-
             if (!validateNull(itemProp.bizDic)) {
               delete item.dicData;
               delete item.dicMethod;
@@ -412,7 +405,6 @@ export default {
               item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${itemProp.bizDic}`;
               waitUpdateDic.push(item.prop);
             }
-
             if (
               itemProp.isDisabled ||
               itemProp.readonly ||
@@ -425,7 +417,6 @@ export default {
             } else {
               item.cell = true;
             }
-
             item.display = true;
           }
         }

@@ -3,21 +3,21 @@
     <avue-form
       ref="form"
       :option.sync="finalOption"
-      v-model="data"
+      v-model="formObj"
       v-on="$listeners"
       @row-del="rowDeleteMaterialList"
       @row-update="rowUpdateMaterialList"
     >
       <template v-for="item in itemLinkList" :slot="item.prop">
-        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, data)">
-          {{ data[item.prop] }}</el-tag
-        >
+        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, data)">{{
+          formObj[item.prop]
+        }}</el-tag>
         <component
           v-else
           :key="item.prop"
           :is="item.component"
-          :seleted.sync="data[item.prop]"
-          @selectDone="doSelect(item.func, data, $event, item.params)"
+          :seleted.sync="formObj[item.prop]"
+          @selectDone="doSelect(item.func, formObj, $event, item.params)"
         ></component>
       </template>
     </avue-form>
@@ -28,12 +28,17 @@ import { getApiPath } from '../../../lib/utils.js';
 import { validateNull } from '../../../lib/validate';
 import { getUserInfo } from '../../../lib/auth';
 import { ElsTemplateConfigService } from '../../../lib/api/materials';
+import popList from '../../../lib/popList';
 
 const baseUrl = getApiPath();
 
 export default {
   name: 'HeadProvider',
   props: {
+    elsAccountStation: {
+      type: String,
+      default: '' // 远程获取 表格字段数据配置- 后续扩充 from 类型
+    },
     businessModule: {
       type: String,
       default: 'requisition' // 远程获取 表格字段数据配置- 后续扩充 from 类型
@@ -42,146 +47,84 @@ export default {
       type: String,
       default: '' // 远程获取 表格字段数据配置- 后续扩充 from 类型
     },
-    elsAccountStation: {
+    businessTypeProperty: {
       type: String,
-      default: '' // 远程获取 表格字段数据配置- 后续扩充 from 类型
-    },
-    status: {
-      type: String,
-      default: 'new' // 远程获取 表格字段数据配置- 后续扩充 from 类型
-    },
-    readOnly: {
-      type: Boolean,
-      default: false // 是否只读模式
+      default: function () {
+        return ''; // 用于匹配实际的业务类型数据
+      }
     },
     col: {
       type: Number,
       default: 0
     },
-    rowPermission: {
+    data: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
-      }
-    },
-    originColumn: {
-      type: Object,
-      default: function() {
-        return [];
       }
     },
     itemLinkList: {
       type: Array,
-      default: function() {
-        return [
-          {
-            label: '验厂单',
-            prop: 'inspectionAccess',
-            url: '/admission/#/inspectTableAudit/detail/'
-          },
-          { label: '资质准入', prop: 'aptitudesAccess', url: '/admission/#/sampleAudit/view/' },
-          { label: '样品准入', prop: 'auditAccess', url: '/admission/#/auditAdmission/view/' },
-          {
-            label: '物料',
-            prop: 'materialNumber',
-            url: '/masterdata/material/#/masterdata/view/',
-            component: 'fast2-select-material',
-            func: 'selectedRowMaterails',
-            params: []
-          },
-          {
-            label: '采购组',
-            prop: 'purchaseGroup',
-            url: '/masterdata/material/#/masterdata/view/',
-            component: 'fast2-select-purchase-group',
-            func: 'saveSelected',
-            params: ['purchaseGroup', 'purchaseGroupDesc', 'orgId', 'orgDesc']
-          },
-          {
-            label: '采购组织',
-            prop: 'purchaseOrganization',
-            url: '/masterdata/material/#/masterdata/view/',
-            component: 'fast2-select-purchase-organization',
-            func: 'saveSelected',
-            params: ['purchaseOrganization', 'purchaseOrganizationDesc', 'orgId', 'orgDesc']
-          },
-          {
-            label: '期望供应商',
-            prop: 'expectSupplierEls',
-            url: '/masterdata/material/#/masterdata/view/',
-            component: 'fast2-select-supplier',
-            func: 'saveSelected',
-            params: [
-              'expectSupplierEls',
-              'expectSupplierElsName',
-              'toElsAccount',
-              'toElsAccountName'
-            ]
-          },
-          {
-            label: '公司代码',
-            prop: 'companyCode',
-            url: '/masterdata/material/#/masterdata/view/',
-            component: 'fast2-select-supplier',
-            func: 'saveSelected',
-            params: ['companyCode', 'companyCodeName', 'toElsAccount', 'toElsAccountName']
-          },
-          {
-            label: '供应商',
-            prop: 'toElsAccount',
-            url: '/masterdata/material/#/masterdata/view/',
-            component: 'fast2-select-supplier',
-            func: 'saveSelected',
-            params: ['toElsAccount', 'toElsAccountName', 'toElsAccount', 'toElsAccountName']
-          },
-          {
-            label: '采购负责人',
-            prop: 'purchasePerson',
-            url: '/masterdata/material/#/masterdata/view/',
-            component: 'fast2-select-employee',
-            func: 'saveSelected',
-            params: ['purchasePerson', 'purchasePersonName', 'subElsAccount', 'name']
-          },
-          {
-            label: '采购工厂',
-            prop: 'purchaseFactory',
-            url: '/masterdata/material/#/masterdata/view/',
-            component: 'fast2-select-factory',
-            func: 'saveSelected',
-            params: ['purchaseFactory', 'purchaseFactoryName', 'toElsAccount', 'toElsAccountName']
-          }
-        ];
+      default: function () {
+        return popList;
       }
     },
     option: {
       type: Object,
-      default: function() {
+      default: function () {
         return { column: [] };
       }
     },
-    data: {
+    originColumn: {
       type: Object,
-      default: function() {
+      default: function () {
+        return [];
+      }
+    },
+    readOnly: {
+      type: Boolean,
+      default: false // 是否只读模式
+    },
+    rowPermission: {
+      type: Object,
+      default: function () {
         return {};
       }
+    },
+    status: {
+      type: String,
+      default: 'new' // 远程获取 表格字段数据配置- 后续扩充 from 类型
     }
   },
   async created() {
     if (this.readOnly) {
       this.finalOption.detail = true;
+      /* 删除 readOnly 处理 
       this.finalOption.column[0] = {
         label: '业务类型',
         prop: 'businessTypeName',
         type: 'input',
         span: 6
       };
+      */
+    } else {
+      this.finalOption.detail = false;
     }
+
     this.loadConfigruations();
   },
   watch: {
-    'data.businessType'(newVal) {
-      this.setHeadColumns(newVal);
-      this.setTableColumns(newVal);
+    'formObj.businessType'(newVal) {
+      console.log(new Date().valueOf(), 'formObj.businessType', newVal);
+      if (newVal && newVal !== '') {
+        this.setHeadColumns(newVal);
+        this.setTableColumns(newVal);
+      }
+    },
+    'formObj.projectType'(newVal) {
+      if (newVal && newVal !== '') {
+        this.$emit('projectTypeChange', newVal);
+      }
     }
   },
   data() {
@@ -199,22 +142,76 @@ export default {
           }
         ]
       },
+      formObj: this.data,
 
       reload: false,
       formSlots: [],
       optionHash: '',
-      typeDicts: [],
-      typeData: [],
+
+      configurations: {},
+
       seleted: {},
-      configurations: {}
+      typeDicts: [],
+      typeData: []
     };
   },
   methods: {
-    saveSelected(row, list, params) {
-      const item = list[0];
-      row[params[0]] = item[params[2]];
-      row[params[1]] = item[params[3]];
+    checkDataType(originItem, item) {
+      if (!originItem || originItem === -1) {
+        return false;
+      }
+
+      Object.assign(item, originItem);
+
+      switch (item.datatype) {
+        case 'readonly':
+        case 'popupName':
+          item.disabled = 'disabled';
+          break;
+        case 'date':
+          item.type = 'date';
+          item.format = 'yyyy-MM-dd';
+          item.valueFormat = 'timestamp';
+          break;
+        case 'datatime':
+        case 'datetime':
+          item.type = 'datetime';
+          item.format = 'yyyy-MM-dd HH:mm:ss';
+          item.valueFormat = 'timestamp';
+          break;
+        case 'price':
+          item.type = 'number';
+          item.precision = 2;
+          break;
+        case 'bizDic':
+          item.type = 'select';
+          item.bizDic = item.bizDic || item.prop;
+          break;
+        default:
+      }
+
+      if (originItem.datatype === 'popup' && !originItem.ref) {
+        item.formslot = true;
+      }
+
+      if (originItem.ref) {
+        item.disabled = 'disabled';
+      }
+
+      if (item.isSystem === 'Y' && this.status === 'new') {
+        item.display = false;
+        item.rules = [];
+      }
+
+      if (!validateNull(item.bizDic)) {
+        delete item.dicData;
+        delete item.dicMethod;
+        delete item.props;
+        item.type = 'select';
+        item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${item.bizDic}`;
+      }
     },
+
     checkForm(callback, failback) {
       this.$refs.form.validate((valid) => {
         if (valid) {
@@ -225,43 +222,17 @@ export default {
         }
       });
     },
-    setHeadColumns(val) {
-      const selected = this.configurations[val];
-      if (selected) {
-        this.seleted = selected;
-        this.updateCoumn(selected);
-      }
-    },
-    updateCoumn(selected) {
-      const column = this.finalOption.column;
-      const form = this.$refs?.form;
-      column.length = 1;
-      const newColumn = this.filterColum(selected.fieldColumns);
-      const waitUpdateDic = [];
-      newColumn.map((item) => {
-        column.push(item);
-        if (item.dicUrl) {
-          waitUpdateDic.push(item.prop);
-        }
-      });
-      waitUpdateDic.map((prop) => {
-        if (form) {
-          form.updateDic(prop);
-        }
-      });
-    },
-    setTableColumns(val) {
-      const selected = this.configurations[val];
-      this.$emit('updateType', selected);
-    },
+
     doSelect(func, row, event, params = []) {
       this[func](row, event, params);
       this.$forceUpdate();
     },
+
     loadConfigruations() {
       let fieldPermission = {};
       let tablePermission = {};
       let defaultNumber = '';
+
       ElsTemplateConfigService.list({
         elsAccount: getUserInfo().elsAccount,
         businessModule: this.businessModule,
@@ -270,6 +241,7 @@ export default {
         .then((res) => {
           const TypeDicts = [];
           const configurations = [];
+
           if (
             res.data &&
             res.data.statusCode === '200' &&
@@ -278,8 +250,16 @@ export default {
           ) {
             const rows = res.data.pageData.rows || [];
             const userStation = this.elsAccountStation || '';
-            defaultNumber = rows[0].templateNumber;
-            this.data.businessType = defaultNumber;
+
+            if (rows.length < 1) {
+              return;
+            }
+
+            defaultNumber =
+              this.data.businessType ||
+              this.data[this.businessTypeProperty] ||
+              rows[0].templateNumber;
+
             const TypeData = {};
 
             for (const item of rows) {
@@ -316,7 +296,6 @@ export default {
 
             this.typeData = TypeData;
             this.typeDicts = TypeDicts;
-
             this.configurations = configurations;
 
             // this.setConfiurationFormValues(-1);
@@ -326,20 +305,29 @@ export default {
             this.$message.error('查找单据类型数据失败, ' + res.data.message || '');
           }
 
-          // 默认加载
-          if (this.data.businessType) {
-            this.setHeadColumns(this.data.businessType);
-            this.setTableColumns(this.data.businessType);
-          } else {
-            this.setHeadColumns(defaultNumber);
-            this.setTableColumns(defaultNumber);
+          if (!this.formObj.businessType) {
+            this.formObj.businessType = defaultNumber;
           }
+
+          /* 删除 readOnly 处理
           if (this.readOnly) {
             console.log('view');
           } else {
             const form = this.$refs.form;
+
+            if (form && form.updateDic) {
+              form.updateDic('businessType', this.typeDicts);
+            }
+          }
+          */
+          const form = this.$refs.form;
+
+          if (form && form.updateDic) {
             form.updateDic('businessType', this.typeDicts);
           }
+
+          this.setHeadColumns(defaultNumber);
+          this.setTableColumns(defaultNumber);
         })
         .catch((err) => {
           this.typeDicts = [];
@@ -347,82 +335,25 @@ export default {
           this.$message.error('查找单据类型配置数据失败, ' + err.message || '');
         });
     },
-    getSelectRefs(type) {
-      const refs = [];
-      if (!type) {
-        return refs;
-      }
-      this.finalOption.column.map((item) => {
-        const originItem = this.findObject(this.originColumn, item.prop);
-        if (originItem.ref && originItem.ref.includes(type)) {
-          refs.push(item.prop);
-        }
-      });
-      console.log('赋值列表', refs);
-      return refs;
-    },
-    checkDataType(originItem, item) {
-      if (!originItem || originItem === -1) {
-        return false;
-      }
-      Object.assign(item, originItem);
-      switch (item.datatype) {
-        case 'readonly':
-        case 'popupName':
-          item.disabled = 'disabled';
-          break;
-        case 'date':
-          item.type = 'date';
-          item.format = 'yyyy-MM-dd';
-          item.valueFormat = 'timestamp';
-          break;
-        case 'datetime':
-        case 'datatime':
-          item.type = 'datetime';
-          item.format = 'yyyy-MM-dd HH:mm:ss';
-          item.valueFormat = 'timestamp';
-          break;
-        case 'price':
-          item.type = 'number';
-          item.precision = 2;
-          break;
-        case 'bizDic':
-          item.type = 'select';
-          item.bizDic = item.bizDic || item.prop;
-          break;
-        default:
-      }
-      if (originItem.datatype === 'popup' && !originItem.ref) {
-        item.formslot = true;
-      }
-      if (originItem.ref) {
-        item.disabled = 'disabled';
-      }
-      if (item.isSystem === 'Y' && this.status === 'new') {
-        item.display = false;
-        item.rules = [];
-      }
-      if (!validateNull(item.bizDic)) {
-        delete item.dicData;
-        delete item.dicMethod;
-        delete item.props;
-        item.type = 'select';
-        item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${item.bizDic}`;
-      }
-    },
+
     filterColum(column) {
       column.map((item) => {
         const itemProp = this.seleted.fieldPermission[item.prop];
         const originItem = this.findObject(this.originColumn, item.prop);
+
         this.checkDataType(originItem, item);
+
         if (itemProp) {
           if (itemProp.display && itemProp.display !== false) {
             let label = item.label;
+
             if (itemProp.displayName) {
               item.label = itemProp.displayName;
               label = itemProp.displayName;
             }
+
             const isRequired = !!itemProp.isRequired;
+
             if (isRequired) {
               const rule = {
                 required: true,
@@ -435,6 +366,7 @@ export default {
                 item.rules = [rule];
               }
             }
+
             if (!validateNull(itemProp.bizDic)) {
               delete item.dicData;
               delete item.dicMethod;
@@ -454,16 +386,90 @@ export default {
             } else {
               item.cell = true;
             }
+
+            /* 删除 readOnly 处理
             if (this.readOnly) {
               item.type = 'text';
             }
+            */
+
             item.display = true;
             item.span = 6;
           }
         }
+
         console.log(item, originItem, '更新后的item');
       });
       return column;
+    },
+
+    getData() {
+      const formData = JSON.parse(JSON.stringify(this.formObj));
+
+      // set real business type data and remove virtual business type data
+      formData[this.businessTypeProperty] = formData.businessType;
+      delete formData.businessType;
+
+      return formData;
+    },
+
+    getSelectRefs(type) {
+      const refs = [];
+      if (!type) {
+        return refs;
+      }
+      this.finalOption.column.map((item) => {
+        const originItem = this.findObject(this.originColumn, item.prop);
+        if (originItem.ref && originItem.ref.includes(type)) {
+          refs.push(item.prop);
+        }
+      });
+      console.log('赋值列表', refs);
+      return refs;
+    },
+
+    saveSelected(row, list, params) {
+      const item = list[0];
+      row[params[0]] = item[params[2]];
+      row[params[1]] = item[params[3]];
+    },
+
+    setHeadColumns(val) {
+      const selected = this.configurations[val];
+
+      if (selected) {
+        this.seleted = selected;
+
+        this.updateCoumn(selected);
+      }
+    },
+
+    setTableColumns(val) {
+      const selected = this.configurations[val];
+      this.$emit('updateType', selected);
+    },
+
+    updateCoumn(selected) {
+      const columns = this.finalOption.column;
+      const form = this.$refs.form;
+
+      columns.length = 1;
+
+      const newColumn = this.filterColum(selected.fieldColumns);
+      const waitUpdateDic = [];
+
+      newColumn.map((item) => {
+        columns.push(item);
+        if (item.dicUrl) {
+          waitUpdateDic.push(item.prop);
+        }
+      });
+
+      waitUpdateDic.map((prop) => {
+        if (form && form.updateDic) {
+          form.updateDic(prop);
+        }
+      });
     }
   }
 };

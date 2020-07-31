@@ -1,7 +1,7 @@
 <template>
   <div class="selectBox">
     <el-input v-model="seleted" size="small" v-if="!multiple" :readonly="true">
-      <i slot="suffix" class="el-input_icon el-icon-search pointer" @click="visable = true"></i>
+      <el-button slot="append" icon="el-icon-search" @click="visable = true"></el-button>
     </el-input>
     <el-dialog :title="title" :visible.sync="visable">
       <avue-crud
@@ -113,22 +113,22 @@ export default {
     this.handleList();
   },
   watch: {
-    page: function(newValue) {
+    page: function (newValue) {
       this.crudPage = newValue;
     },
-    column: function(newValue) {
+    column: function (newValue) {
       this.crudOption.column = newValue;
     },
-    visable: function(newValue) {
+    visable: function (newValue) {
       this.$emit('update:dialogVisible', newValue);
     },
-    dialogVisible: function(newValue) {
+    dialogVisible: function (newValue) {
       this.visable = newValue;
     }
   },
   methods: {
     handleList() {
-      let listParams = {};
+      const listParams = {};
       listParams.elsAccount = this.elsAccount;
       // listParams.toElsAccout = '307001';
       listParams.currentPage = this.crudPage.currentPage;
@@ -146,7 +146,7 @@ export default {
       });
     },
     crudSave() {
-      let selectItems = this.selectColumns;
+      const selectItems = this.selectColumns;
       this.selectColumns = [];
       this.$refs.crud.selectClear();
       this.$emit('selectDone', selectItems);
@@ -159,7 +159,7 @@ export default {
     },
     currentRowChange(row) {
       if (!this.crudMultiple) {
-        let list = [];
+        const list = [];
         list.push(row);
         this.selectColumns = list;
       }

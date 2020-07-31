@@ -7,7 +7,8 @@ import BlockProvider from './components/render/widget/block-provider';
 import PageProvider from './components/render/widget/page-provider';
 import ThemeProvider from './components/render/widget/theme-provider';
 import RowProvider from './components/render/widget/row-provider'; // 单据行项目专用组件
-import HeadProvider from './components/render/widget/head-provider'; // 单据头专用组件
+import HeadProvider from './components/render/widget/head-provider'; // 业务类型单据头专用组件
+import HeadPageProvider from './components/render/widget/head-page-provider'; // 模块单据头专用组件
 import ConfigTabRender from './components/render/widget/render-config-tab';
 import CostConfigTabRender from './components/render/widget/render-cost-config-tab';
 import ConfigTabSetting from './components/render/widget/setting-config-tab';
@@ -26,6 +27,7 @@ import SelectMaterial from './components/render/dialog/material';
 import SelectPurchaseGroup from './components/render/dialog/purchaseGroup';
 import SelectSupplier from './components/render/dialog/supplier';
 import SelectFactory from './components/render/dialog/factory';
+import SelectOrder from './components/render/dialog/order';
 import SelectEmployee from './components/render/dialog/employee';
 import SelectPurchaseOrganization from './components/render/dialog/purchaseOrganization';
 import Uploader from 'vue-simple-uploader';
@@ -63,6 +65,7 @@ export default {
     Vue.component('Fast2' + ThemeProvider.name, ThemeProvider);
     Vue.component('Fast2' + RowProvider.name, RowProvider);
     Vue.component('Fast2' + HeadProvider.name, HeadProvider);
+    Vue.component('Fast2' + HeadPageProvider.name, HeadPageProvider);
     Vue.component('Fast2' + ConfigTabRender.name, ConfigTabRender);
     Vue.component('Fast2' + CostConfigTabRender.name, CostConfigTabRender);
     Vue.component('Fast2' + ConfigTabSetting.name, ConfigTabSetting);
@@ -75,6 +78,7 @@ export default {
     Vue.component('Fast2' + SelectPurchaseGroup.name, SelectPurchaseGroup);
     Vue.component('Fast2' + SelectSupplier.name, SelectSupplier);
     Vue.component('Fast2' + SelectFactory.name, SelectFactory);
+    Vue.component('Fast2' + SelectOrder.name, SelectOrder);
     Vue.component('Fast2' + SelectEmployee.name, SelectEmployee);
     Vue.component('Fast2' + SelectPurchaseOrganization.name, SelectPurchaseOrganization);
 

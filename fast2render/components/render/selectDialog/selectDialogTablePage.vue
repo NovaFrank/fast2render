@@ -120,20 +120,20 @@ export default {
     this.$emit('handleList', this.queryParam, this.page);
   },
   watch: {
-    data: function(newValue) {
+    data: function (newValue) {
       this.crudData = newValue;
     },
-    page: function(newValue) {
+    page: function (newValue) {
       console.log('dialog page', newValue);
       this.crudPage = newValue;
     },
-    column: function(newValue) {
+    column: function (newValue) {
       this.crudOption.column = newValue;
     },
-    visable: function(newValue) {
+    visable: function (newValue) {
       this.$emit('update:dialogVisible', newValue);
     },
-    dialogVisible: function(newValue) {
+    dialogVisible: function (newValue) {
       this.visable = newValue;
     }
     // // TODO:直接修改对象中的属性不会触发此事件，而父对象传入的参数也会对应改变

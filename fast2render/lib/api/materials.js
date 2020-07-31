@@ -93,6 +93,18 @@ const findElsTemplateConfig = (params) => {
   });
 };
 
+// 获取 页面数据 列表
+const findElsPageConfig = (params) => {
+  const url = `${baseUrl}/template/TemplateBusinessPageService/findDetail`;
+  return axios({
+    url: url,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};
+
 const getPurchasePerson = (params) => {
   return axios({
     url: `${baseUrl}/ElsAccountService/findPageList`,
@@ -101,6 +113,16 @@ const getPurchasePerson = (params) => {
       ...params
     }
   });
+};
+const findCreateDeliveryNote = (param) =>
+  axios({
+    url: `${baseUrl}/order/PurchaseDeliveryNoteService/findCreateDeliveryNote`,
+    method: 'post',
+    data: { ...param }
+  });
+
+export const PurchaseDeliveryNoteService = {
+  list: findCreateDeliveryNote
 };
 
 export const ElsAccountService = {
@@ -120,6 +142,10 @@ export const ElsOrgCategoryService = {
 
 export const ElsTemplateConfigService = {
   list: findElsTemplateConfig
+};
+
+export const ElsPageConfigService = {
+  list: findElsPageConfig
 };
 
 export const MaterialService = {

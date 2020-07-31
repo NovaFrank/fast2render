@@ -137,7 +137,7 @@ export default {
     },
     itemLinkList: {
       type: Array,
-      default: function() {
+      default: function () {
         return [
           { name: '验厂单', prop: 'inspectionAccess', link: '/adminission/#/' },
           { name: '资质准入', prop: 'aptitudesAccess', link: '/adminission/#/' },

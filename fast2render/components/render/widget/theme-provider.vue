@@ -41,7 +41,7 @@ export default {
     },
     itemLinkList: {
       type: Array,
-      default: function() {
+      default: function () {
         return [];
       }
     },
@@ -63,13 +63,13 @@ export default {
     },
     rowPermission: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     },
     spanMethodData: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           row: [2, 3],
           prop: null,
@@ -79,13 +79,13 @@ export default {
     },
     option: {
       type: Object,
-      default: function() {
+      default: function () {
         return { column: [] };
       }
     },
     data: {
       type: Array,
-      default: function() {
+      default: function () {
         return [];
       }
     }
@@ -119,7 +119,7 @@ export default {
     }
   },
   computed: {
-    hash: function() {
+    hash: function () {
       const { version, theme, type, optionHash, rowPermission } = this;
       const fullText = zipLayout(
         JSON.stringify({ version, theme, type, optionHash, rowPermission })
@@ -128,7 +128,7 @@ export default {
       const obj = (version || 'local') + '-' + str;
       return obj;
     },
-    myData: function() {
+    myData: function () {
       if (this.spanMethodData.prop) {
         return Object.values(_.groupBy(this.data, this.spanMethodData.prop)).flat();
       }

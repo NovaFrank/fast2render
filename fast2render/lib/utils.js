@@ -345,7 +345,7 @@ export const getObjValue = (stringOfObj, obj) => {
     return null;
   }
   const tempObj = obj;
-  const value = array.reduce(function(prev, cur) {
+  const value = array.reduce(function (prev, cur) {
     const currentObj = getObjType(prev) === 'object' ? prev : getItemChildrenProp(prev, tempObj);
     const newObj = getItemChildrenProp(cur, currentObj);
     // console.log(newObj, currentObj, 'current level obj');
@@ -416,7 +416,7 @@ export const vaildData = (val, dafult) => {
  * @param {*} obj   要处理的数据对象
  */
 export const getFormulaValue = (formulaItem, obj = {}) => {
-  const reference = function(name) {
+  const reference = function (name) {
     return (context) => getNum(context[name]);
   };
   const checkNum = (n) => {
@@ -425,7 +425,7 @@ export const getFormulaValue = (formulaItem, obj = {}) => {
     }
     return false;
   };
-  const getNum = function(value) {
+  const getNum = function (value) {
     let n = 0;
     // 如果是字符串转数字
     if (getObjType(value) === 'string') {
@@ -501,7 +501,7 @@ export const clearColumn = (subList) => {
  * @param {*} prop 排序对比属性
  */
 export const sortArrys = (list, prop) => {
-  list.sort(function(a, b) {
+  list.sort(function (a, b) {
     if (a[prop] > b[prop]) {
       return -1;
     }
@@ -529,7 +529,7 @@ export const checkObjExist = (stringOfObj, obj) => {
     return false;
   }
   const tempObj = obj;
-  const value = array.reduce(function(prev, cur) {
+  const value = array.reduce(function (prev, cur) {
     const currentObj = getObjType(prev) === 'object' ? prev : getItemChildrenProp(prev, tempObj);
     const newObj = getItemChildrenProp(cur, currentObj);
     return newObj;
@@ -858,11 +858,11 @@ export const initJson = () => {
 };
 
 export const loadJson = (url, name) => {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const xhr = new XMLHttpRequest();
     xhr.open('get', url, true);
     xhr.responseType = 'json';
-    xhr.onload = function() {
+    xhr.onload = function () {
       if (xhr.status === 200) {
         console.log('获取文件', url);
         setStore({ name, content: xhr.response });
@@ -1000,29 +1000,79 @@ export const getAccount = () => {
   };
 };
 
+/**
+ * 获取取对象列表的初始值
+
+ * @example
+ * getPropertiesInitValue(
+ * [
+ *    { label: '公开', value: 'open' },
+ *    { label: '邀请', value: 'invite' }
+ * ],
+ * 'prop'
+ * '',
+ * )
+ * @param {*} [properties=[]]
+ * @param {string} [key='']
+ * @param {string} [value='']
+ * @returns {Object}
+ */
+export function getPropertiesInitValue(properties = [], key = '', value = '') {
+  const valueObject = {};
+
+  if (properties && Array.isArray(properties)) {
+    for (const item of properties) {
+      valueObject[item[key]] = value;
+    }
+  } else if (typeof properties === 'object') {
+    const keys = Object.keys(properties);
+
+    for (const item of keys) {
+      valueObject[item] = value;
+    }
+  }
+
+  return valueObject;
+}
+
+export function generateRandomString(e) {
+  e = e || 32;
+  const t = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+  const a = t.length;
+  let n = '';
+
+  for (let i = 0; i < e; i++) {
+    n += t.charAt(Math.floor(Math.random() * a));
+  }
+
+  return n;
+}
+
 const util = {
-  getAccount,
-  formatDate,
+  doCalc,
+  doListCalc,
   findSlug,
-  getObjType,
-  validateNull,
+  formatDate,
   formatObject,
+  getAccount,
+  getBlockItem,
+  getDicItem,
+  getDicList,
+  getFormulaItem,
+  getObjType,
   getObjValue,
+  getPropertiesInitValue,
+  getTemplateItem,
+  initJson,
   isJSON,
-  zipLayout,
-  unzipLayout,
   makeBlockOutputJson,
   mySpanMethod,
   renderSize,
-  getTemplateItem,
-  getDicItem,
-  getFormulaItem,
-  getBlockItem,
-  doCalc,
-  doListCalc,
+  generateRandomString,
   uniqBy,
-  initJson,
-  getDicList
+  unzipLayout,
+  validateNull,
+  zipLayout
 };
 
 export default util;

@@ -31,7 +31,7 @@ export default {
     }
   },
   computed: {
-    showButtons: function() {
+    showButtons: function () {
       const buttons = [
         ...this.buttons,
         {

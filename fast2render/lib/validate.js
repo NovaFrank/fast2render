@@ -62,7 +62,7 @@ export function validateAlphabets(str) {
   return reg.test(str);
 }
 /* 验证pad还是pc */
-export const validatePc = function() {
+export const validatePc = function () {
   const userAgentInfo = navigator.userAgent;
   const Agents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod'];
   let flag = true;

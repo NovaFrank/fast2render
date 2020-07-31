@@ -30,7 +30,7 @@ export default {
     },
     option: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     }

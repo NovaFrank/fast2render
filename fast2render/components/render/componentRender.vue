@@ -4,10 +4,10 @@
       <template
         v-if="
           item &&
-            !item.hide &&
-            (item.type === BLOCK_TYPE.DETAIL ||
-              item.type === BLOCK_TYPE.FORM ||
-              item.type === BLOCK_TYPE.FIELD)
+          !item.hide &&
+          (item.type === BLOCK_TYPE.DETAIL ||
+            item.type === BLOCK_TYPE.FORM ||
+            item.type === BLOCK_TYPE.FIELD)
         "
       >
         <div :key="item.slug">
@@ -147,7 +147,7 @@ export default {
     },
     itemLinkList: {
       type: Array,
-      default: function() {
+      default: function () {
         return [
           {
             label: '验厂单',
@@ -212,7 +212,7 @@ export default {
     }
   },
   watch: {
-    readOnly: function() {
+    readOnly: function () {
       this.initList();
     }
   },

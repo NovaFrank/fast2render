@@ -1,6 +1,6 @@
 {
   "name": "order",
-  "version": "0.2.01",
+  "version": "0.2.02",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",

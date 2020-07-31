@@ -1174,7 +1174,7 @@ export default {
             { power: true, text: '返回', type: '', size: '', action: 'on-back' },
             { power: true, text: '更新时间', type: 'primary', size: '', action: 'on-update-end' },
             {
-              power: true,
+              power: this.detailObj.quoteEndTime < new Date().getTime(),
               text: '保存',
               type: 'primary',
               size: '',

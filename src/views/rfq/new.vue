@@ -951,6 +951,7 @@ export default {
             return;
           }
           this.$message.success('关闭成功');
+          this.$router.go(-1);
         });
       });
     },

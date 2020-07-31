@@ -9,7 +9,7 @@ import Avue from '@smallwei/avue';
 import './styles/common.scss';
 import 'element-ui/lib/theme-chalk/index.css';
 import '@smallwei/avue/lib/index.css';
-import Fast2Render from '../fast2render';
+import Fast2Render from 'fast2render';
 import basicContainer from './components/basic-container/main';
 import { getCommonRes } from '@/util/commonRes';
 

@@ -26,7 +26,7 @@
           <el-input v-model="crudObj.materialNumber" :readonly="true">
             <i
               slot="suffix"
-              class=" el-input_icon el-icon-search pointer"
+              class="el-input_icon el-icon-search pointer"
               @click="materialDialogOpen"
             ></i>
           </el-input>
@@ -274,7 +274,7 @@ export default {
       })
         .then(() => {
           const action = 'updateOrder';
-          let params = {
+          const params = {
             elsAccount: this.elsAccount,
             ...this.formOption.obj,
             orderItemReceiveVOList: this.materielListOption.data,
@@ -295,7 +295,7 @@ export default {
         if (valid) {
           this.formOption.obj.rejectReason = this.ruleForm.rejectObj;
           const action = 'backToOrder';
-          let params = {
+          const params = {
             elsAccount: this.elsAccount,
             ...this.formOption.obj,
             orderItemReceiveVOList: this.materielListOption.data,

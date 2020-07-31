@@ -31,7 +31,7 @@
           <el-input v-model="crudObj.materialNumber" :readonly="true">
             <i
               slot="suffix"
-              class=" el-input_icon el-icon-search pointer"
+              class="el-input_icon el-icon-search pointer"
               @click="materialDialogOpen"
             ></i>
           </el-input>
@@ -297,7 +297,7 @@ export default {
       }
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;
-      let orderItemArr = [];
+      const orderItemArr = [];
       resp2.data.data.forEach((i) => {
         orderItemArr.push(Number(i.orderItemNumber));
       });
@@ -309,7 +309,7 @@ export default {
         } else if (this.auditStatus === '0') {
           this.headerButtons = this.audit3;
         }
-        let content = {
+        const content = {
           flowId: resp.data.data.flowId,
           businessType: 'orderAudit'
         };
@@ -329,7 +329,7 @@ export default {
       })
         .then(() => {
           const action = 'updateOrder';
-          let params = {
+          const params = {
             elsAccount: this.elsAccount,
             elsSubAccount: this.elsSubAccount,
             ...this.formOption.obj,
@@ -394,8 +394,8 @@ export default {
         this.params.addList.push(row);
       } else {
         row.deliveryItemNumber = '1';
-        let sessionItemArr = sessionStorage.getItem('orderItemArr');
-        let maxNum = JSON.parse(sessionItemArr).reduce((a, b) => {
+        const sessionItemArr = sessionStorage.getItem('orderItemArr');
+        const maxNum = JSON.parse(sessionItemArr).reduce((a, b) => {
           return b > a ? b : a;
         });
         row.orderItemNumber = (maxNum + 1).toString();
@@ -409,7 +409,7 @@ export default {
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
       const action = 'sendOrder';
-      let params = {
+      const params = {
         elsAccount: this.elsAccount,
         elsSubAccount: this.elsSubAccount,
         ...this.formOption.obj,
@@ -433,7 +433,7 @@ export default {
       })
         .then(async () => {
           const action2 = 'cancel';
-          let params2 = {
+          const params2 = {
             elsAccount: this.elsAccount,
             toElsAccount: this.formOption.obj.toElsAccount,
             businessType: 'orderAudit',
@@ -507,13 +507,13 @@ export default {
         // this.crudObj.priceIncludingTax = selectColumns[0].priceIncludingTax;
         // this.crudObj.taxRate = selectColumns[0].taxRate;
         const action = 'getToElsEffectivePrice';
-        let params = {
+        const params = {
           elsAccount: this.elsAccount,
           toElsAccount: this.formOption.obj.toElsAccount,
           materialNumber: selectColumns[0].materialNumber
         };
         // console.log('params: ' + JSON.stringify(params));
-        let res = await getPriceDetail(action, params);
+        const res = await getPriceDetail(action, params);
         if (res.data.data !== null) {
           this.crudObj.priceIncludingTax = res.data.data.priceIncludingTax;
           this.crudObj.taxRate = res.data.data.taxRate;

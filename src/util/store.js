@@ -4,8 +4,8 @@ import { validatenull } from '@/util/validate';
  * 存储localStorage
  */
 export const setStore = (params) => {
-  let { name, content, type } = params;
-  let obj = {
+  const { name, content, type } = params;
+  const obj = {
     dataType: typeof content,
     content: content,
     type: type,
@@ -20,7 +20,7 @@ export const setStore = (params) => {
  */
 
 export const getStore = (params) => {
-  let { name, debug, timer } = params;
+  const { name, debug, timer } = params;
   let obj = {};
   let content;
   obj = window.sessionStorage.getItem(name);
@@ -32,9 +32,9 @@ export const getStore = (params) => {
   }
 
   if (timer) {
-    let current = new Date().getTime();
-    let datatime = obj.datetime;
-    let end = current - datatime;
+    const current = new Date().getTime();
+    const datatime = obj.datetime;
+    const end = current - datatime;
     if (timer * 60 * 1000 < end) {
       removeStore({ name });
       return false;
@@ -56,7 +56,7 @@ export const getStore = (params) => {
  * 删除localStorage
  */
 export const removeStore = (params) => {
-  let { name } = params;
+  const { name } = params;
   window.localStorage.removeItem(name);
   window.sessionStorage.removeItem(name);
 };
@@ -65,8 +65,8 @@ export const removeStore = (params) => {
  * 获取全部localStorage
  */
 export const getAllStore = (params) => {
-  let list = [];
-  let { type } = params;
+  const list = [];
+  const { type } = params;
   for (let i = 1; i <= window.sessionStorage.length; i++) {
     if (type) {
       list.push({
@@ -95,7 +95,7 @@ export const getAllStore = (params) => {
  * 清空全部localStorage
  */
 export const clearStore = (params) => {
-  let { type } = params;
+  const { type } = params;
   if (type) {
     window.sessionStorage.clear();
     return;

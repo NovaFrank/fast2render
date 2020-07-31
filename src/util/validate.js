@@ -62,7 +62,7 @@ export function validatAlphabets(str) {
   return reg.test(str);
 }
 /* 验证pad还是pc */
-export const vaildatePc = function() {
+export const vaildatePc = function () {
   const userAgentInfo = navigator.userAgent;
   const Agents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod'];
   let flag = true;
@@ -88,7 +88,7 @@ export function validateEmail(email) {
  * 判断身份证号码
  */
 export function cardid(code) {
-  let list = [];
+  const list = [];
   let result = true;
   let msg = '';
   var city = {
@@ -170,7 +170,7 @@ export function cardid(code) {
  * 判断手机号码是否正确
  */
 export function isvalidatemobile(phone) {
-  let list = [];
+  const list = [];
   let result = true;
   let msg = '';
   var isPhone = /^0\d{2,3}-?\d{7,8}$/;

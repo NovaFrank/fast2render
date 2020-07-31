@@ -15,7 +15,7 @@
           <el-input v-model="formOption.obj.toElsAccount" :readonly="true">
             <i
               slot="suffix"
-              class=" el-input_icon el-icon-search pointer"
+              class="el-input_icon el-icon-search pointer"
               @click="supplierDialogOpen"
             ></i>
           </el-input>
@@ -24,7 +24,7 @@
           <el-input v-model="formOption.obj.purchasePerson" :readonly="true">
             <i
               slot="suffix"
-              class=" el-input_icon el-icon-search pointer"
+              class="el-input_icon el-icon-search pointer"
               @click="purchaseDialogOpen"
             ></i>
           </el-input>
@@ -33,7 +33,7 @@
           <el-input v-model="formOption.obj.purchaseFactory" :readonly="true">
             <i
               slot="suffix"
-              class=" el-input_icon el-icon-search pointer"
+              class="el-input_icon el-icon-search pointer"
               @click="factoryGroupDialogOpen"
             ></i>
           </el-input>
@@ -42,7 +42,7 @@
           <el-input v-model="formOption.obj.purchaseGroup" :readonly="true">
             <i
               slot="suffix"
-              class=" el-input_icon el-icon-search pointer"
+              class="el-input_icon el-icon-search pointer"
               @click="purchaseGroupDialogOpen"
             ></i>
           </el-input>
@@ -80,7 +80,7 @@
           <el-input v-model="crudObj.materialNumber" :readonly="true">
             <i
               slot="suffix"
-              class=" el-input_icon el-icon-search pointer"
+              class="el-input_icon el-icon-search pointer"
               @click="materialDialogOpen"
             ></i>
           </el-input>
@@ -336,7 +336,7 @@ export default {
       this.tabActive = value;
       sessionStorage.setItem('materialRow', JSON.stringify(this.materielListOption.data));
       if (this.tabActive.prop === 'plan') {
-        let sessionCateCode = sessionStorage.getItem('materialRow');
+        const sessionCateCode = sessionStorage.getItem('materialRow');
         this.planListOption.data = JSON.parse(sessionCateCode);
 
         this.planListOption.data.forEach((item) => {
@@ -387,9 +387,7 @@ export default {
       const priceString = Number(row.priceIncludingTax).toFixed(2);
       const quantityString = row.quantity.toString();
       const totalAmount = format(
-        chain(bignumber(priceString))
-          .multiply(bignumber(quantityString))
-          .done()
+        chain(bignumber(priceString)).multiply(bignumber(quantityString)).done()
       );
 
       row.totalAmount = Number(totalAmount).toFixed(2);
@@ -421,9 +419,7 @@ export default {
       const quantityString = row.quantity.toString();
 
       const totalAmount = format(
-        chain(bignumber(priceString))
-          .multiply(bignumber(quantityString))
-          .done()
+        chain(bignumber(priceString)).multiply(bignumber(quantityString)).done()
       );
 
       row.totalAmount = Number(totalAmount).toFixed(2);
@@ -468,7 +464,7 @@ export default {
       this.tabActive = this.tabOption.option.column[1];
       this.handleTabClick(this.tabActive);
       const action = 'createOrder';
-      let params = {
+      const params = {
         elsAccount: this.elsAccount,
         elsSubAccount: this.elsSubAccount,
         ...this.formOption.obj,
@@ -479,7 +475,7 @@ export default {
       const res = await createOrder(action, params);
       const orderNo = res.data.data.orderNumber;
       const action2 = 'submit';
-      let params2 = {
+      const params2 = {
         elsAccount: this.elsAccount,
         toElsAccount: this.formOption.obj.toElsAccount,
         businessType: 'orderAudit',
@@ -516,7 +512,7 @@ export default {
       this.tabActive = this.tabOption.option.column[1];
       this.handleTabClick(this.tabActive);
       const action = 'createOrder';
-      let params = {
+      const params = {
         elsAccount: this.elsAccount,
         elsSubAccount: this.elsSubAccount,
         ...this.formOption.obj,
@@ -552,7 +548,7 @@ export default {
       this.tabActive = this.tabOption.option.column[1];
       this.handleTabClick(this.tabActive);
       const action = 'createOrder';
-      let params = {
+      const params = {
         elsAccount: this.elsAccount,
         elsSubAccount: this.elsSubAccount,
         ...this.formOption.obj,
@@ -593,13 +589,13 @@ export default {
         // this.crudObj.priceIncludingTax = selectColumns[0].priceIncludingTax;
         // this.crudObj.taxRate = selectColumns[0].taxRate;
         const action = 'getToElsEffectivePrice';
-        let params = {
+        const params = {
           elsAccount: this.elsAccount,
           toElsAccount: this.formOption.obj.toElsAccount,
           materialNumber: selectColumns[0].materialNumber
         };
         // console.log('params: ' + JSON.stringify(params));
-        let res = await getPriceDetail(action, params);
+        const res = await getPriceDetail(action, params);
         if (res.data.data !== null) {
           this.crudObj.priceIncludingTax = res.data.data.priceIncludingTax;
           this.crudObj.taxRate = res.data.data.taxRate;
@@ -650,7 +646,7 @@ export default {
       await uploadServlet(formdata)
         .then(async (res) => {
           if (res.data.statusCode === '200') {
-            let data = res.data.data[0];
+            const data = res.data.data[0];
             const file = {
               fileSize: data.size,
               fileName: data.name,
@@ -660,13 +656,13 @@ export default {
             this.$emit('upload-file', file);
             // this.updateFileList(file);
             const action = 'importExcel';
-            let params = {
+            const params = {
               elsAccount: this.elsAccount,
               urlStr: data.url,
               taxMap: this.taxCodeArr
             };
             // console.log('params: ' + JSON.stringify(params));
-            let newRow = await createOrder(action, params);
+            const newRow = await createOrder(action, params);
             if (newRow.data.statusCode === '200') {
               if (this.materielListOption.data.length <= 0) {
                 this.materielListOption.data.push(newRow.data.data[0]);

@@ -39,7 +39,7 @@
         <el-input v-model="listOption.purchasePerson">
           <i
             slot="suffix"
-            class=" el-input_icon el-icon-search pointer"
+            class="el-input_icon el-icon-search pointer"
             @click="purchaseDialogOpen"
           ></i>
         </el-input>
@@ -112,9 +112,9 @@
         <router-link
           v-if="
             row.sourceType === 'request' &&
-              row.orderStatus === '0' &&
-              row.sendStatus === '0' &&
-              row.auditStatus === '1'
+            row.orderStatus === '0' &&
+            row.sendStatus === '0' &&
+            row.auditStatus === '1'
           "
           :to="`edit/${row.orderNumber}`"
         >
@@ -165,9 +165,9 @@
         <router-link
           v-if="
             row.orderStatus === '0' &&
-              row.sendStatus === '0' &&
-              row.auditStatus === '1' &&
-              row.sourceType === null
+            row.sendStatus === '0' &&
+            row.auditStatus === '1' &&
+            row.sourceType === null
           "
           :to="`edits/${row.orderNumber}`"
         >
@@ -176,9 +176,9 @@
         <router-link
           v-if="
             row.orderStatus === '3' &&
-              row.sendStatus === '2' &&
-              row.auditStatus === '1' &&
-              row.sourceType === null
+            row.sendStatus === '2' &&
+            row.auditStatus === '1' &&
+            row.sourceType === null
           "
           :to="`edits/${row.orderNumber}`"
         >
@@ -192,9 +192,9 @@
         <router-link
           v-if="
             row.orderStatus === '2' &&
-              row.sendStatus === '0' &&
-              row.auditStatus === '1' &&
-              row.sourceType === null
+            row.sendStatus === '0' &&
+            row.auditStatus === '1' &&
+            row.sourceType === null
           "
           :to="`view/${row.orderNumber}`"
         >
@@ -203,9 +203,9 @@
         <router-link
           v-if="
             row.orderStatus === '5' &&
-              row.sendStatus === '0' &&
-              row.auditStatus === '1' &&
-              row.sourceType === null
+            row.sendStatus === '0' &&
+            row.auditStatus === '1' &&
+            row.sourceType === null
           "
           :to="`view/${row.orderNumber}`"
         >
@@ -214,9 +214,9 @@
         <router-link
           v-if="
             row.orderStatus === '2' &&
-              row.sendStatus === '0' &&
-              row.auditStatus === '1' &&
-              row.sourceType === 'request'
+            row.sendStatus === '0' &&
+            row.auditStatus === '1' &&
+            row.sourceType === 'request'
           "
           :to="`views/${row.orderNumber}`"
         >
@@ -369,7 +369,7 @@ export default {
         type: 'warning'
       }).then(async () => {
         const action = 'delete';
-        let params = {
+        const params = {
           elsAccount: this.elsAccount,
           toElsAccount: row.toElsAccount,
           orderNumber: row.orderNumber,
@@ -415,7 +415,7 @@ export default {
         type: 'warning'
       }).then(async () => {
         const action = 'updatePerson';
-        let params = {
+        const params = {
           elsAccount: this.elsAccount,
           toElsAccount: row.toElsAccount,
           orderNumber: row.orderNumber,

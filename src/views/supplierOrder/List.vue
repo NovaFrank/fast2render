@@ -56,9 +56,9 @@
         <router-link
           v-if="
             row.orderStatus === '1' ||
-              row.orderStatus === '2' ||
-              row.orderStatus === '4' ||
-              row.orderStatus === '5'
+            row.orderStatus === '2' ||
+            row.orderStatus === '4' ||
+            row.orderStatus === '5'
           "
           :to="`orderView/${row.orderNumber}_${row.elsAccount}`"
         >

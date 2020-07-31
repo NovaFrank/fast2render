@@ -1,6 +1,6 @@
 import axios from './request';
 import { getApiPath } from '@/util/utils';
-let baseUrl = getApiPath();
+const baseUrl = getApiPath();
 
 // 配置平台数据字典查询
 export const dataDicAPI = (code) => {

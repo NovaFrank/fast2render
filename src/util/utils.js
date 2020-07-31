@@ -33,7 +33,7 @@ export const getSupplierInfo = () => {
 };
 
 export const getAccount = () => {
-  let userInfo = getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
+  const userInfo = getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
   if (userInfo && userInfo.elsAccount) {
     return userInfo;
   }
@@ -64,7 +64,7 @@ export const getLocalToken = (supplier) => {
   login(params).then((res) => {
     console.log(res.data);
     setToken(res.data.data.token);
-    let params2 = {
+    const params2 = {
       name: 'userInfo',
       content: {
         elsAccount: params.elsAccount,

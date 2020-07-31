@@ -90,19 +90,19 @@ export default {
     this.handleList();
   },
   watch: {
-    column: function(newValue) {
+    column: function (newValue) {
       this.crudOption.column = newValue;
     },
-    visable: function(newValue) {
+    visable: function (newValue) {
       this.$emit('update:dialogVisible', newValue);
     },
-    dialogVisible: function(newValue) {
+    dialogVisible: function (newValue) {
       this.visable = newValue;
     }
   },
   methods: {
     handleList(params = {}) {
-      let listParams = {};
+      const listParams = {};
       listParams.elsAccount = this.elsAccount;
       listParams.currentPage = this.crudPage.currentPage;
       listParams.pageSize = this.crudPage.pageSize;
@@ -118,7 +118,7 @@ export default {
       });
     },
     crudSave() {
-      let selectItems = this.selectColumns;
+      const selectItems = this.selectColumns;
       this.selectColumns = [];
       this.$refs.crud.selectClear();
       this.$emit('save', selectItems);
@@ -131,7 +131,7 @@ export default {
     },
     currentRowChange(row) {
       if (!this.crudMultiple) {
-        let list = [];
+        const list = [];
         list.push(row);
         this.selectColumns = list;
       }

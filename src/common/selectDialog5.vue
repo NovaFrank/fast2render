@@ -100,22 +100,22 @@ export default {
     this.handleList();
   },
   watch: {
-    page: function(newValue) {
+    page: function (newValue) {
       this.crudPage = newValue;
     },
-    column: function(newValue) {
+    column: function (newValue) {
       this.crudOption.column = newValue;
     },
-    visable: function(newValue) {
+    visable: function (newValue) {
       this.$emit('update:dialogVisible', newValue);
     },
-    dialogVisible: function(newValue) {
+    dialogVisible: function (newValue) {
       this.visable = newValue;
     }
   },
   methods: {
     handleList() {
-      let listParams = {};
+      const listParams = {};
       listParams.elsAccount = this.elsAccount;
       // listParams.toElsAccout = '307001';
       listParams.orgCategoryId = 'factory';
@@ -134,7 +134,7 @@ export default {
       });
     },
     crudSave() {
-      let selectItems = this.selectColumns;
+      const selectItems = this.selectColumns;
       this.selectColumns = [];
       this.$refs.crud.selectClear();
       this.$emit('save', selectItems);
@@ -147,7 +147,7 @@ export default {
     },
     currentRowChange(row) {
       if (!this.crudMultiple) {
-        let list = [];
+        const list = [];
         list.push(row);
         this.selectColumns = list;
       }

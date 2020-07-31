@@ -27,7 +27,7 @@
           <el-input v-model="crudObj.materialNumber" :readonly="true">
             <i
               slot="suffix"
-              class=" el-input_icon el-icon-search pointer"
+              class="el-input_icon el-icon-search pointer"
               @click="materialDialogOpen"
             ></i>
           </el-input>
@@ -200,7 +200,7 @@ export default {
       this.formOption.obj = resp.data.data;
       this.materielListOption.data = resp2.data.data;
       this.planListOption.data = resp3.data.data;
-      let orderItemArr = [];
+      const orderItemArr = [];
       resp2.data.data.forEach((i) => {
         orderItemArr.push(Number(i.orderItemNumber));
       });
@@ -218,7 +218,7 @@ export default {
       })
         .then(() => {
           const action = 'updateOrder';
-          let params = {
+          const params = {
             elsAccount: this.elsAccount,
             elsSubAccount: this.elsSubAccount,
             ...this.formOption.obj,
@@ -284,8 +284,8 @@ export default {
         this.params.addList.push(row);
       } else {
         row.deliveryItemNumber = '1';
-        let sessionItemArr = sessionStorage.getItem('orderItemArr');
-        let maxNum = JSON.parse(sessionItemArr).reduce((a, b) => {
+        const sessionItemArr = sessionStorage.getItem('orderItemArr');
+        const maxNum = JSON.parse(sessionItemArr).reduce((a, b) => {
           return b > a ? b : a;
         });
         row.orderItemNumber = (maxNum + 1).toString();
@@ -299,7 +299,7 @@ export default {
       this.tabActive = this.tabOption.option.column[2];
       this.handleTabClick(this.tabActive);
       const action = 'sendOrder';
-      let params = {
+      const params = {
         elsAccount: this.elsAccount,
         elsSubAccount: this.elsSubAccount,
         ...this.formOption.obj,

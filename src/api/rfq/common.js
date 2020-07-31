@@ -1,7 +1,7 @@
 import request from '@/router/axios';
 import { getApiPath } from '@/util/utils.js';
 
-let prefix = getApiPath();
+const prefix = getApiPath();
 
 export const uploadServlet = (formdata) => {
   return request({

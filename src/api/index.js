@@ -1,5 +1,5 @@
 import request from '@/router/axios';
-let prefix = '/apis';
+const prefix = '/apis';
 
 // 获取登录信息 开发使用
 export const login = (params) =>

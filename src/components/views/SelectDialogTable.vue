@@ -115,19 +115,19 @@ export default {
     this.$emit('handleList', this.queryParam, this.page);
   },
   watch: {
-    data: function(newValue) {
+    data: function (newValue) {
       this.crudData = newValue;
     },
-    page: function(newValue) {
+    page: function (newValue) {
       this.crudPage = newValue;
     },
-    column: function(newValue) {
+    column: function (newValue) {
       this.crudOption.column = newValue;
     },
-    visable: function(newValue) {
+    visable: function (newValue) {
       this.$emit('update:dialogVisible', newValue);
     },
-    dialogVisible: function(newValue) {
+    dialogVisible: function (newValue) {
       this.visable = newValue;
       this.page = {
         ...this.page,

@@ -3,9 +3,9 @@ import { getUserInfo } from '@/util/utils';
 import commonApi from '@/api/index.js';
 
 export const getCommonRes = async (action, params = {}) => {
-  let account = getUserInfo();
+  const account = getUserInfo();
   if (!account) return [];
-  let key = `${account.elsAccount}_${account.elsSubAccount}_${action}`;
+  const key = `${account.elsAccount}_${account.elsSubAccount}_${action}`;
   let data = getStore({ name: key, timer: 120 });
   if (!data || !data.length) {
     data = await getRemoteRes(action, (params = {}));
@@ -17,7 +17,7 @@ export const getCommonRes = async (action, params = {}) => {
 export const getRemoteRes = async (action, params = {}) => {
   let data = [];
   if (commonApi[action]) {
-    let res = await commonApi[action](params);
+    const res = await commonApi[action](params);
     if (res.data && res.data.pageData && res.data.pageData.rows && res.data.pageData.rows.length) {
       data = res.data.pageData.rows;
     }

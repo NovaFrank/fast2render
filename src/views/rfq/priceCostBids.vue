@@ -146,7 +146,7 @@ export default {
       this.costBidsSum.option.column = this.costBidsSum.option.column.concat(this.supplierColumn);
 
       this.template.forEach((item) => {
-        let i = {};
+        const i = {};
         const tempProp = item.prop;
         this.suppliers.forEach((supplier) => {
           const prop = this.initProviderData(supplier);
@@ -213,7 +213,7 @@ export default {
         this.supplierColumnDetail
       );
       this.template.forEach((item) => {
-        let i = {};
+        const i = {};
         const tempProp = item.prop;
         this.suppliers.forEach((supplier) => {
           const prop = this.initProviderData(supplier);

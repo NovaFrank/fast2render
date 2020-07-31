@@ -45,7 +45,7 @@ const execMathExpress = require('exec-mathexpress');
 export default {
   name: 'quote-ladder-dialog',
   components: {},
-  created: function() {},
+  created: function () {},
   props: {
     enquiryPurchaserTax: Boolean,
     dialogWidth: String,

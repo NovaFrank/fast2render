@@ -2,7 +2,7 @@ import axios from '@/router/axios';
 import { getUserInfo } from '@/util/auth';
 import { getApiPath } from '@/util/utils.js';
 
-let baseUrl = getApiPath();
+const baseUrl = getApiPath();
 const layout = '/layout';
 const userInfo = getUserInfo();
 const elsAccount = userInfo.elsAccount;

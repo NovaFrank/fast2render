@@ -132,7 +132,7 @@
       <template slot-scope="scope" slot="quoteMethodInfo">
         <span v-if="scope.row.quoteMethod === '1'">
           <p
-            style="margin: 0"
+            style="margin: 0;"
             v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
             :key="ladder.ladderGrade"
           >
@@ -172,13 +172,13 @@
           </span>
           <span v-else>{{ scope.row.priceIncludingTax }}</span>
         </span>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '1'">
           <span v-if="showXPrice(scope.row)">
             **
           </span>
           <span v-else>{{ getPriceIndex(scope.row, 'priceIncludingTax') }}</span>
         </p>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '2'">
           <span v-if="showXPrice(scope.row)">
             **
           </span>
@@ -193,13 +193,13 @@
           </span>
           <span v-else>{{ scope.row.priceExcludingTax }}</span>
         </span>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '1'">
           <span v-if="showXPrice(scope.row)">
             **
           </span>
           <span v-else>{{ getPriceIndex(scope.row, 'priceExcludingTax') }}</span>
         </p>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '2'">
           <span v-if="showXPrice(scope.row)">
             **
           </span>
@@ -211,11 +211,11 @@
         <el-row
           v-if="
             detailObj.auditStatus !== '0' &&
-              detailObj.auditStatus !== '2' &&
-              scope.row.itemStatus !== '1' &&
-              scope.row.itemStatus !== '3' &&
-              detailObj.quoteEndTime < new Date().getTime() &&
-              !showXPrice(scope.row)
+            detailObj.auditStatus !== '2' &&
+            scope.row.itemStatus !== '1' &&
+            scope.row.itemStatus !== '3' &&
+            detailObj.quoteEndTime < new Date().getTime() &&
+            !showXPrice(scope.row)
           "
           :gutter="24"
         >
@@ -277,7 +277,7 @@
 </template>
 
 <script>
-import { mySpanMethod } from '@/util/utils';
+import { mySpanMethod, getUserInfo, compare } from '@/util/utils';
 import FormHeader from '@/components/views/formHeader';
 import formOption from '@/const/rfq/newAndView/detail';
 import tabOption from '@/const/rfq/newAndView/detailTabs';
@@ -286,7 +286,6 @@ import inquiryListOption from '@/const/rfq/newAndView/detailInquiryList';
 import auditListOption from '@/const/rfq/newAndView/auditListOption';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
-import { getUserInfo, compare } from '@/util/utils.js';
 import {
   purchaseEnquiryAction,
   queryDetailAction,
@@ -411,7 +410,7 @@ export default {
     showXPrice(item) {
       // 显示星星：限时、加密
       const canSee = this.detailObj.canSeeRule || '0';
-      let result =
+      const result =
         ((item.itemStatus === '2' || item.itemStatus === '4') &&
           this.detailObj.quoteEndTime > new Date().getTime() &&
           canSee === '0') ||
@@ -425,12 +424,12 @@ export default {
         currentVersionFlag: 'Y'
       });
       if (res.data && res.data.statusCode === '200' && res.data.pageData) {
-        let configurations = [];
+        const configurations = [];
         const rows = res.data.pageData.rows || [];
         for (const item of rows) {
           const json = JSON.parse(item.configJson);
           const table = json.table;
-          let field = [];
+          const field = [];
           Object.keys(json.fieldJson.purchase).forEach((item) => {
             if (json.fieldJson.purchase[item].display) {
               field.push({
@@ -610,7 +609,7 @@ export default {
       this.initColumns();
       if (this.configurations[value]) {
         const current = this.configurations[value].tableColumns.map((item) => {
-          let result = {};
+          const result = {};
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.purchaseShow;
@@ -665,7 +664,7 @@ export default {
           })
         : [];
       quantityList.push(quantity);
-      quantityList.sort(function(a, b) {
+      quantityList.sort(function (a, b) {
         return a - b;
       });
       const index = quantityList.findIndex((item) => item === Number(quantity));
@@ -796,7 +795,7 @@ export default {
         }, 1000);
         return;
       }
-      let result = this.inquiryListOption.data.length === this.oldInquiryData.length;
+      const result = this.inquiryListOption.data.length === this.oldInquiryData.length;
       if (result) {
         this.$message.error('请添加新供应商再发布');
         return;
@@ -1228,7 +1227,7 @@ export default {
             size: '',
             action: 'on-open-flow-dialog'
           });
-          let content = {
+          const content = {
             flowId: res.data.data.flowCode,
             businessType: 'bargainEnquiryAudit',
             auditStatus: res.data.data.auditStatus

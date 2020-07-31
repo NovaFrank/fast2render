@@ -35,7 +35,7 @@ const execMathExpress = require('exec-mathexpress');
 export default {
   name: 'quote-dialog',
   components: {},
-  created: function() {},
+  created: function () {},
   props: {
     enquiryPurchaserTax: Boolean,
     dialogWidth: String,

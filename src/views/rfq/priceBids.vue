@@ -19,8 +19,8 @@
               <el-button
                 v-if="
                   detailObj.auditStatus &&
-                    detailObj.auditStatus !== '2' &&
-                    detailObj.auditStatus !== '0'
+                  detailObj.auditStatus !== '2' &&
+                  detailObj.auditStatus !== '0'
                 "
                 size="small"
                 @click="handleSave"
@@ -30,8 +30,8 @@
               <el-button
                 v-if="
                   detailObj.auditStatus &&
-                    detailObj.auditStatus !== '2' &&
-                    detailObj.auditStatus !== '0'
+                  detailObj.auditStatus !== '2' &&
+                  detailObj.auditStatus !== '0'
                 "
                 size="small"
                 type="primary"
@@ -50,8 +50,8 @@
                 <div
                   v-if="
                     row[column.prop] === `${row.materialNumber}_${column.prop}` &&
-                      row[`itemStatus_${row.materialNumber}_${column.prop}`] !== '1' &&
-                      row[`itemStatus_${row.materialNumber}_${column.prop}`] !== '3'
+                    row[`itemStatus_${row.materialNumber}_${column.prop}`] !== '1' &&
+                    row[`itemStatus_${row.materialNumber}_${column.prop}`] !== '3'
                   "
                 >
                   <el-col :span="12">
@@ -68,12 +68,12 @@
                     <el-input
                       v-show="
                         row[`itemStatus_${row.materialNumber}_${column.prop}`] === '4' &&
-                          templateRule.enquiryIsQuota === true
+                        templateRule.enquiryIsQuota === true
                       "
                       :disabled="
                         row[`itemStatus_${row.materialNumber}_${column.prop}`] === '5' ||
-                          detailObj.auditStatus === '2' ||
-                          detailObj.auditStatus === '0'
+                        detailObj.auditStatus === '2' ||
+                        detailObj.auditStatus === '0'
                       "
                       v-model="row[`quota_${row.materialNumber}_${column.prop}`]"
                       placeholder="配额"
@@ -147,17 +147,17 @@
 import priceObjOption from '@/const/rfq/priceBids/priceObj';
 import historyChartOption from '@/const/rfq/priceBids/historyChart';
 import inquiryListOption from '@/const/rfq/priceBids/detailInquiryList';
-import { mySpanMethod } from '@/util/utils';
+import { mySpanMethod, compare, getUserInfo } from '@/util/utils';
 import { queryDetailAction, purchaseEnquiryAction } from '@/api/rfq';
 import { historyAction } from '@/api/rfq/priceBids';
-import { compare, getUserInfo } from '@/util/utils.js';
+
 import FormHeader from '@/components/views/formHeader';
 import { formatDate } from '@/util/date';
 import costBids from './priceCostBids';
 import { validatenull } from '@/util/validate';
 import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 
-let echarts = require('echarts/lib/echarts');
+const echarts = require('echarts/lib/echarts');
 const execMathExpress = require('exec-mathexpress');
 require('echarts/lib/component/title');
 require('echarts/lib/component/tooltip');
@@ -378,8 +378,8 @@ export default {
       });
       this.costMaterialData = this.materialData.filter((item) => item.quoteMethod === '2');
       // 最终数据
-      let data = [];
-      let options = ['含税价', '不含税价', '税率', '交货日期', '配额'];
+      const data = [];
+      const options = ['含税价', '不含税价', '税率', '交货日期', '配额'];
       if (this.templateRule.enquirySetRanking === true) options.splice(4, 0, '排名');
       this.materialData.forEach((item) => {
         options.forEach((option) => {
@@ -532,7 +532,7 @@ export default {
       this.chartTabActive = tab.name;
       if (this.chartTabActive === 'historyChart') {
         this.handleTabHistoryTitle();
-        let newQuery = JSON.parse(JSON.stringify(this.$route.query)); // 深拷贝
+        const newQuery = JSON.parse(JSON.stringify(this.$route.query)); // 深拷贝
         newQuery.type = 'historyChart';
         // 如果有引入 lodash, 可以写成: let newQuery = _.omit(this.$route.query, 'code')
         this.$router.replace({ query: newQuery });

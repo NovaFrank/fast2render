@@ -210,7 +210,8 @@
       <template slot-scope="scope" slot="option">
         <el-row
           v-if="
-            detailObj.auditStatus !== '0' &&
+            !closeTag &&
+              detailObj.auditStatus !== '0' &&
               detailObj.auditStatus !== '2' &&
               scope.row.itemStatus !== '1' &&
               scope.row.itemStatus !== '3' &&
@@ -344,6 +345,7 @@ export default {
       tabActive: 'detail',
       detailObj: {},
       filesForm: {},
+      closeTag: false,
       headerButtons: [],
       historyVisible: false,
       historyList: [],
@@ -1142,113 +1144,114 @@ export default {
         }, 5000);
       }
     },
-    initDetail() {
+    async initDetail() {
       this.detailObj = {};
       this.inquiryListOption.data = [];
       this.oldInquiryData = [];
-      queryDetailAction('findHeadDetails', this.currentEnquiryNumber).then((res) => {
-        if (!this.initDetailError(res)) return;
-        this.detailObj = res.data.data;
-        this.templateRule = this.configurations[this.detailObj.enquiryType]
-          ? this.configurations[this.detailObj.enquiryType].rule
-          : {};
-        this.checkQuoteEndTime();
-        if (this.detailObj.auditStatus === '0' || this.detailObj.auditStatus === '2') {
-          this.inquiryListOption.option.header = false;
-          this.headerButtons = [
-            { power: true, text: '返回', type: '', size: '', action: 'on-back' },
-            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
-          ];
-          if (this.detailObj.auditStatus === '2') {
-            this.headerButtons.push({
-              power: true,
-              text: '撤回',
-              type: 'primary',
-              size: '',
-              action: 'on-cancel-approval'
-            });
-          }
-        } else {
-          this.inquiryListOption.option.header = true;
-          this.headerButtons = [
-            { power: true, text: '返回', type: '', size: '', action: 'on-back' },
-            { power: true, text: '更新时间', type: 'primary', size: '', action: 'on-update-end' },
-            {
-              power: this.detailObj.quoteEndTime < new Date().getTime(),
-              text: '保存',
-              type: 'primary',
-              size: '',
-              action: 'on-save-approval'
-            },
-            {
-              power: true,
-              text: '提交审批',
-              type: 'primary',
-              size: '',
-              action: 'on-submit-approval'
-            },
-            { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
-            { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
-            {
-              power: true,
-              text: '发布新供应商',
-              type: 'primary',
-              size: '',
-              action: 'on-new-supplier'
-            }
-          ];
-        }
-
-        if (this.detailObj.quoteEndTime < new Date().getTime()) {
-          this.inquiryListOption.option.header = false;
+      const res = await queryDetailAction('findHeadDetails', this.currentEnquiryNumber);
+      if (!this.initDetailError(res)) return;
+      this.detailObj = res.data.data;
+      this.templateRule = this.configurations[this.detailObj.enquiryType]
+        ? this.configurations[this.detailObj.enquiryType].rule
+        : {};
+      this.checkQuoteEndTime();
+      if (this.detailObj.auditStatus === '0' || this.detailObj.auditStatus === '2') {
+        this.inquiryListOption.option.header = false;
+        this.headerButtons = [
+          { power: true, text: '返回', type: '', size: '', action: 'on-back' },
+          { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' }
+        ];
+        if (this.detailObj.auditStatus === '2') {
           this.headerButtons.push({
             power: true,
-            text: '比价',
+            text: '撤回',
             type: 'primary',
             size: '',
-            action: 'on-bid-price'
+            action: 'on-cancel-approval'
           });
-
-          if (this.detailObj.canSeeRule === '1' && this.detailObj.showQuoteInfo !== 'Y') {
-            this.headerButtons.push({
-              power: true,
-              text: '开启',
-              type: 'primary',
-              size: '',
-              action: 'on-open'
-            });
-          }
         }
+      } else {
+        this.inquiryListOption.option.header = true;
+        this.headerButtons = [
+          { power: true, text: '返回', type: '', size: '', action: 'on-back' },
+          { power: true, text: '更新时间', type: 'primary', size: '', action: 'on-update-end' },
+          {
+            power: this.detailObj.quoteEndTime < new Date().getTime(),
+            text: '保存',
+            type: 'primary',
+            size: '',
+            action: 'on-save-approval'
+          },
+          {
+            power: true,
+            text: '提交审批',
+            type: 'primary',
+            size: '',
+            action: 'on-submit-approval'
+          },
+          { power: true, text: '报价记录', type: 'primary', size: '', action: 'on-history' },
+          { power: true, text: '关闭', type: 'primary', size: '', action: 'on-close' },
+          {
+            power: true,
+            text: '发布新供应商',
+            type: 'primary',
+            size: '',
+            action: 'on-new-supplier'
+          }
+        ];
+      }
 
-        if (res.data.data.flowCode) {
+      if (this.detailObj.quoteEndTime < new Date().getTime()) {
+        this.inquiryListOption.option.header = false;
+        this.headerButtons.push({
+          power: true,
+          text: '比价',
+          type: 'primary',
+          size: '',
+          action: 'on-bid-price'
+        });
+
+        if (this.detailObj.canSeeRule === '1' && this.detailObj.showQuoteInfo !== 'Y') {
           this.headerButtons.push({
             power: true,
-            text: '审批节点',
+            text: '开启',
             type: 'primary',
             size: '',
-            action: 'on-open-flow-dialog'
-          });
-          let content = {
-            flowId: res.data.data.flowCode,
-            businessType: 'bargainEnquiryAudit',
-            auditStatus: res.data.data.auditStatus
-          };
-          setStore({ name: this.currentEnquiryNumber, content, type: true });
-          auditHisList({
-            rootProcessInstanceId: res.data.data.flowCode,
-            businessId: res.data.data.enquiryNumber
-          }).then((res) => {
-            if (res.data.statusCode === '200') {
-              this.auditListOption.data = res.data.pageData.rows;
-            } else {
-              this.auditListOption.data = [];
-            }
+            action: 'on-open'
           });
         }
-      });
+      }
+
+      if (res.data.data.flowCode) {
+        this.headerButtons.push({
+          power: true,
+          text: '审批节点',
+          type: 'primary',
+          size: '',
+          action: 'on-open-flow-dialog'
+        });
+        let content = {
+          flowId: res.data.data.flowCode,
+          businessType: 'bargainEnquiryAudit',
+          auditStatus: res.data.data.auditStatus
+        };
+        setStore({ name: this.currentEnquiryNumber, content, type: true });
+        auditHisList({
+          rootProcessInstanceId: res.data.data.flowCode,
+          businessId: res.data.data.enquiryNumber
+        }).then((res) => {
+          if (res.data.statusCode === '200') {
+            this.auditListOption.data = res.data.pageData.rows;
+          } else {
+            this.auditListOption.data = [];
+          }
+        });
+      }
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;
+        this.closeTag = false;
         this.inquiryListOption.data = res.data.pageData.rows.map((item) => {
+          if (item.itemStatus === '6') this.closeTag = true;
           return {
             id: item.uuid,
             // toElsAccountName: item.toElsAccount.split('_')[1],
@@ -1260,6 +1263,10 @@ export default {
             ...item
           };
         });
+        if (this.closeTag)
+          this.headerButtons = [
+            { power: true, text: '返回', type: '', size: '', action: 'on-back' }
+          ];
 
         this.inquiryListOption.data = this.inquiryListOption.data.sort(compare('materialNumber'));
         this.oldInquiryData = this.inquiryListOption.data;

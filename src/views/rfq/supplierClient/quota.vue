@@ -166,25 +166,6 @@
       @close-field-dialog="closeFieldDialog"
       :enquiryPurchaserTax="templateRule ? templateRule.enquiryPurchaserTax : false"
     ></quote-dialog>
-    <!-- 阶梯报价 -->
-    <quote-ladder-dialog
-      :enquiryPurchaserTax="templateRule ? templateRule.enquiryPurchaserTax : false"
-      :dialogTitle="dialogTitle"
-      :field="fieldDialogForm"
-      :fieldDialogVisible="ladderQuoteVisible"
-      :dialogWidth="dialogWidth"
-      @on-save-form="onSaveLadderForm"
-      @close-field-dialog="closeFieldDialog"
-    ></quote-ladder-dialog>
-    <!-- 成本报价 -->
-    <cost-quote-dialog
-      :dialogTitle="dialogTitle"
-      :field="costDialogForm"
-      :fieldDialogVisible="costQuoteVisible"
-      :dialogWidth="dialogWidth"
-      @on-save-form="onSaveCostForm"
-      @close-field-dialog="closeFieldDialog"
-    ></cost-quote-dialog>
     <!-- 报价历史记录 -->
     <history
       :detailObj="detailObj"
@@ -193,29 +174,16 @@
       :quoteMethodData="quoteMethodData"
       @close-field-dialog="closeFieldDialog"
     ></history>
-    <!-- 成本报价模板 -->
-    <cost-template-dialog
-      dialogTitle="成本报价"
-      dialogWidth="70%"
-      :tabPermission="tabPermission"
-      :template="template"
-      :data="providerData"
-      :fieldDialogVisible.sync="costDialogVisible"
-      @close-field-dialog="closeFieldDialog"
-    ></cost-template-dialog>
   </basic-container>
 </template>
 
 <script>
 import FormHeader from '@/components/views/formHeader';
-import costQuoteDialog from '@/components/views/costQuoteDialog'; // 成本报价
-import quoteLadderDialog from '@/components/views/ladderQuoteDialog'; // 阶梯报价
 import quoteDialog from '@/components/views/quoteDialog'; // 常规报价
 import formOption from '@/const/rfq/supplierClient/detail';
 import tabOption from '@/const/rfq/supplierClient/detailTabs';
 import filesOption from '@/const/rfq/newAndView/fileList';
 
-import costTemplateDialog from '@/components/views/costTemplateDialog';
 import { getAction, postAction, queryQuote } from '@/api/rfq/supplierClient';
 import inquiryListOption from '@/const/rfq/supplierClient/inquiryList';
 import history from './history';
@@ -229,10 +197,7 @@ export default {
   components: {
     FormHeader,
     quoteDialog,
-    quoteLadderDialog,
-    costQuoteDialog,
-    history,
-    costTemplateDialog
+    history
   },
   data() {
     return {
@@ -258,10 +223,7 @@ export default {
       fieldDialogForm: {},
       costDialogForm: {},
       quoteVisible: false,
-      ladderQuoteVisible: false,
-      costQuoteVisible: false,
       historyVisible: false,
-      costDialogVisible: false,
       historyList: [],
       quoteMethodData: [],
       dialogTitle: '',
@@ -443,24 +405,6 @@ export default {
       });
     },
     async tableData(data) {
-      // 组织列表（公司）
-      // orgList({ elsAccount: this.elsAccount, orgCategoryId: 'factory' }).then((res) => {
-      //   this.dialogOption.column = this.dialogOption.column.map((item) => {
-      //     if (item.prop === 'companyCode') {
-      //       return {
-      //         ...item,
-      //         dicData: res.data.pageData.rows.map((item) => {
-      //           return {
-      //             ...item,
-      //             value: item.orgId,
-      //             label: item.orgId
-      //           };
-      //         })
-      //       };
-      //     }
-      //     return item;
-      //   });
-      // });
       // 公开方式 数据字典
       dataDicAPI('enquiryMethod').then((res) => {
         this.formOption.column = this.formOption.column.map((item) => {
@@ -691,9 +635,13 @@ export default {
     },
     handleRadioChange(value, scope) {
       if (value === 'N') {
+        const columns = this.quoteColumn.map((item) => item.prop);
         this.inquiryListOption.data[scope.row.$index].priceIncludingTax = '';
         this.inquiryListOption.data[scope.row.$index].priceExcludingTax = '';
         this.inquiryListOption.data[scope.row.$index].cellEdit = false;
+        columns.forEach((column) => {
+          this.inquiryListOption.data[scope.row.$index][column] = '';
+        });
       } else {
         this.inquiryListOption.data[scope.row.$index].cellEdit = true;
         // }

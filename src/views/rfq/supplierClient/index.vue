@@ -107,10 +107,10 @@ export default {
     this.tableData();
   },
   watch: {
-    tabActive() {
-      this.search = {};
-      this.tableData();
-    }
+    // tabActive() {
+    //   this.search = {};
+    //   this.tableData();
+    // }
   },
   methods: {
     searchReset() {
@@ -144,13 +144,15 @@ export default {
       this.$router.push({ path: `/client/quota/${row.enquiryNumber}` });
     },
     handleTabChange(value) {
-      this.$refs.list.searchReset();
+      // this.$refs.list.searchReset();
       this.tabActive = value.prop;
       this.tableOption.page = {
         currentPage: 1,
         total: 0,
         pageSize: 10
       };
+      this.search = {};
+      this.tableData();
     },
     initDicData() {
       // 报价方式 数据字典（临时），最好写option dicUrl

@@ -848,6 +848,9 @@ export default {
           } else {
             this.iSrfp = false;
           }
+          if (item.text === '保存') {
+            item.power = this.detailObj.quoteEndTime < new Date().getTime();
+          }
           return item;
         });
 
@@ -1193,12 +1196,14 @@ export default {
         enquiryMethod: this.detailObj.enquiryMethod || '',
         itemList: this.inquiryListOption.data
       };
+      console.log('param', param);
       purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
         if (res.data.statusCode === '200') {
           this.$message.success('保存成功');
-          setTimeout(() => {
-            this.$router.go(0);
-          }, 1000);
+          // setTimeout(() => {
+          //   this.$router.go(0);
+          // }, 1000);
+          this.initDetail();
         } else {
           this.$message.error(res.data.message);
         }

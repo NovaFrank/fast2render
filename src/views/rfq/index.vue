@@ -121,10 +121,10 @@ export default {
     this.tableData();
   },
   watch: {
-    tabActive() {
-      this.search = {};
-      this.tableData();
-    }
+    // tabActive() {
+    //   this.search = {};
+    //   this.tableData();
+    // }
   },
   methods: {
     searchReset() {
@@ -179,13 +179,16 @@ export default {
       }
     },
     handleTabChange(value) {
-      this.$refs.list.searchReset();
+      this.search = {};
+      // this.$refs.list.searchReset();
       this.tabActive = value.prop;
       this.tableOption.page = {
         currentPage: 1,
         total: 0,
         pageSize: 10
       };
+      this.search = {};
+      this.tableData();
     },
     sizeChange(val) {
       this.tableOption.page.pageSize = val;

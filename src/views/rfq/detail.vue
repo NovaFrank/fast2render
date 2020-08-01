@@ -759,10 +759,10 @@ export default {
           type: 'select',
           label: '税率',
           prop: 'taxRate',
-          display: !this.iSrfp
+          hide: this.iSrfp
         },
-        { slot: true, label: '含税价', prop: 'priceIncludingTax', display: !this.iSrfp },
-        { slot: true, label: '不含税价', prop: 'priceExcludingTax', display: !this.iSrfp },
+        { slot: true, label: '含税价', prop: 'priceIncludingTax', hide: this.iSrfp },
+        { slot: true, label: '不含税价', prop: 'priceExcludingTax', hide: this.iSrfp },
         // {
         //   type: 'date',
         //   format: 'yyyy-MM-dd',
@@ -770,7 +770,7 @@ export default {
         //   label: '交货日期',
         //   prop: 'deliveryDate'
         // },
-        { slot: true, label: '操作', prop: 'option' }
+        { slot: true, label: '操作', prop: 'option', hide: this.iSrfp }
       ];
       // this.templateRule.enquiryIsQuota = false; // 测试是否配额 否
       // this.templateRule.enquiryIsQuota = 'number'; // 测试配额方式

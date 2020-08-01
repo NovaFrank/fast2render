@@ -348,7 +348,8 @@ export default {
       currentEnquiryNumber: '',
       requestTypeDict: [],
       configurations: {},
-      interval: null
+      interval: null,
+      iSrfp: false
     };
   },
   async created() {
@@ -363,6 +364,8 @@ export default {
     detailObj(newVal) {
       this.quoteEndTimeChange = newVal.quoteEndTime;
       if (!validatenull(newVal.enquiryType) && this.configurations[newVal.enquiryType]) {
+        const type = this.configurations[newVal.enquiryType].name;
+        this.iSrfp = type === 'RFP';
         this.handleEnquiryTypeChange(newVal.enquiryType);
       }
     },
@@ -615,9 +618,9 @@ export default {
             { label: '已关闭', value: '6' }
           ]
         },
-        { slot: true, label: '税率', prop: 'taxRate' },
-        { slot: true, label: '含税价', prop: 'priceIncludingTax' },
-        { slot: true, label: '不含税价', prop: 'priceExcludingTax' },
+        { slot: true, label: '税率', prop: 'taxRate', hide: this.iSrfp },
+        { slot: true, label: '含税价', prop: 'priceIncludingTax', hide: this.iSrfp },
+        { slot: true, label: '不含税价', prop: 'priceExcludingTax', hide: this.iSrfp },
         // {
         //   type: 'date',
         //   format: 'yyyy-MM-dd',
@@ -625,7 +628,7 @@ export default {
         //   label: '交货日期',
         //   prop: 'deliveryDate'
         // },
-        { slot: true, label: '操作', prop: 'option' }
+        { slot: true, label: '操作', prop: 'option', hide: this.iSrfp }
       ];
       // this.templateRule.enquiryIsQuota = false; // 测试是否配额 否
       // this.templateRule.enquiryIsQuota = 'number'; // 测试配额方式

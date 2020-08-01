@@ -1383,7 +1383,8 @@ export default {
       if (
         this.dialogTitle === '添加询价明细' &&
         this.inquiryListOption.data.filter((item) => item.materialNumber === form.materialNumber)
-          .length > 0
+          .length > 0 &&
+        this.configurations[this.form.enquiryType].name !== 'RFI'
       ) {
         this.$message.error('物料编号不可重复');
         return;

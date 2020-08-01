@@ -15,7 +15,7 @@
     "core-js": "^3.6.5",
     "dayjs": "^1.8.31",
     "element-ui": "^2.13.2",
-    "fast2render": "^0.7.10",
+    "fast2render": "^0.7.15",
     "js-cookie": "^2.2.1",
     "js-md5": "^0.7.3",
     "mathjs": "^7.0.0",

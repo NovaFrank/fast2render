@@ -356,7 +356,10 @@ export default {
         this.inquiryListOption.option.menu = true;
         this.headerButtons = [
           {
-            power: !this.purchaseRequest && !validatenull(newVal.enquiryNumber),
+            power:
+              !this.purchaseRequest &&
+              !validatenull(newVal.enquiryNumber) &&
+              this.configurations[newVal.enquiryType].name !== 'RFP',
             text: '退回',
             type: 'primary',
             size: '',

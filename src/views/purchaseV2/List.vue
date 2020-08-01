@@ -8,7 +8,7 @@
     ></page-header>
 
     <avue-crud
-      ref="bidCrud"
+      ref="crud"
       v-bind="bindVal"
       v-on="onEvent"
       @current-row-change="selectRowChange"
@@ -125,7 +125,7 @@ export default window.$crudCommon(
           action = 'edit';
         }
 
-        return `/orderV2/${action}/${row.orderNumber}`;
+        return `${ROUTER_PATH_ORDER_V2}/${action}/${row.orderNumber}`;
       }
     }
   },

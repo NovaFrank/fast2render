@@ -328,7 +328,7 @@ export default {
         { label: '物料描述', prop: 'materialDesc', editDisabled: true },
         { label: '单位', prop: 'baseUnit', span: 4, editDisabled: true },
         { label: '需求数量', prop: 'quantity', editDisabled: true },
-        { type: 'tree', label: '公司代码', prop: 'companyCode', editDisabled: true },
+        { type: 'tree', label: '工厂代码', prop: 'companyCode', editDisabled: true },
         { slot: true, label: '含税价', prop: 'priceIncludingTax', editDisabled: true },
         {
           label: '税率',

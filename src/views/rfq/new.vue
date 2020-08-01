@@ -557,7 +557,7 @@ export default {
         { label: '需求数量', prop: 'quantity' },
         {
           type: 'tree',
-          label: '公司代码',
+          label: '工厂代码',
           span: 6,
           prop: 'companyCode',
           valueDefault: ''
@@ -580,7 +580,7 @@ export default {
           prop: 'quantity',
           rules: [{ trigger: 'change', validator: validateQuantity }]
         },
-        { type: 'tree', label: '公司代码', prop: 'companyCode' },
+        { type: 'tree', label: '工厂代码', prop: 'companyCode' },
         {
           type: 'select',
           label: '税码',

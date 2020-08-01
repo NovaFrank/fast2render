@@ -717,7 +717,7 @@ export default {
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
-        { type: 'tree', label: '公司代码', prop: 'companyCode' },
+        { type: 'tree', label: '工厂代码', prop: 'companyCode' },
         // { slot: true, label: '报价方式', prop: 'quoteMethod' },
         // { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
         // { slot: true, label: '成本模板', prop: 'costTemplate' },

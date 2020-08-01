@@ -496,7 +496,7 @@ export default {
       const current = JSON.parse(row.ladderPriceJson)[index - 1];
       const price = current[column];
       this.inquiryListOption.data[row.$index][column] = price || '';
-      this.inquiryListOption.data[row.$index].taxRate = row.taxRate || '0';
+      this.inquiryListOption.data[row.$index].taxRate = current.taxRate || '0';
       return price;
     },
     getCostPriceIndex(row, column) {
@@ -800,7 +800,6 @@ export default {
       );
       this.$set(this.inquiryListOption.data[form.index], 'remark', form.remark);
       form.$index = form.index;
-      form.taxRate = this.inquiryListOption.data[form.index].taxRate;
       this.getPriceIndex(form, 'priceIncludingTax');
       this.getPriceIndex(form, 'priceExcludingTax');
     },

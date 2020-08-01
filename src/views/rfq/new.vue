@@ -363,7 +363,9 @@ export default {
             action: 'on-back'
           },
           {
-            power: !validatenull(newVal.enquiryNumber),
+            power:
+              !validatenull(newVal.enquiryNumber) &&
+              this.configurations[newVal.enquiryType].name !== 'RFP',
             text: '风险检测',
             type: 'primary',
             size: '',

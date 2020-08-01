@@ -1419,7 +1419,6 @@ export default {
     },
     // 保存供应商选项
     suppliersDialogSaveTransfer(selectedSupplier) {
-      console.log('selectedSupplier', selectedSupplier);
       const newSuppliers = selectedSupplier.filter(
         (item) => !this.currentDetailItemSelected.map((item) => item.id).includes(item)
       );
@@ -1469,6 +1468,7 @@ export default {
           priceExcludingTax: '',
           priceIncludingTax: '',
           quota: '',
+          quoteDate: '',
           ladderPriceJson: this.currentDetailItem.ladderPriceJson || null,
           costConstituteJson: this.currentDetailItem.costConstituteJson || null,
           $cellEdit: false

@@ -273,7 +273,8 @@ export default {
       currentEnquiryNumber: '',
       requestTypeDict: [],
       configurations: {},
-      quoteColumn: []
+      quoteColumn: [],
+      type: ''
     };
   },
   async created() {
@@ -323,22 +324,45 @@ export default {
         { label: '负责人', span: 6, prop: 'createUser', disabled: true }
       ];
       this.inquiryListOption.option.column = [
-        { label: '物料编号', prop: 'materialNumber', editDisabled: true },
-        { label: '物料名称', prop: 'materialName', editDisabled: true },
-        { label: '物料描述', prop: 'materialDesc', editDisabled: true },
-        { label: '单位', prop: 'baseUnit', span: 4, editDisabled: true },
-        { label: '需求数量', prop: 'quantity', editDisabled: true },
-        { type: 'tree', label: '工厂代码', prop: 'companyCode', editDisabled: true },
-        { slot: true, label: '含税价', prop: 'priceIncludingTax', editDisabled: true },
+        {
+          label: '物料编号',
+          prop: 'materialNumber',
+          editDisabled: true,
+          hide: this.type === 'RFI'
+        },
+        { label: '物料名称', prop: 'materialName', editDisabled: true, hide: this.type === 'RFI' },
+        { label: '物料描述', prop: 'materialDesc', editDisabled: true, hide: this.type === 'RFI' },
+        { label: '单位', prop: 'baseUnit', span: 4, editDisabled: true, hide: this.type === 'RFI' },
+        { label: '需求数量', prop: 'quantity', editDisabled: true, hide: this.type === 'RFI' },
+        {
+          type: 'tree',
+          label: '工厂代码',
+          prop: 'companyCode',
+          editDisabled: true
+        },
+        {
+          slot: true,
+          label: '含税价',
+          prop: 'priceIncludingTax',
+          editDisabled: true,
+          hide: this.type === 'RFI'
+        },
         {
           label: '税率',
           prop: 'taxRate',
           editDisabled: true,
           dicUrl: '/layout/dics/value/taxRateNo',
           dicMethod: 'get',
-          type: 'select'
+          type: 'select',
+          hide: this.type === 'RFI'
         },
-        { slot: true, label: '不含税价', prop: 'priceExcludingTax', editDisabled: true },
+        {
+          slot: true,
+          label: '不含税价',
+          prop: 'priceExcludingTax',
+          editDisabled: true,
+          hide: this.type === 'RFI'
+        },
         {
           label: '报价时间',
           type: 'datetime',
@@ -352,8 +376,10 @@ export default {
     handleEnquiryTypeChange(value) {
       if (this.configurations[value]) {
         this.templateRule = this.configurations[value].rule;
-        if (this.configurations[value].name === 'RFI') {
+        this.type = this.configurations[value].name;
+        if (this.type === 'RFI') {
           this.inquiryListOption.option.column.splice(0, 5);
+          this.inquiryListOption.option.menu = false;
         }
         this.quoteColumn = [];
         const current = this.configurations[value].tableColumns.map((item) => {
@@ -412,7 +438,8 @@ export default {
         editDisplay: false,
         label: '是否报价',
         type: 'switch',
-        prop: 'quote'
+        prop: 'quote',
+        hide: this.type === 'RFI'
       });
     },
     async tableData(data) {

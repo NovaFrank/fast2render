@@ -708,14 +708,8 @@ export default {
         itemList.push(item);
       });
 
-      const supplierList = [];
-
-      // this.supplierData.forEach((item, index) => {
-      //   supplierList.push(item);
-      // });
-
-      params.itemList = itemList;
-      params.supplierList = supplierList;
+      params.orderItemVOList = itemList;
+      params.deliveryPlanVOList = this.planListOption.data;
 
       if (params.startingPrice) {
         params.startingPrice = Number(params.startingPrice);

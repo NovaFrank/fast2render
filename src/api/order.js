@@ -13,7 +13,6 @@ const baseServerName = 'PurchaseOrderService';
  * @returns
  */
 export const list = (params, serverName = baseServerName) => {
-  debugger;
   return axios({
     url: `${orderApiUrl}/${serverName}/findPageList`,
     method: 'post',
@@ -192,8 +191,19 @@ export const updateOrder = (params) => {
   });
 };
 
+// 新增订单
+export const create = (params) => {
+  return axios({
+    url: `${baseUrl}/order/PurchaseOrderService/createOrder`,
+    method: 'post',
+    data: {
+      ...params
+    }
+  });
+};
+
 export const PurchaseOrderService = {
-  create: createOrder,
+  create,
   detailPrimaryTable: findOrderHeadVO,
   detailTable: findOrderItemList,
   list,

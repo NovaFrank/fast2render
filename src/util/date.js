@@ -27,13 +27,13 @@ export const calcDate = (date1, date2) => {
  * @param { 时间戳 } t
  */
 export const utcFormat = (t) => {
-  let tt = new Date(t);
-  let y = tt.getUTCFullYear();
-  let m = tt.getUTCMonth();
-  let d = tt.getUTCDate();
-  let h = tt.getUTCHours();
-  let M = tt.getUTCMinutes();
-  let s = tt.getUTCSeconds();
+  const tt = new Date(t);
+  const y = tt.getUTCFullYear();
+  const m = tt.getUTCMonth();
+  const d = tt.getUTCDate();
+  const h = tt.getUTCHours();
+  const M = tt.getUTCMinutes();
+  const s = tt.getUTCSeconds();
   return Date.UTC(y, m, d, h, M, s);
 };
 
@@ -41,16 +41,16 @@ export const formatDate = (date, fmt) => {
   if (/(y+)/.test(fmt)) {
     fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
   }
-  let o = {
+  const o = {
     'M+': date.getMonth() + 1,
     'd+': date.getDate(),
     'h+': date.getHours(),
     'm+': date.getMinutes(),
     's+': date.getSeconds()
   };
-  for (let k in o) {
+  for (const k in o) {
     if (new RegExp(`(${k})`).test(fmt)) {
-      let str = o[k] + '';
+      const str = o[k] + '';
       fmt = fmt.replace(RegExp.$1, RegExp.$1.length === 1 ? str : padLeftZero(str));
     }
   }

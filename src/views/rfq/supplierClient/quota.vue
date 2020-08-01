@@ -71,19 +71,19 @@
     >
       <template slot-scope="scope" slot="priceIncludingTax">
         <span v-if="scope.row.quoteMethod === '0'">{{ scope.row.priceIncludingTax }}</span>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '1'">
           {{ getPriceIndex(scope.row, 'priceIncludingTax') }}
         </p>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '2'">
           {{ getCostPriceIndex(scope.row, 'priceIncludingTax') }}
         </p>
       </template>
       <template slot-scope="scope" slot="priceExcludingTax">
         <span v-if="scope.row.quoteMethod === '0'">{{ scope.row.priceExcludingTax }}</span>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '1'">
           {{ getPriceIndex(scope.row, 'priceExcludingTax') }}
         </p>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '2'">
           {{ getCostPriceIndex(scope.row, 'priceExcludingTax') }}
         </p>
       </template>
@@ -95,7 +95,7 @@
       <template slot-scope="scope" slot="quoteMethodInfo">
         <span v-if="scope.row.quoteMethod === '1'">
           <p
-            style="margin: 0"
+            style="margin: 0;"
             v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
             :key="ladder.ladderGrade"
           >
@@ -120,7 +120,7 @@
         <avue-radio
           v-if="
             (scope.row.itemStatus === '1' && detailObj.quoteEndTime > new Date().getTime()) ||
-              scope.row.itemStatus === '3'
+            scope.row.itemStatus === '3'
           "
           v-model="scope.row.noQuoted"
           :disabled="!['1', '3'].includes(scope.row.itemStatus)"
@@ -134,7 +134,7 @@
             (scope.row.noQuoted !== 'N' &&
               scope.row.itemStatus === '1' &&
               detailObj.quoteEndTime > new Date().getTime()) ||
-              scope.row.itemStatus === '3'
+            scope.row.itemStatus === '3'
           "
         >
           <el-button
@@ -357,7 +357,7 @@ export default {
         }
         this.quoteColumn = [];
         const current = this.configurations[value].tableColumns.map((item) => {
-          let result = {};
+          const result = {};
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.saleShow;
@@ -496,12 +496,12 @@ export default {
         currentVersionFlag: 'Y'
       });
       if (res.data && res.data.statusCode === '200' && res.data.pageData) {
-        let configurations = [];
+        const configurations = [];
         const rows = res.data.pageData.rows || [];
         for (const item of rows) {
           const json = JSON.parse(item.configJson);
           const table = json.table;
-          let field = [];
+          const field = [];
           Object.keys(json.fieldJson.sale).forEach((item) => {
             if (json.fieldJson.sale[item].display) {
               field.push({
@@ -536,14 +536,14 @@ export default {
         return Number(item.ladderQuantity);
       });
       quantityList.push(quantity);
-      quantityList.sort(function(a, b) {
+      quantityList.sort(function (a, b) {
         return a - b;
       });
       const index = quantityList.findIndex((item) => item === Number(quantity));
       const current = JSON.parse(row.ladderPriceJson)[index - 1];
       const price = current[column];
       this.inquiryListOption.data[row.$index][column] = price || '';
-      this.inquiryListOption.data[row.$index].taxRate = row.taxRate || '0';
+      this.inquiryListOption.data[row.$index].taxRate = current.taxRate || '0';
       return price;
     },
     getCostPriceIndex(row, column) {
@@ -646,7 +646,7 @@ export default {
         const template = costJson.templateJson;
         const tabPermission = costJson.permissionJson;
         const templateName = costJson.templateName;
-        let providerData = {};
+        const providerData = {};
         template.forEach((element) => {
           providerData[element.prop] = element.propData;
         });
@@ -717,7 +717,7 @@ export default {
             const template = costJson.templateJson;
             const tabPermission = costJson.permissionJson;
 
-            let providerData = {};
+            const providerData = {};
             template.forEach((element) => {
               providerData[element.prop] = element.propData;
             });
@@ -855,7 +855,6 @@ export default {
       );
       this.$set(this.inquiryListOption.data[form.index], 'remark', form.remark);
       form.$index = form.index;
-      form.taxRate = this.inquiryListOption.data[form.index].taxRate;
       this.getPriceIndex(form, 'priceIncludingTax');
       this.getPriceIndex(form, 'priceExcludingTax');
     },

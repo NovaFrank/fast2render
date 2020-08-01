@@ -36,7 +36,7 @@
         </el-table> -->
         <el-button
           class="el-button el-button--text"
-          style="font-size: 28px; height: 100%; margin-left: 10px"
+          style="font-size: 28px; height: 100%; margin-left: 10px;"
           slot="reference"
         >
           <i class="el-icon-time"></i>
@@ -52,7 +52,7 @@ import { formatDate } from '@/util/date';
 export default {
   name: 'form-header',
   components: {},
-  created: function() {},
+  created: function () {},
   props: {
     showHistoryButton: {
       type: Boolean,

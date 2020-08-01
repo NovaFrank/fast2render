@@ -96,7 +96,7 @@
       <template slot-scope="scope" slot="quoteMethodInfo">
         <span v-if="scope.row.quoteMethod === '1'">
           <p
-            style="margin: 0"
+            style="margin: 0;"
             v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
             :key="ladder.ladderGrade"
           >
@@ -191,7 +191,6 @@ import {
 } from '@/api/rfq/common';
 import { purchaseEnquiryAction, queryDetailAction, auditHisList } from '@/api/rfq';
 import { validatenull, validateNumber } from '@/util/validate';
-import { testSuppliers } from '@/api/rfq/index';
 
 import { ElsTemplateConfigService } from '@/api/templateConfig.js';
 import { DIC } from '@/const/dic';
@@ -472,7 +471,7 @@ export default {
         }
         // 配置字段
         const current = this.configurations[value].tableColumns.map((item) => {
-          let result = {};
+          const result = {};
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.purchaseShow;
@@ -544,7 +543,7 @@ export default {
         for (const item of rows) {
           const json = JSON.parse(item.configJson);
           const table = json.table;
-          let field = [];
+          const field = [];
           Object.keys(json.fieldJson.purchase).forEach((item) => {
             if (json.fieldJson.purchase[item].display) {
               field.push({
@@ -849,7 +848,7 @@ export default {
         this.form = res.data.data;
 
         if (res.data.data.flowCode) {
-          let content = {
+          const content = {
             flowId: res.data.data.flowCode,
             businessType: 'editEnquiryAudit',
             auditStatus: res.data.data.auditStatus
@@ -959,7 +958,7 @@ export default {
     suppliersDialogSave(selectItems) {
       selectItems.forEach((item) => {
         let isExist = false;
-        let newSupplier = {
+        const newSupplier = {
           elsCount: item.elsCount,
           supplierName: item.supplierName,
           $cellEdit: true
@@ -1012,34 +1011,6 @@ export default {
       this.currentDetailItem = {};
       this.currentSelectionDetailItems = [];
       this.$refs.itemList.toggleSelection(false);
-    },
-    handleTest() {
-      let selectSuppliers = [];
-      this.inquiryListOption.data.forEach((item) => {
-        if (item.toElsAccountList) {
-          item.toElsAccountList.split(',').forEach((i) => {
-            selectSuppliers.push(i.split('_')[1]);
-          });
-        }
-      });
-      if (selectSuppliers.length > 0) {
-        testSuppliers(selectSuppliers)
-          .then((res) => {
-            if (res.data.statusCode === '200') {
-              this.showRelationDialog(
-                selectSuppliers,
-                res.data.data.data['companyRelationshipVOS']
-              );
-            } else {
-              this.$message.error('查询失败' || res.data.message);
-            }
-          })
-          .catch((res) => {
-            this.$message.error('查询失败');
-          });
-      } else {
-        this.$message.error('请选择供应商');
-      }
     }
   }
 };

@@ -119,7 +119,7 @@ export default {
     this.$emit('handleList');
   },
   watch: {
-    quoteMethodData: function(newValue) {
+    quoteMethodData: function (newValue) {
       this.crudOption.option.column = this.crudOption.option.column.map((item) => {
         if (item.prop === 'quoteMethod') {
           return {
@@ -130,16 +130,16 @@ export default {
         return item;
       });
     },
-    data: function(newValue) {
+    data: function (newValue) {
       this.crudData = newValue;
     },
-    page: function(newValue) {
+    page: function (newValue) {
       this.crudPage = newValue;
     },
-    column: function(newValue) {
+    column: function (newValue) {
       this.crudOption.column = newValue;
     },
-    crudOption: function(newValue) {}
+    crudOption: function (newValue) {}
   },
   methods: {
     closeDialog() {

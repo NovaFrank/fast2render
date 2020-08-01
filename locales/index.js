@@ -24,7 +24,7 @@ export const setup = (lang) => {
     }
   }
   window.localStorage.setItem(LOCALE_KEY, lang);
-  let html = document.querySelector('html');
+  const html = document.querySelector('html');
   Object.keys(locales).forEach((lang) => {
     html.classList.remove(`lang-${lang}`);
   });

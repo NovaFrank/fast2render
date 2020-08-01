@@ -44,7 +44,7 @@ const execMathExpress = require('exec-mathexpress');
 export default {
   name: 'quote-dialog',
   components: {},
-  created: function() {
+  created: function () {
     dataDicAPI('taxRateNo').then((res) => {
       this.dicData = res.data;
     });

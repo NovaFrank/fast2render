@@ -32,7 +32,7 @@ import { validatenull } from '@/util/validate';
 export default {
   name: 'quote-ladder-dialog',
   components: {},
-  created: function() {},
+  created: function () {},
   props: {
     // template: Array,
     // providerData: Object,

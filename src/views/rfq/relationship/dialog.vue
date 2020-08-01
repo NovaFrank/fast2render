@@ -40,13 +40,13 @@ export default {
     this.crudMultiple = this.multiple;
   },
   watch: {
-    crudObj: function(newValue) {
+    crudObj: function (newValue) {
       this.form = newValue;
     },
-    visable: function(newValue) {
+    visable: function (newValue) {
       this.$emit('update:dialogVisible', newValue);
     },
-    dialogVisible: function(newValue) {
+    dialogVisible: function (newValue) {
       this.visable = newValue;
     }
   },

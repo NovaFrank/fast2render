@@ -20,7 +20,7 @@
 export default {
   name: 'open-quote-dialog',
   components: {},
-  created: function() {},
+  created: function () {},
   props: {
     dialogWidth: String,
     dialogTitle: String,

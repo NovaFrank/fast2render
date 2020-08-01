@@ -31,7 +31,7 @@
       <template slot-scope="scope" slot="quoteMethodInfo">
         <span v-if="scope.row.quoteMethod === '1'">
           <p
-            style="margin: 0"
+            style="margin: 0;"
             v-for="ladder in JSON.parse(scope.row.ladderPriceJson)"
             :key="ladder.ladderGrade"
           >
@@ -64,13 +64,13 @@
           </span>
           <span v-else>{{ scope.row.priceIncludingTax }}</span>
         </span>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '1'">
           <span v-if="showXPrice(scope.row)">
             **
           </span>
           <span v-else>{{ getPriceIndex(scope.row, 'priceIncludingTax') }}</span>
         </p>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '2'">
           <span v-if="showXPrice(scope.row)">
             **
           </span>
@@ -85,13 +85,13 @@
           </span>
           <span v-else>{{ scope.row.priceExcludingTax }}</span>
         </span>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '1'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '1'">
           <span v-if="showXPrice(scope.row)">
             **
           </span>
           <span v-else>{{ getPriceIndex(scope.row, 'priceExcludingTax') }}</span>
         </p>
-        <p style="margin: 0" v-else-if="scope.row.quoteMethod === '2'">
+        <p style="margin: 0;" v-else-if="scope.row.quoteMethod === '2'">
           <span v-if="showXPrice(scope.row)">
             **
           </span>
@@ -184,7 +184,7 @@ export default {
     showXPrice(item) {
       // 显示星星：限时、加密
       const canSee = this.detailObj.canSeeRule || '0';
-      let result =
+      const result =
         ((item.itemStatus === '2' || item.itemStatus === '4') &&
           this.detailObj.quoteEndTime > new Date().getTime() &&
           canSee === '0') ||
@@ -198,7 +198,7 @@ export default {
         currentVersionFlag: 'Y'
       });
       if (res.data && res.data.statusCode === '200' && res.data.pageData) {
-        let configurations = [];
+        const configurations = [];
         const rows = res.data.pageData.rows || [];
         for (const item of rows) {
           const json = JSON.parse(item.configJson);
@@ -264,7 +264,7 @@ export default {
       ];
       if (!validatenull(this.configurations)) {
         const current = this.configurations[value].tableColumns.map((item) => {
-          let result = {};
+          const result = {};
           result.prop = item.prop;
           result.label = item.label;
           result.display = item.purchaseShow;
@@ -408,7 +408,7 @@ export default {
               reason: this.reasonObj.reason,
               itemList: this.inquiryListOption.data
             };
-            let params = {
+            const params = {
               elsAccount: this.detailObj.elsAccount,
               // toElsAccount: this.detailObj.toElsAccount,
               businessType: 'bargainEnquiryAudit',

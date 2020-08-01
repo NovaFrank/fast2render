@@ -131,7 +131,7 @@ export default {
     // 可增加行方法
     downloadFile(row) {
       if (row.attachmentUrl) {
-        let params = {
+        const params = {
           elsAccount: row.elsAccount,
           elsSubAccount: row.elsSubAccount,
           filePath: `http://cs.51qqt.com${row.attachmentUrl}`
@@ -143,23 +143,23 @@ export default {
     },
     async getBase64(file) {
       return new Promise((resolve, reject) => {
-        let reader = new FileReader();
+        const reader = new FileReader();
         let fileResult = '';
         reader.readAsDataURL(file); // 开始转
-        reader.onload = function() {
+        reader.onload = function () {
           fileResult = reader.result;
         }; // 转 失败
-        reader.onerror = function(error) {
+        reader.onerror = function (error) {
           reject(error);
         }; // 转 结束  咱就 resolve 出去
-        reader.onloadend = function() {
+        reader.onloadend = function () {
           resolve(fileResult);
         };
       });
     },
     getList() {
-      let action = 'findList';
-      let params = {
+      const action = 'findList';
+      const params = {
         businessElsAccount: this.businessElsAccount,
         businessModule: this.businessModule,
         businessId: this.id
@@ -180,7 +180,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let action = 'delete';
+        const action = 'delete';
         if (row.uuid) {
           commonApi.attachmentServer(action, { uuid: this.uploadRow.uuid }).then((res) => {
             if (res.data.statusCode !== '200') {
@@ -193,7 +193,7 @@ export default {
       });
     },
     listRowAdd() {
-      let fileItem = {
+      const fileItem = {
         businessItemId: this.id + '_00' + (this.fileList.length + 1)
       };
       this.fileList.push(fileItem);
@@ -209,11 +209,11 @@ export default {
     },
     async uploadFile(myfile) {
       console.log('开始上传');
-      let fileSize = renderSize(myfile.file.size);
+      const fileSize = renderSize(myfile.file.size);
       this.getBase64(myfile.file)
         .then((resBase64) => {
-          let fileBase64 = resBase64.split(',')[1]; // 直接拿到base64信息
-          let params = {
+          const fileBase64 = resBase64.split(',')[1]; // 直接拿到base64信息
+          const params = {
             fileName: myfile.file.name,
             fileType: myfile.file.name.split('.')[1],
             fileData: fileBase64
@@ -222,7 +222,7 @@ export default {
         })
         .then((res) => {
           if (res.data.statusCode === '200') {
-            let data = res.data.data;
+            const data = res.data.data;
             data.fileSize = fileSize;
             this.$emit('upload-file', data);
             this.updateFileList(data);
@@ -235,8 +235,8 @@ export default {
         });
     },
     updateFileList(file) {
-      let action = this.uploadRow.attachmentName ? 'update' : 'create';
-      let checkProp = 'businessItemId';
+      const action = this.uploadRow.attachmentName ? 'update' : 'create';
+      const checkProp = 'businessItemId';
       let uploadRow = {
         ...this.uploadRow,
         attachmentType: file.fileType,

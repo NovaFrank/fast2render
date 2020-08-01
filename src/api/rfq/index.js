@@ -1,7 +1,7 @@
-import request from '@/router/axios';
+import request from '@/api/axios';
 import { getApiPath } from '@/util/utils.js';
 
-let prefix = getApiPath();
+const prefix = getApiPath();
 
 // 询报价信息列表的查询 findPageList post
 // 保存询价单 save post

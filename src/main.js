@@ -7,7 +7,7 @@ import i18n from '../locales';
 import Avue from '@smallwei/avue';
 import '@smallwei/avue/lib/index.css';
 import store from './store';
-import axios from './router/axios';
+import axios from '@/api/axios';
 import VueAxios from 'vue-axios';
 import Fast2Render from 'fast2render'; // ../
 import 'fast2render/lib/index.css';

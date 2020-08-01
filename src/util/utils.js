@@ -18,8 +18,8 @@ export const getApiPath = () => {
 };
 
 // 对象数组排序
-export const compare = function(prop) {
-  return function(obj1, obj2) {
+export const compare = function (prop) {
+  return function (obj1, obj2) {
     const val1 = obj1[prop];
     const val2 = obj2[prop];
     if (val1 < val2) {
@@ -58,8 +58,8 @@ export const validForm = (form) => {
  */
 export const mySpanMethod = (data, arr, filed, id, columnIndex, row) => {
   // 通过groupBy将数据处理成，需要合并的排在一起。
-  let myData = Object.values(_.groupBy(data, filed)).flat();
-  let itemArr = []; // 需要合并的数组。
+  const myData = Object.values(_.groupBy(data, filed)).flat();
+  const itemArr = []; // 需要合并的数组。
   myData.forEach((item) => {
     if (item[filed] === row[filed]) {
       itemArr.push(item);
@@ -98,7 +98,7 @@ export const getSupplierInfo = () => {
 };
 
 export const getAccount = () => {
-  let userInfo = getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
+  const userInfo = getStore({ name: 'userInfo', timer: 1200 }); // getStore 使用样例
   if (userInfo && userInfo.elsAccount) {
     return userInfo;
   }
@@ -117,7 +117,7 @@ export const getLocalToken = (supplier) => {
   };
   login(params).then((res) => {
     setToken(res.data.data.token);
-    let params2 = {
+    const params2 = {
       name: 'userInfo',
       content: {
         elsAccount: params.elsAccount,

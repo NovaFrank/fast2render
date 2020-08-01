@@ -1,7 +1,7 @@
-import request from '@/router/axios';
+import request from '@/api/axios';
 import { getApiPath } from '@/util/utils.js';
 
-let prefix = getApiPath();
+const prefix = getApiPath();
 
 // post
 // 列表 findPageList

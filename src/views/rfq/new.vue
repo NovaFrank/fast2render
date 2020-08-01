@@ -1400,19 +1400,6 @@ export default {
         toElsAccountList: form.toElsAccountList ? form.toElsAccountList.toString() : '',
         quoteMethod: form.quoteMethod // 0、1
       };
-      // if (form.quoteMethod === '1') {
-      //   item = {
-      //     ...item,
-      //     ladderPriceJson: JSON.stringify(
-      //       form.ladderPriceJson.map((item) => {
-      //         return {
-      //           ladderQuantity: item.ladderQuantity,
-      //           ladderGrade: item.ladderGrade
-      //         };
-      //       })
-      //     )
-      //   };
-      // }
 
       if (form.ladderPriceJson) {
         item = {

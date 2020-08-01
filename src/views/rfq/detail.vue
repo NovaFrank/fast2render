@@ -1408,6 +1408,7 @@ export default {
       });
     },
     spanMethod({ row, column, rowIndex, columnIndex }) {
+      if (this.configurations[this.detailObj.enquiryType].name === 'RFI') return;
       return mySpanMethod(
         this.inquiryListOption.data,
         [1, 2, 3, 4, 5, 6],
@@ -1469,6 +1470,7 @@ export default {
           priceIncludingTax: '',
           quota: '',
           quoteDate: '',
+          companyCode: this.currentDetailItem.companyCode,
           ladderPriceJson: this.currentDetailItem.ladderPriceJson || null,
           costConstituteJson: this.currentDetailItem.costConstituteJson || null,
           $cellEdit: false

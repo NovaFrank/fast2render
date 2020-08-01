@@ -168,7 +168,8 @@ export default {
       costDialogVisible: false,
       currentEnquiryNumber: '',
       requestTypeDict: [],
-      configurations: {}
+      configurations: {},
+      iSrfp: false
     };
   },
   created() {
@@ -258,9 +259,9 @@ export default {
             { label: '已关闭', value: '6' }
           ]
         },
-        { slot: true, label: '税率', prop: 'taxRate' },
-        { slot: true, label: '含税价', prop: 'priceIncludingTax' },
-        { slot: true, label: '不含税价', prop: 'priceExcludingTax' }
+        { slot: true, label: '税率', prop: 'taxRate', hide: this.iSrfp },
+        { slot: true, label: '含税价', prop: 'priceIncludingTax', hide: this.iSrfp },
+        { slot: true, label: '不含税价', prop: 'priceExcludingTax', hide: this.iSrfp }
       ];
       if (!validatenull(this.configurations)) {
         const current = this.configurations[value].tableColumns.map((item) => {
@@ -446,6 +447,7 @@ export default {
         else this.templateRule = {};
         if (this.templateRule.enquiryIsQuota === true)
           this.inquiryListOption.option.column.push({ label: '配额', prop: 'quota', cell: true });
+        this.iSrfp = current.name === 'RFP';
       });
       queryDetailAction('findItemDetails', this.currentEnquiryNumber).then((res) => {
         if (!this.initDetailError(res)) return;

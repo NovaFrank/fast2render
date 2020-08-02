@@ -39,6 +39,12 @@ export default {
       type: Boolean,
       default: false // 是否只读模式
     },
+    itemLinkList: {
+      type: Array,
+      default: function () {
+        return [];
+      }
+    },
     hasRowPermission: {
       type: Boolean,
       default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
@@ -47,7 +53,7 @@ export default {
       type: Boolean,
       default: false // 远程获取 表格字段数据配置- 后续扩充 from 类型
     },
-    col:{
+    col: {
       type: Number,
       default: 0
     },
@@ -57,13 +63,13 @@ export default {
     },
     rowPermission: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     },
     spanMethodData: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           row: [2, 3],
           prop: null,
@@ -73,13 +79,13 @@ export default {
     },
     option: {
       type: Object,
-      default: function() {
+      default: function () {
         return { column: [] };
       }
     },
     data: {
       type: Array,
-      default: function() {
+      default: function () {
         return [];
       }
     }
@@ -113,7 +119,7 @@ export default {
     }
   },
   computed: {
-    hash: function() {
+    hash: function () {
       const { version, theme, type, optionHash, rowPermission } = this;
       const fullText = zipLayout(
         JSON.stringify({ version, theme, type, optionHash, rowPermission })
@@ -122,7 +128,7 @@ export default {
       const obj = (version || 'local') + '-' + str;
       return obj;
     },
-    myData: function() {
+    myData: function () {
       if (this.spanMethodData.prop) {
         return Object.values(_.groupBy(this.data, this.spanMethodData.prop)).flat();
       }
@@ -148,14 +154,14 @@ export default {
         this.finalOption.menuBtn = false;
         this.finalOption.menu = false;
       }
-       if (this.addInCell && this.type === 'crud') {
-         this.finalOption.editBtn = false;
-         this.finalOption.cellBtn = true;
-         this.finalOption.saveBtn = true;
+      if (this.addInCell && this.type === 'crud') {
+        this.finalOption.editBtn = false;
+        this.finalOption.cellBtn = true;
+        this.finalOption.saveBtn = true;
       }
       if (this.readOnly) {
-         this.finalOption.detail = true;
-         this.finalOption.menu = false;
+        this.finalOption.detail = true;
+        this.finalOption.menu = false;
       }
       if (this.col > 0) {
         this.finalOption.column.map((item) => {

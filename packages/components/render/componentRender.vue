@@ -18,7 +18,7 @@
             :inTab="inTab"
             type="form"
             :hasRowPermission="hasFieldPermission"
-            :rowPermission="getRowPromession(permission.fieldJson)"
+            :rowPermission="getRowPermission(permission.fieldJson)"
             :formulas="permission.formulas"
             theme="block"
             ref="themebox"
@@ -43,7 +43,7 @@
             :option="item.data"
             :readOnly="readOnly"
             :hasRowPermission="hasRowPermission"
-            :rowPermission="getRowPromession(permission.tableJson)"
+            :rowPermission="getRowPermission(permission.tableJson)"
             :addInCell="addInCell"
             :itemLinkList="itemLinkList"
             type="crud"
@@ -109,7 +109,7 @@
  * block 内含一组组件
  */
 import itemAttachment from './cards/item-attachment';
-import { getRowPromession } from '../../lib/utils';
+import { getRowPermission } from '../../lib/utils';
 import { validateNull } from '../../lib/validate';
 import ThemeProvider from './widget/theme-provider';
 
@@ -323,8 +323,8 @@ export default {
       }
       this.$root.$emit('change-table', data);
     },
-    getRowPromession(data) {
-      return getRowPromession(data);
+    getRowPermission(data) {
+      return getRowPermission(data);
     },
     getComponent(type, component) {
       const KEY_COMPONENT_NAME = 'item-';

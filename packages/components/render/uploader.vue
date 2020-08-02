@@ -165,36 +165,6 @@ export default {
     },
     handleSuccess(response, file, fileList) {
       console.log(response, file, fileList);
-    },
-    async uploadFile(myfile) {
-      // console.log('开始上传', this.uploader, myfile);
-
-      // this.uploader.upload();
-
-      // 方式2
-      const formdata = new FormData();
-      formdata.append('file', myfile.file);
-      uploadApi
-        .uploadServlet(formdata)
-        .then((res) => {
-          console.log('上传结束', res);
-          if (res.data.statusCode === '200') {
-            const data = res.data.data[0];
-            const file = {
-              fileSize: data.size,
-              fileName: data.name,
-              fileType: data.type,
-              filePath: data.url
-            };
-            this.$emit('upload-file', file);
-            this.updateFileList(file);
-          } else {
-            this.$message.error('上传失败');
-          }
-        })
-        .catch(() => {
-          this.$message.error('上传失败');
-        });
     }
   }
 };

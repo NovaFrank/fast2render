@@ -9,53 +9,13 @@
         <div v-if="component.option && component.option.column && component.option.column.length">
           <avue-crud :data="fileList" :option="component.option" @row-del="handleDelete">
             <template v-slot:fileAction="scope">
-           
-              <div v-if="!readonly && downloadClient">
-	         <fast2-upload
-                @file-success="fileSuccess"
-                @file-progress="onFileProgress"
-                @file-error="onFileError"
-              ></fast2-upload>
-                <!-- <el-upload
-                  id="webpicker"
-                  :show-file-list="false"
-                  class="upload-box"
-                  ref="uploadBox"
-                  :http-request="uploadFile"
-                  action="/"
-                >
-                  <!-- :before-upload="uploadFile" -->
-                <!-- action="http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet"
-                  @on-success="handleSuccess" -->
-                <!-- <el-link
-                    size="small"
-                    slot="trigger"
-                    type="primary"
-                    @click="setUploadRow(scope.row)"
-                  >
-                    上传
-                  </el-link> -->
-
-                <!--用来存放item-->
-                <!-- <div id="uploader">
-                    <div id="picker">选择</div>
-                    <button id="ctlBtn" @click="uploadFile" class="btn btn-default">
-                      开始上传
-                    </button>
-                  </div> -->
-                <!-- <template v-if="scope.row.attachmentUrl">
-                    /
-                    <el-link
-                      v-if="scope.row.attachmentUrl"
-                      download
-                      target="_blank"
-                      :href="`${dome}opt/nfsshare/${scope.row.attachmentUrl}`"
-                    >
-                      <!-- @click.stop="handleDownload(scope.row)"
-                      下载
-                    </el-link>
-                  </template>
-                </el-upload> -->
+              <div v-if="!readonly && downloadClient" @mouseover="setUploadRow(scope.row)">
+                <fast2-upload
+                  @file-success="fileSuccess"
+                  @file-progress="onFileProgress"
+                  @file-error="onFileError"
+                  @click="setUploadRow(scope.row)"
+                ></fast2-upload>
               </div>
               <div v-else-if="downloadClient">
                 <el-link
@@ -83,7 +43,6 @@ import uploadApi from '../../lib/api/upload';
 import { formatDate } from '../../lib/utils'; // , renderSize
 import { validateNull } from '../../lib/validate';
 import { getUserInfo } from '../../lib/auth';
-import Uploader from './uploader';
 
 export default {
   name: 'AttachmentList',
@@ -446,37 +405,6 @@ export default {
       }
     },
 
-    initWebUpload() {
-      /*
-      setTimeout(() => {
-        // 方式3
-        // var state = 'pending'; // 上传文件初始化
-        this.uploader = WebUploader.create({
-          swf: './webuploader-0.1.5/Uploader.swf',
-          server: 'http://cs.51qqt.com/ELSServer_SRM/rest/servlet/UploadServlet',
-          pick: '#picker',
-          resize: false
-        });
-        this.uploader.on('fileQueued', function (file) {
-          console.log('fileQueued');
-          console.log(file);
-        });
-        this.uploader.on('uploadProgress', function (file, percentage) {
-          console.log('progress ==', percentage * 100 + '%');
-        });
-        this.uploader.on('uploadSuccess', function (file) {
-          console.log('uploadSuccess');
-        });
-        this.uploader.on('uploadError', function (file) {
-          console.log('uploadError');
-        });
-        this.uploader.on('uploadComplete', function (file) {
-          console.log('uploadComplete');
-        });
-      });
-      */
-    },
-
     listRowAdd() {
       const fileItem = {
         elsAccount: this.elsAccount,
@@ -550,7 +478,7 @@ export default {
     fileSuccess(rootFile, file, message, chunk) {
       console.log(message);
       const data = JSON.parse(message)?.data;
-      //将面试邀请code和文件路径去保存到数据库中
+      // 将面试邀请code和文件路径去保存到数据库中
       const fileData = {
         fileSize: data.size,
         fileName: data.name,
@@ -568,7 +496,7 @@ export default {
     },
     updateFileList(file) {
       const _this = this;
-      const action = _this.uploadRow.attachmentName
+      const action = _this.uploadRow?.attachmentName
         ? 'update'
         : _this.uploadRow.uuid
         ? 'update'

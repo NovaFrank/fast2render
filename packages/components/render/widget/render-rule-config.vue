@@ -36,7 +36,7 @@ export default {
             let dic = item.settingValue;
             if (item.dicUrl && item.dicUrl.length) {
               dic = item.dicUrl + '';
-              delete item.dicUrl
+              delete item.dicUrl;
             }
             if (item.multiple) {
               formItem.multiple = true;

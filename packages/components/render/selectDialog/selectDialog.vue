@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-input v-model="dialogValue" :readonly="true">
-      <i slot="suffix" class="el-input_icon el-icon-search pointer" @click="dialogOpen"></i>
+      <el-button slot="append" icon="el-icon-search" @click="dialogOpen"></el-button>
     </el-input>
     <SelectDialogTable
       ref="selectDialog"
@@ -49,7 +49,6 @@ export default {
     // 采购组选择框弹出
     dialogOpen() {
       this.dialogVisable = true;
-      this.$refs.selectDialog.handleList();
     },
     dialogSave(selectColumn) {
       this.$emit('save', selectColumn);

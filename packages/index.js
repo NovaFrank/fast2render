@@ -6,6 +6,10 @@ import ButtonGroupRender from './components/render/widget/render-button-group';
 import BlockProvider from './components/render/widget/block-provider';
 import PageProvider from './components/render/widget/page-provider';
 import ThemeProvider from './components/render/widget/theme-provider';
+import RowProvider from './components/render/widget/row-provider'; // 单据行项目专用组件
+import RowPageProvider from './components/render/widget/row-page-provider'; // 单据行项目专用组件
+import HeadProvider from './components/render/widget/head-provider'; // 业务类型单据头专用组件
+import HeadPageProvider from './components/render/widget/head-page-provider'; // 模块单据头专用组件
 import ConfigTabRender from './components/render/widget/render-config-tab';
 import CostConfigTabRender from './components/render/widget/render-cost-config-tab';
 import ConfigTabSetting from './components/render/widget/setting-config-tab';
@@ -20,6 +24,13 @@ import SelectDialog from './components/render/selectDialog/selectDialog';
 import SelectDialogTable from './components/render/selectDialog/selectDialogTable';
 import Tree from './components/render/tree/index';
 import Upload from './components/render/uploader';
+import SelectMaterial from './components/render/dialog/material';
+import SelectPurchaseGroup from './components/render/dialog/purchaseGroup';
+import SelectSupplier from './components/render/dialog/supplier';
+import SelectFactory from './components/render/dialog/factory';
+import SelectOrder from './components/render/dialog/order';
+import SelectEmployee from './components/render/dialog/employee';
+import SelectPurchaseOrganization from './components/render/dialog/purchaseOrganization';
 import Uploader from 'vue-simple-uploader';
 
 import { getStore, setStore } from './lib/store';
@@ -36,7 +47,7 @@ import util, {
   getTableList,
   getDicNow,
   getApiPath,
-  getRowPromession,
+  getRowPermission,
   handlerLocalPermission,
   handlerLocalRolePermission
 } from './lib/utils';
@@ -53,6 +64,11 @@ export default {
     Vue.component('Fast2' + PageProvider.name, PageProvider);
     Vue.component('Fast2' + TemplateProvider.name, TemplateProvider);
     Vue.component('Fast2' + ThemeProvider.name, ThemeProvider);
+    Vue.component('Fast2' + RowProvider.name, RowProvider);
+    Vue.component('Fast2' + RowPageProvider.name, RowPageProvider);
+
+    Vue.component('Fast2' + HeadProvider.name, HeadProvider);
+    Vue.component('Fast2' + HeadPageProvider.name, HeadPageProvider);
     Vue.component('Fast2' + ConfigTabRender.name, ConfigTabRender);
     Vue.component('Fast2' + CostConfigTabRender.name, CostConfigTabRender);
     Vue.component('Fast2' + ConfigTabSetting.name, ConfigTabSetting);
@@ -61,6 +77,13 @@ export default {
     Vue.component(PageDetailHeader.name, PageDetailHeader);
     Vue.component('Fast2' + AttachmentList.name, AttachmentList);
     Vue.component('Fast2' + Upload.name, Upload);
+    Vue.component('Fast2' + SelectMaterial.name, SelectMaterial);
+    Vue.component('Fast2' + SelectPurchaseGroup.name, SelectPurchaseGroup);
+    Vue.component('Fast2' + SelectSupplier.name, SelectSupplier);
+    Vue.component('Fast2' + SelectFactory.name, SelectFactory);
+    Vue.component('Fast2' + SelectOrder.name, SelectOrder);
+    Vue.component('Fast2' + SelectEmployee.name, SelectEmployee);
+    Vue.component('Fast2' + SelectPurchaseOrganization.name, SelectPurchaseOrganization);
 
     Vue.component(AttachmentList.name, AttachmentList);
     Vue.prototype.$loadDic = loadDic;
@@ -80,7 +103,7 @@ export default {
     Vue.prototype.$util.setStore = setStore;
     Vue.prototype.$util.getStore = getStore;
     Vue.prototype.$util.getApiPath = getApiPath;
-    Vue.prototype.$util.getRowPromession = getRowPromession;
+    Vue.prototype.$util.getRowPermission = getRowPermission;
     Vue.prototype.$util.handlerLocalPermission = handlerLocalPermission;
     Vue.prototype.$util.handlerLocalRolePermission = handlerLocalRolePermission;
 

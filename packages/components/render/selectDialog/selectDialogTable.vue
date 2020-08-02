@@ -1,8 +1,9 @@
 <template>
   <div>
-    <el-dialog :title="title" :visible.sync="visable">
+    <el-dialog :title="title" :visible.sync="visable" :append-to-body="true">
       <avue-crud
         ref="crud"
+        class="listSelect"
         v-model="crudObj"
         :data.sync="crudData"
         :option.sync="crudOption"
@@ -77,7 +78,8 @@ export default {
         currentPage: 1,
         pageSize: 10
       },
-      crudMultiple: true
+      crudMultiple: true,
+      currentRow: null
     };
   },
   created() {
@@ -117,10 +119,14 @@ export default {
       this.$emit('getData', param);
     },
     crudSave() {
-      const selectItems = this.selectColumns;
+      this.checkSelectedItem();
+    },
+    ok() {
+      const selectItems = this.crudMultiple ? this.selectColumns : [this.currentRow];
       this.selectColumns = [];
+      this.currentRow = null;
       this.$refs.crud.selectClear();
-      this.$emit('save', selectItems);
+      this.$emit('ok', selectItems);
       this.visable = false;
     },
     selectionChange(list) {
@@ -128,11 +134,36 @@ export default {
         this.selectColumns = list;
       }
     },
+    checkSelectedItem() {
+      const selectedItem = this.crudMultiple ? this.selectColumns.length : this.currentRow;
+
+      if (selectedItem) {
+        this.ok();
+      } else {
+        this.$message('请选择数据!');
+      }
+    },
     currentRowChange(row) {
       if (!this.crudMultiple) {
-        const list = [];
-        list.push(row);
-        this.selectColumns = list;
+        if (row) {
+          this.currentRow = row;
+        } else if (this.crudData && this.crudData[0]) {
+          const defaultRow = this.crudData[0];
+
+          if (this.currentRow) {
+            if (
+              defaultRow &&
+              this.rowKey &&
+              this.currentRow[this.rowKey] !== defaultRow[this.rowKey]
+            ) {
+              this.currentRow = defaultRow;
+            }
+          } else {
+            this.currentRow = defaultRow;
+          }
+        } else {
+          this.currentRow = null;
+        }
       }
     },
     searchChange(params, done) {
@@ -157,3 +188,15 @@ export default {
   }
 };
 </script>
+<style>
+.listSelect .el-collapse-item__header {
+  display: none;
+}
+.listSelect .el-dialog__body {
+  padding-top: 5px;
+}
+.listSelect .el-collapse {
+  border-top: 0;
+  border-bottom: 0;
+}
+</style>

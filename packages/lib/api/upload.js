@@ -15,14 +15,6 @@ export const sendFiles = (params) => {
   });
 };
 
-export const uploadServlet = (formdata) => {
-  return axios({
-    url: `${baseUrl}/servlet/UploadServlet`,
-    method: 'post',
-    data: formdata
-  });
-};
-
 export const downloadServlet = (url) => {
   return axios({
     url: `${baseUrl}/servlet/downloadServlet?filePath=${url}`,
@@ -68,7 +60,6 @@ export const attachmentServer = (action, params) => {
 
 const uploadApi = {
   sendFiles,
-  uploadServlet,
   downloadServlet,
   uploadFile,
   attachmentServer,

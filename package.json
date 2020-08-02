@@ -16,7 +16,7 @@
     "core-js": "^3.6.4",
     "dayjs": "^1.8.28",
     "localforage": "^1.7.3",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "mathjs": "^7.1.0",
     "node-sass": "^4.13.1",
     "nprogress": "^0.2.0",

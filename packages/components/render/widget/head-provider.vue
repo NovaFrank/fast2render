@@ -18,7 +18,7 @@
           :is="item.component"
           :seleted.sync="formObj[item.prop]"
           :api="listApi[item.prop]"
-          :list-params="listParams[item.prop]"
+          :list-params.sync="listParams[item.prop]"
           :isDisabled="getDisabledProperty(item.prop)"
           @selectDone="doSelect(item.func, formObj, $event, item.params)"
         ></component>

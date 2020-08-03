@@ -29,6 +29,8 @@
           v-else
           :key="item.prop"
           :is="item.component"
+          :api="listApi[item.prop]"
+          :list-params.sync="listParams[item.prop]"
           :seleted.sync="scope.row[item.prop]"
           @selectDone="doSelect(item.func, scope.row, $event, item.params)"
         ></component>
@@ -68,6 +70,18 @@ export default {
       type: Array,
       default: function() {
         return popList;
+      }
+    },
+    listApi: {
+      type: Object,
+      default: function() {
+        return {};
+      }
+    },
+    listParams: {
+      type: Object,
+      default: function() {
+        return {};
       }
     },
     option: {

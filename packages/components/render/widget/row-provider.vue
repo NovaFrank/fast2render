@@ -26,6 +26,8 @@
           :key="item.prop"
           :is="item.component"
           :seleted.sync="scope.row[item.prop]"
+          :api="listApi[item.prop]"
+          :list-params.sync="listParams[item.prop]"
           @selectDone="doSelect(item.func, scope.row, $event, item.params)"
         ></component>
       </template>
@@ -61,7 +63,7 @@ export default {
     },
     itemLinkList: {
       type: Array,
-      default: function () {
+      default: function() {
         return popList;
       }
     },
@@ -71,25 +73,37 @@ export default {
     },
     rowPermission: {
       type: Object,
-      default: function () {
+      default: function() {
         return {};
       }
     },
     originColumn: {
       type: Object,
-      default: function () {
+      default: function() {
         return [];
+      }
+    },
+    listApi: {
+      type: Object,
+      default: function() {
+        return {};
+      }
+    },
+    listParams: {
+      type: Object,
+      default: function() {
+        return {};
       }
     },
     option: {
       type: Object,
-      default: function () {
+      default: function() {
         return { column: [] };
       }
     },
     data: {
       type: Array,
-      default: function () {
+      default: function() {
         return [];
       }
     }
@@ -417,7 +431,9 @@ export default {
       if (typeof data.budgetPrice !== 'undefined' && typeof data.quantity !== 'undefined') {
         // 采购申请有这个数据
         const subtotalAmount = format(
-          chain(bignumber(data.budgetPrice)).multiply(bignumber(data.quantity)).done()
+          chain(bignumber(data.budgetPrice))
+            .multiply(bignumber(data.quantity))
+            .done()
         );
 
         data.subtotalAmount = subtotalAmount || 0;

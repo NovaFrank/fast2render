@@ -7,10 +7,7 @@
       :option.sync="finalOption"
       v-on="$listeners"
     >
-      <template
-        v-for="item in itemLinkList"
-        :slot="item.prop"
-      >
+      <template v-for="item in itemLinkList" :slot="item.prop">
         <el-tag
           v-if="readOnly && data.data[item.prop]"
           :key="item.prop"
@@ -23,7 +20,7 @@
           v-else
           :key="item.prop"
           :api="listApi[item.prop]"
-          :list-params="listParams[item.prop]"
+          :list-params.sync="listParams[item.prop]"
           :seleted.sync="data.data[item.prop]"
           @selectDone="doSelect(item.func, data.data, $event, item.params)"
         />
@@ -310,7 +307,6 @@ export default {
       if (!type) {
         return refs;
       }
-      debugger;
       this.finalOption.column.map((item) => {
         if (item.ref && item.ref.includes(type)) {
           refs.push(item.prop);

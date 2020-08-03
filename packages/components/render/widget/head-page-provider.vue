@@ -7,7 +7,10 @@
       :option.sync="finalOption"
       v-on="$listeners"
     >
-      <template v-for="item in itemLinkList" :slot="item.prop">
+      <template
+        v-for="item in itemLinkList"
+        :slot="item.prop"
+      >
         <el-tag
           v-if="readOnly && data.data[item.prop]"
           :key="item.prop"
@@ -112,9 +115,9 @@ export default {
   },
   watch: {
     // 暂时无需监测
-    form: {
+    'data.data': {
       handler: function(newVal, oldVar) {
-        this.emit('on-update', newVal);
+        this.$emit('on-update', newVal);
       },
       immediate: true,
       deep: true
@@ -230,6 +233,8 @@ export default {
       if (type === 'function') {
         this[func](row, event, params);
       }
+      const field = params[0] || 'materialNumber';
+      this.$emit('on-select', field, row);
       this.$forceUpdate();
     },
 

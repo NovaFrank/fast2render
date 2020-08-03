@@ -13,22 +13,27 @@
         icon="el-icon-search"
         :disabled="isDisabled"
         @click="openFieldDialog"
-      ></el-button>
+      />
     </el-input>
-    <el-button v-else @click="openFieldDialog">{{ addBtnText }}</el-button>
+    <el-button
+      v-else
+      @click="openFieldDialog"
+    >
+      {{ addBtnText }}
+    </el-button>
     <SelectDialogTable
       ref="materialsDialog"
-      :dialogVisible.sync="materialDlgViaible"
+      :dialog-visible.sync="materialDlgViaible"
       :title="'物料列表'"
       :column="materialsDialogOption.option.column"
       :data="materialsDialogOption.data"
       :page="materialsDialogOption.page"
-      :queryParam="materialsDialogQueryParam"
-      :pageParam="materialsDialogPageParam"
+      :query-param="materialsDialogQueryParam"
+      :page-param="materialsDialogPageParam"
       :multiple="materialsDialogOption.option.multiple"
-      @handleList="materialsHandleList"
+      @handleList="handleList"
       @ok="selectedMaterails"
-    ></SelectDialogTable>
+    />
   </div>
 </template>
 <script>
@@ -39,6 +44,9 @@ import { MaterialService } from '../../../lib/api/materials';
 
 export default {
   name: 'SelectMaterial',
+  components: {
+    SelectDialogTable
+  },
   props: {
     materialListOption: {
       type: Object,
@@ -46,14 +54,21 @@ export default {
         return { obj: { materialNumber: '' } };
       }
     },
+    listParams: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    },
+    api: {
+      type: Function,
+      default: MaterialService.list
+    },
     seleted: { type: String, default: '' },
     addBtnText: { type: String, default: '添加物料' },
 
     isDisabled: { type: Boolean, default: false }, // 是否禁用
     multiple: { type: Boolean, default: false }
-  },
-  components: {
-    SelectDialogTable
   },
   data() {
     return {
@@ -90,7 +105,7 @@ export default {
       this.dialogTitle = `${title}物料明细`;
       this.materialDlgViaible = true;
     },
-    materialsHandleList(queryCondition = {}, pagination) {
+    handleList(queryCondition = {}, pagination) {
       const params = {
         auditStatus: 0,
         elsAccount: getUserInfo().elsAccount,
@@ -106,8 +121,15 @@ export default {
           params[key] = queryCondition[key];
         }
       }
+      // 外部传递参数
+      for (const key in this.listParams) {
+        if (listParams[key]) {
+          params[key] = listParams[key];
+        }
+      }
 
-      MaterialService.list(params)
+      const api = this.api;
+      api(params)
         .then((res) => {
           if (
             res.data &&

@@ -1,12 +1,5 @@
 const popList = [
   {
-    label: '验厂单',
-    prop: 'inspectionAccess',
-    url: '/admission/#/inspectTableAudit/detail/'
-  },
-  { label: '资质准入', prop: 'aptitudesAccess', url: '/admission/#/sampleAudit/view/' },
-  { label: '样品准入', prop: 'auditAccess', url: '/admission/#/auditAdmission/view/' },
-  {
     label: '物料',
     prop: 'materialNumber',
     url: '/masterdata/material/#/masterdata/view/',

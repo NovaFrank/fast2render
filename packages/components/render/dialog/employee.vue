@@ -12,9 +12,12 @@
         icon="el-icon-search"
         :disabled="isDisabled"
         @click="visable = true"
-      ></el-button>
+      />
     </el-input>
-    <el-dialog :title="title" :visible.sync="visable">
+    <el-dialog
+      :title="title"
+      :visible.sync="visable"
+    >
       <avue-crud
         ref="crud"
         v-model="crudObj"
@@ -29,9 +32,16 @@
         @current-row-change="currentRowChange"
       >
         <template slot="menuLeft">
-          <el-button type="primary" size="small" plain @click.stop="crudSave()">{{
-            btnText
-          }}</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            plain
+            @click.stop="crudSave()"
+          >
+            {{
+              btnText
+            }}
+          </el-button>
         </template>
       </avue-crud>
     </el-dialog>
@@ -45,7 +55,6 @@ export default {
   props: {
     elsAccount: { type: String, default: '' }, // elsAccount
     elsSubAccount: { type: String, default: '' }, // elsSubAccount
-
     btnText: { type: String, default: '保存' }, // 保存按钮文字
     title: { type: String, default: '' }, // dialog标题
     seleted: { type: String, default: '' },
@@ -121,30 +130,30 @@ export default {
       crudMultiple: true
     };
   },
+  watch: {
+    page: function(newValue) {
+      this.crudPage = newValue;
+    },
+    column: function(newValue) {
+      this.crudOption.column = newValue;
+    },
+    visable: function(newValue) {
+      this.$emit('update:dialogVisible', newValue);
+    },
+    dialogVisible: function(newValue) {
+      this.visable = newValue;
+    }
+  },
   created() {
     this.crudOption.column = this.column;
     this.crudPage = this.page;
     this.crudMultiple = this.multiple;
     this.crudOption.selection = this.multiple;
     this.crudOption.highlightCurrentRow = !this.multiple;
-    this.handleList();
-  },
-  watch: {
-    page: function (newValue) {
-      this.crudPage = newValue;
-    },
-    column: function (newValue) {
-      this.crudOption.column = newValue;
-    },
-    visable: function (newValue) {
-      this.$emit('update:dialogVisible', newValue);
-    },
-    dialogVisible: function (newValue) {
-      this.visable = newValue;
-    }
+    this.handleEmployeeList();
   },
   methods: {
-    handleList() {
+    handleEmployeeList() {
       const listParams = {};
       listParams.elsAccount = getUserInfo().elsAccount;
       // listParams.toElsAccout = '307001';
@@ -194,21 +203,21 @@ export default {
     searchChange(params, done) {
       this.crudPageParam.currentPage = 1;
       // Object.assign(this.crudQueryParam, params);
-      this.handleList();
+      this.handThisList();
       done();
     },
     refreshChange() {
       this.crudPageParam.currentPage = 1;
-      this.handleList();
+      this.handThisList();
     },
     currentChange(page) {
       this.crudPageParam.currentPage = page;
-      this.handleList();
+      this.handThisList();
     },
     sizeChange(pageSize) {
       this.crudPageParam.currentPage = 1;
       this.crudPageParam.pageSize = pageSize;
-      this.handleList();
+      this.handThisList();
     }
   }
 };

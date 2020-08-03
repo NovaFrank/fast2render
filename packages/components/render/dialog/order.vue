@@ -7,10 +7,23 @@
       :readonly="true"
       :disabled="isDisabled"
     >
-      <el-button slot="append" icon="el-icon-search" @click="visable = true"></el-button>
+      <el-button
+        slot="append"
+        icon="el-icon-search"
+        @click="visable = true"
+      />
     </el-input>
-    <el-button v-else @click="visable = true">{{ addBtnText }}</el-button>
-    <el-dialog :title="title" :visible.sync="visable" append-to-body>
+    <el-button
+      v-else
+      @click="visable = true"
+    >
+      {{ addBtnText }}
+    </el-button>
+    <el-dialog
+      :title="title"
+      :visible.sync="visable"
+      append-to-body
+    >
       <avue-crud
         ref="crud"
         v-model="crudObj"
@@ -25,9 +38,16 @@
         @current-row-change="currentRowChange"
       >
         <template slot="menuLeft">
-          <el-button type="primary" size="small" plain @click.stop="crudSave()">{{
-            btnText
-          }}</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            plain
+            @click.stop="crudSave()"
+          >
+            {{
+              btnText
+            }}
+          </el-button>
         </template>
       </avue-crud>
     </el-dialog>
@@ -48,15 +68,18 @@ export default {
     actionPath: { type: String, default: 'findPageList' }, // 数据接口地址
     seleted: { type: String, default: '' },
     addBtnText: { type: String, default: '选择订单' },
-
     dialogVisible: { type: Boolean, default: false }, // dialog显隐
     isDisabled: { type: Boolean, default: false }, // 是否禁用
     multiple: { type: Boolean, default: false }, // 是否多选
 
     api: {
       type: Function,
+      default: PurchaseDeliveryNoteService.list
+    },
+    listParams: {
+      type: Object,
       default: () => {
-        return PurchaseDeliveryNoteService;
+        return {};
       }
     },
     // 表格的分页配置
@@ -118,35 +141,35 @@ export default {
       crudMultiple: true
     };
   },
+  watch: {
+    page: function(newValue) {
+      this.crudPage = newValue;
+    },
+    column: function(newValue) {
+      this.crudOption.column = newValue;
+    },
+    visable: function(newValue) {
+      this.$emit('update:dialogVisible', newValue);
+    },
+    dialogVisible: function(newValue) {
+      this.visable = newValue;
+    }
+  },
   created() {
     this.crudOption.column = DialogOption.option.column;
     this.crudPage = this.page;
     this.crudMultiple = this.multiple;
     this.crudOption.selection = this.multiple;
     this.crudOption.highlightCurrentRow = !this.multiple;
-    this.handleList();
-  },
-  watch: {
-    page: function (newValue) {
-      this.crudPage = newValue;
-    },
-    column: function (newValue) {
-      this.crudOption.column = newValue;
-    },
-    visable: function (newValue) {
-      this.$emit('update:dialogVisible', newValue);
-    },
-    dialogVisible: function (newValue) {
-      this.visable = newValue;
-    }
+    this.handleThisList();
   },
   methods: {
     handleList() {
-      const listParams = {};
+      const listParams = this.listParams;
       listParams.elsAccount = getUserInfo().elsAccount;
       listParams.currentPage = this.crudPage.currentPage;
       listParams.pageSize = this.crudPage.pageSize;
-      PurchaseDeliveryNoteService.list(listParams).then((res) => {
+      this.api(listParams).then((res) => {
         const data = res.data;
         if (data.statusCode !== '200') {
           this.$message.error(data.message);

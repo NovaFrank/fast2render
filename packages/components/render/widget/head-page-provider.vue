@@ -22,6 +22,8 @@
           :is="item.component"
           v-else
           :key="item.prop"
+          :api="listApi[item.prop]"
+          :list-params="listParams[item.prop]"
           :seleted.sync="data.data[item.prop]"
           @selectDone="doSelect(item.func, data.data, $event, item.params)"
         />
@@ -53,6 +55,18 @@ export default {
     readOnly: {
       type: Boolean,
       default: false // 是否只读模式
+    },
+    listApi: {
+      type: Object,
+      default: function() {
+        return {};
+      }
+    },
+    listParams: {
+      type: Object,
+      default: function() {
+        return {};
+      }
     },
     col: {
       type: Number,
@@ -177,6 +191,10 @@ export default {
 
     getData() {
       return this.data.data;
+    },
+
+    updateSearchParmas(field, parmas) {
+      // 更新 弹窗过滤条件
     },
 
     updateCoumn(selected) {

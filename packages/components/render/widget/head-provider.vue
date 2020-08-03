@@ -17,6 +17,8 @@
           :key="item.prop"
           :is="item.component"
           :seleted.sync="formObj[item.prop]"
+          :api="listApi[item.prop]"
+          :list-params="listParams[item.prop]"
           :isDisabled="getDisabledProperty(item.prop)"
           @selectDone="doSelect(item.func, formObj, $event, item.params)"
         ></component>
@@ -50,7 +52,7 @@ export default {
     },
     businessTypeProperty: {
       type: String,
-      default: function () {
+      default: function() {
         return ''; // 用于匹配实际的业务类型数据
       }
     },
@@ -60,25 +62,37 @@ export default {
     },
     data: {
       type: Object,
-      default: function () {
+      default: function() {
         return {};
       }
     },
     itemLinkList: {
       type: Array,
-      default: function () {
+      default: function() {
         return popList;
+      }
+    },
+    listApi: {
+      type: Object,
+      default: function() {
+        return {};
+      }
+    },
+    listParams: {
+      type: Object,
+      default: function() {
+        return {};
       }
     },
     option: {
       type: Object,
-      default: function () {
+      default: function() {
         return { column: [] };
       }
     },
     originColumn: {
       type: Object,
-      default: function () {
+      default: function() {
         return [];
       }
     },
@@ -88,7 +102,7 @@ export default {
     },
     rowPermission: {
       type: Object,
-      default: function () {
+      default: function() {
         return {};
       }
     },

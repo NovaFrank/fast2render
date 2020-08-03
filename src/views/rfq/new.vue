@@ -578,7 +578,7 @@ export default {
           formslot: true
         },
         { label: '物料名称', prop: 'materialName' },
-        { label: '物料描述', prop: 'materialDesc' },
+        // { label: '物料描述', prop: 'materialDesc' },
         {
           disabled: this.purchaseRequest,
           label: '需求数量',

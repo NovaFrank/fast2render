@@ -281,11 +281,18 @@ export default {
       }
     },
     getPriceIndex(row, column) {
+      if (column === 'priceIncludingTax' && row.priceIncludingTax) return row.priceIncludingTax;
+      if (column === 'priceExcludingTax' && row.priceExcludingTax) return row.priceExcludingTax;
       const quantity = row.quantity;
-      const quantityList = JSON.parse(row.ladderPriceJson).map((item) => {
-        return Number(item.ladderQuantity);
-      });
+      const quantityList = row.ladderPriceJson
+        ? JSON.parse(row.ladderPriceJson).map((item) => {
+            return Number(item.ladderQuantity);
+          })
+        : [];
       quantityList.push(quantity);
+      quantityList.sort(function (a, b) {
+        return a - b;
+      });
       const index = quantityList.findIndex((item) => item === Number(quantity));
       return JSON.parse(row.ladderPriceJson)[index - 1][column];
     },

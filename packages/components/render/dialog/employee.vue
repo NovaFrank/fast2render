@@ -115,16 +115,16 @@ export default {
     this.handleList();
   },
   watch: {
-    page: function(newValue) {
+    page: function (newValue) {
       this.crudPage = newValue;
     },
-    column: function(newValue) {
+    column: function (newValue) {
       this.crudOption.column = newValue;
     },
-    visable: function(newValue) {
+    visable: function (newValue) {
       this.$emit('update:dialogVisible', newValue);
     },
-    dialogVisible: function(newValue) {
+    dialogVisible: function (newValue) {
       this.visable = newValue;
     }
   },
@@ -157,9 +157,9 @@ export default {
     selectionChange(list) {
       if (this.crudMultiple) {
         this.selectColumns = list;
-        const str = '';
+        let str = '';
         list.map((item) => {
-          str += item.name + ' ';
+          str += item.elsSubAccount + '_' + item.name + ' ';
         });
         this.seleted = str;
       }
@@ -169,9 +169,9 @@ export default {
         const list = [];
         list.push(row);
         this.selectColumns = list;
-        const str = '';
+        let str = '';
         list.map((item) => {
-          str += item.name + ' ';
+          str += item.elsSubAccount + '_' + item.name + ' ';
         });
         this.seleted = str;
       }

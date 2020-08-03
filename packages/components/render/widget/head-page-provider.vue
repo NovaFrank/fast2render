@@ -56,19 +56,19 @@ export default {
     },
     itemLinkList: {
       type: Array,
-      default: function() {
+      default: function () {
         return popList;
       }
     },
     extendDic: {
       type: Array,
-      default: function() {
+      default: function () {
         return [];
       }
     },
     propMatch: {
       type: Array,
-      default: function() {
+      default: function () {
         return [
           {
             from: 'subElsAccount',
@@ -80,13 +80,13 @@ export default {
     },
     option: {
       type: Object,
-      default: function() {
+      default: function () {
         return { column: [] };
       }
     },
     data: {
       type: Object,
-      default: function() {
+      default: function () {
         return { data: {} };
       }
     }
@@ -134,14 +134,14 @@ export default {
       }
     },
     checkForm(callback, failback) {
-      // this.$refs.form.validate((valid) => {
-      //   if (valid) {
-      //     callback && callback();
-      //   } else {
-      //     failback && failback();
-      //     return false;
-      //   }
-      // });
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          callback && callback();
+        } else {
+          failback && failback();
+          return false;
+        }
+      });
     },
     setHeadColumns(val) {
       const selected = this.configurations;
@@ -167,6 +167,7 @@ export default {
         }
       });
       this.updateDic(waitUpdateDic);
+      this.inited = true;
     },
     replaceWithExtendDic(item) {
       const extendlist = this.extendDic;
@@ -377,8 +378,6 @@ export default {
 
         item.display = true;
         item.span = 6;
-
-        this.inited = true;
       });
       return column;
     }

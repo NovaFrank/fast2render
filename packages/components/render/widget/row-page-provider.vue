@@ -41,6 +41,7 @@ import { getApiPath, generateRandomString } from '../../../lib/utils.js';
 import { validateNull } from '../../../lib/validate';
 import { format, chain, bignumber } from 'mathjs';
 import popList from '../../../lib/popList';
+import materialsFix from '../../../lib/materials-fix';
 
 const baseUrl = getApiPath();
 
@@ -65,19 +66,19 @@ export default {
     },
     itemLinkList: {
       type: Array,
-      default: function () {
+      default: function() {
         return popList;
       }
     },
     option: {
       type: Object,
-      default: function () {
+      default: function() {
         return { column: [] };
       }
     },
     data: {
       type: Array,
-      default: function () {
+      default: function() {
         return [];
       }
     }
@@ -172,6 +173,16 @@ export default {
     doSelect(func, row, event, params = []) {
       this[func](row, event, params);
       this.$forceUpdate();
+    },
+    getMaterialsRefs() {
+      const refs = [];
+      materialsFix.map((item) => {
+        if (item.ref) {
+          refs.push(item.prop);
+        }
+      });
+      console.log('物料赋值列表', refs);
+      return refs;
     },
     go(item, row) {
       if (window?.parent) {
@@ -345,7 +356,9 @@ export default {
       if (typeof data.budgetPrice !== 'undefined' && typeof data.quantity !== 'undefined') {
         // 采购申请有这个数据
         const subtotalAmount = format(
-          chain(bignumber(data.budgetPrice)).multiply(bignumber(data.quantity)).done()
+          chain(bignumber(data.budgetPrice))
+            .multiply(bignumber(data.quantity))
+            .done()
         );
         data.subtotalAmount = subtotalAmount;
       }
@@ -368,7 +381,7 @@ export default {
     selectedRowMaterails(row, materialList) {
       if (materialList.length > 0) {
         const result = this.checkAddedMaterials(materialList);
-        const refs = this.getSelectRefs();
+        const refs = this.getMaterialsRefs();
         const addMaterialList = result.addList;
 
         for (const material of addMaterialList) {

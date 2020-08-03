@@ -195,6 +195,7 @@ const materialsColumn = [
     span: 8,
     label: '最小订单量',
     datatype: 'number',
+    ref: 'materialNumber',
     value: 0,
     width: '100px'
   },
@@ -203,6 +204,7 @@ const materialsColumn = [
     span: 8,
     label: '最小包装量',
     disabled: 'disabled',
+    ref: 'materialNumber',
     datatype: 'number'
   },
   {

@@ -32,6 +32,7 @@ import { validateNull } from '../../../lib/validate';
 import { getUserInfo } from '../../../lib/auth';
 import { ElsPageConfigService } from '../../../lib/api/materials';
 import popList from '../../../lib/popList';
+import materialsFix from '../../../lib/materials-fix';
 
 const baseUrl = getApiPath();
 
@@ -56,19 +57,19 @@ export default {
     },
     itemLinkList: {
       type: Array,
-      default: function () {
+      default: function() {
         return popList;
       }
     },
     extendDic: {
       type: Array,
-      default: function () {
+      default: function() {
         return [];
       }
     },
     propMatch: {
       type: Array,
-      default: function () {
+      default: function() {
         return [
           {
             from: 'subElsAccount',
@@ -80,13 +81,13 @@ export default {
     },
     option: {
       type: Object,
-      default: function () {
+      default: function() {
         return { column: [] };
       }
     },
     data: {
       type: Object,
-      default: function () {
+      default: function() {
         return { data: {} };
       }
     }
@@ -277,6 +278,17 @@ export default {
       return refs;
     },
 
+    getMaterialsRefs() {
+      const refs = [];
+      materialsFix.map((item) => {
+        if (item.ref) {
+          refs.push(item.prop);
+        }
+      });
+      console.log('物料赋值列表', refs);
+      return refs;
+    },
+
     checkDataType(item) {
       const dateList = ['noteDate', 'deliveryDate', 'confirmDate', 'needDate'];
       const datetimeList = ['createDate', 'lastUpdateDate', 'validUntilTime'];
@@ -335,7 +347,7 @@ export default {
     },
 
     selectedRowMaterails(row, materialList) {
-      const refs = this.getSelectRefs('materialNumber');
+      const refs = this.getMaterialsRefs();
       const material = materialList[0];
       refs.map((prop) => {
         row[prop] = material[prop] || '';

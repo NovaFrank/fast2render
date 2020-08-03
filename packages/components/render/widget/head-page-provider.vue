@@ -1,27 +1,30 @@
 <template>
   <div class="head-list">
     <avue-form
-      ref="form"
-      :option.sync="finalOption"
-      v-model="data.data"
       v-if="data.data && inited"
+      ref="form"
+      v-model="data.data"
+      :option.sync="finalOption"
       v-on="$listeners"
     >
-      <template v-for="item in itemLinkList" :slot="item.prop">
+      <template
+        v-for="item in itemLinkList"
+        :slot="item.prop"
+      >
         <el-tag
           v-if="readOnly && data.data[item.prop]"
           :key="item.prop"
           @click.stop="go(item, data.data)"
         >
-          {{ data.data[item.prop] }}</el-tag
-        >
+          {{ data.data[item.prop] }}
+        </el-tag>
         <component
+          :is="item.component"
           v-else
           :key="item.prop"
-          :is="item.component"
           :seleted.sync="data.data[item.prop]"
           @selectDone="doSelect(item.func, data.data, $event, item.params)"
-        ></component>
+        />
       </template>
     </avue-form>
   </div>
@@ -92,15 +95,6 @@ export default {
       }
     }
   },
-  async created() {
-    if (this.readOnly) {
-      this.finalOption.detail = true;
-    }
-    this.loadConfigruations();
-  },
-  watch: {
-    // 暂时无需监测
-  },
   data() {
     return {
       finalOption: {
@@ -119,13 +113,33 @@ export default {
       configurations: {}
     };
   },
+  watch: {
+    // 暂时无需监测
+  },
+  async created() {
+    if (this.readOnly) {
+      this.finalOption.detail = true;
+    }
+    this.loadConfigruations();
+  },
   methods: {
     saveSelected(row, list, params) {
       const item = list[0];
       const ref = params[0];
+      const refs = this.getSelectRefs(ref);
       const propMacth = this.propMatch;
       row[params[0]] = item[params[2]];
+      item[params[0]] = item[params[2]];
       row[params[1]] = item[params[3]];
+      item[params[1]] = item[params[3]];
+      //
+      if (refs && refs.length) {
+        refs.map((prop) => {
+          if (item[prop]) {
+            row[prop] = item[prop];
+          }
+        });
+      }
       if (propMacth && propMacth.length) {
         propMacth.map((matchitem) => {
           if (matchitem.ref === ref) {
@@ -269,6 +283,7 @@ export default {
       if (!type) {
         return refs;
       }
+      debugger;
       this.finalOption.column.map((item) => {
         if (item.ref && item.ref.includes(type)) {
           refs.push(item.prop);

@@ -128,6 +128,32 @@ export default {
     // 单点监测 ，避免多次触发
   },
   methods: {
+    addEmptyMaterail() {
+      const item = {};
+      const showColumnProps = this.getShowColumnProps();
+
+      for (const prop in showColumnProps) {
+        // for (const prop in this.existColumnProps) {
+        item[prop] = '';
+        item.id = `${new Date().valueOf()}${generateRandomString(6)}`;
+      }
+
+      this.data.push(item);
+    },
+
+    addEmptyRow() {
+      const item = {};
+      const showColumnProps = this.getShowColumnProps();
+
+      for (const prop in showColumnProps) {
+        // for (const prop in this.existColumnProps) {
+        item[prop] = '';
+        item.id = `${new Date().valueOf()}${generateRandomString(6)}`;
+      }
+
+      this.data.push(item);
+    },
+
     checkAddedMaterials(list) {
       const data = this.data;
 
@@ -163,153 +189,7 @@ export default {
         existsList
       };
     },
-    // slot 弹框 处理
-    doSelect(func, row, event, params = []) {
-      this[func](row, event, params);
-      this.$forceUpdate();
-    },
-    go(item, row) {
-      if (window?.parent) {
-        const router = {
-          name: item.label,
-          src: item.url + row[item.prop]
-        };
-        const event = {
-          name: 'openNewTag',
-          props: router
-        };
-        console.log('测试跳转事件', event);
-        window.parent.postMessage(event, '*');
-      } else {
-        window.location.href = item.url;
-      }
-    },
-    rowDelete(row, index) {
-      this.data.splice(index, 1);
-    },
-    handleAddRow(title, row) {
-      console.log('配置属性', this.$refs.crud.option.column);
-      this.$emit('handleAddShow');
-    },
-    saveSelected(row, list, params) {
-      const item = list[0];
-      row[params[0]] = item[params[2]];
-      row[params[1]] = item[params[3]];
-    },
-    addEmptyRow() {
-      const item = {};
-      const showColumnProps = this.getShowColumnProps();
 
-      for (const prop in showColumnProps) {
-        // for (const prop in this.existColumnProps) {
-        item[prop] = '';
-        item.id = `${new Date().valueOf()}${generateRandomString(6)}`;
-      }
-
-      this.data.push(item);
-    },
-    addEmptyMaterail() {
-      const item = {};
-      const showColumnProps = this.getShowColumnProps();
-
-      for (const prop in showColumnProps) {
-        // for (const prop in this.existColumnProps) {
-        item[prop] = '';
-        item.id = `${new Date().valueOf()}${generateRandomString(6)}`;
-      }
-
-      this.data.push(item);
-    },
-    checkForm(callback, failback) {
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          callback && callback();
-        } else {
-          failback && failback();
-          return false;
-        }
-      });
-    },
-
-    rowUpdate(row, index, done, loading) {
-      const data = this.data[index];
-
-      if (row.queryUuid) {
-        data.queryUuid = row.queryUuid;
-      }
-
-      Object.assign(data, row);
-
-      if (typeof data.budgetPrice !== 'undefined' && typeof data.quantity !== 'undefined') {
-        // 采购申请有这个数据
-        const subtotalAmount = format(
-          chain(bignumber(data.budgetPrice)).multiply(bignumber(data.quantity)).done()
-        );
-
-        data.subtotalAmount = subtotalAmount || 0;
-      }
-
-      done();
-    },
-    getSelectRefs(type) {
-      const refs = [];
-      if (!type) {
-        return refs;
-      }
-      this.finalOption.column.map((item) => {
-        const originItem = this.findObject(this.originColumn, item.prop);
-        if (originItem.ref && originItem.ref.includes(type)) {
-          refs.push(item.prop);
-        }
-      });
-      console.log('赋值列表', refs);
-      return refs;
-    },
-    selectedRowMaterails(row, materialList) {
-      if (materialList.length > 0) {
-        const result = this.checkAddedMaterials(materialList);
-        const refs = this.getSelectRefs('materialNumber');
-        const addMaterialList = result.addList;
-
-        for (const material of addMaterialList) {
-          refs.map((prop) => {
-            row[prop] = material[prop] || '';
-          });
-          console.log('重新赋值', row, material);
-          // 创建. 修改采购申请(新增的行将物料的uuid放入queryUuid字段), 重新选择了物料也要更新 queryUuid
-          row.queryUuid = material.uuid;
-          row.materialNumber = material.materialNumber;
-          const materialObject = row;
-
-          Object.assign(materialObject, material);
-          // 设置与物料编辑关联的表单编辑状态
-          //  this.disableOpenForms(item.materialNumber);
-        }
-
-        if (result.existsList.length > 0) {
-          this.existsMaterials.data = result.existsList;
-
-          this.existsMaterials.visible = true;
-        }
-      } else {
-        this.$message.warning('请选择一条物料明细');
-      }
-    },
-    getShowColumnProps() {
-      const showColumnProps = this.showColumnProps || {};
-
-      if (!this.showColumnProps) {
-        const columns = this.$refs.crud.option.column;
-
-        columns.forEach((item) => {
-          showColumnProps[item.prop] = 1;
-        });
-
-        this.showColumnProps = showColumnProps;
-      }
-
-      return this.showColumnProps;
-    },
     checkDataType(item, waitUpdateDic) {
       switch (item.datatype) {
         case 'popup':
@@ -353,16 +233,24 @@ export default {
         waitUpdateDic.push(item.prop);
       }
     },
-    initSlotList(option) {
-      const list = option?.column;
-      this.itemLinkList.map((item) => {
-        const linkItem = this.findObject(list, item.prop);
-        if (linkItem !== -1) {
-          linkItem.slot = true;
+
+    checkForm(callback, failback) {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          callback && callback();
+        } else {
+          failback && failback();
+          return false;
         }
       });
-      return option;
     },
+
+    // slot 弹框 处理
+    doSelect(func, row, event, params = []) {
+      this[func](row, event, params);
+      this.$forceUpdate();
+    },
+
     filterColum(option) {
       // 新增时, 不需要 申请单号
       const tablePermission = this.rowPermission;
@@ -447,6 +335,132 @@ export default {
         }
       });
       return this.initSlotList(option);
+    },
+
+    getSelectRefs(type) {
+      const refs = [];
+      if (!type) {
+        return refs;
+      }
+      this.finalOption.column.map((item) => {
+        const originItem = this.findObject(this.originColumn, item.prop);
+        if (originItem.ref && originItem.ref.includes(type)) {
+          refs.push(item.prop);
+        }
+      });
+      console.log('赋值列表', refs);
+      return refs;
+    },
+
+    getShowColumnProps() {
+      const showColumnProps = this.showColumnProps || {};
+
+      if (!this.showColumnProps) {
+        const columns = this.$refs.crud.option.column;
+
+        columns.forEach((item) => {
+          showColumnProps[item.prop] = 1;
+        });
+
+        this.showColumnProps = showColumnProps;
+      }
+
+      return this.showColumnProps;
+    },
+
+    go(item, row) {
+      if (window?.parent) {
+        const router = {
+          name: item.label,
+          src: item.url + row[item.prop]
+        };
+        const event = {
+          name: 'openNewTag',
+          props: router
+        };
+        console.log('测试跳转事件', event);
+        window.parent.postMessage(event, '*');
+      } else {
+        window.location.href = item.url;
+      }
+    },
+
+    handleAddRow(title, row) {
+      console.log('配置属性', this.$refs.crud.option.column);
+      this.$emit('handleAddShow');
+    },
+
+    initSlotList(option) {
+      const list = option?.column;
+      this.itemLinkList.map((item) => {
+        const linkItem = this.findObject(list, item.prop);
+        if (linkItem !== -1) {
+          linkItem.slot = true;
+        }
+      });
+      return option;
+    },
+
+    rowDelete(row, index) {
+      this.data.splice(index, 1);
+    },
+
+    rowUpdate(row, index, done, loading) {
+      const data = this.data[index];
+
+      if (row.queryUuid) {
+        data.queryUuid = row.queryUuid;
+      }
+
+      Object.assign(data, row);
+
+      if (typeof data.budgetPrice !== 'undefined' && typeof data.quantity !== 'undefined') {
+        // 采购申请有这个数据
+        const subtotalAmount = format(
+          chain(bignumber(data.budgetPrice)).multiply(bignumber(data.quantity)).done()
+        );
+
+        data.subtotalAmount = subtotalAmount || 0;
+      }
+
+      done();
+    },
+
+    saveSelected(row, list, params) {
+      const item = list[0];
+      row[params[0]] = item[params[2]];
+      row[params[1]] = item[params[3]];
+    },
+
+    selectedRowMaterails(row, materialList) {
+      if (materialList.length > 0) {
+        const result = this.checkAddedMaterials(materialList);
+        const refs = this.getSelectRefs('materialNumber');
+        const addMaterialList = result.addList;
+
+        for (const material of addMaterialList) {
+          refs.map((prop) => {
+            row[prop] = material[prop] || '';
+          });
+          console.log('重新赋值', row, material);
+          // 创建. 修改采购申请(新增的行将物料的uuid放入queryUuid字段), 重新选择了物料也要更新 queryUuid
+          row.queryUuid = material.uuid;
+          row.materialNumber = material.materialNumber;
+          const materialObject = row;
+
+          Object.assign(materialObject, material);
+          // 设置与物料编辑关联的表单编辑状态
+          //  this.disableOpenForms(item.materialNumber);
+        }
+
+        if (result.existsList.length > 0) {
+          this.existsMaterials.data = result.existsList;
+
+          this.existsMaterials.visible = true;
+        }
+      } else {
+        this.$message.warning('请选择一条物料明细');
+      }
     }
   }
 };

@@ -133,6 +133,7 @@ export default {
         });
       }
     },
+
     checkForm(callback, failback) {
       this.$refs.form.validate((valid) => {
         if (valid) {
@@ -143,6 +144,7 @@ export default {
         }
       });
     },
+
     setHeadColumns(val) {
       const selected = this.configurations;
       if (selected) {
@@ -150,9 +152,11 @@ export default {
         this.updateCoumn(selected);
       }
     },
+
     getData() {
       return this.data.data;
     },
+
     updateCoumn(selected) {
       const column = this.finalOption.column;
       column.length = 0;
@@ -169,6 +173,7 @@ export default {
       this.updateDic(waitUpdateDic);
       this.inited = true;
     },
+
     replaceWithExtendDic(item) {
       const extendlist = this.extendDic;
       if (extendlist.length) {
@@ -182,6 +187,7 @@ export default {
         });
       }
     },
+
     updateDic(list) {
       const form = this.$refs.form;
       if (form) {
@@ -194,10 +200,12 @@ export default {
         }, 1000);
       }
     },
+
     setTableColumns(val) {
       const selected = this.configurations;
       this.$emit('updateTableColumn', selected);
     },
+
     doSelect(func, row, event, params = []) {
       const type = getObjType(this[func]);
       if (type === 'function') {
@@ -205,6 +213,7 @@ export default {
       }
       this.$forceUpdate();
     },
+
     loadConfigruations() {
       const fieldPermission = {};
       const tablePermission = {};
@@ -253,6 +262,7 @@ export default {
           this.$message.error('查找单据类型配置数据失败, ' + err.message || '');
         });
     },
+
     getSelectRefs(type) {
       const refs = [];
       if (!type) {
@@ -266,6 +276,7 @@ export default {
       console.log('赋值列表', refs);
       return refs;
     },
+
     checkDataType(item) {
       const dateList = ['noteDate', 'deliveryDate', 'confirmDate', 'needDate'];
       const datetimeList = ['createDate', 'lastUpdateDate', 'validUntilTime'];
@@ -313,8 +324,8 @@ export default {
           item.slot = true;
         }
       });
+
       if (!validateNull(item.bizDic)) {
-        delete item.dicData;
         delete item.dicMethod;
         delete item.props;
         item.type = 'select';
@@ -322,6 +333,7 @@ export default {
       }
       this.$forceUpdate();
     },
+
     selectedRowMaterails(row, materialList) {
       const refs = this.getSelectRefs('materialNumber');
       const material = materialList[0];
@@ -335,6 +347,7 @@ export default {
       const materialObject = row;
       Object.assign(materialObject, material);
     },
+
     filterColum(column) {
       column.map((item) => {
         delete item.readonly;

@@ -1,8 +1,19 @@
 <template>
   <!-- 物料明细弹窗 -->
   <div class="materialBox">
-    <el-input v-model="seleted" size="small" v-if="!multiple" :readonly="true">
-      <el-button slot="append" icon="el-icon-search" @click="openFieldDialog"></el-button>
+    <el-input
+      v-if="!multiple"
+      v-model="seleted"
+      size="small"
+      :readonly="true"
+      :disabled="isDisabled"
+    >
+      <el-button
+        slot="append"
+        icon="el-icon-search"
+        :disabled="isDisabled"
+        @click="openFieldDialog"
+      ></el-button>
     </el-input>
     <el-button v-else @click="openFieldDialog">{{ addBtnText }}</el-button>
     <SelectDialogTable
@@ -36,8 +47,10 @@ export default {
       }
     },
     seleted: { type: String, default: '' },
-    multiple: { type: Boolean, default: false },
-    addBtnText: { type: String, default: '添加物料' }
+    addBtnText: { type: String, default: '添加物料' },
+
+    isDisabled: { type: Boolean, default: false }, // 是否禁用
+    multiple: { type: Boolean, default: false }
   },
   components: {
     SelectDialogTable

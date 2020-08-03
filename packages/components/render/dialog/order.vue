@@ -1,6 +1,12 @@
 <template>
   <div class="selectBox">
-    <el-input v-model="seleted" size="small" v-if="!multiple" :readonly="true">
+    <el-input
+      v-if="!multiple"
+      v-model="seleted"
+      size="small"
+      :readonly="true"
+      :disabled="isDisabled"
+    >
       <el-button slot="append" icon="el-icon-search" @click="visable = true"></el-button>
     </el-input>
     <el-button v-else @click="visable = true">{{ addBtnText }}</el-button>
@@ -36,13 +42,17 @@ export default {
   props: {
     elsAccount: { type: String, default: '' }, // elsAccount
     elsSubAccount: { type: String, default: '' }, // elsSubAccount
+
     btnText: { type: String, default: '保存' }, // 保存按钮文字
     title: { type: String, default: '' }, // dialog标题
-    dialogVisible: { type: Boolean, default: false }, // dialog显隐
-    multiple: { type: Boolean, default: false }, // 是否多选
     actionPath: { type: String, default: 'findPageList' }, // 数据接口地址
     seleted: { type: String, default: '' },
     addBtnText: { type: String, default: '选择订单' },
+
+    dialogVisible: { type: Boolean, default: false }, // dialog显隐
+    isDisabled: { type: Boolean, default: false }, // 是否禁用
+    multiple: { type: Boolean, default: false }, // 是否多选
+
     api: {
       type: Function,
       default: () => {

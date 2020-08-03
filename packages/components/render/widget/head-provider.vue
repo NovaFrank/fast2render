@@ -17,6 +17,7 @@
           :key="item.prop"
           :is="item.component"
           :seleted.sync="formObj[item.prop]"
+          :isDisabled="getDisabledProperty(item.prop)"
           @selectDone="doSelect(item.func, formObj, $event, item.params)"
         ></component>
       </template>
@@ -129,6 +130,8 @@ export default {
   },
   data() {
     return {
+      disabledProperties: {},
+
       finalOption: {
         menuBtn: false,
         submitBtn: false,
@@ -159,14 +162,17 @@ export default {
     checkDataType(originItem, item) {
       const dateList = ['noteDate', 'deliveryDate', 'confirmDate', 'needDate'];
       const datetimeList = ['createDate', 'lastUpdateDate', 'validUntilTime'];
+
       if (!originItem || originItem === -1) {
         return false;
       }
+
       Object.assign(item, originItem);
 
       if (dateList.includes(item.prop)) {
         item.datatype = 'date';
       }
+
       if (datetimeList.includes(item.prop)) {
         item.datatype = 'datetime';
       }
@@ -234,6 +240,111 @@ export default {
     doSelect(func, row, event, params = []) {
       this[func](row, event, params);
       this.$forceUpdate();
+    },
+
+    filterColum(column) {
+      column.map((item) => {
+        const itemProp = this.seleted.fieldPermission[item.prop];
+        const originItem = this.findObject(this.originColumn, item.prop);
+
+        this.checkDataType(originItem, item);
+
+        if (itemProp) {
+          if (itemProp.display && itemProp.display !== false) {
+            let label = item.label;
+
+            if (itemProp.displayName) {
+              item.label = itemProp.displayName;
+              label = itemProp.displayName;
+            }
+
+            const isRequired = !!itemProp.isRequired;
+
+            if (isRequired) {
+              const rule = {
+                required: true,
+                message: '请输入' + label,
+                trigger: 'blur'
+              };
+              if (item.rules) {
+                item.rules.push(rule);
+              } else {
+                item.rules = [rule];
+              }
+            }
+
+            if (!validateNull(itemProp.bizDic)) {
+              delete item.dicData;
+              delete item.dicMethod;
+              delete item.props;
+              item.type = item.type || 'select';
+              item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${itemProp.bizDic}`;
+            }
+            if (
+              itemProp.isDisabled ||
+              itemProp.readonly ||
+              item.ref ||
+              item.disabled === 'disabled'
+            ) {
+              item.disabled = 'disabled';
+              item.cell = false;
+              item.rules = [];
+            } else {
+              item.cell = true;
+            }
+
+            if (item.isDisabled || itemProp.isDisabled) {
+              this.disabledProperties[item.prop] = 1;
+            }
+
+            /* 删除 readOnly 处理
+            if (this.readOnly) {
+              item.type = 'text';
+            }
+            */
+
+            item.display = true;
+            item.span = 6;
+          }
+        }
+
+        console.log(item, originItem, '更新后的item');
+      });
+
+      return column;
+    },
+
+    getData() {
+      const formData = JSON.parse(JSON.stringify(this.formObj));
+
+      // set real business type data and remove virtual business type data
+      formData[this.businessTypeProperty] = formData.businessType;
+      delete formData.businessType;
+
+      return formData;
+    },
+
+    getDisabledProperty(prop) {
+      return this.disabledProperties[prop] || false;
+    },
+
+    getSelectRefs(type) {
+      const refs = [];
+
+      if (!type) {
+        return refs;
+      }
+
+      this.finalOption.column.map((item) => {
+        const originItem = this.findObject(this.originColumn, item.prop);
+
+        if (originItem.ref && originItem.ref.includes(type)) {
+          refs.push(item.prop);
+        }
+      });
+
+      console.log('赋值列表', refs);
+      return refs;
     },
 
     loadConfigruations() {
@@ -382,98 +493,6 @@ export default {
           console.log('query purchase rquestion cofiguration error', err);
           this.$message.error('查找单据类型配置数据失败, ' + err.message || '');
         });
-    },
-
-    filterColum(column) {
-      column.map((item) => {
-        const itemProp = this.seleted.fieldPermission[item.prop];
-        const originItem = this.findObject(this.originColumn, item.prop);
-
-        this.checkDataType(originItem, item);
-
-        if (itemProp) {
-          if (itemProp.display && itemProp.display !== false) {
-            let label = item.label;
-
-            if (itemProp.displayName) {
-              item.label = itemProp.displayName;
-              label = itemProp.displayName;
-            }
-
-            const isRequired = !!itemProp.isRequired;
-
-            if (isRequired) {
-              const rule = {
-                required: true,
-                message: '请输入' + label,
-                trigger: 'blur'
-              };
-              if (item.rules) {
-                item.rules.push(rule);
-              } else {
-                item.rules = [rule];
-              }
-            }
-
-            if (!validateNull(itemProp.bizDic)) {
-              delete item.dicData;
-              delete item.dicMethod;
-              delete item.props;
-              item.type = item.type || 'select';
-              item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${itemProp.bizDic}`;
-            }
-            if (
-              itemProp.isDisabled ||
-              itemProp.readonly ||
-              item.ref ||
-              item.disabled === 'disabled'
-            ) {
-              item.disabled = 'disabled';
-              item.cell = false;
-              item.rules = [];
-            } else {
-              item.cell = true;
-            }
-
-            /* 删除 readOnly 处理
-            if (this.readOnly) {
-              item.type = 'text';
-            }
-            */
-
-            item.display = true;
-            item.span = 6;
-          }
-        }
-
-        console.log(item, originItem, '更新后的item');
-      });
-      return column;
-    },
-
-    getData() {
-      const formData = JSON.parse(JSON.stringify(this.formObj));
-
-      // set real business type data and remove virtual business type data
-      formData[this.businessTypeProperty] = formData.businessType;
-      delete formData.businessType;
-
-      return formData;
-    },
-
-    getSelectRefs(type) {
-      const refs = [];
-      if (!type) {
-        return refs;
-      }
-      this.finalOption.column.map((item) => {
-        const originItem = this.findObject(this.originColumn, item.prop);
-        if (originItem.ref && originItem.ref.includes(type)) {
-          refs.push(item.prop);
-        }
-      });
-      console.log('赋值列表', refs);
-      return refs;
     },
 
     saveSelected(row, list, params) {

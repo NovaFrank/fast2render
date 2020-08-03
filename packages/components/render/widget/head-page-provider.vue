@@ -7,10 +7,7 @@
       :option.sync="finalOption"
       v-on="$listeners"
     >
-      <template
-        v-for="item in itemLinkList"
-        :slot="item.prop"
-      >
+      <template v-for="item in itemLinkList" :slot="item.prop">
         <el-tag
           v-if="readOnly && data.data[item.prop]"
           :key="item.prop"
@@ -113,7 +110,7 @@ export default {
         column: []
       },
       inited: false,
-      form: this.data.data || {},
+      form: this.data.data,
       reload: false,
       formSlots: [],
       optionHash: '',
@@ -124,6 +121,13 @@ export default {
   },
   watch: {
     // 暂时无需监测
+    form: {
+      handler: function(newVal, oldVar) {
+        this.emit('on-update', newVal);
+      },
+      immediate: true,
+      deep: true
+    }
   },
   async created() {
     if (this.readOnly) {

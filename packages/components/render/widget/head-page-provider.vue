@@ -451,4 +451,20 @@ export default {
 .row-list .avue-crud__menu {
   display: none;
 }
+.head-list .el-form-item__label {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  width: auto !important;
+}
+.head-list .el-form-item__content {
+  position: relative;
+  display: block;
+  flex: 1;
+  width: auto;
+  margin-left: 0 !important;
+}
+.head-list .el-form-item {
+  display: flex;
+}
 </style>

@@ -8,6 +8,7 @@
     >
       添加行
     </el-button>
+    {{ finalOption.column }}
     <avue-crud
       v-if="reload"
       ref="crud"
@@ -18,16 +19,8 @@
       @row-del="rowDelete"
       @row-update="rowUpdate"
     >
-      <template
-        v-for="item in itemLinkList"
-        :slot="item.prop"
-        slot-scope="scope"
-      >
-        <el-tag
-          v-if="readOnly"
-          :key="item.prop"
-          @click.stop="go(item, scope.row)"
-        >
+      <template v-for="item in itemLinkList" :slot="item.prop" slot-scope="scope">
+        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, scope.row)">
           {{ scope.row[item.prop] }}
         </el-tag>
         <component
@@ -48,6 +41,7 @@ import { getApiPath, generateRandomString } from '../../../lib/utils.js';
 import { validateNull } from '../../../lib/validate';
 import { format, chain, bignumber } from 'mathjs';
 import popList from '../../../lib/popList';
+import { checkDataTypeItem, checkFixDic } from '../core/utils.js';
 
 const baseUrl = getApiPath();
 
@@ -213,50 +207,6 @@ export default {
       };
     },
 
-    checkDataType(item, waitUpdateDic) {
-      switch (item.datatype) {
-        case 'popup':
-          item.formslot = true;
-          break;
-        case 'readonly':
-        case 'popupName':
-          item.disabled = 'disabled';
-          break;
-        case 'data':
-        case 'date':
-          item.type = 'date';
-          item.format = 'yyyy-MM-dd';
-          item.valueFormat = 'timestamp';
-          break;
-        case 'datatime':
-        case 'datetime':
-          item.type = 'datetime';
-          item.format = 'yyyy-MM-dd HH:mm:ss';
-          item.valueFormat = 'timestamp';
-          break;
-        case 'price':
-          item.type = 'number';
-          item.precision = 2;
-          break;
-        case 'bizDic':
-          item.type = 'select';
-          item.bizDic = item.bizDic || item.prop;
-          break;
-        default:
-      }
-      if (item.ref) {
-        item.disabled = 'disabled';
-      }
-      if (!validateNull(item.bizDic)) {
-        delete item.dicData;
-        delete item.dicMethod;
-        delete item.props;
-        item.type = 'select';
-        item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${item.bizDic}`;
-        waitUpdateDic.push(item.prop);
-      }
-    },
-
     checkForm(callback, failback) {
       this.$refs.form.validate((valid) => {
         if (valid) {
@@ -292,7 +242,8 @@ export default {
       const crud = this.$refs.crud;
       option.column.map((item) => {
         const itemProp = this.rowPermission[item.prop];
-        this.checkDataType(item, waitUpdateDic);
+        checkDataTypeItem(item, waitUpdateDic);
+        checkFixDic(item);
         if (itemProp) {
           if (itemProp.display && itemProp.display !== false) {
             let label = item.label;

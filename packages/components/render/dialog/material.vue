@@ -15,10 +15,7 @@
         @click="openFieldDialog"
       />
     </el-input>
-    <el-button
-      v-else
-      @click="openFieldDialog"
-    >
+    <el-button v-else @click="openFieldDialog">
       {{ addBtnText }}
     </el-button>
     <SelectDialogTable
@@ -123,8 +120,8 @@ export default {
       }
       // 外部传递参数
       for (const key in this.listParams) {
-        if (listParams[key]) {
-          params[key] = listParams[key];
+        if (this.listParams[key]) {
+          params[key] = this.listParams[key];
         }
       }
 

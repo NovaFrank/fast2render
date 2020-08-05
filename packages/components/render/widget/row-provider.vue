@@ -8,7 +8,6 @@
     >
       添加行
     </el-button>
-    {{ finalOption.column }}
     <avue-crud
       v-if="reload"
       ref="crud"

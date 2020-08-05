@@ -1,6 +1,8 @@
 import { validateNull } from '../../../lib/validate';
+import { getApiPath } from '../../../lib/utils.js';
 
-const  fixSeleteDic = [{ form: 'taxCode', to: 'taxRate' }],
+const fixSeleteDic = [{ from: 'taxCode', to: 'taxRate' }];
+const baseUrl = getApiPath();
 export const getFilePath = () => {
   let projectPath;
   if (top.location.pathname) {
@@ -13,15 +15,15 @@ export const getFilePath = () => {
   }
 };
 
-export const checkFixDic = (item, list = fixSeleteDic) => {
-  list.map(dicItem => {
+export const checkFixDic = (item, list) => {
+  fixSeleteDic.map((dicItem) => {
     if (dicItem.from === item.prop) {
-      debugger
-        item.type='select'
-        item.dicUrl =`${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${item.prop}`;
-      }
-    })
-}
+      item.type = 'select';
+      item.datatype = 'fixBizDic';
+      item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${item.prop}`;
+    }
+  });
+};
 
 export const checkDataType = (item) => {
   const dateList = ['noteDate', 'deliveryDate', 'confirmDate', 'needDate'];
@@ -83,69 +85,69 @@ export const checkDataType = (item) => {
   }
 };
 
-  export const   checkDataTypeItem = (originItem, item) => {
-      const dateList = ['noteDate', 'deliveryDate', 'confirmDate', 'needDate'];
-      const datetimeList = ['createDate', 'lastUpdateDate', 'validUntilTime'];
+export const checkDataTypeItem = (originItem, item) => {
+  const dateList = ['noteDate', 'deliveryDate', 'confirmDate', 'needDate'];
+  const datetimeList = ['createDate', 'lastUpdateDate', 'validUntilTime'];
 
-      if (!originItem || originItem === -1) {
-        return false;
-      }
+  if (!originItem || originItem === -1) {
+    return false;
+  }
 
-      Object.assign(item, originItem);
+  Object.assign(item, originItem);
 
-      if (dateList.includes(item.prop)) {
-        item.datatype = 'date';
-      }
+  if (dateList.includes(item.prop)) {
+    item.datatype = 'date';
+  }
 
-      if (datetimeList.includes(item.prop)) {
-        item.datatype = 'datetime';
-      }
+  if (datetimeList.includes(item.prop)) {
+    item.datatype = 'datetime';
+  }
 
-      switch (item.datatype) {
-        case 'readonly':
-        case 'popupName':
-          item.disabled = 'disabled';
-          break;
-        case 'date':
-          item.type = 'date';
-          item.format = 'yyyy-MM-dd';
-          item.valueFormat = 'timestamp';
-          break;
-        case 'datatime':
-        case 'datetime':
-          item.type = 'datetime';
-          item.format = 'yyyy-MM-dd HH:mm:ss';
-          item.valueFormat = 'timestamp';
-          break;
-        case 'price':
-          item.type = 'number';
-          item.precision = 2;
-          break;
-        case 'bizDic':
-          item.type = 'select';
-          item.bizDic = item.bizDic || item.prop;
-          break;
-        default:
-      }
+  switch (item.datatype) {
+    case 'readonly':
+    case 'popupName':
+      item.disabled = 'disabled';
+      break;
+    case 'date':
+      item.type = 'date';
+      item.format = 'yyyy-MM-dd';
+      item.valueFormat = 'timestamp';
+      break;
+    case 'datatime':
+    case 'datetime':
+      item.type = 'datetime';
+      item.format = 'yyyy-MM-dd HH:mm:ss';
+      item.valueFormat = 'timestamp';
+      break;
+    case 'price':
+      item.type = 'number';
+      item.precision = 2;
+      break;
+    case 'bizDic':
+      item.type = 'select';
+      item.bizDic = item.bizDic || item.prop;
+      break;
+    default:
+  }
 
-      if (originItem.datatype === 'popup' && !originItem.ref) {
-        item.formslot = true;
-      }
+  if (originItem.datatype === 'popup' && !originItem.ref) {
+    item.formslot = true;
+  }
 
-      if (originItem.ref) {
-        item.disabled = 'disabled';
-      }
+  if (originItem.ref) {
+    item.disabled = 'disabled';
+  }
 
-      if (item.isSystem === 'Y' && this.status === 'new') {
-        item.display = false;
-        item.rules = [];
-      }
+  // if (item.isSystem === 'Y') {
+  //   item.display = false;
+  //   item.rules = [];
+  // }
 
-      if (!validateNull(item.bizDic)) {
-        delete item.dicData;
-        delete item.dicMethod;
-        delete item.props;
-        item.type = 'select';
-        item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${item.bizDic}`;
-      }
-    },
+  if (!validateNull(item.bizDic)) {
+    delete item.dicData;
+    delete item.dicMethod;
+    delete item.props;
+    item.type = 'select';
+    item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${item.bizDic}`;
+  }
+};

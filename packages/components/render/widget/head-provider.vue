@@ -253,8 +253,6 @@ export default {
             item.span = 6;
           }
         }
-
-        console.log(item, originItem, '更新后的item');
       });
 
       return column;

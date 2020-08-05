@@ -10,4 +10,4 @@ export const OPERATION = {
   SUBMIT: 'SUBMIT'
 };
 
-export const ROUTER_PATH_ORDER_V2 = '/orderV2';
+export const ROUTER_PATH_ORDER_V2 = '/v2/order';

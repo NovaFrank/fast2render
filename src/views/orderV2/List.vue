@@ -49,7 +49,7 @@ export default window.$crudCommon(
         headerButtons: [
           {
             name: 'btn-createBid',
-            label: '新增',
+            label: '新 增',
             icon: 'el-icon-plus',
             size: 'small',
             disabled: false,
@@ -68,7 +68,7 @@ export default window.$crudCommon(
         this[action]();
       },
       handleAddItem() {
-        this.$router.push({ path: `${ROUTER_PATH_ORDER_V2}/new` });
+        this.$router.push({ path: `${ROUTER_PATH_ORDER_V2}/create` });
       },
       getDisable(item) {
         if (this.currentRow && item.type === 'rowAction') {

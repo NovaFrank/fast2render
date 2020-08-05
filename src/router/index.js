@@ -10,24 +10,24 @@ const routes = [
   },
 
   {
-    path: '/orderV2',
+    path: '/v2/order',
     name: 'orderListV2',
-    component: () => import('@/views/purchaseV2/List.vue')
+    component: () => import('@/views/orderV2/List.vue')
   },
   {
-    path: '/orderV2/new',
-    name: 'orderNewV2',
-    component: () => import('@/views/purchaseV2/New.vue')
+    path: '/v2/order/create',
+    name: 'orderCreateV2',
+    component: () => import('@/views/orderV2/Create.vue')
   },
   {
-    path: '/orderV2/edit/:orderNumber',
+    path: '/v2/order/edit/:orderNumber',
     name: 'orderEditV2',
-    component: () => import('@/views/purchaseV2/Edit.vue')
+    component: () => import('@/views/orderV2/Edit.vue')
   },
   {
-    path: '/orderV2/detail/:orderNumber',
+    path: '/v2/order/detail/:orderNumber',
     name: 'orderDetailV2',
-    component: () => import('@/views/purchaseV2/Detail.vue')
+    component: () => import('@/views/orderV2/Detail.vue')
   },
 
   {
@@ -38,11 +38,6 @@ const routes = [
   {
     path: '/create',
     component: () => import('@/views/order/Create'),
-    name: 'Create'
-  },
-  {
-    path: '/new/create',
-    component: () => import('@/views/orderNew/Create'),
     name: 'Create'
   },
   {

@@ -10,6 +10,7 @@ import RowProvider from './components/render/widget/row-provider'; // 单据行�
 import RowPageProvider from './components/render/widget/row-page-provider'; // 单据行项目专用组件
 import HeadProvider from './components/render/widget/head-provider'; // 业务类型单据头专用组件
 import HeadPageProvider from './components/render/widget/head-page-provider'; // 模块单据头专用组件
+import SearchProvider from './components/render/widget/search-provider'; // 业务类型单据头专用组件
 import ConfigTabRender from './components/render/widget/render-config-tab';
 import CostConfigTabRender from './components/render/widget/render-cost-config-tab';
 import ConfigTabSetting from './components/render/widget/setting-config-tab';
@@ -69,6 +70,7 @@ export default {
 
     Vue.component('Fast2' + HeadProvider.name, HeadProvider);
     Vue.component('Fast2' + HeadPageProvider.name, HeadPageProvider);
+    Vue.component('Fast2' + SearchProvider.name, SearchProvider);
     Vue.component('Fast2' + ConfigTabRender.name, ConfigTabRender);
     Vue.component('Fast2' + CostConfigTabRender.name, CostConfigTabRender);
     Vue.component('Fast2' + ConfigTabSetting.name, ConfigTabSetting);

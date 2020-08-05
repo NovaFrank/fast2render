@@ -15,6 +15,7 @@
       :data="data"
       :option.sync="finalOption"
       v-on="$listeners"
+      :page.sync="tableOption.page"
       @row-del="rowDelete"
       @row-update="rowUpdate"
     >
@@ -116,6 +117,12 @@ export default {
       type: Object,
       default: function() {
         return { column: [] };
+      }
+    },
+    page: {
+      type: Object,
+      default: function() {
+        return {};
       }
     },
     data: {

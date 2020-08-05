@@ -5,33 +5,40 @@
       size="small"
       style="margin-left: 10px; margin-bottom: 10px;"
       @click.stop="handleAddRow()"
-      >添加行</el-button
     >
+      添加行
+    </el-button>
     <avue-crud
-      ref="crud"
       v-if="reload"
+      ref="crud"
+      v-model="obj"
       :data="data"
       :option.sync="finalOption"
-      v-model="obj"
       v-on="$listeners"
       @row-del="rowDelete"
       @row-update="rowUpdate"
     >
-      <template v-for="item in itemLinkList" :slot="item.prop" slot-scope="scope">
+      <template
+        v-for="item in itemLinkList"
+        :slot="item.prop"
+        slot-scope="scope"
+      >
         <el-tag
           v-if="readOnly || !scope.row.$cellEdit"
           :key="item.prop"
           @click.stop="go(item, scope.row)"
         >
-          {{ scope.row[item.prop] }}</el-tag
-        >
+          {{ scope.row[item.prop] }}
+        </el-tag>
         <component
+          :is="item.component"
           v-else
           :key="item.prop"
-          :is="item.component"
+          :api="listApi[item.prop]"
+          :list-params.sync="listParams[item.prop]"
           :seleted.sync="scope.row[item.prop]"
           @selectDone="doSelect(item.func, scope.row, $event, item.params)"
-        ></component>
+        />
       </template>
     </avue-crud>
   </div>
@@ -70,6 +77,18 @@ export default {
         return popList;
       }
     },
+    listApi: {
+      type: Object,
+      default: function() {
+        return {};
+      }
+    },
+    listParams: {
+      type: Object,
+      default: function() {
+        return {};
+      }
+    },
     option: {
       type: Object,
       default: function() {
@@ -81,12 +100,6 @@ export default {
       default: function() {
         return [];
       }
-    }
-  },
-  created() {
-    this.reload = true;
-    if (this.readOnly) {
-      this.finalOption.menu = false;
     }
   },
   data() {
@@ -115,6 +128,12 @@ export default {
       deep: true
     }
     // 单点监测 ，避免多次触发
+  },
+  created() {
+    this.reload = true;
+    if (this.readOnly) {
+      this.finalOption.menu = false;
+    }
   },
   methods: {
     addEmptyRow() {

@@ -2,24 +2,35 @@
   <div class="head-list">
     <avue-form
       ref="form"
-      :option.sync="finalOption"
       v-model="formObj"
+      :option.sync="finalOption"
       v-on="$listeners"
       @row-del="rowDeleteMaterialList"
       @row-update="rowUpdateMaterialList"
     >
-      <template v-for="item in itemLinkList" :slot="item.prop">
-        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, data)">{{
-          formObj[item.prop]
-        }}</el-tag>
+      <template
+        v-for="item in itemLinkList"
+        :slot="item.prop"
+      >
+        <el-tag
+          v-if="readOnly"
+          :key="item.prop"
+          @click.stop="go(item, data)"
+        >
+          {{
+            formObj[item.prop]
+          }}
+        </el-tag>
         <component
+          :is="item.component"
           v-else
           :key="item.prop"
-          :is="item.component"
           :seleted.sync="formObj[item.prop]"
-          :isDisabled="getDisabledProperty(item.prop)"
+          :api="listApi[item.prop]"
+          :list-params.sync="listParams[item.prop]"
+          :is-disabled="getDisabledProperty(item.prop)"
           @selectDone="doSelect(item.func, formObj, $event, item.params)"
-        ></component>
+        />
       </template>
     </avue-form>
   </div>
@@ -50,7 +61,7 @@ export default {
     },
     businessTypeProperty: {
       type: String,
-      default: function () {
+      default: function() {
         return ''; // 用于匹配实际的业务类型数据
       }
     },
@@ -60,25 +71,37 @@ export default {
     },
     data: {
       type: Object,
-      default: function () {
+      default: function() {
         return {};
       }
     },
     itemLinkList: {
       type: Array,
-      default: function () {
+      default: function() {
         return popList;
+      }
+    },
+    listApi: {
+      type: Object,
+      default: function() {
+        return {};
+      }
+    },
+    listParams: {
+      type: Object,
+      default: function() {
+        return {};
       }
     },
     option: {
       type: Object,
-      default: function () {
+      default: function() {
         return { column: [] };
       }
     },
     originColumn: {
       type: Object,
-      default: function () {
+      default: function() {
         return [];
       }
     },
@@ -88,44 +111,13 @@ export default {
     },
     rowPermission: {
       type: Object,
-      default: function () {
+      default: function() {
         return {};
       }
     },
     status: {
       type: String,
       default: 'new' // 远程获取 表格字段数据配置- 后续扩充 from 类型
-    }
-  },
-  async created() {
-    if (this.readOnly) {
-      this.finalOption.detail = true;
-      /* 删除 readOnly 处理
-      this.finalOption.column[0] = {
-        label: '业务类型',
-        prop: 'businessTypeName',
-        type: 'input',
-        span: 6
-      };
-      */
-    } else {
-      this.finalOption.detail = false;
-    }
-
-    this.loadConfigruations();
-  },
-  watch: {
-    'formObj.businessType'(newVal) {
-      console.log(new Date().valueOf(), 'formObj.businessType', newVal);
-      if (newVal && newVal !== '') {
-        this.setHeadColumns(newVal);
-        this.setTableColumns(newVal);
-      }
-    },
-    'formObj.projectType'(newVal) {
-      if (newVal && newVal !== '') {
-        this.$emit('projectTypeChange', newVal);
-      }
     }
   },
   data() {
@@ -157,6 +149,37 @@ export default {
       typeDicts: [],
       typeData: []
     };
+  },
+  watch: {
+    'formObj.businessType'(newVal) {
+      console.log(new Date().valueOf(), 'formObj.businessType', newVal);
+      if (newVal && newVal !== '') {
+        this.setHeadColumns(newVal);
+        this.setTableColumns(newVal);
+      }
+    },
+    'formObj.projectType'(newVal) {
+      if (newVal && newVal !== '') {
+        this.$emit('projectTypeChange', newVal);
+      }
+    }
+  },
+  async created() {
+    if (this.readOnly) {
+      this.finalOption.detail = true;
+      /* 删除 readOnly 处理
+      this.finalOption.column[0] = {
+        label: '业务类型',
+        prop: 'businessTypeName',
+        type: 'input',
+        span: 6
+      };
+      */
+    } else {
+      this.finalOption.detail = false;
+    }
+
+    this.loadConfigruations();
   },
   methods: {
     checkDataType(originItem, item) {
@@ -553,5 +576,21 @@ export default {
 <style>
 .row-list .avue-crud__menu {
   display: none;
+}
+.head-list .el-form-item__label {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  width: auto !important;
+}
+.head-list .el-form-item__content {
+  position: relative;
+  display: block;
+  flex: 1;
+  width: auto;
+  margin-left: 0 !important;
+}
+.head-list .el-form-item {
+  display: flex;
 }
 </style>

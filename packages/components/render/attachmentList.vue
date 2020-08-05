@@ -1,21 +1,38 @@
 <template>
   <div>
     <h4>
-      <i class="el-icon-link"></i> <span v-if="!readonly">附件</span><span v-else>上传附件</span>
-      <el-button size="mini" v-if="addBtn && !readonly" @click="listRowAdd">新增行</el-button>
+      <i class="el-icon-link" /> <span v-if="!readonly">附件</span><span v-else>上传附件</span>
+      <el-button
+        v-if="addBtn && !readonly"
+        size="mini"
+        @click="listRowAdd"
+      >
+        新增行
+      </el-button>
     </h4>
-    <fast2-theme-provider :option="readonly ? readOption : option" theme="block" :version="version">
+    <fast2-theme-provider
+      :option="readonly ? readOption : option"
+      theme="block"
+      :version="version"
+    >
       <template v-slot="component">
         <div v-if="component.option && component.option.column && component.option.column.length">
-          <avue-crud :data="fileList" :option="component.option" @row-del="handleDelete">
+          <avue-crud
+            :data="fileList"
+            :option="component.option"
+            @row-del="handleDelete"
+          >
             <template v-slot:fileAction="scope">
-              <div v-if="!readonly && downloadClient" @mouseover="setUploadRow(scope.row)">
+              <div
+                v-if="!readonly && downloadClient"
+                @mouseover="setUploadRow(scope.row)"
+              >
                 <fast2-upload
                   @file-success="fileSuccess"
                   @file-progress="onFileProgress"
                   @file-error="onFileError"
                   @click="setUploadRow(scope.row)"
-                ></fast2-upload>
+                />
               </div>
               <div v-else-if="downloadClient">
                 <el-link
@@ -28,8 +45,14 @@
                 </el-link>
               </div>
             </template>
-            <template slot="annexType" slot-scope="{ row }">
-              <span class="annexType" v-if="row.isRequired === 'Y'"></span>{{ row.annexType }}
+            <template
+              slot="annexType"
+              slot-scope="{ row }"
+            >
+              <span
+                v-if="row.isRequired === 'Y'"
+                class="annexType"
+              />{{ row.annexType }}
             </template>
           </avue-crud>
         </div>
@@ -97,7 +120,7 @@ export default {
     },
     attachmentTemplate: {
       type: Array,
-      default: function () {
+      default: function() {
         return [];
       }
     },
@@ -143,8 +166,6 @@ export default {
               prop: 'annexType',
               type: 'select',
               span: 8,
-              dicName: 'annex-type',
-              datatype: 'remoteDic',
               orderIndex: 0,
               order: 1,
               slot: true
@@ -200,6 +221,18 @@ export default {
       uploader: null
     };
   },
+  watch: {
+    id(newValue) {
+      this.businessId = newValue;
+      this.initData();
+    },
+    attachmentTemplate() {
+      this.initData();
+    },
+    fileList(newVal) {
+      console.log(newVal);
+    }
+  },
   created() {},
   mounted() {
     const currentUserInfo = getUserInfo();
@@ -217,18 +250,6 @@ export default {
     }
     if (this.domain) {
       this.dome = this.domain;
-    }
-  },
-  watch: {
-    id(newValue) {
-      this.businessId = newValue;
-      this.initData();
-    },
-    attachmentTemplate() {
-      this.initData();
-    },
-    fileList(newVal) {
-      console.log(newVal);
     }
   },
   methods: {
@@ -297,13 +318,13 @@ export default {
         const reader = new FileReader();
         let fileResult = '';
         reader.readAsDataURL(file); // 开始转
-        reader.onload = function () {
+        reader.onload = function() {
           fileResult = reader.result;
         }; // 转 失败
-        reader.onerror = function (error) {
+        reader.onerror = function(error) {
           reject(error);
         }; // 转 结束  咱就 resolve 出去
-        reader.onloadend = function () {
+        reader.onloadend = function() {
           resolve(fileResult);
         };
       });

@@ -28,11 +28,40 @@
           @selectDone="doSelect(item.func, data.data, $event, item.params)"
         />
       </template>
+      <template
+        v-for="item in itemUploadList"
+        :slot="item.prop"
+      >
+        {{ data.data[item.prop] }}
+        <img
+          v-if="data.data[item.prop] && item.datatype === 'uploadImg'"
+          :key="item.prop"
+          width="200px"
+          :src="data.data[item.prop]"
+        >
+        <el-link
+          v-else-if="data.data[item.prop] && item.datatype === 'uploadFile'"
+          :key="item.prop"
+          type="text"
+          :herf="data.data[item.prop]"
+        >
+          {{ data.data[item.prop] }}
+        </el-link>
+        <fast2-upload
+          v-else
+          :key="item.prop"
+          @file-success="fileSuccess"
+          @file-progress="onFileProgress"
+          @file-error="onFileError"
+          @click="setUploadField(item.prop)"
+        />
+      </template>
     </avue-form>
   </div>
 </template>
 <script>
 import { getApiPath, getObjType } from '../../../lib/utils.js';
+import { getFilePath } from '../core/utils.js';
 import { validateNull } from '../../../lib/validate';
 import { getUserInfo } from '../../../lib/auth';
 import { ElsPageConfigService } from '../../../lib/api/materials';
@@ -78,6 +107,12 @@ export default {
         return popList;
       }
     },
+    itemUploadList: {
+      type: Array,
+      default: function() {
+        return [];
+      }
+    },
     extendDic: {
       type: Array,
       default: function() {
@@ -118,13 +153,14 @@ export default {
         column: []
       },
       inited: false,
-      form: this.data.data,
+      obj: this.data.data || {},
       reload: false,
       formSlots: [],
       optionHash: '',
       typeData: [],
       seleted: {},
-      configurations: {}
+      configurations: {},
+      uploadField: ''
     };
   },
   watch: {
@@ -168,6 +204,20 @@ export default {
           }
         });
       }
+    },
+    fileSuccess(req, req1, res) {
+      const data = JSON.parse(res).data;
+      const prop = this.uploadField || this.itemUploadList[0].prop;
+      debugger;
+      if (prop) {
+        this.data.data[prop] = getFilePath() + data.url;
+      }
+    },
+    onFileProgress() {
+      console.log('上传中');
+    },
+    setUploadField(prop) {
+      this.uploadField = prop;
     },
 
     checkForm(callback, failback) {
@@ -372,20 +422,35 @@ export default {
           break;
         default:
       }
-      this.itemLinkList.map((linkItem) => {
-        if (item.prop === linkItem.prop) {
-          item.formslot = true;
-          item.slot = true;
-        }
-      });
-
       if (!validateNull(item.bizDic)) {
         delete item.dicMethod;
         delete item.props;
         item.type = 'select';
         item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${item.bizDic}`;
       }
-      this.$forceUpdate();
+    },
+
+    checkSlot(item) {
+      this.itemLinkList.map((linkItem) => {
+        if (item.prop === linkItem.prop) {
+          item.formslot = true;
+          item.slot = true;
+        }
+      });
+      if (item.datatype === 'uploadImg' || item.prop === 'picture') {
+        item.datatype = 'uploadFile';
+        this.itemUploadList.push(item);
+      }
+      if (item.datatype === 'uploadFile' || item.prop === 'url') {
+        item.datatype = 'uploadFile';
+        this.itemUploadList.push(item);
+      }
+      this.itemUploadList.map((linkItem) => {
+        if (item.prop === linkItem.prop) {
+          item.formslot = true;
+          item.slot = true;
+        }
+      });
     },
 
     selectedRowMaterails(row, materialList) {
@@ -411,6 +476,7 @@ export default {
           label = item.displayName;
         }
         this.checkDataType(item);
+        this.checkSlot(item);
         const isRequired = item.isRequired === 'Y';
         if (isRequired) {
           const rule = {
@@ -454,5 +520,21 @@ export default {
 <style>
 .row-list .avue-crud__menu {
   display: none;
+}
+.head-list .el-form-item__label {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  width: auto !important;
+}
+.head-list .el-form-item__content {
+  position: relative;
+  display: block;
+  flex: 1;
+  width: auto;
+  margin-left: 0 !important;
+}
+.head-list .el-form-item {
+  display: flex;
 }
 </style>

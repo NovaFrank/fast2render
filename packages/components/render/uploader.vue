@@ -1,7 +1,10 @@
 <template>
   <uploader :options="uploadOptions" v-on="$listeners" v-bind="$props" class="uploader-example">
     <uploader-unsupport></uploader-unsupport>
-    <uploader-btn>上传</uploader-btn>
+    <uploader-btn>
+      <span v-if="type !== 'image' || !url">上传</span>
+      <img v-else :src="url" class="thumb" />
+    </uploader-btn>
   </uploader>
 </template>
 
@@ -24,6 +27,14 @@ export default {
       type: String,
       default: null
     },
+    url: {
+      type: String,
+      default: null
+    },
+    type: {
+      type: String,
+      default: 'file'
+    },
     elsAccount: {
       type: String,
       default: null
@@ -44,7 +55,7 @@ export default {
         chunkSize: '1024000', // 分块大小
         fileParameterName: 'file', // 上传文件时文件的参数名，默认file
         maxChunkRetries: 3, // 最大自动失败重试上传次数
-        checkChunkUploadedByResponse: function (chunk, message) {
+        checkChunkUploadedByResponse: function(chunk, message) {
           const objMessage = JSON.parse(message);
           if (objMessage.skipUpload) {
             return true;
@@ -105,6 +116,7 @@ export default {
             .sendFiles(params)
             .then((res) => {
               if (res.data.statusCode === '200') {
+                console.log('返回数据', res);
                 resolve({ result: true, statusCode: res.data.statusCode });
               } else {
                 resolve({
@@ -152,13 +164,13 @@ export default {
         const reader = new FileReader();
         let fileResult = '';
         reader.readAsDataURL(file); // 开始转
-        reader.onload = function () {
+        reader.onload = function() {
           fileResult = reader.result;
         }; // 转 失败
-        reader.onerror = function (error) {
+        reader.onerror = function(error) {
           reject(error);
         }; // 转 结束  咱就 resolve 出去
-        reader.onloadend = function () {
+        reader.onloadend = function() {
           resolve(fileResult);
         };
       });
@@ -169,3 +181,9 @@ export default {
   }
 };
 </script>
+<style>
+.thumb {
+  width: 80px;
+  height: 80px;
+}
+</style>

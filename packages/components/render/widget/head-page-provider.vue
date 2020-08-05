@@ -46,7 +46,7 @@
 </template>
 <script>
 import { getApiPath, getObjType } from '../../../lib/utils.js';
-import { getFilePath } from '../core/utils.js';
+import { getFilePath, checkDataType } from '../core/utils.js';
 import { validateNull } from '../../../lib/validate';
 import { getUserInfo } from '../../../lib/auth';
 import { ElsPageConfigService } from '../../../lib/api/materials';
@@ -364,55 +364,6 @@ export default {
       return refs;
     },
 
-    checkDataType(item) {
-      const dateList = ['noteDate', 'deliveryDate', 'confirmDate', 'needDate'];
-      const datetimeList = ['createDate', 'lastUpdateDate', 'validUntilTime'];
-
-      if (dateList.includes(item.prop)) {
-        item.datatype = 'date';
-      }
-      if (datetimeList.includes(item.prop)) {
-        item.datatype = 'datetime';
-      }
-
-      switch (item.datatype) {
-        case 'popup':
-          item.formslot = true;
-          item.slot = true;
-          break;
-        case 'popupName':
-          item.disabled = 'disabled';
-          break;
-        case 'data':
-        case 'date':
-          item.type = 'date';
-          item.format = 'yyyy-MM-dd';
-          item.valueFormat = 'timestamp';
-          break;
-        case 'datatime':
-        case 'datetime':
-          item.type = 'datetime';
-          item.format = 'yyyy-MM-dd HH:mm:ss';
-          item.valueFormat = 'timestamp';
-          break;
-        case 'price':
-          item.type = 'number';
-          item.precision = 2;
-          break;
-        case 'bizDic':
-          item.type = 'select';
-          item.bizDic = item.bizDic || item.prop;
-          break;
-        default:
-      }
-      if (!validateNull(item.bizDic)) {
-        delete item.dicMethod;
-        delete item.props;
-        item.type = 'select';
-        item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${item.bizDic}`;
-      }
-    },
-
     checkSlot(item) {
       this.itemLinkList.map((linkItem) => {
         if (item.prop === linkItem.prop) {
@@ -458,7 +409,7 @@ export default {
           item.label = item.displayName;
           label = item.displayName;
         }
-        this.checkDataType(item);
+        checkDataType(item);
         this.checkSlot(item);
         const isRequired = item.isRequired === 'Y';
         if (isRequired) {

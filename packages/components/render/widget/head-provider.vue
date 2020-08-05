@@ -8,18 +8,9 @@
       @row-del="rowDeleteMaterialList"
       @row-update="rowUpdateMaterialList"
     >
-      <template
-        v-for="item in itemLinkList"
-        :slot="item.prop"
-      >
-        <el-tag
-          v-if="readOnly"
-          :key="item.prop"
-          @click.stop="go(item, data)"
-        >
-          {{
-            formObj[item.prop]
-          }}
+      <template v-for="item in itemLinkList" :slot="item.prop">
+        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, data)">
+          {{ formObj[item.prop] }}
         </el-tag>
         <component
           :is="item.component"
@@ -38,6 +29,7 @@
 <script>
 import { getApiPath } from '../../../lib/utils.js';
 import { validateNull } from '../../../lib/validate';
+import { checkDataTypeItem, checkFixDic } from '../core/utils.js';
 import { getUserInfo } from '../../../lib/auth';
 import { ElsTemplateConfigService } from '../../../lib/api/materials';
 import popList from '../../../lib/popList';
@@ -138,6 +130,7 @@ export default {
         ]
       },
       formObj: this.data,
+      fixSeleteDic: [{ form: 'taxCode', to: 'taxRate' }],
 
       reload: false,
       formSlots: [],
@@ -182,73 +175,6 @@ export default {
     this.loadConfigruations();
   },
   methods: {
-    checkDataType(originItem, item) {
-      const dateList = ['noteDate', 'deliveryDate', 'confirmDate', 'needDate'];
-      const datetimeList = ['createDate', 'lastUpdateDate', 'validUntilTime'];
-
-      if (!originItem || originItem === -1) {
-        return false;
-      }
-
-      Object.assign(item, originItem);
-
-      if (dateList.includes(item.prop)) {
-        item.datatype = 'date';
-      }
-
-      if (datetimeList.includes(item.prop)) {
-        item.datatype = 'datetime';
-      }
-
-      switch (item.datatype) {
-        case 'readonly':
-        case 'popupName':
-          item.disabled = 'disabled';
-          break;
-        case 'date':
-          item.type = 'date';
-          item.format = 'yyyy-MM-dd';
-          item.valueFormat = 'timestamp';
-          break;
-        case 'datatime':
-        case 'datetime':
-          item.type = 'datetime';
-          item.format = 'yyyy-MM-dd HH:mm:ss';
-          item.valueFormat = 'timestamp';
-          break;
-        case 'price':
-          item.type = 'number';
-          item.precision = 2;
-          break;
-        case 'bizDic':
-          item.type = 'select';
-          item.bizDic = item.bizDic || item.prop;
-          break;
-        default:
-      }
-
-      if (originItem.datatype === 'popup' && !originItem.ref) {
-        item.formslot = true;
-      }
-
-      if (originItem.ref) {
-        item.disabled = 'disabled';
-      }
-
-      if (item.isSystem === 'Y' && this.status === 'new') {
-        item.display = false;
-        item.rules = [];
-      }
-
-      if (!validateNull(item.bizDic)) {
-        delete item.dicData;
-        delete item.dicMethod;
-        delete item.props;
-        item.type = 'select';
-        item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${item.bizDic}`;
-      }
-    },
-
     checkForm(callback, failback) {
       this.$refs.form.validate((valid) => {
         if (valid) {
@@ -270,7 +196,8 @@ export default {
         const itemProp = this.seleted.fieldPermission[item.prop];
         const originItem = this.findObject(this.originColumn, item.prop);
 
-        this.checkDataType(originItem, item);
+        checkDataTypeItem(originItem, item);
+        checkFixDic(item, this.fixSeleteDic);
 
         if (itemProp) {
           if (itemProp.display && itemProp.display !== false) {
@@ -303,6 +230,7 @@ export default {
               item.type = item.type || 'select';
               item.dicUrl = `${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${itemProp.bizDic}`;
             }
+            // 检查特定字段 固定处理
             if (
               itemProp.isDisabled ||
               itemProp.readonly ||

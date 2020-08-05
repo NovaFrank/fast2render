@@ -7,10 +7,7 @@
       :option.sync="finalOption"
       v-on="$listeners"
     >
-      <template
-        v-for="item in itemLinkList"
-        :slot="item.prop"
-      >
+      <template v-for="item in itemLinkList" :slot="item.prop">
         <el-tag
           v-if="readOnly && data.data[item.prop]"
           :key="item.prop"
@@ -28,21 +25,11 @@
           @selectDone="doSelect(item.func, data.data, $event, item.params)"
         />
       </template>
-      <template
-        v-for="item in itemUploadList"
-        :slot="item.prop"
-      >
+      <template v-for="item in itemUploadList" :slot="item.prop">
         <span :key="item.prop">
           <span v-if="data.data[item.prop]">
-            <img
-              v-if="item.datatype === 'uploadImg'"
-              width="200px"
-              :src="data.data[item.prop]"
-            >
-            <el-link
-              v-else
-              :href="data.data[item.prop]"
-            >
+            <img v-if="item.datatype === 'uploadImg'" width="200px" :src="data.data[item.prop]" />
+            <el-link v-else :href="data.data[item.prop]">
               下载
             </el-link>
           </span>
@@ -52,7 +39,7 @@
             @file-progress="onFileProgress"
             @file-error="onFileError"
             @click="setUploadField(item.prop)"
-          /></span>
+        /></span>
       </template>
     </avue-form>
   </div>
@@ -357,7 +344,6 @@ export default {
       if (!type) {
         return refs;
       }
-      debugger;
       this.finalOption.column.map((item) => {
         if (item.ref && item.ref.includes(type)) {
           refs.push(item.prop);

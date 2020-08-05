@@ -18,11 +18,7 @@
       @row-del="rowDelete"
       @row-update="rowUpdate"
     >
-      <template
-        v-for="item in itemLinkList"
-        :slot="item.prop"
-        slot-scope="scope"
-      >
+      <template v-for="item in itemLinkList" :slot="item.prop" slot-scope="scope">
         <el-tag
           v-if="readOnly || !scope.row.$cellEdit"
           :key="item.prop"
@@ -39,6 +35,27 @@
           :seleted.sync="scope.row[item.prop]"
           @selectDone="doSelect(item.func, scope.row, $event, item.params)"
         />
+      </template>
+      <template v-for="item in itemUploadList" :slot="item.prop" slot-scope="scope">
+        <span :key="item.prop">
+          <span v-if="data.data[item.prop]">
+            <img
+              v-if="item.datatype === 'uploadImg'"
+              width="40px"
+              class="rowImage"
+              :src="data.data[item.prop]"
+            />
+            <el-link v-else :href="data.data[item.prop]">
+              下载
+            </el-link>
+          </span>
+          <fast2-upload
+            v-if="!readOnly && !!scope.row.$cellEdit"
+            @file-success="fileSuccess"
+            @file-progress="onFileProgress"
+            @file-error="onFileError"
+            @click="setUploadField(item.prop)"
+        /></span>
       </template>
     </avue-crud>
   </div>
@@ -87,6 +104,12 @@ export default {
       type: Object,
       default: function() {
         return {};
+      }
+    },
+    itemUploadList: {
+      type: Array,
+      default: function() {
+        return [];
       }
     },
     option: {
@@ -279,6 +302,7 @@ export default {
       const crud = this.$refs.crud;
       option.column.map((item) => {
         this.checkDataType(item, waitUpdateDic);
+        this.checkSlot(item);
         let label = item.label;
         if (item.displayName) {
           item.label = item.displayName;
@@ -393,6 +417,28 @@ export default {
         const isItem = !!item[prop];
         if (isItem) {
           row[prop] = item[prop];
+        }
+      });
+    },
+    checkSlot(item) {
+      this.itemLinkList.map((linkItem) => {
+        if (item.prop === linkItem.prop) {
+          item.formslot = true;
+          item.slot = true;
+        }
+      });
+      if (item.datatype === 'uploadImg' || item.prop === 'picture') {
+        this.itemUploadList.push(item);
+      }
+      if (item.datatype === 'uploadFile' || item.prop === 'url') {
+        item.datatype = 'uploadFile';
+        item.slot = true;
+        this.itemUploadList.push(item);
+      }
+      this.itemUploadList.map((linkItem) => {
+        if (item.prop === linkItem.prop) {
+          item.formslot = true;
+          item.slot = true;
         }
       });
     },

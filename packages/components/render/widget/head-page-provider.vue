@@ -338,6 +338,22 @@ export default {
           this.$message.error('查找单据类型配置数据失败, ' + err.message || '');
         });
     },
+    go(item, row) {
+      if (window?.parent) {
+        const router = {
+          name: item.label,
+          src: item.url + row[item.prop]
+        };
+        const event = {
+          name: 'openNewTag',
+          props: router
+        };
+        console.log('测试跳转事件', event);
+        window.parent.postMessage(event, '*');
+      } else {
+        window.location.href = item.url;
+      }
+    },
 
     getSelectRefs(type) {
       const refs = [];

@@ -9,7 +9,9 @@
       @row-update="rowUpdateMaterialList"
     >
       <template v-for="item in itemLinkList" :slot="item.prop">
-        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, data)"> </el-tag>
+        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, data)">
+          {{ formObj[item.prop] }}
+        </el-tag>
         <component
           :is="item.component"
           v-else
@@ -180,6 +182,22 @@ export default {
         }
       });
     },
+    go(item, row) {
+      if (window?.parent) {
+        const router = {
+          name: item.label,
+          src: item.url + row[item.prop]
+        };
+        const event = {
+          name: 'openNewTag',
+          props: router
+        };
+        console.log('测试跳转事件', event);
+        window.parent.postMessage(event, '*');
+      } else {
+        window.location.href = item.url;
+      }
+    },
 
     doSelect(func, row, event, params = []) {
       this[func](row, event, params);
@@ -242,12 +260,6 @@ export default {
             if (item.isDisabled || itemProp.isDisabled) {
               this.disabledProperties[item.prop] = 1;
             }
-
-            /* 删除 readOnly 处理
-            if (this.readOnly) {
-              item.type = 'text';
-            }
-            */
 
             item.display = true;
             item.span = 6;

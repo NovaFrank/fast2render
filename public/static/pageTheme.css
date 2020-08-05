@@ -1,0 +1,195 @@
+html, body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+#app>.el-container {
+  height: 100%;
+}
+
+.header {
+  clear: both;
+  padding: 0;
+  margin: 0;
+  border-bottom: 5px solid #eee;
+}
+
+.main {
+  background-color: #eee;
+  border-top: 12px solid #eee;
+}
+
+h3, h4, h5 {
+  margin: 6px 0;
+}
+
+.pagedesc {
+  font-size: 12px;
+  color: #999;
+}
+
+.el-card__body {
+  padding: 12px !important;
+}
+
+.avue-crud {
+  width: 100%;
+}
+
+.el-divider--horizontal {
+  margin: 12px 0;
+}
+
+.avue-crud-search .avue-form__group {
+  margin: 0 -10px;
+}
+
+.avue-crud-search .avue-form__menu--center {
+  text-align: left;
+}
+
+.innerbox {
+  padding: 0;
+  margin: 0;
+}
+
+.avue-crud__pagination {
+  height: 35px;
+}
+
+.avue-crud-search {
+  width: 80%;
+  position: relative;
+  margin-bottom: -20px;
+}
+
+.avue-crud-search .el-col-24 .el-form-item--feedback .avue-form__menu {
+  position: absolute;
+  right: -100%;
+  top: -50px;
+}
+
+.hiddenToolbar .avue-crud__menu {
+  display: none;
+}
+
+.page-header, .detail-header {
+  padding: 0;
+  margin: 0;
+}
+
+.page-header h4, .detail-header h4 {
+  padding: 8px;
+}
+
+.page-header .header-line, .detail-header .header-line {
+  margin: 0 0 8px 0 !important;
+}
+
+.page-header .buttons .btns-right, .detail-header .buttons .btns-right {
+  padding: 8px;
+  float: right;
+}
+
+.basic-container {
+  padding: 12px;
+}
+
+.detail-box, .detail-box {
+  padding-top: 12px;
+  background-color: #fff;
+  height: 100%;
+}
+
+.avue-form-box .avue-form {
+  max-width: 1100px;
+  margin-left: 0 !important;
+}
+
+.avue-form-box .avue--detail .el-input__inner, .avue-form-box .avue--detail .el-input.is-disabled .el-input__inner {
+  padding-left: 0;
+}
+
+.avue-form-box .el-form-item__label {
+  text-align: left;
+}
+
+.avue-form-box .avue--detail .avue-form__item--top label {
+  font-weight: bold;
+  color: #333;
+}
+
+.avue-form-box .avue-form__item--top .el-input--small.is-disabled input {
+  padding-left: 0;
+  padding-right: 35px;
+}
+
+.avue-form-box .avue--detail {
+  max-width: 1100px;
+  margin-left: 0 !important;
+}
+
+.avue-form-box .avue-form {
+  margin-left: 0 !important;
+}
+
+.avue-form-box .avue-form {
+  margin-left: 0 !important;
+}
+
+.avue-form-box .avue-form .el-form-item__label {
+  font-weight: bold;
+  width: 100% !important;
+}
+
+.avue-form-box .avue-form .el-form-item__content {
+  margin-left: 0 !important;
+}
+
+.avue-form-box .el-form-item--mini.el-form-item, .avue-form-box .el-form-item--small.el-form-item {
+  margin-bottom: 8px;
+}
+
+.el-divider--horizontal {
+  margin: 6px 0;
+}
+
+.avue-form-box .avue--detail .el-form-item--mini.el-form-item, .avue-form-box .avue--detail .el-form-item--small.el-form-item {
+  margin-bottom: 8px;
+}
+
+.detail-box .el-divider--horizontal {
+  margin: 6px 0;
+}
+
+.avue-form-box .el-collapse-item__header {
+  display: none;
+}
+
+.avue-form-box .el-collapse-item__wrap {
+  border-bottom: 0px;
+}
+
+.avue-form-box .el-collapse-item__content {
+  padding-bottom: 0;
+}
+
+.avue-form-box .el-collapse {
+  border-bottom: 0;
+  border-top: 0;
+}
+
+/**
+progress 
+**/
+
+/**
+
+module order
+
+*/
+
+.order {
+  border-top: 0;
+}

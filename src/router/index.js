@@ -22,12 +22,32 @@ const routes = [
   {
     path: '/v2/order/edit/:orderNumber',
     name: 'orderEditV2',
+    props: true,
     component: () => import('@/views/orderV2/Edit.vue')
   },
   {
     path: '/v2/order/detail/:orderNumber',
     name: 'orderDetailV2',
+    props: true,
     component: () => import('@/views/orderV2/Detail.vue')
+  },
+
+  {
+    path: '/v2/order/supplier/orderList',
+    name: 'orderList',
+    component: () => import('@/views/supplierOrderV2/List')
+  },
+  {
+    path: '/v2/order/supplier/orderDetail/:id',
+    props: true,
+    component: () => import('@/views/supplierOrderV2/Detail'),
+    name: 'orderDetail'
+  },
+  {
+    path: '/v2/order/supplier/orderView/:id',
+    props: true,
+    component: () => import('@/views/supplierOrderV2/View'),
+    name: 'orderView'
   },
 
   {

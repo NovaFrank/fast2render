@@ -16,21 +16,9 @@
       :page.sync="page"
       version="BLOCK_VERSION"
     >
-      <template slot="menuLeft">
-        <el-button
-          v-for="item in rowBtns"
-          :key="item.action"
-          :icon="item.icon"
-          :disabled="currentRow ? '' : 'disabled'"
-          size="small"
-          plain
-          @click.stop="doAction(item.action)"
-          >{{ item.label }}</el-button
-        >
-      </template>
       <template slot="orderNumber" slot-scope="scope">
         <router-link type="primary" :to="`${getItemURL(scope.row)}`" class="link">
-          <el-tag class="tagpoint" type="success"> {{ scope.row.orderNumber }} </el-tag>
+          <a-tag color="#1890FF">{{ scope.row.orderNumber }} </a-tag>
         </router-link>
       </template>
     </avue-crud>

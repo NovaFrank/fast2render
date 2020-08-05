@@ -3,9 +3,10 @@
     <page-detail-header
       title="订单信息"
       :buttons="headerButtons"
-      @itemBack="handleCancel"
+      @itemBack="handleBack"
       @do-action="doBtnAction"
     ></page-detail-header>
+    {{ primaryTableData }}
     <div class="avue-form-box">
       <fast2-head-provider
         v-if="uuid"
@@ -147,13 +148,25 @@ export default {
         */
         {
           name: 'btn-save',
-          label: '保存',
+          label: '保 存',
           icon: 'el-icon-position',
           size: 'small',
           disabled: false,
           round: false,
           type: 'primary',
           action: 'handleSave',
+          align: 'btn-right',
+          class: ''
+        },
+        {
+          name: 'btn-back',
+          label: '返 回',
+          icon: 'el-icon-back',
+          size: 'small',
+          disabled: false,
+          round: false,
+          type: '',
+          action: 'handleBack',
           align: 'btn-right',
           class: ''
         }
@@ -217,7 +230,7 @@ export default {
     this.getOragin();
 
     await this.setUserAccountInfo();
-    debugger;
+    // debugger;
     this.loadPrimaryTableData();
     this.loadTableData();
   },
@@ -236,6 +249,7 @@ export default {
 
     async getOragin() {
       const config = await this.$getBlockItem(this.blockVersion);
+      console.log('config', config);
       this.originColumn = config[1].data.column;
       this.originHeadColumn = config[0].data.column;
     },
@@ -257,14 +271,9 @@ export default {
 
       PurchaseOrderService.detailPrimaryTable(params)
         .then((res) => {
-          if (
-            res.data &&
-            res.data.statusCode === '200' &&
-            res.data.message === 'response OK' &&
-            res.data.data
-          ) {
+          if (res.data && res.data.statusCode === '200' && res.data.data) {
             const data = res.data.data;
-
+            console.log(data);
             this.orderNumber = data.orderNumber;
             this.orderStatus = data.orderStatus;
             this.uuid = data.uuid;
@@ -300,12 +309,8 @@ export default {
 
       PurchaseOrderService.detailTable(params)
         .then((res) => {
-          if (
-            res.data &&
-            res.data.statusCode === '200' &&
-            res.data.message === 'response OK' &&
-            res.data.data
-          ) {
+          console.log('res', res);
+          if (res.data && res.data.statusCode === '200' && res.data.data) {
             const data = res.data.data.rows || [];
 
             for (const row of data) {
@@ -365,7 +370,7 @@ export default {
       done();
     },
 
-    handleCancel() {
+    handleBack() {
       this.$router.back();
     },
 

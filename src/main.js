@@ -14,6 +14,10 @@ import 'fast2render/lib/index.css';
 import basicContainer from './components/basic-container/main';
 import { getCommonRes } from '@/util/commonRes';
 import crudCommon from '@/mixins/crud';
+// 按需引入ant组件
+import { Tag, Icon } from 'ant-design-vue';
+
+Vue.use(Tag).use(Icon);
 
 Vue.use(Fast2Render);
 

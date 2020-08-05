@@ -9,9 +9,7 @@
       @row-update="rowUpdateMaterialList"
     >
       <template v-for="item in itemLinkList" :slot="item.prop">
-        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, data)">
-          {{ formObj[item.prop] }}
-        </el-tag>
+        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, data)"> </el-tag>
         <component
           :is="item.component"
           v-else
@@ -115,7 +113,6 @@ export default {
   data() {
     return {
       disabledProperties: {},
-
       finalOption: {
         menuBtn: false,
         submitBtn: false,
@@ -130,8 +127,6 @@ export default {
         ]
       },
       formObj: this.data,
-      fixSeleteDic: [{ form: 'taxCode', to: 'taxRate' }],
-
       reload: false,
       formSlots: [],
       optionHash: '',

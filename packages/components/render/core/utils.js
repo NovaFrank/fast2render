@@ -1,5 +1,6 @@
 import { validateNull } from '../../../lib/validate';
 
+const  fixSeleteDic = [{ form: 'taxCode', to: 'taxRate' }],
 export const getFilePath = () => {
   let projectPath;
   if (top.location.pathname) {
@@ -12,9 +13,10 @@ export const getFilePath = () => {
   }
 };
 
-export const checkFixDic = (item, list) => {
+export const checkFixDic = (item, list = fixSeleteDic) => {
   list.map(dicItem => {
     if (dicItem.from === item.prop) {
+      debugger
         item.type='select'
         item.dicUrl =`${baseUrl}/ElsSearchDictionaryService/no-auth/dict/${item.prop}`;
       }

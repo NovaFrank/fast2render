@@ -1,7 +1,7 @@
 import { validateNull } from '../../../lib/validate';
 import { getApiPath } from '../../../lib/utils.js';
 
-const fixSeleteDic = [{ from: 'taxCode', to: 'taxRate' }];
+const fixSelectDic = [{ from: 'taxCode', to: 'taxRate' }];
 const baseUrl = getApiPath();
 export const getFilePath = () => {
   let projectPath;
@@ -16,7 +16,7 @@ export const getFilePath = () => {
 };
 
 export const checkFixDic = (item, list) => {
-  fixSeleteDic.map((dicItem) => {
+  fixSelectDic.map((dicItem) => {
     if (dicItem.from === item.prop) {
       item.type = 'select';
       item.datatype = 'fixBizDic';
@@ -138,10 +138,10 @@ export const checkDataTypeItem = (originItem, item) => {
     item.disabled = 'disabled';
   }
 
-  // if (item.isSystem === 'Y') {
-  //   item.display = false;
-  //   item.rules = [];
-  // }
+  if (item.isSystem === 'Y') {
+    item.display = false;
+    item.rules = [];
+  }
 
   if (!validateNull(item.bizDic)) {
     delete item.dicData;

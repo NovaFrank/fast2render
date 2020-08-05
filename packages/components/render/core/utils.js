@@ -8,7 +8,7 @@ export const getFilePath = () => {
   if (projectPath) {
     return '/' + projectPath + '/opt/nfsshare/';
   } else {
-    return '/opt/nfsshare/';
+    return 'http://cs.51qqt.com/opt/nfsshare/';
   }
 };
 

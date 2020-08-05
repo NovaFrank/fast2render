@@ -32,29 +32,27 @@
         v-for="item in itemUploadList"
         :slot="item.prop"
       >
-        {{ data.data[item.prop] }}
-        <img
-          v-if="data.data[item.prop] && item.datatype === 'uploadImg'"
-          :key="item.prop"
-          width="200px"
-          :src="data.data[item.prop]"
-        >
-        <el-link
-          v-else-if="data.data[item.prop] && item.datatype === 'uploadFile'"
-          :key="item.prop"
-          type="text"
-          :herf="data.data[item.prop]"
-        >
-          {{ data.data[item.prop] }}
-        </el-link>
-        <fast2-upload
-          v-else
-          :key="item.prop"
-          @file-success="fileSuccess"
-          @file-progress="onFileProgress"
-          @file-error="onFileError"
-          @click="setUploadField(item.prop)"
-        />
+        <span :key="item.prop">
+          <span v-if="data.data[item.prop]">
+            <img
+              v-if="item.datatype === 'uploadImg'"
+              width="200px"
+              :src="data.data[item.prop]"
+            >
+            <el-link
+              v-else
+              :href="data.data[item.prop]"
+            >
+              下载
+            </el-link>
+          </span>
+          <fast2-upload
+            v-if="!readOnly"
+            @file-success="fileSuccess"
+            @file-progress="onFileProgress"
+            @file-error="onFileError"
+            @click="setUploadField(item.prop)"
+          /></span>
       </template>
     </avue-form>
   </div>
@@ -208,7 +206,6 @@ export default {
     fileSuccess(req, req1, res) {
       const data = JSON.parse(res).data;
       const prop = this.uploadField || this.itemUploadList[0].prop;
-      debugger;
       if (prop) {
         this.data.data[prop] = getFilePath() + data.url;
       }
@@ -438,11 +435,11 @@ export default {
         }
       });
       if (item.datatype === 'uploadImg' || item.prop === 'picture') {
-        item.datatype = 'uploadFile';
         this.itemUploadList.push(item);
       }
       if (item.datatype === 'uploadFile' || item.prop === 'url') {
         item.datatype = 'uploadFile';
+        item.slot = true;
         this.itemUploadList.push(item);
       }
       this.itemUploadList.map((linkItem) => {

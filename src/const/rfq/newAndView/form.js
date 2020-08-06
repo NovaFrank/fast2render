@@ -28,7 +28,7 @@ export default {
       type: 'tree',
       label: '工厂代码',
       span: 6,
-      prop: 'companyCode',
+      prop: 'factory',
       valueDefault: ''
     },
     {

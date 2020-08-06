@@ -299,7 +299,7 @@ export default {
         {
           type: 'tree',
           label: '工厂代码',
-          prop: 'companyCode',
+          prop: 'factory',
           editDisabled: true
         },
         {

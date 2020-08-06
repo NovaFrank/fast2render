@@ -564,7 +564,7 @@ export default {
           type: 'tree',
           label: '工厂代码',
           span: 6,
-          prop: 'companyCode',
+          prop: 'factory',
           valueDefault: ''
         },
         { label: '供应商', prop: 'accountList' }
@@ -585,7 +585,7 @@ export default {
           prop: 'quantity',
           rules: [{ trigger: 'change', validator: validateQuantity }]
         },
-        { type: 'tree', label: '工厂代码', prop: 'companyCode' },
+        { type: 'tree', label: '工厂代码', prop: 'factory' },
         {
           type: 'select',
           label: '税码',
@@ -780,10 +780,10 @@ export default {
           return item;
         });
       });
-      // 组织列表（公司）
+      // 组织列表（公司）-> 工厂代码
       orgList({ elsAccount: this.elsAccount, orgCategoryId: 'factory' }).then((res) => {
         this.dialogOption.column = this.dialogOption.column.map((item) => {
-          if (item.prop === 'companyCode') {
+          if (item.prop === 'factory') {
             return {
               ...item,
               dicData: res.data.pageData.rows.map((item) => {
@@ -1102,7 +1102,6 @@ export default {
                   quoteEndTime: this.form.quoteEndTime,
                   enquiryType: this.form.enquiryType,
                   enquiryDesc: this.form.enquiryDesc,
-                  // companyCode: this.form.companyCode,
                   enquiryMethod: this.form.enquiryMethod,
                   canSeeRule: this.form.canSeeRule,
                   passWord: this.form.passWord,
@@ -1218,7 +1217,6 @@ export default {
                   quoteEndTime: this.form.quoteEndTime,
                   enquiryType: this.form.enquiryType,
                   enquiryDesc: this.form.enquiryDesc,
-                  // companyCode: this.form.companyCode,
                   enquiryMethod: this.form.enquiryMethod,
                   canSeeRule: this.form.canSeeRule,
                   passWord: this.form.passWord,
@@ -1297,7 +1295,6 @@ export default {
               quoteEndTime: this.form.quoteEndTime,
               enquiryType: this.form.enquiryType,
               enquiryDesc: this.form.enquiryDesc,
-              // companyCode: this.form.companyCode,
               enquiryMethod: this.form.enquiryMethod,
               canSeeRule: this.form.canSeeRule,
               passWord: this.form.passWord,

@@ -578,10 +578,10 @@ export default {
           return item;
         });
       });
-      // 组织列表（公司）
+      // 组织列表（公司）-> 工厂代码
       orgList({ elsAccount: this.elsAccount, orgCategoryId: 'factory' }).then((res) => {
         this.inquiryListOption.option.column = this.inquiryListOption.option.column.map((item) => {
-          if (item.prop === 'companyCode') {
+          if (item.prop === 'factory') {
             return {
               ...item,
               dicData: res.data.pageData.rows.map((item) => {
@@ -717,7 +717,7 @@ export default {
         { label: '物料描述', prop: 'materialDesc' },
         { label: '单位', prop: 'baseUnit', span: 4 },
         { label: '需求数量', prop: 'quantity' },
-        { type: 'tree', label: '工厂代码', prop: 'companyCode' },
+        { type: 'tree', label: '工厂代码', prop: 'factory' },
         // { slot: true, label: '报价方式', prop: 'quoteMethod' },
         // { slot: true, label: '阶梯信息', prop: 'quoteMethodInfo' },
         // { slot: true, label: '成本模板', prop: 'costTemplate' },
@@ -1192,7 +1192,6 @@ export default {
         quoteEndTime: this.detailObj.quoteEndTime,
         enquiryType: this.detailObj.enquiryType,
         enquiryDesc: this.detailObj.enquiryDesc,
-        // companyCode: this.detailObj.companyCode,
         enquiryMethod: this.detailObj.enquiryMethod || '',
         itemList: this.inquiryListOption.data
       };
@@ -1277,7 +1276,6 @@ export default {
         quoteEndTime: this.detailObj.quoteEndTime,
         enquiryType: this.detailObj.enquiryType,
         enquiryDesc: this.detailObj.enquiryDesc,
-        // companyCode: this.detailObj.companyCode,
         enquiryMethod: this.detailObj.enquiryMethod || '',
         itemList: this.inquiryListOption.data
       };
@@ -1288,39 +1286,6 @@ export default {
           this.$message.error(res.data.message);
         }
       });
-      // this.$confirm('是否提交审批？', '提示', {
-      //   confirmButtonText: '确定',
-      //   cancelButtonText: '取消',
-      //   type: 'warning'
-      // }).then(() => {
-      //   const action = 'submit';
-      //   const param = {
-      //     ...this.detailObj,
-      //     enquiryNumber: this.currentEnquiryNumber,
-      //     elsAccount: this.elsAccount,
-      //     quoteEndTime: this.detailObj.quoteEndTime,
-      //     enquiryType: this.detailObj.enquiryType,
-      //     enquiryDesc: this.detailObj.enquiryDesc,
-      //     companyCode: this.detailObj.companyCode,
-      //     enquiryMethod: this.detailObj.enquiryMethod || '',
-      //     itemList: this.inquiryListOption.data
-      //   };
-      //   let params = {
-      //     elsAccount: this.detailObj.elsAccount,
-      //     // toElsAccount: this.detailObj.toElsAccount,
-      //     businessType: 'bargainEnquiryAudit',
-      //     businessId: this.detailObj.enquiryNumber,
-      //     params: JSON.stringify(param)
-      //   };
-      //   submitAudit(action, params).then((res) => {
-      //     if (res.data.statusCode === '200') {
-      //       this.$message.success('提交审批成功');
-      //       this.$router.go(0);
-      //       return;
-      //     }
-      //     this.$message.error('提交审批失败');
-      //   });
-      // });
     },
     handleUpdateQuoteEndTime() {
       if (this.quoteEndTimeChange < new Date().getTime()) {
@@ -1470,7 +1435,7 @@ export default {
           priceIncludingTax: '',
           quota: '',
           quoteDate: '',
-          companyCode: this.currentDetailItem.companyCode,
+          factory: this.currentDetailItem.factory,
           ladderPriceJson: this.currentDetailItem.ladderPriceJson || null,
           costConstituteJson: this.currentDetailItem.costConstituteJson || null,
           $cellEdit: false

@@ -234,6 +234,9 @@ export default {
         this.form.baseUnit = materialList[0].baseUnit;
         this.form.orderUnit = materialList[0].orderUnit;
         this.form.queryUuid = materialList[0].uuid;
+        this.form.minOrderQuantity = materialList[0].minOrderQuantity;
+        this.form.fbk18 = materialList[0].fbk18;
+        this.form.minPackingQuantity = materialList[0].minPackingQuantity;
         // Object.assign(this.form, materialList[0]);
         // this.form.queryUuid = materialList[0].uuid;
         // console.log('selectedMaterails this.form', this.form);

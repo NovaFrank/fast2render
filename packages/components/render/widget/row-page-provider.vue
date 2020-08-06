@@ -39,19 +39,19 @@
       </template>
       <template v-for="item in itemUploadList" :slot="item.prop" slot-scope="scope">
         <span :key="item.prop">
-          <span v-if="data.data[item.prop]">
+          <span v-if="scope.row[item.prop]">
             <img
               v-if="item.datatype === 'uploadImg'"
               width="40px"
               class="rowImage"
-              :src="data.data[item.prop]"
+              :src="scope.row[item.prop]"
             />
-            <el-link v-else :href="data.data[item.prop]">
+            <el-link v-else :href="scope.row[item.prop]">
               下载
             </el-link>
           </span>
           <fast2-upload
-            v-if="!readOnly && !!scope.row.$cellEdit"
+            v-if="isUploadAble(item)"
             @file-success="fileSuccess"
             @file-progress="onFileProgress"
             @file-error="onFileError"
@@ -181,6 +181,18 @@ export default {
 
     beforeAddRow() {
       console.log('Add Row Before');
+    },
+
+    isUploadAble(item) {
+      if (this.readOnly) {
+        return false;
+      }
+      if (item.datatype === 'uploadImg' || item.datatype === 'uploadFile') {
+        if (item.isReadOnly !== 'Y') {
+          return true;
+        }
+      }
+      return false;
     },
 
     checkAddedMaterials(list) {

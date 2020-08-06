@@ -3,7 +3,7 @@
   <div class="materialBox">
     <el-input
       v-if="!multiple"
-      v-model="seleted"
+      :data.sync="seleted"
       size="small"
       :readonly="true"
       :disabled="isDisabled"
@@ -15,10 +15,7 @@
         @click="openFieldDialog"
       />
     </el-input>
-    <el-button
-      v-else
-      @click="openFieldDialog"
-    >
+    <el-button v-else @click="openFieldDialog">
       {{ addBtnText }}
     </el-button>
     <SelectDialogTable

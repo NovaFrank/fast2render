@@ -279,6 +279,12 @@ export default {
               item.label = itemProp.displayName;
               label = itemProp.displayName;
             }
+            if (itemProp.isRequired === 'Y') {
+              itemProp.isRequired = true;
+            }
+            if (itemProp.isRequired === 'N') {
+              itemProp.isRequired = false;
+            }
             const isRequired = !!itemProp.isRequired;
             if (isRequired) {
               // 日期格式校验不通过。 暂时隐藏
@@ -326,6 +332,8 @@ export default {
               item.rules = [];
             } else {
               item.cell = true;
+              item.width = '120px';
+              delete item.readonly;
             }
             item.display = true;
           }
@@ -424,6 +432,7 @@ export default {
     },
 
     saveSelected(row, list, params) {
+      debugger;
       const item = list[0];
       row[params[0]] = item[params[2]];
       row[params[1]] = item[params[3]];

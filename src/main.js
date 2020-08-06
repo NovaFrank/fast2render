@@ -9,7 +9,7 @@ import '@smallwei/avue/lib/index.css';
 import store from './store';
 import axios from '@/api/axios';
 import VueAxios from 'vue-axios';
-import Fast2Render from 'fast2render'; // ../
+import Fast2Render from '../fast2render/packages/'; // ../
 import 'fast2render/lib/index.css';
 import basicContainer from './components/basic-container/main';
 import { getCommonRes } from '@/util/commonRes';

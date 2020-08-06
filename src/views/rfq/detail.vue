@@ -76,7 +76,7 @@
       :passClient="false"
       :client="false"
       :clientTab="false"
-      version="attahcment-fiels_4_3"
+      version="rfq-attahcments"
     ></fast2-attachment-list>
     <!-- 供应商附件 -->
     <fast2-attachment-list
@@ -90,7 +90,7 @@
       :client="false"
       :clientTab="true"
       :downloadClient="detailObj.quoteEndTime < new Date().getTime()"
-      version="attahcment-fiels_4_3"
+      version="rfq-attahcments"
     ></fast2-attachment-list>
     <!-- 审批记录 -->
     <avue-crud

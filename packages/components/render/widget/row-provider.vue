@@ -5,9 +5,8 @@
       size="small"
       style="margin-left: 10px; margin-bottom: 10px;"
       @click.stop="handleAddRow()"
+      >添加行</el-button
     >
-      添加行
-    </el-button>
     <avue-crud
       v-if="reload"
       ref="crud"
@@ -178,6 +177,13 @@ export default {
       immediate: true, // 刷新加载 立马触发一次handler
       deep: true
     }
+    // 'obj.taxCode':{
+    //     handler(n) {
+    //     if (n) {
+    //       this.obj.taxRate = 1
+    //     }
+    //   },
+    // }
     // 单点监测 ，避免多次触发
   },
   created() {
@@ -427,7 +433,7 @@ export default {
       if (row.queryUuid) {
         data.queryUuid = row.queryUuid;
       }
-
+      data.taxRate = data.taxCode;
       Object.assign(data, row);
 
       if (typeof this.rowUpdateProcFn === 'function') {

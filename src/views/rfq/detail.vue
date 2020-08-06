@@ -923,7 +923,6 @@ export default {
           });
           price = Math.floor((result.num / result.den) * 100) / 100;
         }
-        console.log(row.toElsAccount, price);
         return price || '';
       }
       return '';
@@ -1071,9 +1070,17 @@ export default {
     handleRadioChange(value, scope) {
       this.inquiryListOption.data[scope.row.$index].itemStatusCopy = value;
       if (value === '5') {
+        this.inquiryListOption.data[scope.row.$index].fbk2 = '';
         this.inquiryListOption.data[scope.row.$index].quota = '';
         this.inquiryListOption.data[scope.row.$index].$cellEdit = false;
       } else {
+        const result = execMathExpress('( v1 - v2 ) * v3', {
+          v1: scope.row.fbk1,
+          v2: scope.row.priceIncludingTax,
+          v3: scope.row.quantity
+        });
+        this.inquiryListOption.data[scope.row.$index].fbk2 =
+          Math.floor((result.num / result.den) * 100) / 100;
         this.inquiryListOption.data[scope.row.$index].$cellEdit = true;
       }
     },
@@ -1179,6 +1186,14 @@ export default {
     },
     handleSave() {
       this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
+        // if (item.itemStatusCopy === '4') {
+        //   const result = execMathExpress('( v1 - v2 ) * v3', {
+        //     v1: item.fbk1,
+        //     v2: item.priceIncludingTax,
+        //     v3: item.quantity
+        //   });
+        //   item.fbk2 = Math.floor((result.num / result.den) * 100) / 100;
+        // }
         return {
           ...item,
           itemStatus: item.itemStatusCopy
@@ -1195,7 +1210,6 @@ export default {
         enquiryMethod: this.detailObj.enquiryMethod || '',
         itemList: this.inquiryListOption.data
       };
-      console.log('param', param);
       purchaseEnquiryAction('acceptOrRefuse', param).then((res) => {
         if (res.data.statusCode === '200') {
           this.$message.success('保存成功');
@@ -1263,6 +1277,14 @@ export default {
       }
       // 保存后跳转到比价报告页面
       this.inquiryListOption.data = this.inquiryListOption.data.map((item) => {
+        // if (item.itemStatusCopy === '4') {
+        //   const result = execMathExpress('( v1 - v2 ) * v3', {
+        //     v1: item.fbk1,
+        //     v2: item.priceIncludingTax,
+        //     v3: item.quantity
+        //   });
+        //   item.fbk2 = Math.floor((result.num / result.den) * 100) / 100;
+        // }
         return {
           ...item,
           itemStatus: item.itemStatusCopy
@@ -1347,7 +1369,6 @@ export default {
           if (item.itemStatus === '6') this.closeTag = true;
           return {
             id: item.uuid,
-            // toElsAccountName: item.toElsAccount.split('_')[1],
             $cellEdit:
               item.itemStatus === '4' &&
               this.detailObj.auditStatus !== '0' &&

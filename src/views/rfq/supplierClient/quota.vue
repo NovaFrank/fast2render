@@ -345,7 +345,7 @@ export default {
         }
         this.quoteColumn = [];
         const current = this.configurations[value].tableColumns.map((item) => {
-          const result = {};
+          let result = {};
           result.prop = item.prop;
           result.label = item.fbk1 || item.label;
           result.display = item.saleShow;
@@ -358,23 +358,18 @@ export default {
           result.dicMethod = item.dicMethod;
           result.valueFormat = 'timestamp';
           result.format = item.format;
+          if (item.prop === 'currency') {
+            result = {
+              ...result,
+              dicUrl: '/layout/dics/value/currency',
+              dicMethod: 'get',
+              type: 'select'
+            };
+          }
           if (item.saleEdit) {
             this.quoteColumn.push(result);
           }
           return result;
-        });
-        // 询价范围 数据字典
-        dataDicAPI('currency').then((res) => {
-          this.quoteColumn = this.quoteColumn.map((item) => {
-            if (item.prop === 'currency') {
-              return {
-                ...item,
-                type: 'select',
-                dicData: res.data
-              };
-            }
-            return item;
-          });
         });
         this.initColumns();
         current.forEach((item) => {

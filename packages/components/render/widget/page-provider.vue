@@ -1,14 +1,18 @@
 <template>
   <div>
     <slot name="header">
-      <page-header :title="title" :buttons="currentButtons" @do-action="doBtnAction"></page-header>
+      <page-header
+        :title="title"
+        :buttons="currentButtons"
+        @do-action="doBtnAction"
+      />
     </slot>
     <slot name="searchBox">
-      <fast2-search-provider :option="searchOption"></fast2-search-provider>
+      <fast2-search-provider :option="searchOption" />
     </slot>
-    <slot name="tabBox"> </slot>
+    <slot name="tabBox" />
     <slot name="listBox">
-      <fast2-row-page-provider :option="tableOption"></fast2-row-page-provider>
+      <fast2-row-page-provider :option="tableOption" />
     </slot>
   </div>
 </template>
@@ -21,7 +25,7 @@ export default {
       type: Function
     },
     pageCode: {
-      type: string,
+      type: String,
       default: ''
     }
   },

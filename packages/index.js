@@ -87,6 +87,7 @@ export default {
     Vue.component('Fast2' + SelectOrder.name, SelectOrder);
     Vue.component('Fast2' + SelectEmployee.name, SelectEmployee);
     Vue.component('Fast2' + SelectPurchaseOrganization.name, SelectPurchaseOrganization);
+    Vue.component('Fast2' + RfqAttachmentList.name, RfqAttachmentList);
 
     Vue.component(AttachmentList.name, AttachmentList);
     Vue.component(RfqAttachmentList.name, RfqAttachmentList);

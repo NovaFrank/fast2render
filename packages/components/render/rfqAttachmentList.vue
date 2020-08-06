@@ -2,16 +2,33 @@
   <div>
     <h4>
       <i class="el-icon-link" /> <span v-if="!readonly">附件</span><span v-else>上传附件</span>
-      <el-button v-if="addBtn && !readonly" size="mini" @click="listRowAdd">
+      <el-button
+        v-if="addBtn && !readonly"
+        size="mini"
+        @click="listRowAdd"
+      >
         新增行
       </el-button>
     </h4>
-    <fast2-theme-provider :option="readonly ? readOption : option" theme="block" :version="version">
+    <fast2-theme-provider
+      :option="readonly ? readOption : option"
+      theme="block"
+      :version="version"
+    >
       <template v-slot="component">
         <div v-if="component.option && component.option.column && component.option.column.length">
-          <avue-crud :data="fileList" :option="component.option" @row-del="handleDelete">
+          <avue-crud
+            ref="crud"
+            :data="fileList"
+            :option="component.option"
+            @row-del="handleDelete"
+            @row-updare="handleUpdate"
+          >
             <template v-slot:fileAction="scope">
-              <div v-if="!readonly && downloadClient" @mouseover="setUploadRow(scope.row)">
+              <div
+                v-if="!readonly && downloadClient"
+                @mouseover="setUploadRow(scope.row)"
+              >
                 <fast2-upload
                   @file-success="fileSuccess"
                   @file-progress="onFileProgress"
@@ -30,8 +47,14 @@
                 </el-link>
               </div>
             </template>
-            <template slot="annexType" slot-scope="{ row }">
-              <span v-if="row.isRequired === 'Y'" class="annexType" />{{ row.annexType }}
+            <template
+              slot="annexType"
+              slot-scope="{ row }"
+            >
+              <span
+                v-if="row.isRequired === 'Y'"
+                class="annexType"
+              />{{ row.annexType }}
             </template>
           </avue-crud>
         </div>
@@ -73,7 +96,7 @@ export default {
     },
     version: {
       type: String,
-      default: 'attahcment-fiels_4_3'
+      default: 'attahcment-fiels_rfq'
     },
     domain: {
       type: String,
@@ -99,7 +122,7 @@ export default {
     },
     attachmentTemplate: {
       type: Array,
-      default: function() {
+      default: function () {
         return [];
       }
     },
@@ -127,26 +150,22 @@ export default {
           addBtn: false,
           delBtn: true,
           cancelBtn: false,
+          cellBtn: true,
           showSummary: false,
           rowKey: 'businessItemId',
           column: [
-            {
-              label: '文件',
-              prop: 'fileAction',
-              slot: true
-            },
-            {
-              label: '是否启用有效期',
-              prop: 'isValidity',
-              hide: true
-            },
             {
               label: '文件类型',
               prop: 'annexType',
               type: 'input',
               span: 8,
+              cell: true,
               orderIndex: 0,
-              order: 1,
+              order: 0
+            },
+            {
+              label: '文件',
+              prop: 'fileAction',
               slot: true
             }
           ]
@@ -165,22 +184,17 @@ export default {
           showSummary: false,
           column: [
             {
-              label: '文件',
-              prop: 'fileAction',
-              slot: true
-            },
-            {
-              label: '是否启用有效期',
-              prop: 'isValidity',
-              hide: true
-            },
-            {
               label: '文件类型',
               prop: 'annexType',
               type: 'input',
               span: 8,
               orderIndex: 0,
               order: 1,
+              slot: true
+            },
+            {
+              label: '文件',
+              prop: 'fileAction',
               slot: true
             }
           ]
@@ -209,6 +223,15 @@ export default {
     },
     fileList(newVal) {
       console.log(newVal);
+    },
+    '$refs.crud.option.column.length'(newVal) {
+      const column = this.$refs.crud.option.column;
+      const item = this.findObject(column, 'annexType');
+      debugger;
+      if (item !== -1) {
+        item.type = 'input';
+        item.cell = true;
+      }
     }
   },
   created() {},
@@ -234,6 +257,11 @@ export default {
     doAction(action, data) {
       this.$emit(action, data);
       // this.$message.success(action)
+    },
+
+    handleUpdate(row, index, done, loading) {
+      this.$set(this.fileList, index, row);
+      done();
     },
 
     handleDelete(row, index) {
@@ -296,13 +324,13 @@ export default {
         const reader = new FileReader();
         let fileResult = '';
         reader.readAsDataURL(file); // 开始转
-        reader.onload = function() {
+        reader.onload = function () {
           fileResult = reader.result;
         }; // 转 失败
-        reader.onerror = function(error) {
+        reader.onerror = function (error) {
           reject(error);
         }; // 转 结束  咱就 resolve 出去
-        reader.onloadend = function() {
+        reader.onloadend = function () {
           resolve(fileResult);
         };
       });
@@ -406,6 +434,7 @@ export default {
 
     listRowAdd() {
       const fileItem = {
+        $cellEdit: true,
         elsAccount: this.elsAccount,
         businessItemId: this.id + '_00' + (this.fileList.length + 1)
       };
@@ -505,6 +534,7 @@ export default {
       let itemRow = {
         ...this.uploadRow,
         elsAccount: this.elsAccount,
+        anneType: 'test',
         attachmentType: file.fileType,
         attachmentSize: file.fileSize,
         attachmentName: file.fileName,

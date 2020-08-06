@@ -18,13 +18,9 @@
       @row-del="rowDelete"
       @row-update="rowUpdate"
     >
-      <template
-        v-for="item in itemLinkList"
-        :slot="item.prop"
-        slot-scope="scope"
-      >
+      <template v-for="item in itemLinkList" :slot="item.prop" slot-scope="scope">
         <el-tag
-          v-if="readOnly"
+          v-if="readOnly && scope.row[item.prop]"
           :key="item.prop"
           @click.stop="go(item, scope.row)"
         >
@@ -32,7 +28,7 @@
         </el-tag>
         <component
           :is="item.component"
-          v-else
+          v-else-if="scope.row.$cellEdit"
           :key="item.prop"
           :seleted.sync="scope.row[item.prop]"
           :api="listApi[item.prop]"
@@ -150,7 +146,7 @@ export default {
     rowUpdateProcFn: {
       type: Function,
       default: null
-    },
+    }
   },
   data() {
     return {
@@ -421,7 +417,7 @@ export default {
       Object.assign(data, row);
 
       if (typeof this.rowUpdateProcFn === 'function') {
-        this.rowUpdateProcFn(data)
+        this.rowUpdateProcFn(data);
       }
 
       done();

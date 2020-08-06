@@ -51,9 +51,9 @@ const popList = [
     label: '公司代码',
     prop: 'companyCode',
     url: '/masterdata/material/#/masterdata/view/',
-    component: 'fast2-select-supplier',
+    component: 'fast2-select-purchase-organization',
     func: 'saveSelected',
-    params: ['companyCode', 'companyCodeName', 'toElsAccount', 'toElsAccountName']
+    params: ['companyCode', 'companyCodeName', 'orgId', 'orgDesc']
   },
   {
     label: '供应商',
@@ -94,6 +94,14 @@ const popList = [
     component: 'fast2-select-employee',
     func: 'saveSelected',
     params: ['principal', 'principalName', 'subElsAccount', 'name']
+  },
+  {
+    label: '销售负责人',
+    prop: 'salePerson',
+    url: '/masterdata/material/#/masterdata/view/',
+    component: 'fast2-select-employee',
+    func: 'saveSelected',
+    params: ['salePerson', 'salePersonName', 'subElsAccount', 'name']
   },
   {
     label: '采购工厂',

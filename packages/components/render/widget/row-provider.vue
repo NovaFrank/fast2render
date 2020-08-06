@@ -18,8 +18,16 @@
       @row-del="rowDelete"
       @row-update="rowUpdate"
     >
-      <template v-for="item in itemLinkList" :slot="item.prop" slot-scope="scope">
-        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, scope.row)">
+      <template
+        v-for="item in itemLinkList"
+        :slot="item.prop"
+        slot-scope="scope"
+      >
+        <el-tag
+          v-if="readOnly"
+          :key="item.prop"
+          @click.stop="go(item, scope.row)"
+        >
           {{ scope.row[item.prop] }}
         </el-tag>
         <component
@@ -38,7 +46,6 @@
 <script>
 import { getApiPath, generateRandomString } from '../../../lib/utils.js';
 import { validateNull } from '../../../lib/validate';
-import { format, chain, bignumber } from 'mathjs';
 import popList from '../../../lib/popList';
 import { checkDataTypeItem, checkFixDic } from '../core/utils.js';
 
@@ -108,7 +115,42 @@ export default {
       default: function() {
         return [];
       }
-    }
+    },
+    /* 添加空行时，对数据进行初始化处理
+      例如
+      addEmptyRowProc(item) {
+        item.budgetPrice = '0';
+        item.quantity = '0';
+        item.subtotalAmount = '0';
+
+        return item;
+      }
+    */
+    addEmptyRowProcFn: {
+      type: Function,
+      default: null
+    },
+    /* 编辑后更新行数据时，对数据进行处理
+       例如
+       rowUpdateProc(data) {
+        const budgetPriceString = Number(data.budgetPrice).toFixed(2);
+
+        const quantityString = data.quantity.toString();
+
+        data.budgetPrice = budgetPriceString;
+        data.quantity = quantityString;
+
+        const subtotalAmount = format(
+          chain(bignumber(budgetPriceString)).multiply(bignumber(quantityString)).done()
+        );
+
+        data.subtotalAmount = Number(subtotalAmount).toFixed(2);
+      }
+    */
+    rowUpdateProcFn: {
+      type: Function,
+      default: null
+    },
   },
   data() {
     return {
@@ -144,19 +186,6 @@ export default {
     }
   },
   methods: {
-    addEmptyMaterail() {
-      const item = {};
-      const showColumnProps = this.getShowColumnProps();
-
-      for (const prop in showColumnProps) {
-        // for (const prop in this.existColumnProps) {
-        item[prop] = '';
-        item.id = `${new Date().valueOf()}${generateRandomString(6)}`;
-      }
-
-      this.data.push(item);
-    },
-
     addEmptyRow() {
       const item = {};
       const showColumnProps = this.getShowColumnProps();
@@ -167,7 +196,11 @@ export default {
         item.id = `${new Date().valueOf()}${generateRandomString(6)}`;
       }
 
-      this.data.push(item);
+      if (typeof this.addEmptyRowProcFn === 'function') {
+        this.data.push(this.addEmptyRowProcFn(item));
+      } else {
+        this.data.push(item);
+      }
     },
 
     checkAddedMaterials(list) {
@@ -387,15 +420,8 @@ export default {
 
       Object.assign(data, row);
 
-      if (typeof data.budgetPrice !== 'undefined' && typeof data.quantity !== 'undefined') {
-        // 采购申请有这个数据
-        const subtotalAmount = format(
-          chain(bignumber(data.budgetPrice))
-            .multiply(bignumber(data.quantity))
-            .done()
-        );
-
-        data.subtotalAmount = subtotalAmount || 0;
+      if (typeof this.rowUpdateProcFn === 'function') {
+        this.rowUpdateProcFn(data)
       }
 
       done();

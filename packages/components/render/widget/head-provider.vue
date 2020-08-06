@@ -9,18 +9,9 @@
       @row-del="rowDeleteMaterialList"
       @row-update="rowUpdateMaterialList"
     >
-      <template
-        v-for="item in itemLinkList"
-        :slot="item.prop"
-      >
-        <el-tag
-          v-if="readOnly"
-          :key="item.prop"
-          @click.stop="go(item, data)"
-        >
-          {{
-            formObj[item.prop]
-          }}
+      <template v-for="item in itemLinkList" :slot="item.prop">
+        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, data)">
+          {{ formObj[item.prop] }}
         </el-tag>
         <component
           :is="item.component"
@@ -63,7 +54,7 @@ export default {
     },
     businessTypeProperty: {
       type: String,
-      default: function () {
+      default: function() {
         return ''; // 用于匹配实际的业务类型数据
       }
     },
@@ -73,37 +64,37 @@ export default {
     },
     data: {
       type: Object,
-      default: function () {
+      default: function() {
         return {};
       }
     },
     itemLinkList: {
       type: Array,
-      default: function () {
+      default: function() {
         return popList;
       }
     },
     listApi: {
       type: Object,
-      default: function () {
+      default: function() {
         return {};
       }
     },
     listParams: {
       type: Object,
-      default: function () {
+      default: function() {
         return {};
       }
     },
     option: {
       type: Object,
-      default: function () {
+      default: function() {
         return { column: [] };
       }
     },
     originColumn: {
       type: Object,
-      default: function () {
+      default: function() {
         return [];
       }
     },
@@ -113,7 +104,7 @@ export default {
     },
     rowPermission: {
       type: Object,
-      default: function () {
+      default: function() {
         return {};
       }
     },
@@ -212,7 +203,11 @@ export default {
               item.label = itemProp.displayName;
               label = itemProp.displayName;
             }
-
+            if (itemProp.isRequired === 'Y') {
+              itemProp.isRequired = true;
+            } else if (itemProp.isRequired === 'N') {
+              itemProp.isRequired = false;
+            }
             const isRequired = !!itemProp.isRequired;
 
             if (isRequired) {
@@ -249,7 +244,7 @@ export default {
               item.cell = true;
             }
 
-            if (item.isDisabled || itemProp.isDisabled) {
+            if (item.isDisabled || itemProp.isDisabled || itemProp.isReadOnly === 'Y') {
               this.disabledProperties[item.prop] = 1;
             }
 

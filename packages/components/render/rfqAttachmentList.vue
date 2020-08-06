@@ -22,7 +22,7 @@
             :data="fileList"
             :option="component.option"
             @row-del="handleDelete"
-            @row-updare="handleUpdate"
+            @row-update="handleUpdate"
           >
             <template v-slot:fileAction="scope">
               <div
@@ -223,15 +223,6 @@ export default {
     },
     fileList(newVal) {
       console.log(newVal);
-    },
-    '$refs.crud.option.column.length'(newVal) {
-      const column = this.$refs.crud.option.column;
-      const item = this.findObject(column, 'annexType');
-      debugger;
-      if (item !== -1) {
-        item.type = 'input';
-        item.cell = true;
-      }
     }
   },
   created() {},
@@ -260,6 +251,7 @@ export default {
     },
 
     handleUpdate(row, index, done, loading) {
+      loading();
       this.$set(this.fileList, index, row);
       done();
     },

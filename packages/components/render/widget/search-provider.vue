@@ -250,7 +250,7 @@ export default {
             this.finalOption.column = serachColumn;
 
             const configurations = {
-              listColumns: fiel
+              listColumns: field
             };
             this.configurations = configurations;
           } else {
@@ -264,6 +264,10 @@ export default {
           console.log('query purchase rquestion cofiguration error', err);
           this.$message.error('查找单据类型配置数据失败, ' + err.message || '');
         });
+    },
+    setTableColumns(val) {
+      const selected = this.configurations;
+      this.$emit('updateTableColumn', selected);
     },
     go(item, row) {
       if (window?.parent) {

@@ -20,6 +20,7 @@ import PageListHeader from './components/render/widget/page-list-header';
 import PageDetailHeader from './components/render/widget/page-detail-header';
 import BusinessRuleConfig from './components/render/widget/render-rule-config';
 import AttachmentList from './components/render/attachmentList';
+import RfqAttachmentList from './components/render/rfqAttachmentList';
 import auth from './lib/auth';
 import SelectDialog from './components/render/selectDialog/selectDialog';
 import SelectDialogTable from './components/render/selectDialog/selectDialogTable';
@@ -88,6 +89,8 @@ export default {
     Vue.component('Fast2' + SelectPurchaseOrganization.name, SelectPurchaseOrganization);
 
     Vue.component(AttachmentList.name, AttachmentList);
+    Vue.component(RfqAttachmentList.name, RfqAttachmentList);
+
     Vue.prototype.$loadDic = loadDic;
     Vue.prototype.$getDicItem = getDicItem;
     Vue.prototype.$getDicNow = getDicNow;

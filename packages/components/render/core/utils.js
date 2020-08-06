@@ -8,10 +8,13 @@ export const getFilePath = () => {
   if (top.location.pathname) {
     projectPath = top.location.pathname.split('/')[1];
   }
+  if (top.location.hostname === 'localhost') {
+    return 'http://cs.51qqt.com/opt/nfsshare/';
+  }
   if (projectPath) {
     return '/' + projectPath + '/opt/nfsshare/';
   } else {
-    return 'http://cs.51qqt.com/opt/nfsshare/';
+    return '/opt/nfsshare/';
   }
 };
 

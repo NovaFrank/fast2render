@@ -237,6 +237,9 @@ export default {
       const newColumn = this.filterColum(selected.fieldColumns);
 
       const waitUpdateDic = [];
+      if (!newColumn && !newColumn.length) {
+        return;
+      }
       newColumn.map((item) => {
         this.replaceWithExtendDic(item);
         column.push(item);
@@ -250,7 +253,7 @@ export default {
 
     replaceWithExtendDic(item) {
       const extendlist = this.extendDic;
-      if (extendlist.length) {
+      if (extendlist && extendlist.length) {
         extendlist.map((ditem) => {
           if (item.prop === ditem.prop) {
             Object.assign(item, ditem);
@@ -418,6 +421,9 @@ export default {
     },
 
     filterColum(column) {
+      if (!column || column.length < 1) {
+        return;
+      }
       column.map((item) => {
         delete item.readonly;
         let label = item.label;

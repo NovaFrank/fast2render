@@ -416,6 +416,7 @@ export default {
       if (row.queryUuid) {
         data.queryUuid = row.queryUuid;
       }
+      data.taxRate = data.taxCode;
       Object.assign(data, row);
 
       if (typeof data.budgetPrice !== 'undefined' && typeof data.quantity !== 'undefined') {
@@ -426,6 +427,9 @@ export default {
             .done()
         );
         data.subtotalAmount = subtotalAmount;
+      }
+      if (typeof this.rowUpdateProcFn === 'function') {
+        this.rowUpdateProcFn(data);
       }
       done();
     },

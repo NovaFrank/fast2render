@@ -73,9 +73,7 @@ export default {
     },
     version: {
       type: String,
-      default: () => {
-        return 'attahcment-fiels_4_3';
-      }
+      default: 'attahcment-fiels_4_3'
     },
     domain: {
       type: String,

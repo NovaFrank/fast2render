@@ -14,12 +14,16 @@
       v-model="obj"
       :data="data"
       :option.sync="finalOption"
+      :page.sync="page"
       v-on="$listeners"
-      :page.sync="tableOption.page"
       @row-del="rowDelete"
       @row-update="rowUpdate"
     >
-      <template v-for="item in itemLinkList" :slot="item.prop" slot-scope="scope">
+      <template
+        v-for="item in itemLinkList"
+        :slot="item.prop"
+        slot-scope="scope"
+      >
         <el-tag
           v-if="readOnly || !scope.row.$cellEdit"
           :key="item.prop"
@@ -37,7 +41,11 @@
           @selectDone="doSelect(item.func, scope.row, $event, item.params)"
         />
       </template>
-      <template v-for="item in itemUploadList" :slot="item.prop" slot-scope="scope">
+      <template
+        v-for="item in itemUploadList"
+        :slot="item.prop"
+        slot-scope="scope"
+      >
         <span :key="item.prop">
           <span v-if="data.data[item.prop]">
             <img
@@ -45,8 +53,11 @@
               width="40px"
               class="rowImage"
               :src="data.data[item.prop]"
-            />
-            <el-link v-else :href="data.data[item.prop]">
+            >
+            <el-link
+              v-else
+              :href="data.data[item.prop]"
+            >
               下载
             </el-link>
           </span>
@@ -56,7 +67,7 @@
             @file-progress="onFileProgress"
             @file-error="onFileError"
             @click="setUploadField(item.prop)"
-        /></span>
+          /></span>
       </template>
     </avue-crud>
   </div>

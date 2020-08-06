@@ -2,31 +2,16 @@
   <div>
     <h4>
       <i class="el-icon-link" /> <span v-if="!readonly">附件</span><span v-else>上传附件</span>
-      <el-button
-        v-if="addBtn && !readonly"
-        size="mini"
-        @click="listRowAdd"
-      >
+      <el-button v-if="addBtn && !readonly" size="mini" @click="listRowAdd">
         新增行
       </el-button>
     </h4>
-    <fast2-theme-provider
-      :option="readonly ? readOption : option"
-      theme="block"
-      :version="version"
-    >
+    <fast2-theme-provider :option="readonly ? readOption : option" theme="block" :version="version">
       <template v-slot="component">
         <div v-if="component.option && component.option.column && component.option.column.length">
-          <avue-crud
-            :data="fileList"
-            :option="component.option"
-            @row-del="handleDelete"
-          >
+          <avue-crud :data="fileList" :option="component.option" @row-del="handleDelete">
             <template v-slot:fileAction="scope">
-              <div
-                v-if="!readonly && downloadClient"
-                @mouseover="setUploadRow(scope.row)"
-              >
+              <div v-if="!readonly && downloadClient" @mouseover="setUploadRow(scope.row)">
                 <fast2-upload
                   @file-success="fileSuccess"
                   @file-progress="onFileProgress"
@@ -45,14 +30,8 @@
                 </el-link>
               </div>
             </template>
-            <template
-              slot="annexType"
-              slot-scope="{ row }"
-            >
-              <span
-                v-if="row.isRequired === 'Y'"
-                class="annexType"
-              />{{ row.annexType }}
+            <template slot="annexType" slot-scope="{ row }">
+              <span v-if="row.isRequired === 'Y'" class="annexType" />{{ row.annexType }}
             </template>
           </avue-crud>
         </div>
@@ -63,9 +42,11 @@
 
 <script>
 import uploadApi from '../../lib/api/upload';
-import { formatDate } from '../../lib/utils'; // , renderSize
+import { formatDate, getApiPath } from '../../lib/utils'; // , renderSize
 import { validateNull } from '../../lib/validate';
 import { getUserInfo } from '../../lib/auth';
+
+const BaseUrl = getApiPath();
 
 export default {
   name: 'AttachmentList',
@@ -165,6 +146,7 @@ export default {
               label: '文件类型',
               prop: 'annexType',
               type: 'select',
+              dicUrl: `${BaseUrl}/ElsSearchDictionaryService/no-auth/dict/annexType`,
               span: 8,
               orderIndex: 0,
               order: 1,
@@ -178,6 +160,7 @@ export default {
       default: () => {
         return {
           menu: false,
+          detail: true,
           editBtn: false,
           addBtn: false,
           delBtn: false,
@@ -197,10 +180,8 @@ export default {
             {
               label: '文件类型',
               prop: 'annexType',
-              type: 'select',
+              type: 'input',
               span: 8,
-              dicName: 'annex-type',
-              datatype: 'remoteDic',
               orderIndex: 0,
               order: 1,
               slot: true

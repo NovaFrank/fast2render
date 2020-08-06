@@ -14,6 +14,7 @@
       v-model="obj"
       :data="data"
       :option.sync="finalOption"
+      :page.sync="page"
       v-on="$listeners"
       @row-del="rowDelete"
       @row-update="rowUpdate"
@@ -38,19 +39,19 @@
       </template>
       <template v-for="item in itemUploadList" :slot="item.prop" slot-scope="scope">
         <span :key="item.prop">
-          <span v-if="data.data[item.prop]">
+          <span v-if="scope.row[item.prop]">
             <img
               v-if="item.datatype === 'uploadImg'"
               width="40px"
               class="rowImage"
-              :src="data.data[item.prop]"
+              :src="scope.row[item.prop]"
             />
-            <el-link v-else :href="data.data[item.prop]">
+            <el-link v-else :href="scope.row[item.prop]">
               下载
             </el-link>
           </span>
           <fast2-upload
-            v-if="!readOnly && !!scope.row.$cellEdit"
+            v-if="isUploadAble(item)"
             @file-success="fileSuccess"
             @file-progress="onFileProgress"
             @file-error="onFileError"
@@ -118,6 +119,12 @@ export default {
         return { column: [] };
       }
     },
+    page: {
+      type: Object,
+      default: function() {
+        return {};
+      }
+    },
     data: {
       type: Array,
       default: function() {
@@ -174,6 +181,18 @@ export default {
 
     beforeAddRow() {
       console.log('Add Row Before');
+    },
+
+    isUploadAble(item) {
+      if (this.readOnly) {
+        return false;
+      }
+      if (item.datatype === 'uploadImg' || item.datatype === 'uploadFile') {
+        if (item.isReadOnly !== 'Y') {
+          return true;
+        }
+      }
+      return false;
     },
 
     checkAddedMaterials(list) {
@@ -300,6 +319,9 @@ export default {
       // 新增时, 不需要 申请单号
       const waitUpdateDic = [];
       const crud = this.$refs.crud;
+      if (!option || !option.column) {
+        return false;
+      }
       option.column.map((item) => {
         this.checkDataType(item, waitUpdateDic);
         this.checkSlot(item);
@@ -410,8 +432,10 @@ export default {
 
     saveSelected(row, list, params) {
       const item = list[0];
-      row[params[0]] = item[params[2]];
-      row[params[1]] = item[params[3]];
+      if (params) {
+        row[params[0]] = item[params[2]];
+        row[params[1]] = item[params[3]];
+      }
       const refs = this.getSelectRefs();
       refs.map((prop) => {
         const isItem = !!item[prop];
@@ -444,7 +468,7 @@ export default {
     },
 
     selectedRowMaterails(row, materialList) {
-      if (materialList.length > 0) {
+      if (materialList && materialList.length > 0) {
         const result = this.checkAddedMaterials(materialList);
         const refs = this.getMaterialsRefs();
         const addMaterialList = result.addList;

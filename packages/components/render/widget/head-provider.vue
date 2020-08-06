@@ -54,7 +54,7 @@ export default {
     },
     businessTypeProperty: {
       type: String,
-      default: function() {
+      default: function () {
         return ''; // 用于匹配实际的业务类型数据
       }
     },
@@ -64,37 +64,54 @@ export default {
     },
     data: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     },
+    // hideBusinssType: 是否禁用 业务类型选择切换，选择 true 时, 不显示 businessType 下拉列表
+    hideBusinssType: {
+      type: Boolean,
+      default: false
+    },
+    // hideForms: 是否禁止 form 表单，选择 true 时, 只显示 businessType 下拉列表， 其他表单不显示，也不生成隐藏的 form 表单元素
+    // 通常用于只需要控制下面的表格的展现这种场景
+    hideForms: {
+      type: Boolean,
+      default: false
+    },
+    // hideTable: 是否禁止 下面的表格，选择 true 时, 不显示 下面的表格, 只显示上面的表单
+    // 通常用于只需要填写或显示表单的场景
+    hideTable: {
+      type: Boolean,
+      default: false
+    },
     itemLinkList: {
       type: Array,
-      default: function() {
+      default: function () {
         return popList;
       }
     },
     listApi: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     },
     listParams: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     },
     option: {
       type: Object,
-      default: function() {
+      default: function () {
         return { column: [] };
       }
     },
     originColumn: {
       type: Object,
-      default: function() {
+      default: function () {
         return [];
       }
     },
@@ -102,9 +119,10 @@ export default {
       type: Boolean,
       default: false // 是否只读模式
     },
+
     rowPermission: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     },
@@ -162,11 +180,7 @@ export default {
     }
   },
   async created() {
-    if (this.readOnly) {
-      this.finalOption.detail = true;
-    } else {
-      this.finalOption.detail = false;
-    }
+    this.initOption();
 
     this.loadConfigruations();
   },
@@ -307,6 +321,19 @@ export default {
         window.parent.postMessage(event, '*');
       } else {
         window.location.href = item.url;
+      }
+    },
+
+    initOption() {
+      if (this.readOnly) {
+        this.finalOption.detail = true;
+      } else {
+        this.finalOption.detail = false;
+      }
+
+      if (this.hideBusinssType) {
+        const businessTypeItem = this.findObject(this.finalOption.column, 'businessType');
+        businessTypeItem.display = false;
       }
     },
 
@@ -476,8 +503,10 @@ export default {
     },
 
     setTableColumns(val) {
-      const selected = this.configurations[val];
-      this.$emit('updateType', selected);
+      if (!this.hideTable) {
+        const selected = this.configurations[val];
+        this.$emit('updateType', selected);
+      }
     },
 
     updateCoumn(businessTypeValue, selected, option = {}) {
@@ -493,13 +522,21 @@ export default {
 
       const waitUpdateDic = [];
 
-      newColumn.map((item) => {
-        columns.push(item);
+      if (this.hideForms) {
+        newColumn.map((item) => {
+          if (item.dicUrl) {
+            waitUpdateDic.push(item.prop);
+          }
+        });
+      } else {
+        newColumn.map((item) => {
+          columns.push(item);
 
-        if (item.dicUrl) {
-          waitUpdateDic.push(item.prop);
-        }
-      });
+          if (item.dicUrl) {
+            waitUpdateDic.push(item.prop);
+          }
+        });
+      }
 
       if (isChanged === true) {
         const formEmptyValue = getPropertiesInitValue(columns, 'prop', '');

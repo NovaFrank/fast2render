@@ -358,8 +358,23 @@ export default {
           result.dicMethod = item.dicMethod;
           result.valueFormat = 'timestamp';
           result.format = item.format;
-          if (item.saleEdit) this.quoteColumn.push(result);
+          if (item.saleEdit) {
+            this.quoteColumn.push(result);
+          }
           return result;
+        });
+        // 询价范围 数据字典
+        dataDicAPI('currency').then((res) => {
+          this.quoteColumn = this.quoteColumn.map((item) => {
+            if (item.prop === 'currency') {
+              return {
+                ...item,
+                type: 'select',
+                dicData: res.data
+              };
+            }
+            return item;
+          });
         });
         this.initColumns();
         current.forEach((item) => {

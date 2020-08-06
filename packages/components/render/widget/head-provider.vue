@@ -234,6 +234,7 @@ export default {
             if (
               itemProp.isDisabled ||
               itemProp.readonly ||
+              itemProp.isReadOnly ||
               item.ref ||
               item.disabled === 'disabled'
             ) {

@@ -129,14 +129,13 @@
         ></avue-radio>
       </template>
       <template slot-scope="scope" slot="menu">
-        <div
-          v-if="
+        <!-- v-if="
             (scope.row.noQuoted !== 'N' &&
               scope.row.itemStatus === '1' &&
               detailObj.quoteEndTime > new Date().getTime()) ||
             scope.row.itemStatus === '3'
-          "
-        >
+          " -->
+        <div>
           <el-button
             @click.stop="handleQuoteRow(scope)"
             class="el-button el-button--text el-button--small"
@@ -344,15 +343,20 @@ export default {
           this.inquiryListOption.option.menu = false;
         }
         this.quoteColumn = [];
+        console.log('this.configurations[value].tableColumns', this.configurations[value]);
         const current = this.configurations[value].tableColumns.map((item) => {
           let result = {};
           result.prop = item.prop;
-          result.label = item.fbk1 || item.label;
+          result.label = item.displayName || item.label;
           result.display = item.saleShow;
           result.hide = !item.saleShow;
           result.editDisabled = !item.saleEdit;
           result.span = item.span;
-          result.type = item.type;
+          if (item.datatype === 'date' || item.datatype === 'datetime') {
+            result.type = item.datatype;
+          } else {
+            result.type = '';
+          }
           result.dicData = item.dicData;
           result.dicUrl = item.dicUrl;
           result.dicMethod = item.dicMethod;
@@ -371,6 +375,7 @@ export default {
           }
           return result;
         });
+        console.log('quoteColumn', this.quoteColumn);
         this.initColumns();
         current.forEach((item) => {
           if (

@@ -455,8 +455,19 @@ export default {
       const item = list[0];
       const ref = params[0];
       const propMacth = this.propMatch;
-      row[params[0]] = item[params[2]];
-      row[params[1]] = item[params[3]];
+      // value 赋值
+      if (params[0] && params[2]) {
+        row[params[0]] = item[params[2]];
+      }
+      // 名字 赋值
+      if (params[1] && params[3]) {
+        row[params[1]] = item[params[3]];
+      }
+      // 别名 赋值
+      if (params[4] && params[3]) {
+        row[params[4]] = item[params[3]];
+      }
+
       if (propMacth && propMacth.length) {
         propMacth.map((matchitem) => {
           if (matchitem.ref === ref) {

@@ -21,7 +21,7 @@ const popList = [
     url: '/masterdata/material/#/masterdata/view/',
     component: 'fast2-select-purchase-group',
     func: 'saveSelected',
-    params: ['purchaseGroupCode', 'purchaseGroupDesc', 'orgId', 'orgDesc']
+    params: ['purchaseGroupCode', 'purchaseGroupDesc', 'orgId', 'orgDesc', 'purchaseGroupName']
   },
   {
     label: '采购组织',
@@ -29,7 +29,13 @@ const popList = [
     url: '/masterdata/material/#/masterdata/view/',
     component: 'fast2-select-purchase-organization',
     func: 'saveSelected',
-    params: ['purchaseOrganization', 'purchaseOrganizationDesc', 'orgId', 'orgDesc']
+    params: [
+      'purchaseOrganization',
+      'purchaseOrganizationDesc',
+      'orgId',
+      'orgDesc',
+      'purchaseOrganizationName'
+    ]
   },
   {
     label: '采购组织',
@@ -37,7 +43,13 @@ const popList = [
     url: '/masterdata/material/#/masterdata/view/',
     component: 'fast2-select-purchase-organization',
     func: 'saveSelected',
-    params: ['organizationCode', 'purchaseOrganizationDesc', 'orgId', 'orgDesc']
+    params: [
+      'organizationCode',
+      'purchaseOrganizationDesc',
+      'orgId',
+      'orgDesc',
+      'purchaseOrganizationName'
+    ]
   },
   {
     label: '期望供应商',
@@ -61,7 +73,7 @@ const popList = [
     url: '/masterdata/material/#/masterdata/view/',
     component: 'fast2-select-supplier',
     func: 'saveSelected',
-    params: ['toElsAccount', 'toElsAccountName', 'toElsAccount', 'toElsAccountName']
+    params: ['toElsAccount', 'toElsAccountName', 'toElsAccount', 'toElsAccountName', 'supplierName']
   },
   {
     label: '采购计划员',

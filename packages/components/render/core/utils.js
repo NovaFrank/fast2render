@@ -70,12 +70,6 @@ export const checkDataType = (item) => {
       break;
     default:
   }
-  this.itemLinkList.map((linkItem) => {
-    if (item.prop === linkItem.prop) {
-      item.formslot = true;
-      item.slot = true;
-    }
-  });
 
   if (!validateNull(item.bizDic)) {
     delete item.dicMethod;

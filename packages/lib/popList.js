@@ -121,7 +121,7 @@ const popList = [
     url: '/masterdata/material/#/masterdata/view/',
     component: 'fast2-select-factory',
     func: 'saveSelected',
-    params: ['purchaseFactory', 'factoryName', 'orgId', 'orgDesc']
+    params: ['purchaseFactory', 'purchaseFactoryName', 'orgId', 'orgDesc']
   },
   {
     label: '采购工厂',

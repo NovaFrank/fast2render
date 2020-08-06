@@ -1,6 +1,7 @@
 <template>
   <div class="head-list">
     <avue-form
+      v-if="isSetConfigForm"
       ref="form"
       v-model="formObj"
       :option.sync="finalOption"
@@ -8,9 +9,18 @@
       @row-del="rowDeleteMaterialList"
       @row-update="rowUpdateMaterialList"
     >
-      <template v-for="item in itemLinkList" :slot="item.prop">
-        <el-tag v-if="readOnly" :key="item.prop" @click.stop="go(item, data)">
-          {{ formObj[item.prop] }}
+      <template
+        v-for="item in itemLinkList"
+        :slot="item.prop"
+      >
+        <el-tag
+          v-if="readOnly"
+          :key="item.prop"
+          @click.stop="go(item, data)"
+        >
+          {{
+            formObj[item.prop]
+          }}
         </el-tag>
         <component
           :is="item.component"
@@ -27,7 +37,7 @@
   </div>
 </template>
 <script>
-import { getApiPath } from '../../../lib/utils.js';
+import { getApiPath, getPropertiesInitValue } from '../../../lib/utils.js';
 import { validateNull } from '../../../lib/validate';
 import { checkDataTypeItem, checkFixDic } from '../core/utils.js';
 import { getUserInfo } from '../../../lib/auth';
@@ -53,7 +63,7 @@ export default {
     },
     businessTypeProperty: {
       type: String,
-      default: function() {
+      default: function () {
         return ''; // 用于匹配实际的业务类型数据
       }
     },
@@ -63,37 +73,37 @@ export default {
     },
     data: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     },
     itemLinkList: {
       type: Array,
-      default: function() {
+      default: function () {
         return popList;
       }
     },
     listApi: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     },
     listParams: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     },
     option: {
       type: Object,
-      default: function() {
+      default: function () {
         return { column: [] };
       }
     },
     originColumn: {
       type: Object,
-      default: function() {
+      default: function () {
         return [];
       }
     },
@@ -103,7 +113,7 @@ export default {
     },
     rowPermission: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       }
     },
@@ -115,6 +125,8 @@ export default {
   data() {
     return {
       disabledProperties: {},
+      isSetConfigForm: true,
+
       finalOption: {
         menuBtn: false,
         submitBtn: false,
@@ -129,6 +141,7 @@ export default {
         ]
       },
       formObj: this.data,
+
       reload: false,
       formSlots: [],
       optionHash: '',
@@ -141,10 +154,13 @@ export default {
     };
   },
   watch: {
-    'formObj.businessType'(newVal) {
-      console.log(new Date().valueOf(), 'formObj.businessType', newVal);
+    'formObj.businessType'(newVal, oldVal) {
+      console.log(new Date().valueOf(), 'formObj.businessType', newVal, oldVal);
       if (newVal && newVal !== '') {
-        this.setHeadColumns(newVal);
+        this.setHeadColumns(newVal, {
+          isChanged: true
+        });
+
         this.setTableColumns(newVal);
       }
     },
@@ -157,14 +173,6 @@ export default {
   async created() {
     if (this.readOnly) {
       this.finalOption.detail = true;
-      /* 删除 readOnly 处理
-      this.finalOption.column[0] = {
-        label: '业务类型',
-        prop: 'businessTypeName',
-        type: 'input',
-        span: 6
-      };
-      */
     } else {
       this.finalOption.detail = false;
     }
@@ -181,22 +189,6 @@ export default {
           return false;
         }
       });
-    },
-    go(item, row) {
-      if (window?.parent) {
-        const router = {
-          name: item.label,
-          src: item.url + row[item.prop]
-        };
-        const event = {
-          name: 'openNewTag',
-          props: router
-        };
-        console.log('测试跳转事件', event);
-        window.parent.postMessage(event, '*');
-      } else {
-        window.location.href = item.url;
-      }
     },
 
     doSelect(func, row, event, params = []) {
@@ -265,6 +257,8 @@ export default {
             item.span = 6;
           }
         }
+
+        // console.log(item, originItem, '更新后的item');
       });
 
       return column;
@@ -303,6 +297,23 @@ export default {
       return refs;
     },
 
+    go(item, row) {
+      if (window?.parent) {
+        const router = {
+          name: item.label,
+          src: item.url + row[item.prop]
+        };
+        const event = {
+          name: 'openNewTag',
+          props: router
+        };
+        console.log('测试跳转事件', event);
+        window.parent.postMessage(event, '*');
+      } else {
+        window.location.href = item.url;
+      }
+    },
+
     loadConfigruations() {
       let fieldPermission = {};
       let tablePermission = {};
@@ -338,14 +349,14 @@ export default {
             const TypeData = {};
 
             for (const item of rows) {
-              const configJson = item.configJson || [];
+              const configJson = item.configJson || '{}';
 
               const json = JSON.parse(configJson);
 
-              const fields = json.field;
+              const fields = json.field || [];
               const fieldJson = json.fieldJson || {};
 
-              const table = json.table;
+              const table = json.table || [];
               const tableJson = json.tableJson || {};
 
               // 排除非法数据 $index
@@ -424,24 +435,16 @@ export default {
             this.formObj.businessType = defaultNumber;
           }
 
-          /* 删除 readOnly 处理
-          if (this.readOnly) {
-            console.log('view');
-          } else {
-            const form = this.$refs.form;
-
-            if (form && form.updateDic) {
-              form.updateDic('businessType', this.typeDicts);
-            }
-          }
-          */
           const form = this.$refs.form;
 
           if (form && form.updateDic) {
             form.updateDic('businessType', this.typeDicts);
           }
 
-          this.setHeadColumns(defaultNumber);
+          this.setHeadColumns(defaultNumber, {
+            isChanged: false
+          });
+
           this.setTableColumns(defaultNumber);
         })
         .catch((err) => {
@@ -466,13 +469,13 @@ export default {
       }
     },
 
-    setHeadColumns(val) {
-      const selected = this.configurations[val];
+    setHeadColumns(businessTypeValue, option = null) {
+      const selected = this.configurations[businessTypeValue];
 
       if (selected) {
         this.seleted = selected;
 
-        this.updateCoumn(selected);
+        this.updateCoumn(businessTypeValue, selected, option);
       }
     },
 
@@ -481,27 +484,55 @@ export default {
       this.$emit('updateType', selected);
     },
 
-    updateCoumn(selected) {
+    updateCoumn(businessTypeValue, selected, option = {}) {
+      this.isSetConfigForm = false;
+
+      const isChanged = option.isChanged;
+
       const columns = this.finalOption.column;
-      const form = this.$refs.form;
 
       columns.length = 1;
 
       const newColumn = this.filterColum(selected.fieldColumns);
+
       const waitUpdateDic = [];
 
       newColumn.map((item) => {
         columns.push(item);
+
         if (item.dicUrl) {
           waitUpdateDic.push(item.prop);
         }
       });
 
-      waitUpdateDic.map((prop) => {
-        if (form && form.updateDic) {
-          form.updateDic(prop);
-        }
+      if (isChanged === true) {
+        const formEmptyValue = getPropertiesInitValue(columns, 'prop', '');
+        formEmptyValue.businessType = businessTypeValue;
+
+        this.formObj = formEmptyValue;
+      }
+
+      this.$nextTick(() => {
+        this.isSetConfigForm = true;
+
+        this.$nextTick(() => {
+          this.updateFormDict(waitUpdateDic);
+        });
       });
+    },
+
+    updateFormDict(dicts) {
+      const form = this.$refs.form;
+
+      if (form && form.updateDic) {
+        form.updateDic('businessType', this.typeDicts);
+      }
+
+      if (form && form.updateDic) {
+        dicts.map((prop) => {
+          form.updateDic(prop);
+        });
+      }
     }
   }
 };
@@ -525,5 +556,11 @@ export default {
 }
 .head-list .el-form-item {
   display: flex;
+}
+
+.avue-form-box .avue-form .el-form-item__label {
+  font-weight: bold;
+  /* width: 100% !important; */
+  width: auto !important;
 }
 </style>

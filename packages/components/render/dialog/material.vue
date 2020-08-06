@@ -3,7 +3,7 @@
   <div class="materialBox">
     <el-input
       v-if="!multiple"
-      :data.sync="seleted"
+      v-model="seleted"
       size="small"
       :readonly="true"
       :disabled="isDisabled"

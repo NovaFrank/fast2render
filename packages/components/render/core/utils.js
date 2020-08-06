@@ -132,6 +132,7 @@ export const checkDataTypeItem = (originItem, item) => {
 
   if (originItem.datatype === 'popup' && !originItem.ref) {
     item.formslot = true;
+    item.width ='240px'
   }
 
   if (originItem.ref) {

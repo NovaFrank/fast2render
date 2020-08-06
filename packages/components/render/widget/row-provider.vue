@@ -19,13 +19,18 @@
       @row-update="rowUpdate"
     >
       <template v-for="item in itemLinkList" :slot="item.prop" slot-scope="scope">
+        <span v-if="!scope.row.$cellEdit && !scope.row.$cellEdit" :key="item.prop">
+          {{ scope.row[item.prop] }}</span
+        >
+
         <el-tag
-          v-if="readOnly && scope.row[item.prop]"
+          v-else-if="readOnly && scope.row[item.prop]"
           :key="item.prop"
           @click.stop="go(item, scope.row)"
         >
           {{ scope.row[item.prop] }}
         </el-tag>
+
         <component
           :is="item.component"
           v-else-if="scope.row.$cellEdit"
@@ -236,6 +241,7 @@ export default {
     },
 
     checkForm(callback, failback) {
+      console.log('方法内检查表单');
       this.$refs.form.validate((valid) => {
         if (valid) {
           callback && callback();
@@ -332,7 +338,7 @@ export default {
               item.rules = [];
             } else {
               item.cell = true;
-              item.width = '120px';
+              item.width = '200px';
               delete item.readonly;
             }
             item.display = true;

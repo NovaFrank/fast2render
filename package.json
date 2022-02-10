@@ -18,7 +18,7 @@
     "localforage": "^1.7.3",
     "lodash": "^4.17.15",
     "mathjs": "^7.1.0",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "nprogress": "^0.2.0",
     "sass-loader": "^8.0.2",
     "vue": "^2.6.11",
